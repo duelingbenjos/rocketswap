@@ -1,0 +1,29 @@
+<script lang="ts">
+</script>
+
+<div class="container"><button class="swap-button"> Swap </button></div>
+
+<style>
+  .swap-button {
+    width: 100%;
+    background-color: #1d2fba;
+    color: #fff;
+    height: 70px;
+    border-radius: 20px;
+    font-size: 25px;
+  }
+
+  .container {
+      padding: 20px;
+  }
+
+  button {
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+  }
+</style>
