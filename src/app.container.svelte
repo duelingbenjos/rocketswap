@@ -2,7 +2,9 @@
   import Header from './components/header.svelte'
   import SwapPanel from './components/swap-panel.svelte'
   import Footer from './components/footer.svelte'
-  // export let name: string;
+  import { WalletService } from './services/wallet.service'
+
+  const walletService = WalletService.getInstance()
 </script>
 
 <main>
@@ -17,7 +19,6 @@
 
 <style>
   main {
-    /* background-color: black; */
     height: 100%;
     width: 100%;
   }

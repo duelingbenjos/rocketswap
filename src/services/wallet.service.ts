@@ -13,11 +13,15 @@ export class WalletService {
 
   constructor() {
     const connectionRequest = {
-      appName: 'RocketSwap', // Your DAPPS's name
-      version: '1.0.0', // any version to start, increment later versions to update connection info
-      logo: 'images/logo.png', // or whatever the location of your logo
-      contractName: 'con_killer_app', // Will never change
-      networkType: 'testnet' // other option is 'mainnet'
+      appName: 'RocketSwap',
+      version: '1.0.0',
+      logo: 'images/logo.png',
+      contractName: 'con_amm',
+      currencySymbol: 'dTau', 
+      // domainName: "https://demoapp.lamden.io",
+      blockExplorer: 'https://testnet.lamden.io/api',
+      masternode: 'https://testnet-master-1.lamden.io',
+      networkType: 'testnet' // or 'mainnet'
     }
 
     this.lwc = new WalletController(connectionRequest)
