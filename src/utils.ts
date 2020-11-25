@@ -1,6 +1,5 @@
 import Lamden from 'lamden-js'
-import { config } from '../../../shared/config'
-import axios from 'axios'
+import { config } from './config'
 
 let API = new Lamden.Masternode_API({ hosts: [config.masternode] })
 
@@ -14,21 +13,19 @@ export const refreshTAUBalance = async (account) => {
 }
 
 export const checkForApproval = (account: string) => {
-  return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${config.master_contract}`)
+  return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${config.contractName}`)
     .then((res) => res.json())
     .then((json) => {
       return json.value as number
     })
-    .catch((e) => console.log(e.message))
+    .catch((e) => console.error(e.message))
 }
 
-export const formatAccountAddress = (account, lsize = 8, rsize = 4) => {
+export const formatAccountAddress = (account: string, lsize = 8, rsize = 4) => {
   return account.substring(0, lsize) + '...' + account.substring(account.length - rsize)
 }
 
 export const returnFloat = (value: any) => {
-  console.log(value)
-  console.log(typeof value)
   return { __fixed__: parseFloat(value).toFixed(9) }
 }
 

@@ -10,14 +10,10 @@ body {
 	margin: 0;
 	/* padding: 8px; */
 	box-sizing: border-box;
-	font-family: "Inter", sans-serif;
+  font-family: "Inter", sans-serif;
+  overflow: hidden;
 }
 
-h1 {
-	font-size: 30px;
-	font-family: "Inter";
-	font-weight: 800;
-}
 
 a {
 	color: rgb(0,100,200);
@@ -44,11 +40,18 @@ input, button, select, textarea {
 	margin: 0 0 0.5em 0;
 	box-sizing: border-box;
 	border: 1px solid #ccc;
-	border-radius: 2px;
+  border-radius: 2px;
 }
 
 input:disabled {
 	color: #ccc;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  background-color: none;
 }
 
 button {
@@ -68,7 +71,7 @@ button:not(:disabled):active {
 button:focus {
 	border-color: #666;
 }
-
+/* 
 @font-face {
   font-family: 'Inter';
   font-style:  normal;
@@ -220,7 +223,7 @@ button:focus {
   font-display: swap;
   src: url("./font/Inter-BlackItalic.woff2?v=3.11") format("woff2"),
        url("./font/Inter-BlackItalic.woff?v=3.11") format("woff");
-}
+} */
 
 /* -------------------------------------------------------
 Variable font.
@@ -231,7 +234,7 @@ Usage:
     html { font-family: 'Inter var', sans-serif; }
   }
 */
-@font-face {
+/* @font-face {
   font-family: 'Inter var';
   font-weight: 100 900;
   font-display: swap;
@@ -246,7 +249,7 @@ Usage:
   font-style: italic;
   font-named-instance: 'Italic';
   src: url("./font/Inter-italic.var.woff2?v=3.11") format("woff2");
-}
+} */
 
 
 /* --------------------------------------------------------------------------
@@ -262,7 +265,7 @@ explicitly, e.g.
   .italic { font-variation-settings: "slnt" 10deg }
 
 */
-@font-face {
+/* @font-face {
   font-family: 'Inter var experimental';
   font-weight: 100 900;
   font-display: swap;
@@ -284,4 +287,4 @@ explicitly, e.g.
   font-weight: 500;
   font-display: swap;
   src: url("./font/EB_Garamond_500_italic.ttf") format("truetype");
-}
+} */

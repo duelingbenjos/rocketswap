@@ -4,7 +4,7 @@
 <div class="container">
   <div class="amount">
     <div class="label">From</div>
-    <div class="amount-value">5.5132</div>
+    <div class="amount-value"><input /></div>
   </div>
   <div class="token-info">
     <div class="label">Balance: 50001</div>
@@ -16,11 +16,24 @@
 </div>
 
 <style>
-.max-button-cont {
-    margin-right: 20px;
-}
+  .amount-value {
+    width: 300px;
+  }
 
-  .token-select-button { 
+  .amount-value>input {
+    font-size: 40px;
+    color: #fff;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+    padding: 0px;
+  }
+
+
+  .max-button-cont {
+    margin-right: 20px;
+  }
+
+  .token-select-button {
     color: #fff;
     font-size: 30px;
   }
@@ -29,8 +42,14 @@
     background-color: #3131d98f;
     color: #fff;
     font-size: 20px;
-    padding: 6px 8px 8px 8px;
-    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    height: 30px;
+    width: 60px;
+    border-radius: 15px;
   }
 
   .container {

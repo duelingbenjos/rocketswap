@@ -23,6 +23,8 @@
     "@tsconfig/svelte": "^1.0.0"
   },
   "dependencies": {
+    "axios": "^0.21.0",
+    "lamden-js": "^1.21.0",
     "lamden_wallet_controller": "^0.6.1",
     "sirv-cli": "^1.0.0",
     "smelte": "^1.0.18"
