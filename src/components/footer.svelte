@@ -1,6 +1,6 @@
 <script type="ts">
   import { onDestroy } from 'svelte'
-  import type { WalletType, WalletInitType, WalletErrorType } from '../store'
+  import type { WalletType, WalletInitType, WalletErrorType } from '../types/wallet.types'
   import { walletStore } from '../store'
   import { config } from '../config'
   import { formatAccountAddress } from '../utils'
