@@ -1,6 +1,7 @@
 import WalletController from 'lamden_wallet_controller'
-import { WalletConnectedType, WalletErrorType, WalletInitType, walletStore, WalletType } from '../store'
 import { config } from '../config'
+import { walletStore } from '../store'
+import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
 import { refreshTAUBalance } from '../utils'
 
 export class WalletService {
