@@ -10,7 +10,6 @@
   $: wallet_info
 
   const wallet_unsub = walletStore.subscribe((wallet_update) => {
-    console.log(wallet_update)
     wallet_info = wallet_update
   })
 

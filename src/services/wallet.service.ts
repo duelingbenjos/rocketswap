@@ -22,7 +22,7 @@ export class WalletService {
     })
 
     //Connect to event emitters
-    this.lwc.events.on('newInfo', handleWalletInfo) // Wallet Info Events, including errors
+    this.lwc.events.on('newInfo', this.handleWalletInfo) // Wallet Info Events, including errors
     this.lwc.events.on('txStatus', handleTxResults) // Transaction Results
     this.lwc.walletIsInstalled().then((installed) => {
       if (!installed) {
@@ -31,6 +31,12 @@ export class WalletService {
       }
       this.lwc.sendConnection(config)
     })
+
+    setInterval(() => {
+      if (isWalletConnected(this.wallet_state) && this.wallet_state.wallets[0]) {
+        this.walletRefreshLoop(this.wallet_state.wallets[0])
+      }
+    }, 1000)
   }
 
   private setNotInstalledError() {
@@ -40,19 +46,28 @@ export class WalletService {
       }
     }, 3000)
   }
-}
 
-async function handleWalletInfo(wallet_update: WalletType) {
-  let wallet_info: WalletType
-  if (isWalletConnected(wallet_update)) {
-    wallet_info = wallet_update
-    if (wallet_info.wallets[0]) {
-      wallet_info.balance = await refreshTAUBalance(wallet_info)
+  private async handleWalletInfo(wallet_update: WalletType) {
+    let wallet_info: WalletType
+    if (isWalletConnected(wallet_update)) {
+      wallet_info = wallet_update
+      console.log(wallet_info)
+      if (wallet_info.wallets[0]) {
+        wallet_info.balance = await refreshTAUBalance(wallet_info.wallets[0])
+      }
+    } else {
+      wallet_info = wallet_update
     }
-  } else {
-    wallet_info = wallet_update
+    walletStore.set(wallet_info)
   }
-  walletStore.set(wallet_info)
+
+  private async walletRefreshLoop(vk: string) {
+    const balance = await refreshTAUBalance(vk)
+    if (isWalletConnected(this.wallet_state)) {
+      this.wallet_state.balance = balance
+      walletStore.set(this.wallet_state)
+    }
+  }
 }
 
 async function handleTxResults(txInfo) {
