@@ -9553,12 +9553,37 @@ var app = (function () {
     module.exports = index;
     });
 
-    let API = new lamden.Masternode_API({ hosts: [config.masternode] });
+    // {
+    // 	// infoContract: "con_pixel_frames",
+    // 	master_contract: "con_ac2c_master_05",
+    // 	currency_symbol: "dTau",
+    // 	// domainName: "https://demoapp.lamden.io",
+    // 	//blockExplorer: "http://localhost:1337",
+    // 	block_explorer: "https://testnet.lamden.io/api",
+    //     masternode: "https://testnet-master-1.lamden.io",
+    //     network: 'testnet'
+    // };
+
+    const connectionRequest$1 = {
+      appName: 'RocketSwap',
+      version: '1.0.0',
+      logo: 'images/logo.png',
+      contractName: 'con_amm',
+      currencySymbol: 'dTau',
+      // domainName: "https://demoapp.lamden.io",
+      blockExplorer: 'https://testnet.lamden.io/api',
+      masternode: 'https://testnet-master-1.lamden.io',
+      networkType: 'testnet' // or 'mainnet'
+    };
+
+    const config$1 = connectionRequest$1;
+
+    let API = new lamden.Masternode_API({ hosts: [config$1.masternode] });
     const refreshTAUBalance = async (account) => {
         const res = await API.getCurrencyBalance(account);
         return res;
     };
-    const formatAccountAddress = (account, lsize = 8, rsize = 4) => {
+    const formatAccountAddress = (account, lsize = 4, rsize = 4) => {
         return account.substring(0, lsize) + '...' + account.substring(account.length - rsize);
     };
 
@@ -9814,19 +9839,19 @@ var app = (function () {
 
     class WalletService {
         constructor() {
-            this.lwc = new walletController(config);
+            this.lwc = new walletController(config$1);
             walletStore.subscribe((update) => {
                 this.wallet_state = update;
             });
-            //Connect to event emitters
-            this.lwc.events.on('newInfo', this.handleWalletInfo); // Wallet Info Events, including errors
-            this.lwc.events.on('txStatus', handleTxResults); // Transaction Results
+            // events
+            this.lwc.events.on('newInfo', this.handleWalletInfo);
+            this.lwc.events.on('txStatus', handleTxResults);
             this.lwc.walletIsInstalled().then((installed) => {
                 if (!installed) {
                     console.info('wallet not installed');
                     this.setNotInstalledError();
                 }
-                this.lwc.sendConnection(config);
+                this.lwc.sendConnection(config$1);
             });
             setInterval(() => {
                 if (isWalletConnected(this.wallet_state) && this.wallet_state.wallets[0]) {

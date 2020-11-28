@@ -1,5 +1,5 @@
 import Lamden from 'lamden-js'
-import { config } from './config'
+import { config } from '../../../shared/config'
 
 let API = new Lamden.Masternode_API({ hosts: [config.masternode] })
 
@@ -21,7 +21,7 @@ export const checkForApproval = (account: string) => {
     .catch((e) => console.error(e.message))
 }
 
-export const formatAccountAddress = (account: string, lsize = 8, rsize = 4) => {
+export const formatAccountAddress = (account: string, lsize = 4, rsize = 4) => {
   return account.substring(0, lsize) + '...' + account.substring(account.length - rsize)
 }
 

@@ -1,19 +1,20 @@
 import WalletController from 'lamden_wallet_controller'
-import { config } from '../config'
+import { config } from '../../../../shared/config'
 import { walletStore } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
 import { refreshTAUBalance } from '../utils'
 
 export class WalletService {
+  private static _instance: WalletService
+  private wallet_state: WalletType
+  private lwc: WalletController
+
   public static getInstance() {
     if (!WalletService._instance) {
       WalletService._instance = new WalletService()
     }
     return WalletService._instance
   }
-  private static _instance: WalletService
-  private wallet_state: WalletType
-  lwc: WalletController
 
   constructor() {
     this.lwc = new WalletController(config)
@@ -21,9 +22,9 @@ export class WalletService {
       this.wallet_state = update
     })
 
-    //Connect to event emitters
-    this.lwc.events.on('newInfo', this.handleWalletInfo) // Wallet Info Events, including errors
-    this.lwc.events.on('txStatus', handleTxResults) // Transaction Results
+    // events
+    this.lwc.events.on('newInfo', this.handleWalletInfo)
+    this.lwc.events.on('txStatus', handleTxResults)
     this.lwc.walletIsInstalled().then((installed) => {
       if (!installed) {
         console.info('wallet not installed')
@@ -49,6 +50,7 @@ export class WalletService {
 
   private async handleWalletInfo(wallet_update: WalletType) {
     let wallet_info: WalletType
+
     if (isWalletConnected(wallet_update)) {
       wallet_info = wallet_update
       console.log(wallet_info)
