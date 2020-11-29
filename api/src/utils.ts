@@ -1,4 +1,4 @@
-import { IKvp } from "../../../shared/types";
+import { IKvp } from "./types/misc.types";
 
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;

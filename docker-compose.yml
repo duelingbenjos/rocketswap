@@ -1,0 +1,54 @@
+version: '3'
+services:
+
+  # rocketswap-mariadb:
+  #   image: bitnami/mariadb:10.4
+  #   container_name: rocketswap-mariadb
+  #   environment:
+  #     - MARIADB_DATABASE=rocketswap
+  #     - MARIADB_ROOT_USER=root
+  #     - MARIADB_ROOT_PASSWORD=root
+  #   networks:
+  #     - rocketswap-network
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 8081:8081    
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    container_name: rocketswap-mongo
+    networks: 
+      - rocketswap-network
+
+
+  ui:
+    build: ./ui
+    image: rocketswap-client-ui
+    container_name: rocketswap-ui
+    networks: 
+      - rocketswap-network
+
+  api:
+    build: ./api
+    image: rocketswap-api
+    restart: always
+    container_name: rocketswap-api
+    environment:
+      - ROCKETSWAP_DB_HOST=rocketswap-mongo
+      - ROCKETSWAP_DB_PORT=8081
+      - ROCKETSWAP_DB_USERNAME=root
+      - ROCKETSWAP_DB_PASSWORD=example
+      - ROCKETSWAP_DB_FIRST_RUN=${ROCKETSWAP_DB_FIRST_RUN}
+    networks:
+      - rocketswap-network
+    ports:
+      - 3001:3001
+
+volumes:
+  rocketswap-volume:
+networks:
+  rocketswap-network:
+    driver: bridge

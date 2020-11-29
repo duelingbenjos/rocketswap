@@ -6,7 +6,7 @@ import {
 	BaseEntity,
 	PrimaryGeneratedColumn
 } from "typeorm";
-import { IKvp } from "../../../../shared/types";
+import { IKvp } from "../types/misc.types";
 
 @Entity()
 export class TokenEntity extends BaseEntity {

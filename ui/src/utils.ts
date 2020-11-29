@@ -1,5 +1,5 @@
 import Lamden from 'lamden-js'
-import { config } from '../../../shared/config'
+import { config } from './config'
 
 let API = new Lamden.Masternode_API({ hosts: [config.masternode] })
 

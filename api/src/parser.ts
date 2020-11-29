@@ -1,5 +1,5 @@
-import { BlockDTO, IGameStateUpdate } from "../../../shared/types";
-import { config } from "../../../shared/config";
+import { BlockDTO, IGameStateUpdate } from "./types/misc.types";
+import { config } from "./config";
 import { prepareAddToken, processAddToken } from "./entities/token.entity";
 import {
 	getContractCode,

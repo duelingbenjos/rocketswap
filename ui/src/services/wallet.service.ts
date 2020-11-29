@@ -1,5 +1,5 @@
 import WalletController from 'lamden_wallet_controller'
-import { config } from '../../../../shared/config'
+import { config } from '../config'
 import { walletStore } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
 import { refreshTAUBalance } from '../utils'

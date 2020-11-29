@@ -11,7 +11,6 @@ import {
 import { Server, Socket } from "socket.io";
 import blockgrabber from "./blockgrabber";
 import { parseBlock } from "./parser";
-// import { BalanceDTO, IGameStateUpdate, JoinTableDTO } from '../../shared/types'
 import { BalanceEntity } from "./entities/balance.entity";
 import { getNewJoiner, isLamdenKey } from "./utils";
 

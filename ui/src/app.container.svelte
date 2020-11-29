@@ -3,13 +3,18 @@
   import SwapPanel from './components/swap-panel.svelte'
   import Footer from './components/footer.svelte'
   import { WalletService } from './services/wallet.service'
+  import { ApiService } from './api.service'
+  import { onMount } from 'svelte'
 
-  const walletService = WalletService.getInstance()
+  onMount(() => {
+    WalletService.getInstance()
+    ApiService.getInstance()
+  })
 </script>
 
 <main>
   <div class="bg-solid">
-    <div class="bg-gradient flex">
+    <div class="bg-gradient flex"> 
       <Header />
       <SwapPanel />
       <Footer />
