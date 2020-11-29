@@ -1,24 +1,21 @@
-import { Module } from '@nestjs/common'
-import { BalanceEntity } from './entities/balance.entity'
-import { GameEntity } from './entities/game.entity'
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
-import { AppGateway } from './app.gateway'
-import { HandEntity } from './entities/hand.entity'
-import { TreasuryEntity } from './entities/treasury.entity'
-import { TableLogEntity } from './entities/table-log.entity'
+import { Module } from "@nestjs/common";
+import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { AppGateway } from "./app.gateway";
+import { TokenEntity } from "./entities/token.entity";
+import { AppController } from './app.controller';
 
 const db_options: TypeOrmModuleOptions = {
-	name: 'default',
-	type: 'sqlite',
-	database: 'database.sqlite',
-	entities: [],
+	name: "default",
+	type: "sqlite",
+	database: "database.sqlite",
+	entities: [TokenEntity],
 	synchronize: true,
 	autoLoadEntities: true
-}
+};
 
 @Module({
 	imports: [TypeOrmModule.forRoot(db_options)],
-	controllers: [],
+	controllers: [AppController],
 	providers: [AppGateway]
 })
 export class AppModule {}

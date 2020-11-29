@@ -1,109 +1,43 @@
-import {
-	createGame,
-	getPreviousTableState,
-	processDealHand,
-	processJoinTable,
-	processDealDecisionCard
-} from "./entities/game.entity";
-import {
-	DealDecisionCardDTO,
-	DealHandDTO,
-	GameDTO,
-	ICard,
-	IDealtCards,
-	IGameStateUpdate
-} from "../../../shared/types";
+import { BlockDTO, IGameStateUpdate } from "../../../shared/types";
 import { config } from "../../../shared/config";
+import { prepareAddToken, processAddToken } from "./entities/token.entity";
 import {
-	AddFundsDTO,
-	processAddFunds,
-	processApproval
-} from "./entities/balance.entity";
-import { updateGameTreasury } from "./entities/treasury.entity";
+	getContractCode,
+	getContractName,
+	getVal,
+	validateTokenContract
+} from "./utils";
 
-/**
- *
- * Contracts must have the following fields to be added to the watch list:
- * 'def transfer', 'def balance_of', 'def allowance' 'def approve', 'def transfer_from', 'token_name = Variable', 'token_symbol = Variable'
- */
+export async function parseBlock(block: BlockDTO, handleStateUpdate: Function) {
+	const { state, fn, contract: contract_name } = block;
 
-function validateTokenContract(contract: string) {
-	console.log(contract)
-	const required_fields = [
-		"def transfer",
-		"def balance_of",
-		"def allowance",
-		"def approve",
-		"def transfer_from",
-		"token_name = Variable",
-		"token_symbol = Variable"
-	];
-	required_fields.forEach((field) => {
-		if (!contract.includes(field)) {
-			console.log(`field missing: ${field}`);
-			return false;
+	if (contract_name === "submission" && fn === "submit_contract") {
+		console.log(block);
+		// Check if the submitted contract is a token, if it's a token, add it to the DB
+		const contract_str = getContractCode(state);
+		const token_is_valid = validateTokenContract(contract_str);
+		console.log(token_is_valid);
+		if (token_is_valid) {
+			const add_token_dto = prepareAddToken(state);
+			console.log(add_token_dto);
+			await processAddToken(add_token_dto);
 		}
-	});
-	return true;
-}
-
-export async function blockParser(
-	block: BlockDTO,
-	handleStateUpdate: Function
-) {
-	const { state, fn, contract } = block;
-	// console.log(block)
-
-	if (contract === "submission" && fn === "submit_contract") {
-		const contract_str = state[3];
-
-		// const approved_contract: string = parts[2]
-		console.log("contract processed");
-		const validated = validateTokenContract(contract_str.value);
-		console.log(`contract validated: ${validated}`);
-		// if (approved_contract === config.contractName) {
-		// const wallet_address = parts[1]
-		// const approved_amount = state[0].value.__fixed__
-		// const wallet_balance = state[1].value.__fixed__
-
-		// await processApproval(
-		// 	wallet_address,
-		// 	approved_amount,
-		// 	wallet_balance
-		// )
-		// }
-	} else if (contract !== config.contractName) {
-		console.log(`ignoring block with contract : ${contract}`);
+		return;
+	} else if (contract_name !== config.contractName) {
+		// Exit from function if we're not interested in updates to this contract
+		console.log(`ignoring block with contract : ${contract_name}`);
 		return;
 	}
 
-	console.log(`adding AC2C block to DB ...`);
+	console.log(`adding block to DB ...`);
 	console.log(state);
 	console.log(fn);
 	let state_update: IGameStateUpdate, game_id: string;
 	switch (fn) {
 		case "createGame":
-			// const create_game_dto = prepareCreateGameData(state)
-			// await createGame(create_game_dto)
-
-			// state_update = {
-			// 	action: 'createGame',
-			// 	state: create_game_dto,
-			// 	time: Date.now().toString()
-			// }
-			// handleStateUpdate(state_update)
 			break;
 		default:
 	}
-}
-
-function getKey(state: IKvp[], idx_1: number, idx_2: number) {
-	return state[idx_1].key.split(":")[idx_2];
-}
-
-function getVal(state: IKvp[], idx: number) {
-	const val = state[idx].value;
-	return val.__fixed__ ? parseFloat(val.__fixed__) : val;
 }
 
 // function prepareDealHandData(state: IKvp[]): DealHandDTO {
@@ -113,30 +47,6 @@ function getVal(state: IKvp[], idx: number) {
 // 	const card_2: ICard = getVal(state, 2)
 // 	return { game_id, pot_size, card_1, card_2 }
 // }
-// ;[
-// 	{
-// 		key: 'con_ac2c_master_05.S:games:94948929285602138:dealt_cards',
-// 		value: { card_1: [Object], card_2: [Object], decision_card: [Object] }
-// 	},
-// 	{
-// 		key:
-// 			'con_ac2c_master_05.Balances:96dae3b6213fb80eac7c6f4fa0fd26f34022741c56773107b20199cb43f5ed62',
-// 		value: { __fixed__: '48.000000000' }
-// 	},
-// 	{
-// 		key: 'con_ac2c_master_05.S:games:94948929285602138:pot_size',
-// 		value: { __fixed__: '2.0' }
-// 	},
-// 	{
-// 		key: 'con_ac2c_master_05.S:games:94948929285602138:round_index',
-// 		value: 1
-// 	},
-// 	{
-// 		key:
-// 			'currency.balances:96dae3b6213fb80eac7c6f4fa0fd26f34022741c56773107b20199cb43f5ed62',
-// 		value: { __fixed__: '32.300000000' }
-// 	}
-// ]
 
 // function prepareDealDecisionCard(state: IKvp[]): DealDecisionCardDTO {
 // 	const game_id: string = getKey(state, 0, 2)
@@ -200,14 +110,3 @@ function getVal(state: IKvp[], idx: number) {
 
 // 	return create_game_dto
 // }
-
-export class BlockDTO {
-	state: IKvp[];
-	fn: string;
-	contract: string;
-}
-
-export interface IKvp {
-	key: string;
-	value: any;
-}

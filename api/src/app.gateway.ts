@@ -10,12 +10,10 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import blockgrabber from "./blockgrabber";
-import { blockParser } from "./parser";
-import { GameEntity } from "./entities/game.entity";
+import { parseBlock } from "./parser";
 // import { BalanceDTO, IGameStateUpdate, JoinTableDTO } from '../../shared/types'
 import { BalanceEntity } from "./entities/balance.entity";
 import { getNewJoiner, isLamdenKey } from "./utils";
-import { addToTableLog } from "./entities/table-log.entity";
 
 @WebSocketGateway()
 export class AppGateway
@@ -33,7 +31,7 @@ export class AppGateway
 
 	handleNewBlock = (block: any) => {
 		const { state, fn, contract } = block;
-		blockParser(
+		parseBlock(
 			{
 				state,
 				fn,
@@ -54,23 +52,23 @@ export class AppGateway
 		}
 	};
 
-	@SubscribeMessage("joinRoom")
-	async handleJoinRoom(socket: Socket, room: string) {
-		socket.join(room);
-		socket.emit("joinedRoom", room);
-		if (room === "global") {
-			const games = await GameEntity.find();
-			socket.emit("games_list", games);
-		} else if (isLamdenKey(room)) {
-			/** This is the users' channel, which they join on connection to the websocket. */
-			const balance = await BalanceEntity.findOne(room);
-			if (balance) {
-				socket.emit("balance_update", balance);
-			}
-		} else {
-			socket.emit("hi", "hi");
-		}
-	}
+	// @SubscribeMessage("joinRoom")
+	// async handleJoinRoom(socket: Socket, room: string) {
+	// 	socket.join(room);
+	// 	socket.emit("joinedRoom", room);
+	// 	if (room === "global") {
+	// 		const games = await GameEntity.find();
+	// 		socket.emit("games_list", games);
+	// 	} else if (isLamdenKey(room)) {
+	// 		/** This is the users' channel, which they join on connection to the websocket. */
+	// 		const balance = await BalanceEntity.findOne(room);
+	// 		if (balance) {
+	// 			socket.emit("balance_update", balance);
+	// 		}
+	// 	} else {
+	// 		socket.emit("hi", "hi");
+	// 	}
+	// }
 
 	@SubscribeMessage("leaveRoom")
 	handleLeaveRoom(client: Socket, room: string) {
@@ -78,10 +76,10 @@ export class AppGateway
 		client.emit("leftRoom", room);
 	}
 
-	async updateTableLog(game_id: string, message: string) {
-		this.wss.to(game_id).emit("status_message", message);
-		return await addToTableLog(game_id, message);
-	}
+	// async updateTableLog(game_id: string, message: string) {
+	// 	this.wss.to(game_id).emit("status_message", message);
+	// 	return await addToTableLog(game_id, message);
+	// }
 
 	handleDisconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
