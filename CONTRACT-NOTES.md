@@ -1,6 +1,6 @@
 # Submit Contract basetoken.py args
 ```
-{"s_name": "shekkels", "s_symbol":"SHK", "vk":"af3bd7c81d224dfb794b6f6bf096b596ed11325a3ca0c79f5a66256acb6ac3c6","vk_amount":100000000}
+{"s_name": "HRRRMMCOIN", "s_symbol":"HRM", "vk":"f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def","vk_amount":100000000}
 ```
 
 # API / Frontend Integration Notes

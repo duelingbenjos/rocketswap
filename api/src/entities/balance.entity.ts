@@ -1,59 +1,32 @@
-import { Entity, Column, PrimaryColumn, BaseEntity } from 'typeorm'
+import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 
 @Entity()
 export class BalanceEntity extends BaseEntity {
 	@PrimaryColumn()
-	id: string
+	vk: string;
 
-	@Column({ nullable: true })
-	game_balance: number
-
-	@Column({ nullable: true })
-	wallet_balance: number
-
-	@Column({ nullable: true })
-	amount_approved: number
+	@Column({ type: "simple-json" })
+	balances: UserBalancesType;
 }
 
-export const processAddFunds = async (add_funds_dto: AddFundsDTO) => {
-	const {
-		address,
-		game_balance,
-		wallet_balance,
-		amount_approved
-	} = add_funds_dto
-	let entity: BalanceEntity
-	entity = await BalanceEntity.findOne(address)
-	if (!entity) entity = new BalanceEntity()
-
-	entity.id = address
-	entity.game_balance = game_balance
-	entity.wallet_balance = wallet_balance
-	entity.amount_approved = amount_approved
-
-	await entity.save()
-	return entity
+export async function updateUserBalance(balance_dto: BalanceType) {
+	const { contract_name, amount, vk } = balance_dto;
+	let entity = await BalanceEntity.findOne(vk);
+	if (!entity) {
+		entity = new BalanceEntity();
+		entity.vk = vk;
+		entity.balances = {};
+	}
+	entity.balances[contract_name] = amount;
+	return await entity.save();
 }
 
-export const processApproval = async (
-	address: string,
-	approved: number,
-	wallet_balance: number
-) => {
-	let entity: BalanceEntity
-	entity = await BalanceEntity.findOne(address)
-	if (!entity) entity = new BalanceEntity()
+export type UserBalancesType = {
+	[key: string]: number;
+};
 
-	entity.id = address
-	entity.amount_approved = approved
-	entity.wallet_balance = wallet_balance
-
-	await entity.save()
-}
-
-export class AddFundsDTO {
-	address: string
-	game_balance: number
-	wallet_balance: number
-	amount_approved: number
-}
+export type BalanceType = {
+	contract_name: string;
+	vk: string;
+	amount: number;
+};

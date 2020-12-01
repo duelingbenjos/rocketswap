@@ -10,17 +10,18 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import blockgrabber from "./blockgrabber";
-import { parseBlock } from "./parser";
 import { BalanceEntity } from "./entities/balance.entity";
 import { getNewJoiner, isLamdenKey } from "./utils";
+import { ParserProvider } from "./parser.provider";
 
 @WebSocketGateway()
 export class AppGateway
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger("AppGateway");
+
 	@WebSocketServer() wss: Server;
 
-	constructor() {
+	constructor(private readonly parser: ParserProvider) {
 		blockgrabber(this.handleNewBlock);
 	}
 
@@ -30,7 +31,7 @@ export class AppGateway
 
 	handleNewBlock = (block: any) => {
 		const { state, fn, contract } = block;
-		parseBlock(
+		this.parser.parseBlock(
 			{
 				state,
 				fn,
