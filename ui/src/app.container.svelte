@@ -5,21 +5,34 @@
   import { WalletService } from './services/wallet.service'
   import { ApiService } from './api.service'
   import { onMount } from 'svelte'
+  import Dimmer from './components/dimmer.svelte'
+  import TokenSelect from './components/token-select.svelte'
+  import { show_token_select_store } from './store'
+
+  let show_token_select: boolean
 
   onMount(() => {
     WalletService.getInstance()
     ApiService.getInstance()
+    show_token_select_store.subscribe((update) => {
+      show_token_select = update
+    })
   })
 </script>
 
 <main>
   <div class="bg-solid">
-    <div class="bg-gradient flex"> 
+    <div class="bg-gradient flex">
       <Header />
       <SwapPanel />
       <Footer />
     </div>
   </div>
+  {#if show_token_select}
+    <Dimmer>
+      <TokenSelect />
+    </Dimmer>
+  {/if}
 </main>
 
 <style>

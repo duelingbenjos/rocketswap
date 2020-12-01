@@ -8,25 +8,21 @@ export class ApiService {
   }
   private static instance: ApiService
   constructor() {
-    this.getTokenList()
+    this.startTimer()
+    getTokenList()
   }
 
-  private getTokenList() {
+  private startTimer() {
     setInterval(async () => {
-      try {
-        const token_list = await getTokenList()
-        console.log(token_list)
-        token_list_store.set(token_list)
-      } catch (err) {
-        console.log(err)
-      }
-    },10000)
+      await getTokenList()
+    }, 1000)
   }
 }
 
 export async function getTokenList() {
   try {
     const res = await axios.get('http://localhost:3001/api/token_list')
+    token_list_store.set(res.data)
     return res.data
   } catch (err) {
     console.error(err)

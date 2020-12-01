@@ -36,6 +36,8 @@ export class WalletService {
     setInterval(() => {
       if (isWalletConnected(this.wallet_state) && this.wallet_state.wallets[0]) {
         this.walletRefreshLoop(this.wallet_state.wallets[0])
+      } else if (isWalletError(this.wallet_state)) {
+        
       }
     }, 1000)
   }
@@ -63,9 +65,9 @@ export class WalletService {
     walletStore.set(wallet_info)
   }
 
-  private async walletRefreshLoop(vk: string) {
-    const balance = await refreshTAUBalance(vk)
+  private async walletRefreshLoop(vk?: string) {
     if (isWalletConnected(this.wallet_state)) {
+      const balance = await refreshTAUBalance(vk)
       this.wallet_state.balance = balance
       walletStore.set(this.wallet_state)
     }

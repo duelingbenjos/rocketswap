@@ -1,4 +1,8 @@
 <script lang="ts">
+  import {show_token_select_store} from '../store'
+  function openTokenSelect() {
+    show_token_select_store.set(true)
+  }
 </script>
 
 <div class="container">
@@ -10,7 +14,7 @@
     <div class="label">Balance: 50001</div>
     <div class="token-controls">
       <div class="max-button-cont"><button class="max-button">MAX</button></div>
-      <div class="token-button-cont"><button class="token-select-button">TAU <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button></div>
+      <div class="token-button-cont"><button class="token-select-button" on:click={openTokenSelect}>TAU <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button></div>
     </div>
   </div>
 </div>

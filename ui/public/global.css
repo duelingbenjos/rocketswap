@@ -71,6 +71,18 @@ button:not(:disabled):active {
 button:focus {
 	border-color: #666;
 }
+
+.nostyle,
+.nostyle[type='submit'],
+.nostyle[type='reset'] {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
 /* 
 @font-face {
   font-family: 'Inter';
