@@ -2,7 +2,7 @@
   import { fade } from 'svelte/transition'
 </script>
 
-<div class="dimmer-wrapper" transition:fade>
+<div class="dimmer-wrapper" transition:fade={{ duration: 300 }}>
   <slot />
 </div>
 

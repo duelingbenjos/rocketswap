@@ -23,7 +23,7 @@
   }
 </script>
 
-<div class="token-select-wrapper" transition:fly={{ y: 50, duration: 500 }}>
+<div class="token-select-wrapper" transition:fly={{ y: 50, duration: 300 }}>
   <div class="heading">
     <span> Select a token </span>
     <button

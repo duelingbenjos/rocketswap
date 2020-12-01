@@ -12096,7 +12096,7 @@ var app = (function () {
     			transition_in(default_slot, local);
 
     			add_render_callback(() => {
-    				if (!div_transition) div_transition = create_bidirectional_transition(div, fade, {}, true);
+    				if (!div_transition) div_transition = create_bidirectional_transition(div, fade, { duration: 300 }, true);
     				div_transition.run(1);
     			});
 
@@ -12104,7 +12104,7 @@ var app = (function () {
     		},
     		o: function outro(local) {
     			transition_out(default_slot, local);
-    			if (!div_transition) div_transition = create_bidirectional_transition(div, fade, {}, false);
+    			if (!div_transition) div_transition = create_bidirectional_transition(div, fade, { duration: 300 }, false);
     			div_transition.run(0);
     			current = false;
     		},
@@ -12344,14 +12344,14 @@ var app = (function () {
     			if (current) return;
 
     			add_render_callback(() => {
-    				if (!div4_transition) div4_transition = create_bidirectional_transition(div4, fly, { y: 50, duration: 500 }, true);
+    				if (!div4_transition) div4_transition = create_bidirectional_transition(div4, fly, { y: 50, duration: 300 }, true);
     				div4_transition.run(1);
     			});
 
     			current = true;
     		},
     		o: function outro(local) {
-    			if (!div4_transition) div4_transition = create_bidirectional_transition(div4, fly, { y: 50, duration: 500 }, false);
+    			if (!div4_transition) div4_transition = create_bidirectional_transition(div4, fly, { y: 50, duration: 300 }, false);
     			div4_transition.run(0);
     			current = false;
     		},
