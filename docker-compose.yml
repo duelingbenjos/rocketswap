@@ -30,6 +30,8 @@ services:
     container_name: rocketswap-ui
     networks: 
       - rocketswap-network
+    ports:
+      - 5000:5000
 
   api:
     build: ./api
