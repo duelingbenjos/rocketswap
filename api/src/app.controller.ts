@@ -15,10 +15,12 @@ export class AppController {
 		}
 	}
 
-	@Get("balances:vk")
-	async getBalances(@Param() vk): Promise<any> {
+	@Get("balances/:vk")
+	async getBalances(@Param() params): Promise<any> {
 		try {
-			let balances: any = await BalanceEntity.findOne(vk);
+			console.log(params.vk)
+			let balances: any = await BalanceEntity.findOne(params.vk);
+			console.log(balances)
 			if (!balances) balances = [];
 			return balances;
 		} catch (err) {
