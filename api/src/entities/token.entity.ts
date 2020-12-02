@@ -19,7 +19,7 @@ export class TokenEntity extends BaseEntity {
 	@Column()
 	token_name: string;
 
-	@Column()
+	@Column({ nullable: true })
 	base_supply: number;
 
 	@Column()
@@ -49,9 +49,9 @@ export const processAddToken = async (add_token_dto: AddTokenDto) => {
 	if (!token_symbol || !token_name || !base_supply || !contract_name)
 		throw new Error("Field missing.");
 
-	const exists = await TokenEntity.findOne(contract_name)
-	if (exists) return
-	const entity = new TokenEntity()
+	const exists = await TokenEntity.findOne(contract_name);
+	if (exists) return;
+	const entity = new TokenEntity();
 	entity.base_supply = base_supply;
 	entity.token_symbol = token_symbol;
 	entity.token_name = token_name;

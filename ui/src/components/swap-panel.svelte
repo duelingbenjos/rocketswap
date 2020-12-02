@@ -47,4 +47,12 @@
     cursor: pointer;
     outline: inherit;
   }
+
+  @media screen and (max-width: 800px) {
+  .container {
+    height: 100%;
+    width: 100%;
+    border-radius: 0px;
+  }
+}
 </style>
