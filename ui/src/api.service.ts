@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { token_list_store, wallet_store } from './store'
+import { getBaseUrl } from './utils'
 
 export class ApiService {
   public static getInstance() {
@@ -7,34 +8,36 @@ export class ApiService {
     return ApiService.instance
   }
   private static instance: ApiService
+  private base_url = getBaseUrl(document.location.href)
   constructor() {
+    console.log(this.base_url)
     this.startTimer()
-    getTokenList()
+    this.getTokenList()
   }
 
   private startTimer() {
     setInterval(async () => {
-      await getTokenList()
+      await this.getTokenList()
     }, 1000)
   }
-}
 
-export async function getTokenList() {
-  try {
-    const token_list = await axios.get('http://localhost:3001/api/token_list')
-    token_list_store.set(token_list.data)
-    return token_list.data
-  } catch (err) {
-    console.error(err)
-    throw err
+  async getTokenList() {
+    try {
+      const token_list = await axios.get(`${this.base_url}:3001/api/token_list`)
+      token_list_store.set(token_list.data)
+      return token_list.data
+    } catch (err) {
+      console.error(err)
+      throw err
+    }
   }
-}
 
-export async function getTokenBalances(vk: string) {
-  try {
-    const res = await axios.get(`http://localhost:3001/api/balances/${vk}'`)
-    return res.data.balances
-  } catch (err) {
-    console.error(err)
+  async getTokenBalances(vk: string) {
+    try {
+      const res = await axios.get(`${this.base_url}:3001/api/balances/${vk}'`)
+      return res.data.balances
+    } catch (err) {
+      console.error(err)
+    }
   }
 }

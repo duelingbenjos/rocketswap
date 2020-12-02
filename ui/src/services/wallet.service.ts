@@ -1,5 +1,5 @@
 import WalletController from 'lamden_wallet_controller'
-import { getTokenBalances } from '../api.service'
+import { ApiService } from '../api.service'
 import { config } from '../config'
 import { wallet_store } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
@@ -9,6 +9,7 @@ export class WalletService {
   private static _instance: WalletService
   private wallet_state: WalletType
   private lwc: WalletController
+  private apiService = ApiService.getInstance()
 
   public static getInstance() {
     if (!WalletService._instance) {
@@ -50,7 +51,7 @@ export class WalletService {
     }, 3000)
   }
 
-  private async handleWalletInfo(wallet_update: WalletType) {
+  private handleWalletInfo = async (wallet_update: WalletType) => {
     let wallet_info: WalletType
 
     if (isWalletConnected(wallet_update)) {
@@ -58,7 +59,7 @@ export class WalletService {
       console.log(wallet_info)
       if (wallet_info.wallets[0]) {
         const vk = wallet_info.wallets[0]
-        const balances = await updateBalances(vk)
+        const balances = await this.updateBalances(vk)
         wallet_info.balance = balances[1]
         wallet_info.tokens = balances[0]
       }
@@ -70,18 +71,18 @@ export class WalletService {
 
   private async walletRefreshLoop(vk?: string) {
     if (isWalletConnected(this.wallet_state)) {
-      const res = await updateBalances(vk)
+      const res = await this.updateBalances(vk)
       this.wallet_state.tokens = res[0]
       this.wallet_state.balance = res[1]
       wallet_store.set(this.wallet_state)
       // console.log(this.wallet_state)
     }
   }
-}
 
-async function updateBalances(vk: string) {
-  const proms = [getTokenBalances(vk), refreshTAUBalance(vk)]
-  return await Promise.all(proms)
+  private async updateBalances(vk: string) {
+    const proms = [this.apiService.getTokenBalances(vk), refreshTAUBalance(vk)]
+    return await Promise.all(proms)
+  }
 }
 
 async function handleTxResults(txInfo) {

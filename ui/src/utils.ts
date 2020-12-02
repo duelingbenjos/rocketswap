@@ -12,6 +12,11 @@ export const refreshTAUBalance = async (account) => {
   return res
 }
 
+export const getBaseUrl = (url): string => {
+  const parts = url.split(':')
+  return `${parts[0]}:${parts[1]}`
+}
+
 export const checkForApproval = (account: string) => {
   return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${config.contractName}`)
     .then((res) => res.json())
