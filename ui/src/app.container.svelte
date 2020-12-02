@@ -45,14 +45,14 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    background-image: linear-gradient(rgba(233, 43, 247, 0.433), rgba(0, 0, 0, 0));
+    background-image: linear-gradient(rgba(233, 43, 247, 0.6), rgba(0, 0, 0, 0));
   }
 
   .bg-solid {
     position: absolute;
     height: 100%;
     width: 100%;
-    background-color: #1a127e;
+    background-color: #120E4A;
   }
 
   .flex {
