@@ -14,6 +14,29 @@
   let token_list: TokenListType[] = []
 
   onMount(() => {
+    createSubscriptions()
+  })
+
+  onDestroy(() => {
+    token_list_unsub()
+    wallet_unsub()
+    swap_panel_unsub()
+  })
+
+  function closeModal() {
+    show_token_select_store.set(false)
+  }
+
+  function selectToken(token: TokenListType) {
+    const swap_panel = $swap_panel_store
+    swap_panel.slot_b.selected_token = token
+    swap_panel_store.set(swap_panel)
+    setTimeout(() => {
+      closeModal()
+    }, 150)
+  }
+
+  function createSubscriptions() {
     wallet_unsub = wallet_store.subscribe((update) => {
       wallet = update
     })
@@ -35,29 +58,10 @@
         console.log(token_list)
       } else {
         token_list = update.sort((a, b) => {
-            return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
-          })
+          return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
+        })
       }
     })
-  })
-
-  onDestroy(() => {
-    token_list_unsub()
-    wallet_unsub()
-    swap_panel_unsub()
-  })
-
-  function closeModal() {
-    show_token_select_store.set(false)
-  }
-
-  function selectToken(token: TokenListType) {
-    const swap_panel = $swap_panel_store
-    swap_panel.slot_b.selected_token = token
-    swap_panel_store.set(swap_panel)
-    setTimeout(() => {
-      closeModal()
-    }, 150)
   }
 </script>
 
@@ -69,28 +73,44 @@
   <div class="token-scroll">
     <div class="token-list">
       {#each token_list as token}
+      <div class="select-wrapper">
+        <div class="select-icon">
+          {#if token.contract_name === selected_contract}<img src="assets/images/token-select-arrow.svg" alt="" />{/if}
+        </div>
         <button on:click={() => selectToken(token)} class="nostyle button-item">
-          <div class="select-icon">
-            {#if token.contract_name === selected_contract}<img src="assets/images/token-select-arrow.svg" alt="" />{/if}
-          </div>
           <div class="token-container"><span class="token-symbol"> {token.token_symbol.toUpperCase()} </span> <span class="token-amount number"> {token.balance || 0} </span></div>
         </button>
+      </div>
       {/each}
     </div>
   </div>
 </div>
 
 <style>
+
+  .select-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+  }
   .select-icon {
     width: 10px;
-    margin-right: 10px;
-    /* height: 10px; */
+    margin: 0px 15px 10px 0px;
   }
   .button-item {
     width: 100%;
     display: flex;
+    padding: 10px 10px 10px -30px;
     justify-content: space-around;
+    /* padding: 10px; */
     align-items: center;
+  }
+
+  .button-item:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    /* outline: 1px  rgba(255,255,255,0.2) double */
+    /* border-radius: 30px; */
   }
   .token-symbol {
     font-weight: 600;
