@@ -1,5 +1,4 @@
 import { Controller, Get, HttpException, Param } from "@nestjs/common";
-import { HttpErrorByCode } from "@nestjs/common/utils/http-error-by-code.util";
 import { BalanceEntity } from "./entities/balance.entity";
 import { TokenEntity } from "./entities/token.entity";
 
@@ -19,7 +18,11 @@ export class AppController {
 	async getBalances(@Param() params): Promise<any> {
 		try {
 			let balances: any = await BalanceEntity.findOne(params.vk);
-			if (!balances) balances = [];
+			if (!balances)
+				balances = {
+					vk: params.vk,
+					balances: {}
+				};
 			return balances;
 		} catch (err) {
 			console.error(err);

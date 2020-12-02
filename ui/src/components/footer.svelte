@@ -1,7 +1,7 @@
 <script type="ts">
   import { onDestroy } from 'svelte'
   import type { WalletType, WalletInitType, WalletErrorType } from '../types/wallet.types'
-  import { walletStore } from '../store'
+  import { wallet_store } from '../store'
   import { config } from '../config'
   import { formatAccountAddress } from '../utils'
   import { isWalletConnected, isWalletError, isWalletInit } from '../services/wallet.service'
@@ -9,7 +9,7 @@
   let wallet_info: WalletType
   $: wallet_info
 
-  const wallet_unsub = walletStore.subscribe((wallet_update) => {
+  const wallet_unsub = wallet_store.subscribe((wallet_update) => {
     wallet_info = wallet_update
   })
 

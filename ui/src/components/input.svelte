@@ -1,37 +1,104 @@
 <script lang="ts">
-  import {show_token_select_store} from '../store'
+  import { onDestroy, onMount } from 'svelte'
+  import { config } from '../config'
+  import type { SlotType, SwapPanelType } from '../store'
+  import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
+  import type { WalletConnectedType } from '../types/wallet.types'
+  export let position: 'from' | 'to'
+
+  let selected: SlotType
+  let balance, role, slot_position, selected_token, wallet
+
+  $: wallet_balance = wallet.balance
+
+  let swap_unsub = swap_panel_store.subscribe((update) => {
+    const { slot_a, slot_b } = update
+    selected = slot_a.position === position ? slot_a : slot_b
+    balance = selected.selected_token?.balance
+    role = selected.role
+    slot_position = selected.position
+    selected_token = selected.selected_token
+  })
+
+  let wallet_unsub = wallet_store.subscribe((update) => {
+    wallet = update
+  })
+
+  onDestroy(() => {
+    swap_unsub()
+    wallet_unsub()
+  })
+
   function openTokenSelect() {
     show_token_select_store.set(true)
   }
+
+  // function getBalance(selected: SlotType) {
+  //   console.log(selected)
+  //   if (role === 'currency') {
+  //     console.log('currency')
+  //     console.log("WALLET" ,wallet)
+  //     return (wallet as WalletConnectedType).balance
+  //   }
+  //   if (selected.selected_token) {
+  //     return selected.selected_token.balance ? selected.selected_token.balance : 0
+  //   }
+  // }
 </script>
 
 <div class="container">
   <div class="amount">
-    <div class="label">From</div>
+    <div class="label">{position === 'from' ? 'From' : 'To'}</div>
     <div class="amount-value"><input /></div>
   </div>
   <div class="token-info">
-    <div class="label">Balance: 50001</div>
+    {#if role === 'currency'}
+      <div class="label">{wallet_balance ? `Balance: ${wallet_balance}` : ''}</div>
+    {:else}
+      <div class="label">{selected_token ? `Balance: ${selected_token.balance || 0}` : ''}</div>
+    {/if}
     <div class="token-controls">
-      <div class="max-button-cont"><button class="max-button">MAX</button></div>
-      <div class="token-button-cont"><button class="token-select-button" on:click={openTokenSelect}>TAU <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button></div>
+      <div class="max-button-cont">
+        {#if position === 'from'}<button class="max-button">MAX</button>{/if}
+      </div>
+      <div class="token-button-cont">
+        {#if role === 'token'}
+          {#if selected.selected_token}
+            <button class="token-select-button" on:click={openTokenSelect}>{selected.selected_token.token_symbol.toUpperCase()}
+              <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button>
+          {:else}
+            <button on:click={openTokenSelect} class="no-token-button"> Select Token <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /> </button>
+          {/if}
+        {:else}
+          <button style="pointer-events: none" class="token-select-button" on:click={openTokenSelect}>{config.currencySymbol}
+            <img style="opacity: 0" src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button>
+        {/if}
+      </div>
     </div>
   </div>
 </div>
 
 <style>
+  .no-token-button {
+    background-color: #3131d98f;
+    font-size: 1.2em;
+    color: #fff;
+    padding: 7px;
+    border-radius: 15px;
+    height: 40px;
+    width: 155px;
+  }
   .amount-value {
-    width: 300px;
+    width: 250px;
   }
 
-  .amount-value>input {
+  .amount-value > input {
     font-size: 40px;
     color: #fff;
     background-color: rgba(0, 0, 0, 0);
     border: none;
     padding: 0px;
   }
-
 
   .max-button-cont {
     margin-right: 20px;
@@ -40,6 +107,7 @@
   .token-select-button {
     color: #fff;
     font-size: 30px;
+    /* width: 110px; */
   }
 
   .max-button {
@@ -78,15 +146,18 @@
   .token-info {
     padding: 5px 15px 0px 0px;
     display: flex;
+    width:230px;
     flex-direction: column;
     justify-content: space-between;
+    justify-items: end;
     text-align: right;
   }
 
   .token-controls {
     display: flex;
-    justify-content: space-around;
-    align-items: center;
+    justify-content: space-between;
+    /* align-items: end; */
+    /* width: 200px; */
   }
 
   .label {
@@ -99,9 +170,7 @@
     color: #fff;
   }
 
-  button,
-  input[type='submit'],
-  input[type='reset'] {
+  button {
     background: none;
     color: inherit;
     border: none;

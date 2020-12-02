@@ -9,7 +9,7 @@
     background-color: #1d2fba;
     color: #fff;
     height: 70px;
-    border-radius: 20px;
+    border-radius: 30px;
     font-size: 25px;
   }
 

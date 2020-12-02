@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 
 @Entity()
-export class BalanceEntity extends BaseEntity {
+export class BalanceEntity extends BaseEntity implements IBalance {
 	@PrimaryColumn()
 	vk: string;
 
@@ -30,3 +30,8 @@ export type BalanceType = {
 	vk: string;
 	amount: number;
 };
+
+export interface IBalance {
+	vk: string;
+	balances?: UserBalancesType;
+}

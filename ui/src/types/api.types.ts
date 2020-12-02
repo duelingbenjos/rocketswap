@@ -3,5 +3,6 @@ export type TokenListType = {
     token_name: string
     token_symbol: string
     contract_name: string
-    base_supply: number
+    base_supply?: number
+    balance?: number
 }

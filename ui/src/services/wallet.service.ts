@@ -1,6 +1,7 @@
 import WalletController from 'lamden_wallet_controller'
+import { getTokenBalances } from '../api.service'
 import { config } from '../config'
-import { walletStore } from '../store'
+import { wallet_store } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
 import { refreshTAUBalance } from '../utils'
 
@@ -18,7 +19,7 @@ export class WalletService {
 
   constructor() {
     this.lwc = new WalletController(config)
-    walletStore.subscribe((update) => {
+    wallet_store.subscribe((update) => {
       this.wallet_state = update
     })
 
@@ -37,7 +38,6 @@ export class WalletService {
       if (isWalletConnected(this.wallet_state) && this.wallet_state.wallets[0]) {
         this.walletRefreshLoop(this.wallet_state.wallets[0])
       } else if (isWalletError(this.wallet_state)) {
-        
       }
     }, 1000)
   }
@@ -45,7 +45,7 @@ export class WalletService {
   private setNotInstalledError() {
     setTimeout(() => {
       if (!isWalletConnected(this.wallet_state)) {
-        walletStore.set({ errors: ['not_installed'] })
+        wallet_store.set({ errors: ['not_installed'] })
       }
     }, 3000)
   }
@@ -57,21 +57,31 @@ export class WalletService {
       wallet_info = wallet_update
       console.log(wallet_info)
       if (wallet_info.wallets[0]) {
-        wallet_info.balance = await refreshTAUBalance(wallet_info.wallets[0])
+        const vk = wallet_info.wallets[0]
+        const balances = await updateBalances(vk)
+        wallet_info.balance = balances[1]
+        wallet_info.tokens = balances[0]
       }
     } else {
       wallet_info = wallet_update
     }
-    walletStore.set(wallet_info)
+    wallet_store.set(wallet_info)
   }
 
   private async walletRefreshLoop(vk?: string) {
     if (isWalletConnected(this.wallet_state)) {
-      const balance = await refreshTAUBalance(vk)
-      this.wallet_state.balance = balance
-      walletStore.set(this.wallet_state)
+      const res = await updateBalances(vk)
+      this.wallet_state.tokens = res[0]
+      this.wallet_state.balance = res[1]
+      wallet_store.set(this.wallet_state)
+      // console.log(this.wallet_state)
     }
   }
+}
+
+async function updateBalances(vk: string) {
+  const proms = [getTokenBalances(vk), refreshTAUBalance(vk)]
+  return await Promise.all(proms)
 }
 
 async function handleTxResults(txInfo) {
