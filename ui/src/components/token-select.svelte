@@ -73,21 +73,23 @@
   <div class="token-scroll">
     <div class="token-list">
       {#each token_list as token}
-      <div class="select-wrapper">
-        <div class="select-icon">
-          {#if token.contract_name === selected_contract}<img src="assets/images/token-select-arrow.svg" alt="" />{/if}
+        <div class="select-wrapper">
+          <div class="select-icon">
+            {#if token.contract_name === selected_contract}<img src="assets/images/token-select-arrow.svg" alt="" />{/if}
+          </div>
+          <button on:click={() => selectToken(token)} class="nostyle button-item">
+            <div class="token-container">
+              <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
+              <span class="token-amount number"> {token.balance || 0} </span>
+            </div>
+          </button>
         </div>
-        <button on:click={() => selectToken(token)} class="nostyle button-item">
-          <div class="token-container"><span class="token-symbol"> {token.token_symbol.toUpperCase()} </span> <span class="token-amount number"> {token.balance || 0} </span></div>
-        </button>
-      </div>
       {/each}
     </div>
   </div>
 </div>
 
 <style>
-
   .select-wrapper {
     display: flex;
     justify-content: space-between;

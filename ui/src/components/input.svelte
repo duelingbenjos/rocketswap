@@ -1,23 +1,25 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte'
+  import { beforeUpdate, onDestroy, onMount } from 'svelte'
   import { config } from '../config'
+import { isWalletConnected } from '../services/wallet.service';
   import type { SlotType, SwapPanelType } from '../store'
   import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
   import type { WalletConnectedType } from '../types/wallet.types'
   export let position: 'from' | 'to'
 
   let selected: SlotType
-  let balance, role, slot_position, selected_token, wallet
+  let balance, role, slot_position, selected_token, wallet, input_amount, hide_max
 
   $: wallet_balance = wallet.balance
 
   let swap_unsub = swap_panel_store.subscribe((update) => {
-    const { slot_a, slot_b } = update
-    selected = slot_a.position === position ? slot_a : slot_b
+    selected = getPosition(update)
+
     balance = selected.selected_token?.balance
     role = selected.role
     slot_position = selected.position
     selected_token = selected.selected_token
+    input_amount = selected.input_amount
   })
 
   let wallet_unsub = wallet_store.subscribe((update) => {
@@ -29,37 +31,50 @@
     wallet_unsub()
   })
 
+  beforeUpdate(()=>{
+    hide_max = false
+  })
+
+  function getPosition(update: SwapPanelType) {
+    const { slot_a, slot_b } = update
+    return slot_a.position === position ? slot_a : slot_b
+  }
+
   function openTokenSelect() {
     show_token_select_store.set(true)
   }
 
-  // function getBalance(selected: SlotType) {
-  //   console.log(selected)
-  //   if (role === 'currency') {
-  //     console.log('currency')
-  //     console.log("WALLET" ,wallet)
-  //     return (wallet as WalletConnectedType).balance
-  //   }
-  //   if (selected.selected_token) {
-  //     return selected.selected_token.balance ? selected.selected_token.balance : 0
-  //   }
-  // }
+  function handleInputChange(e) {
+    hide_max = false
+    console.log(e.target.value)
+  }
+
+  function handleMaxInput() {
+    const slots = $swap_panel_store
+    hide_max = true
+    if (role === 'currency') {
+      slots.slot_a.input_amount = wallet_balance || 0
+    } else if (role === 'token') {
+      slots.slot_a.input_amount = selected_token.balance || 0
+    }
+    swap_panel_store.set(slots)
+  }
 </script>
 
 <div class="container">
   <div class="amount">
     <div class="label">{position === 'from' ? 'From' : 'To'}</div>
-    <div class="amount-value number"><input /></div>
+    <div class="amount-value number"><input placeholder="0" value={input_amount} on:input={handleInputChange} /></div>
   </div>
   <div class="token-info">
     {#if role === 'currency'}
-      <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance}` : ''}</span></div>
+      <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance || 0}` : ''}</span></div>
     {:else}
-      <div class="label">{selected_token ? `Balance: ` : ''}<span class="number">{selected_token ? `${selected_token.balance}` : ''}</span></div>
+      <div class="label">{selected_token ? `Balance: ` : ''}<span class="number">{selected_token ? `${selected_token.balance || 0}` : ''}</span></div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
-        {#if position === 'from'}<button class="max-button">MAX</button>{/if}
+        {#if position === 'from' && isWalletConnected(wallet) && !hide_max && (role === 'token' ? selected_token : true)}<button on:click={handleMaxInput} class="max-button">MAX</button>{/if}
       </div>
       <div class="token-button-cont">
         {#if role === 'token'}
@@ -168,6 +183,10 @@
   .amount-value {
     font-size: 40px;
     color: #fff;
+  }
+
+  input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
   }
 
   button {

@@ -10,11 +10,13 @@ export const show_token_select_store: Writable<boolean> = writable(false)
 export const swap_panel_store: Writable<SwapPanelType> = writable({
   slot_a: {
     position: 'from',
-    role: 'currency'
+    role: 'currency',
+    input_amount: null
   },
   slot_b: {
     position: 'to',
-    role: 'token'
+    role: 'token',
+    input_amount: null
   }
 })
 
@@ -27,4 +29,5 @@ export type SlotType = {
   position: 'from' | 'to'
   selected_token?: TokenListType
   role: 'currency' | 'token'
+  input_amount: number
 }
