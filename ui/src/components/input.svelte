@@ -49,13 +49,13 @@
 <div class="container">
   <div class="amount">
     <div class="label">{position === 'from' ? 'From' : 'To'}</div>
-    <div class="amount-value"><input /></div>
+    <div class="amount-value number"><input /></div>
   </div>
   <div class="token-info">
     {#if role === 'currency'}
-      <div class="label">{wallet_balance ? `Balance: ${wallet_balance}` : ''}</div>
+      <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance}` : ''}</span></div>
     {:else}
-      <div class="label">{selected_token ? `Balance: ${selected_token.balance || 0}` : ''}</div>
+      <div class="label">{selected_token ? `Balance: ` : ''}<span class="number">{selected_token ? `${selected_token.balance}` : ''}</span></div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
@@ -146,7 +146,7 @@
   .token-info {
     padding: 5px 15px 0px 0px;
     display: flex;
-    width:230px;
+    width: 230px;
     flex-direction: column;
     justify-content: space-between;
     justify-items: end;

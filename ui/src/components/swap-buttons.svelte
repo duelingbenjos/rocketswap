@@ -10,7 +10,8 @@
     color: #fff;
     height: 70px;
     border-radius: 30px;
-    font-size: 25px;
+    font-size: 2em;
+    letter-spacing: 0.1em;
   }
 
   .container {

@@ -34,7 +34,9 @@
         ]
         console.log(token_list)
       } else {
-        token_list = update
+        token_list = update.sort((a, b) => {
+            return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
+          })
       }
     })
   })
@@ -42,6 +44,7 @@
   onDestroy(() => {
     token_list_unsub()
     wallet_unsub()
+    swap_panel_unsub()
   })
 
   function closeModal() {
@@ -70,7 +73,7 @@
           <div class="select-icon">
             {#if token.contract_name === selected_contract}<img src="assets/images/token-select-arrow.svg" alt="" />{/if}
           </div>
-          <div class="token-container"><span class="token-symbol"> {token.token_symbol.toUpperCase()} </span> <span class="token-amount"> 0 </span></div>
+          <div class="token-container"><span class="token-symbol"> {token.token_symbol.toUpperCase()} </span> <span class="token-amount number"> {token.balance || 0} </span></div>
         </button>
       {/each}
     </div>
@@ -80,6 +83,7 @@
 <style>
   .select-icon {
     width: 10px;
+    margin-right: 10px;
     /* height: 10px; */
   }
   .button-item {
@@ -95,7 +99,7 @@
     font-weight: 400;
   }
   .token-container {
-    width: 85%;
+    width: 95%;
     display: flex;
     padding: 10px;
     justify-content: space-between;
