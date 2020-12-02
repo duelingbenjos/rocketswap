@@ -8,7 +8,7 @@ import { isWalletConnected } from '../services/wallet.service';
   export let position: 'from' | 'to'
 
   let selected: SlotType
-  let balance, role, slot_position, selected_token, wallet, input_amount, hide_max
+  let balance, role, slot_position, selected_token, wallet, input_amount
 
   $: wallet_balance = wallet.balance
 
@@ -31,9 +31,6 @@ import { isWalletConnected } from '../services/wallet.service';
     wallet_unsub()
   })
 
-  beforeUpdate(()=>{
-    hide_max = false
-  })
 
   function getPosition(update: SwapPanelType) {
     const { slot_a, slot_b } = update
@@ -45,13 +42,11 @@ import { isWalletConnected } from '../services/wallet.service';
   }
 
   function handleInputChange(e) {
-    hide_max = false
     console.log(e.target.value)
   }
 
   function handleMaxInput() {
     const slots = $swap_panel_store
-    hide_max = true
     if (role === 'currency') {
       slots.slot_a.input_amount = wallet_balance || 0
     } else if (role === 'token') {
@@ -64,7 +59,7 @@ import { isWalletConnected } from '../services/wallet.service';
 <div class="container">
   <div class="amount">
     <div class="label">{position === 'from' ? 'From' : 'To'}</div>
-    <div class="amount-value number"><input placeholder="0" value={input_amount} on:input={handleInputChange} /></div>
+    <div class="amount-value number"><input placeholder="0.0" value={input_amount} on:input={handleInputChange} /></div>
   </div>
   <div class="token-info">
     {#if role === 'currency'}
@@ -74,7 +69,7 @@ import { isWalletConnected } from '../services/wallet.service';
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
-        {#if position === 'from' && isWalletConnected(wallet) && !hide_max && (role === 'token' ? selected_token : true)}<button on:click={handleMaxInput} class="max-button">MAX</button>{/if}
+        {#if position === 'from' && isWalletConnected(wallet) && (role === 'token' ? selected_token : true)}<button on:click={handleMaxInput} class="max-button">MAX</button>{/if}
       </div>
       <div class="token-button-cont">
         {#if role === 'token'}
