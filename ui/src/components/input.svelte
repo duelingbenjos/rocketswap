@@ -20,6 +20,7 @@ import { isWalletConnected } from '../services/wallet.service';
     slot_position = selected.position
     selected_token = selected.selected_token
     input_amount = selected.input_amount
+    console.log(selected_token)
   })
 
   let wallet_unsub = wallet_store.subscribe((update) => {
@@ -65,7 +66,7 @@ import { isWalletConnected } from '../services/wallet.service';
     {#if role === 'currency'}
       <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance || 0}` : ''}</span></div>
     {:else}
-      <div class="label">{selected_token ? `Balance: ` : ''}<span class="number">{selected_token ? `${selected_token.balance || 0}` : ''}</span></div>
+      <div class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token && wallet_balance ? `${selected_token.balance || 0}` : ''}</span></div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
