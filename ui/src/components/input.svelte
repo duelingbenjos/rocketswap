@@ -39,6 +39,7 @@ import { isWalletConnected } from '../services/wallet.service';
   }
 
   function openTokenSelect() {
+    console.log('open token select')
     show_token_select_store.set(true)
   }
 
@@ -51,7 +52,7 @@ import { isWalletConnected } from '../services/wallet.service';
     if (role === 'currency') {
       slots.slot_a.input_amount = wallet_balance || 0
     } else if (role === 'token') {
-      slots.slot_a.input_amount = selected_token.balance || 0
+      slots.slot_b.input_amount = selected_token.balance || 0
     }
     swap_panel_store.set(slots)
   }
