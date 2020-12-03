@@ -30,12 +30,12 @@
 
   .container {
     background-color: #875dd6;
-    width: 556px;
-    border-radius: 60px;
+    width: 444px;
+    border-radius: 32px;
     box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-    padding-top: 50px;
+    padding-top: 15px;
   }
 
   button {

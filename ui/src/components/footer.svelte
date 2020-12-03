@@ -43,23 +43,23 @@
 <style>
   .wallet-button {
     display: flex;
-    padding-right: 20px;
-    padding-top: 15px;
+    padding-right: 16px;
+    padding-top: 12px;
     height: 100%;
   }
   .balance {
-    padding-left: 20px;
+    padding-left: 16px;
   }
 
   .wallet-message {
-    padding-right: 20px;
+    padding-right: 16px;
   }
   .address {
-    margin: 3px 3px 0px 40px;
-    padding: 5px 20px 5px 20px;
-    height: 43px;
+    margin: 3px 3px 0px 32px;
+    padding: 5px 16px 4px 16px;
+    height: 33px;
     background-color: #333862;
-    border-radius: 13px;
+    border-radius: 10px;
     align-self: stretch;
     display: flex;
     align-items: center;
@@ -67,19 +67,19 @@
   }
   .wallet-info {
     background-color: #ffffff55;
-    margin-left: 60px;
-    border-radius: 15px;
-    font-size: 30px;
+    margin-left: 48px;
+    border-radius: 12px;
+    font-size: 1.6em;
     color: #ffffffa5;
-    height: 60px;
-    padding-left: 15px;
+    height: 48px;
+    padding-left: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .container {
     background-color: #333862;
-    height: 90px;
+    height: 72px;
     width: 100%;
     display: flex;
     align-items: center;

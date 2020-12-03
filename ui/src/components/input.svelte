@@ -77,11 +77,11 @@ import { isWalletConnected } from '../services/wallet.service';
             <button class="token-select-button" on:click={openTokenSelect}>{selected.selected_token.token_symbol.toUpperCase()}
               <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button>
           {:else}
-            <button on:click={openTokenSelect} class="no-token-button"> Select Token <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /> </button>
+            <button on:click={openTokenSelect} class="no-token-button">Select Token <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /> </button>
           {/if}
         {:else}
           <button style="pointer-events: none" class="token-select-button" on:click={openTokenSelect}>{config.currencySymbol}
-            <img style="opacity: 0" src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button>
+            <img style="opacity: 0" src="assets/images/chevron-arrow-down.svg" height="16px" width="16px" alt="" /></button>
         {/if}
       </div>
     </div>
@@ -91,92 +91,108 @@ import { isWalletConnected } from '../services/wallet.service';
 <style>
   .no-token-button {
     background-color: #3131d98f;
-    font-size: 1.2em;
+    display: flex;
+    font-size: .8em;
+    font-weight: 600;
     color: #fff;
-    padding: 7px;
-    border-radius: 15px;
-    height: 40px;
-    width: 155px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    justify-content: space-between;
+    align-items: center;
+    /* height: 32px; */
+    width: 124px;
   }
+
+  .no-token-button>img {
+    height: 12px;
+  }
+  
   .amount-value {
-    width: 250px;
+    width: 210px;
   }
 
   .amount-value > input {
-    font-size: 40px;
+    font-size: 0.9em;
     color: #fff;
     background-color: rgba(0, 0, 0, 0);
     border: none;
     padding: 0px;
-  }
+  } 
 
   .max-button-cont {
-    margin-right: 20px;
+    margin-right: 10px;
+    padding-top: 5px;
+    font-size: .8em;
+    font-weight: 600;
   }
 
   .token-select-button {
     color: #fff;
-    font-size: 30px;
+    font-size: 1.7em;
+    font-weight: 600;
     /* width: 110px; */
   }
 
   .max-button {
     background-color: #3131d98f;
     color: #fff;
-    font-size: 20px;
+    font-size: 1.1em;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 20px;
-    height: 30px;
+    padding: 15px 0px;
+    height: 24px;
     width: 60px;
-    border-radius: 15px;
+    border-radius: 18px;
+    text-align: center;
   }
 
   .container {
-    width: 90%;
+    width: 89%;
     margin-top: 30px;
     padding: 10px;
     border-radius: 25px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     display: flex;
-    height: 120px;
+    height: 100px;
     justify-content: space-between;
     margin: 0 auto;
   }
 
   .amount {
-    padding: 5px 0px 0px 15px;
+    padding: 5px 0px 0px 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
 
   .token-info {
-    padding: 5px 15px 0px 0px;
+    /* padding: 5px 15px 0px 0px; */
     display: flex;
-    width: 230px;
+    width: 185px;
     flex-direction: column;
     justify-content: space-between;
     justify-items: end;
     text-align: right;
+    padding-right: 10px;
   }
 
   .token-controls {
     display: flex;
-    justify-content: space-between;
-    /* align-items: end; */
+    justify-content:flex-end;
+    /* align-items: start; */
     /* width: 200px; */
   }
 
   .label {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 22px;
+    font-size: 1.1em;
+    padding: 2px 10px 0px 0px;
   }
 
   .amount-value {
-    font-size: 40px;
+    font-size: 32px;
     color: #fff;
   }
 

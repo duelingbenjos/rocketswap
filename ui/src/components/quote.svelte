@@ -5,7 +5,7 @@
   <div class="label">Price</div>
   <div class="quote-container">
     <div class="quote-text">5.5132 XMG per TAU</div>
-    <button> <img src="assets/images/switch.svg" alt="" /> </button>
+    <div><button> <img src="assets/images/switch.svg" alt="" /> </button></div>
   </div>
 </div>
 
@@ -14,14 +14,18 @@
     color: #ffffffaf;
     display: flex;
     justify-content: space-between;
-    align-content: center;
-    padding: 20px 40px 20px 40px;
+    align-items: center;
+    padding: 15px 32px;
+    height: 50px;
   }
 
   .quote-container {
     display: flex;
+    align-items: center;
+    justify-content: center;
     align-content: center;
-    line-height: 30px;
+    /* height: 60px; */
+    /* line-height: 30px; */
   }
 
   .quote-text {
@@ -29,7 +33,11 @@
   }
 
   .quote-container button {
-      height: 20px;
+    height: 20px;
+  }
+
+  .quote-container button img {
+    height: 30px;
   }
 
   .label {

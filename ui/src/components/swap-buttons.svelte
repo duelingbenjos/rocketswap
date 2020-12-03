@@ -8,14 +8,15 @@
     width: 100%;
     background-color: #1d2fba;
     color: #fff;
-    height: 70px;
-    border-radius: 30px;
-    font-size: 2em;
+    height: 56px;
+    border-radius: 24px;
+    font-size: 1.6em;
+    font-weight: 600;
     letter-spacing: 0.1em;
   }
 
   .container {
-      padding: 20px;
+      padding: 10px 20px 10px 20px;
   }
 
   button {

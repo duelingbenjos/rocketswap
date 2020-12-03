@@ -39,13 +39,14 @@ export class WalletService {
       if (isWalletConnected(this.wallet_state) && this.wallet_state.wallets[0]) {
         this.walletRefreshLoop(this.wallet_state.wallets[0])
       } else if (isWalletError(this.wallet_state)) {
+        // To Do finish this.
       }
     }, 1000)
   }
 
   private setNotInstalledError() {
     setTimeout(() => {
-      if (!isWalletConnected(this.wallet_state)) {
+      if (!isWalletConnected(this.wallet_state) && !isWalletError(this.wallet_state)) {
         wallet_store.set({ errors: ['not_installed'] })
       }
     }, 3000)
