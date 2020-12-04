@@ -1,12 +1,34 @@
-<script>
+<script lang="ts">
   import Router from 'svelte-hash-router'
   import Header from './components/header.svelte'
   import Footer from './components/footer.svelte'
+  import Dimmer from './components/dimmer.svelte'
+  import TokenSelect from './components/token-select.svelte'
+  import { onMount } from 'svelte'
+  import { WalletService } from './services/wallet.service'
+  import { ApiService } from './api.service'
+  import { show_token_select_store } from './store'
+  import type { TokenSelectType } from './store'
+
+  let show_token_select: TokenSelectType
+
+  onMount(() => {
+    WalletService.getInstance()
+    ApiService.getInstance()
+    show_token_select_store.subscribe((update) => {
+      show_token_select = update
+    })
+  })
 </script>
 
 <main>
   <div class="bg-solid">
     <div class="bg-gradient flex">
+      {#if show_token_select?.open}
+        <Dimmer>
+          <TokenSelect />
+        </Dimmer>
+      {/if}
       <Header />
       <Router />
       <Footer />

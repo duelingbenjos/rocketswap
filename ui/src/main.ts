@@ -1,11 +1,17 @@
-import Swap from './swap.container.svelte'
+import Swap from './pages/swap.page.svelte'
+import Pool from './pages/pool.page.svelte'
 import App from './app.container.svelte'
 import { routes } from 'svelte-hash-router'
-// import Swap from './'
 
 routes.set({
-  '/': Swap
-  // '/about': About
+  '/': {
+    $$component: Swap,
+    $$name: 'Swap'
+  },
+  '/pool': {
+    $$component: Pool,
+    $$name: 'Pool'
+  }
 })
 
 const app = new App({

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { BlockDTO, IGameStateUpdate } from "./types/misc.types";
+import { BlockDTO, IGameStateUpdate, IKvp } from "./types/misc.types";
 import { config } from "./config";
 import {
 	getTokenList,
@@ -7,14 +7,14 @@ import {
 	processAddToken
 } from "./entities/token.entity";
 import { getContractCode, validateTokenContract } from "./utils";
-import { updateUserBalance } from "./entities/balance.entity";
+import { handleTransfer, updateUserBalance } from "./entities/balance.entity";
 
 @Injectable()
 export class ParserProvider {
 	private token_contract_list: string[];
 
 	onModuleInit() {
-		setTimeout(() => this.updateTokenList(), 1000);
+		this.updateTokenList()
 	}
 
 	private async updateTokenList(): Promise<void> {
@@ -60,6 +60,9 @@ export class ParserProvider {
 				console.log(`Found block for token ${contract_name}`);
 				console.log(`function : ${fn}`);
 				console.log(state);
+				if (fn === 'transfer') {
+					handleTransfer(state)
+				}
 				// this contract is a token
 			} else {
 				console.log(`ignoring block for contract: ${contract_name}`);

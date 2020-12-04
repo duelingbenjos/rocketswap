@@ -1,37 +1,56 @@
 <script lang="ts">
-  import { beforeUpdate, onDestroy, onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import { config } from '../config'
-import { isWalletConnected } from '../services/wallet.service';
+  import { isWalletConnected } from '../services/wallet.service'
+  import { pool_panel_store } from '../store'
   import type { SlotType, SwapPanelType } from '../store'
   import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
-  import type { WalletConnectedType } from '../types/wallet.types'
+  import TokenSelect from './token-select.svelte'
   export let position: 'from' | 'to'
+  export let context: 'pool' | 'swap'
 
   let selected: SlotType
+  $: selected
   let balance, role, slot_position, selected_token, wallet, input_amount
+  let context_store
 
   $: wallet_balance = wallet.balance
+  $: contract_name = selected_token
+  $: balance
 
-  let swap_unsub = swap_panel_store.subscribe((update) => {
+  let input_unsub
+
+  onMount(() => {
+    if (context === 'swap') {
+      context_store = swap_panel_store
+    } else if (context === 'pool') {
+      context_store = pool_panel_store
+    }
+    input_unsub = context_store.subscribe((update) => handleStoreUpdate(update))
+  })
+
+  let wallet_unsub = wallet_store.subscribe((update) => {
+    wallet = update
+    if (selected_token && wallet.tokens) {
+      balance = wallet.tokens.balances[selected_token.contract_name]
+    }
+  })
+
+  onDestroy(() => {
+    input_unsub()
+    wallet_unsub()
+  })
+
+  function handleStoreUpdate(update) {
+    console.log(update)
     selected = getPosition(update)
-
     balance = selected.selected_token?.balance
     role = selected.role
     slot_position = selected.position
     selected_token = selected.selected_token
     input_amount = selected.input_amount
     console.log(selected_token)
-  })
-
-  let wallet_unsub = wallet_store.subscribe((update) => {
-    wallet = update
-  })
-
-  onDestroy(() => {
-    swap_unsub()
-    wallet_unsub()
-  })
-
+  }
 
   function getPosition(update: SwapPanelType) {
     const { slot_a, slot_b } = update
@@ -40,7 +59,7 @@ import { isWalletConnected } from '../services/wallet.service';
 
   function openTokenSelect() {
     console.log('open token select')
-    show_token_select_store.set(true)
+    show_token_select_store.set({ open: true, context })
   }
 
   function handleInputChange(e) {
@@ -48,13 +67,13 @@ import { isWalletConnected } from '../services/wallet.service';
   }
 
   function handleMaxInput() {
-    const slots = $swap_panel_store
+    const slots = $context_store
     if (role === 'currency') {
       slots.slot_a.input_amount = wallet_balance || 0
     } else if (role === 'token') {
       slots.slot_b.input_amount = selected_token.balance || 0
     }
-    swap_panel_store.set(slots)
+    context_store.set(slots)
   }
 </script>
 
@@ -67,7 +86,7 @@ import { isWalletConnected } from '../services/wallet.service';
     {#if role === 'currency'}
       <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance || 0}` : ''}</span></div>
     {:else}
-      <div class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token && wallet_balance ? `${selected_token.balance || 0}` : ''}</span></div>
+      <div class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token && wallet_balance ? `${balance || 0}` : ''}</span></div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
@@ -79,7 +98,9 @@ import { isWalletConnected } from '../services/wallet.service';
             <button class="token-select-button" on:click={openTokenSelect}>{selected.selected_token.token_symbol.toUpperCase()}
               <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button>
           {:else}
-            <button on:click={openTokenSelect} class="no-token-button">Select Token <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /> </button>
+            <button on:click={() => openTokenSelect()} class="no-token-button">Select Token
+              <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" />
+            </button>
           {/if}
         {:else}
           <button style="pointer-events: none" class="token-select-button" on:click={openTokenSelect}>{config.currencySymbol}
@@ -94,7 +115,7 @@ import { isWalletConnected } from '../services/wallet.service';
   .no-token-button {
     background-color: #3131d98f;
     display: flex;
-    font-size: .8em;
+    font-size: 0.8em;
     font-weight: 600;
     color: #fff;
     padding: 7px 10px;
@@ -105,10 +126,10 @@ import { isWalletConnected } from '../services/wallet.service';
     width: 124px;
   }
 
-  .no-token-button>img {
+  .no-token-button > img {
     height: 12px;
   }
-  
+
   .amount-value {
     width: 210px;
   }
@@ -119,12 +140,12 @@ import { isWalletConnected } from '../services/wallet.service';
     background-color: rgba(0, 0, 0, 0);
     border: none;
     padding: 0px;
-  } 
+  }
 
   .max-button-cont {
     margin-right: 10px;
     padding-top: 5px;
-    font-size: .8em;
+    font-size: 0.8em;
     font-weight: 600;
   }
 
@@ -182,7 +203,7 @@ import { isWalletConnected } from '../services/wallet.service';
 
   .token-controls {
     display: flex;
-    justify-content:flex-end;
+    justify-content: flex-end;
     /* align-items: start; */
     /* width: 200px; */
   }

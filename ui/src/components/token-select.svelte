@@ -3,34 +3,40 @@
   import type { WalletConnectedType, WalletType } from '../types/wallet.types'
   import { onDestroy, onMount } from 'svelte'
   import { fly } from 'svelte/transition'
-  import { show_token_select_store, swap_panel_store, token_list_store, wallet_store } from '../store'
+  import { pool_panel_store, show_token_select_store, swap_panel_store, token_list_store, wallet_store } from '../store'
   import { isWalletConnected } from '../services/wallet.service'
 
   let token_list_unsub
   let wallet_unsub
   let selected_contract
-  let swap_panel_unsub = swap_panel_store.subscribe((update) => (selected_contract = update.slot_b.selected_token?.contract_name))
+  let context_panel_unsub
   let wallet: WalletType
   let token_list: TokenListType[] = []
+  let context
+  let context_store
 
   onMount(() => {
     createSubscriptions()
+    context = $show_token_select_store.context
+    if (context === 'swap') context_store = swap_panel_store
+    else if (context === 'pool') context_store = pool_panel_store
+    context_panel_unsub = context_store.subscribe((update) => (selected_contract = update.slot_b.selected_token?.contract_name))
   })
 
   onDestroy(() => {
     token_list_unsub()
     wallet_unsub()
-    swap_panel_unsub()
+    context_panel_unsub()
   })
 
   function closeModal() {
-    show_token_select_store.set(false)
+    show_token_select_store.set({ open: false })
   }
 
   function selectToken(token: TokenListType) {
-    const swap_panel = $swap_panel_store
-    swap_panel.slot_b.selected_token = token
-    swap_panel_store.set(swap_panel)
+    const panel = $context_store
+    panel.slot_b.selected_token = token
+    context_store.set(panel)
     setTimeout(() => {
       closeModal()
     }, 150)
@@ -44,13 +50,13 @@
       if (wallet && isWalletConnected(wallet)) {
         const list_with_balances = update
           .map((token) => {
-            token.balance = (wallet as WalletConnectedType).tokens[token.contract_name] || 0
+            token.balance = (wallet as WalletConnectedType).tokens.balances[token.contract_name] || 0
             return token
           })
           .sort((a, b) => {
             return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
           })
-          .sort((a, b) => a.balance - b.balance)
+          .sort((a, b) => b.balance - a.balance)
         token_list = [
           // { token_name: 'TAU', id: 'TAU', token_symbol: 'TAU', contract_name: 'currency', base_supply: 288090567 },
           ...list_with_balances

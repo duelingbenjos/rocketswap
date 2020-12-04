@@ -13,9 +13,9 @@
 </script>
 
 <div class="container">
-  <Input position="from" context="swap" />
+  <Input position="from" context="pool" />
   <div class="switch-symbols-cont"><button on:click={switchPositions}><img src="/assets/images/down-arrow.svg" alt="" /> </button></div>
-  <Input position="to" context="swap" />
+  <Input position="to" context="pool" />
   <Quote />
   <SwapButtons />
 </div>

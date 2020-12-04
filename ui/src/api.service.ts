@@ -10,7 +10,6 @@ export class ApiService {
   private static instance: ApiService
   private base_url = getBaseUrl(document.location.href)
   constructor() {
-    console.log(this.base_url)
     this.startTimer()
     this.getTokenList()
   }
@@ -34,8 +33,8 @@ export class ApiService {
 
   async getTokenBalances(vk: string) {
     try {
-      const res = await axios.get(`${this.base_url}:3001/api/balances/${vk}'`)
-      return res.data.balances
+      const res = await axios.get(`${this.base_url}:3001/api/balances/${vk}`)
+      return res.data
     } catch (err) {
       console.error(err)
     }
