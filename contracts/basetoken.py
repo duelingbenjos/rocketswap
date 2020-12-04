@@ -1,4 +1,5 @@
 # TODO - Update basetoken to whatever the first TRC_20 currency standard is
+# ARGS : {"s_name": "HRRRMMCOIN", "s_symbol":"HRM", "vk":"f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def","vk_amount":100000000}
 balances = Hash(default_value=0)
 token_name = Variable()
 token_symbol = Variable()
