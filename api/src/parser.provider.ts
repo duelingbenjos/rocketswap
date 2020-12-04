@@ -7,14 +7,17 @@ import {
 	processAddToken
 } from "./entities/token.entity";
 import { getContractCode, validateTokenContract } from "./utils";
-import { handleTransfer, updateUserBalance } from "./entities/balance.entity";
+import { handleTransfer, updateBalance } from "./entities/balance.entity";
+import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
+import { saveUserLp } from "./entities/lp-points.entity";
+import { savePrice } from "./entities/price.entity";
 
 @Injectable()
 export class ParserProvider {
 	private token_contract_list: string[];
 
 	onModuleInit() {
-		this.updateTokenList()
+		this.updateTokenList();
 	}
 
 	private async updateTokenList(): Promise<void> {
@@ -45,7 +48,7 @@ export class ParserProvider {
 						token_seed_holder: vk,
 						base_supply: amount
 					} = add_token_dto;
-					await updateUserBalance({ amount, contract_name, vk });
+					await updateBalance({ amount, contract_name, vk });
 					console.log(
 						`Updated user balance for contract : ${contract_name}, amount: ${amount}, vk: ${vk}`
 					);
@@ -55,20 +58,87 @@ export class ParserProvider {
 			} else if (contract_name === config.contractName) {
 				// handle events for the AMM contract
 				console.log(`Found AMM contract block ...`);
+				console.log(state)
+				if (fn === "create_market") {
+					await processCreateMarket(state);
+				} else if (fn === 'add_liquidity'){
+					await processAddLiquidity(state)
+				}
 				return;
 			} else if (this.token_contract_list.includes(contract_name)) {
 				console.log(`Found block for token ${contract_name}`);
 				console.log(`function : ${fn}`);
 				console.log(state);
-				if (fn === 'transfer') {
-					handleTransfer(state)
+				if (fn === "transfer") {
+					handleTransfer(state);
 				}
 				// this contract is a token
 			} else {
 				console.log(`ignoring block for contract: ${contract_name}`);
+				console.log(state);
+				console.log(state[state.length - 1].value);
+				console.log(fn);
 			}
 		} catch (err) {
 			console.error(err);
 		}
 	}
 }
+
+async function processCreateMarket(state: IKvp[]) {
+	try {
+		await savePair(state);
+		await handleTransfer(state);
+		await savePairLp(state);
+		await saveUserLp(state);
+		await saveReserves(state);
+		await savePrice(state);
+	} catch (err) {
+		console.error(err);
+	}
+}
+
+async function processAddLiquidity(state: IKvp[]) {
+	try {
+		await handleTransfer(state);
+		await savePairLp(state);
+		await saveUserLp(state);
+		await saveReserves(state);
+		await savePrice(state);
+	} catch (err) {
+		console.error(err);
+	}
+}
+
+[
+	{
+	  key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def:con_amm2',
+	  value: { __fixed__: '107000.0' }
+	},
+	{
+	  key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+	  value: { __fixed__: '1705.93130000' }
+	},
+	{ key: 'currency.balances:con_amm2', value: { __fixed__: '3000.0' } },
+	{
+	  key: 'con_token_test14.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+	  value: { __fixed__: '99997900.0' }
+	},
+	{
+	  key: 'con_token_test14.balances:con_amm2',
+	  value: { __fixed__: '2100.0' }
+	},
+	{
+	  key: 'con_amm2.lp_points:con_token_test14:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+	  value: { __fixed__: '2100.0' }
+	},
+	{
+	  key: 'con_amm2.lp_points:con_token_test14',
+	  value: { __fixed__: '2100.0' }
+	},
+	{
+	  key: 'con_amm2.reserves:con_token_test14',
+	  value: [ [Object], [Object] ]
+	}
+  ]
+

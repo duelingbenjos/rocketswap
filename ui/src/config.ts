@@ -22,3 +22,5 @@ const connectionRequest = {
 }
 
 export const config = connectionRequest
+
+///https://testnet-master-1.lamden.io/contracts/${contract}/${variable}/

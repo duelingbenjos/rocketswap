@@ -44,14 +44,19 @@ export function getKey(state: IKvp[], idx_1: number, idx_2: number) {
 
 /** Returns and parses a value */
 
-export function getVal(state: IKvp[], idx: number) {
-	const val = state[idx].value;
+export function getVal(state: IKvp[] | IKvp, idx?: number) {
+	let val;
+	if (idx) {
+		val = state[idx].value;
+	} else {
+		val = (state as IKvp).value;
+	}
 	return val.__fixed__ ? parseFloat(val.__fixed__) : val;
 }
 
 export function getContractName(state: IKvp[]) {
 	let code_entry = getContractEntry(state);
-	console.log(code_entry)
+	console.log(code_entry);
 	if (code_entry) {
 		let code_key = code_entry.key;
 		let contract_name = code_key.split(".")[0];

@@ -58,10 +58,10 @@ def approve(amount: float, to: str):
 
 
 @export
-def transfer_from(amount: float, from_address: str, to_address: str):
+def transfer_from(amount: float, to: str, main_account: str):
     assert amount > 0, 'Cannot send negative balances!'
-    assert balances[from_address] > amount, 'Cannot send amount greater than balance!'
+    assert balances[main_account] > amount, 'Cannot send amount greater than balance!'
 
     # TODO - A1 - Trying to understand this currency.py vs. function in general...
-    balances[from_address] -= amount
-    balances[to_address] += amount
+    balances[main_account] -= amount
+    balances[to] += amount

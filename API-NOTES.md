@@ -1,3 +1,74 @@
+### TO-DO
+
+##### Integrate fns on API side
+
+* create_market
+
+```
+[
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def:con_amm2',
+    value: { __fixed__: '109700.0' }
+  },
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '4512.85130000' }
+  },
+  { key: 'currency.balances:con_amm2', value: { __fixed__: '300.0' } },
+  {
+    key: 'con_token_test7.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '99999900.0' }
+  },
+  {
+    key: 'con_token_test7.balances:con_amm2',
+    value: { __fixed__: '100.0' }
+  },
+  { key: 'con_amm2.prices:con_token_test7', value: { __fixed__: '1' } },
+  { key: 'con_amm2.pairs:con_token_test7', value: true },
+  {
+    key: 'con_amm2.lp_points:con_token_test7:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: 100
+  },
+  { key: 'con_amm2.lp_points:con_token_test7', value: 100 },
+  {
+    key: 'con_amm2.reserves:con_token_test7',
+    value: [  { __fixed__: '100.0' }, { __fixed__: '100.0' }  ]
+  }
+]
+create_market
+```
+
+* approve
+```
+Found block for token con_token_test3
+function : approve
+[
+  {
+    key: 'con_token_test3.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def:con_amm2',
+    value: { __fixed__: '100000.0' }
+  },
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '4915.72130000' }
+  }
+]
+```
+
+* approve_liquidity
+
+```
+ignoring block for contract: con_amm2
+[
+  {
+    key: 'con_amm2.lp_points:con_token_test4:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '100.0' }
+  },
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '4869.58130000' }
+  }
+] approve_liquidity
+```
 ### DB Tables
 
 * Token

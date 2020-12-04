@@ -37,7 +37,7 @@ export class WalletService {
 
     setInterval(() => {
       if (isWalletConnected(this.wallet_state) && this.wallet_state.wallets[0]) {
-        this.walletRefreshLoop(this.wallet_state.wallets[0])
+        this.updateBalances(this.wallet_state.wallets[0])
       } else if (isWalletError(this.wallet_state)) {
         // To Do finish this.
       }
@@ -60,7 +60,7 @@ export class WalletService {
       console.log(wallet_info)
       if (wallet_info.wallets[0]) {
         const vk = wallet_info.wallets[0]
-        const balances = await this.updateBalances(vk)
+        const balances = await this.getBalances(vk)
         wallet_info.balance = balances[1]
         wallet_info.tokens = balances[0]
       }
@@ -70,9 +70,9 @@ export class WalletService {
     wallet_store.set(wallet_info)
   }
 
-  private async walletRefreshLoop(vk?: string) {
+  private async updateBalances(vk?: string) {
     if (isWalletConnected(this.wallet_state)) {
-      const res = await this.updateBalances(vk)
+      const res = await this.getBalances(vk)
       this.wallet_state.tokens = res[0]
       this.wallet_state.balance = res[1]
       wallet_store.set(this.wallet_state)
@@ -80,10 +80,20 @@ export class WalletService {
     }
   }
 
-  private async updateBalances(vk: string) {
+  private async getBalances(vk: string) {
     const proms = [this.apiService.getTokenBalances(vk), refreshTAUBalance(vk)]
     return await Promise.all(proms)
   }
+
+  public async buyTransation(args) {
+    // this.lwc send transaction, with callback
+    // update balances by calling updateBalances()
+  }
+}
+
+export function handleBuyResult(res) {
+  // Send info to toast controller / success | fail
+  // refresh balance w/ masternode & backend API
 }
 
 async function handleTxResults(txInfo) {
