@@ -6,7 +6,9 @@
   import type { SlotType, SwapPanelType } from '../store'
   import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
   import TokenSelect from './token-select.svelte'
+
   export let position: 'from' | 'to'
+  export let label;
   export let context: 'pool' | 'swap'
 
   let selected: SlotType
@@ -63,6 +65,11 @@
   }
 
   function handleInputChange(e) {
+    context_store.update(currValue => {
+        if (position === 'from') currValue.slot_a.input_amount = e.target.value
+        if (position === 'to') currValue.slot_b.input_amount = e.target.value
+        return currValue
+    })
     console.log(e.target.value)
   }
 
@@ -79,7 +86,7 @@
 
 <div class="container">
   <div class="amount">
-    <div class="label">{position === 'from' ? 'From' : 'To'}</div>
+    <div class="label">{label ? label : position === 'from' ? 'From' : 'To'}</div>
     <div class="amount-value number"><input placeholder="0.0" value={input_amount} on:input={handleInputChange} /></div>
   </div>
   <div class="token-info">

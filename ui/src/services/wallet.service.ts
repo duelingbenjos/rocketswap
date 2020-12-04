@@ -85,19 +85,39 @@ export class WalletService {
     return await Promise.all(proms)
   }
 
-  public async buyTransation(args) {
-    // this.lwc send transaction, with callback
-    // update balances by calling updateBalances()
+  private create_txInfo(method, args){
+    return {
+      'methodName': method,
+      'networkType': config.networkType,
+      'stampLimit': 100, //TODO Populate with blockexplorer stamp info endpoint
+      'kwargs': args
+    }
+  }
+
+  public async createMarket(args){
+    console.log(this.create_txInfo('create_market', args))
+    this.lwc.sendTransaction(this.create_txInfo('create_market', args), handleCreateMarket)
   }
 }
 
-export function handleBuyResult(res) {
-  // Send info to toast controller / success | fail
-  // refresh balance w/ masternode & backend API
+function handleCreateMarket(res) {
+  let status = txResult(res.data)
+  if (status === 'success') {
+    // TODO Send info to toast controller success
+  }
+  // TODO Send error(s) to toast controller
+}
+
+function txResult(txResults){
+  if (txResults.errors) return txResults.errors
+  if (txResults.txBlockResult.status){
+    if (txResults.txBlockResult.status === 0) return 'success'
+    if (txResults.txBlockResult.status === 1) return txResults.txBlockResult.errors
+  }
 }
 
 async function handleTxResults(txInfo) {
-  console.log(txInfo)
+  //console.log(txInfo)
 }
 
 export function isWalletError(wallet_info: WalletType): wallet_info is WalletErrorType {

@@ -1,11 +1,14 @@
 <script>
+  export let showSwitch = true;
 </script>
 
 <div class="container">
   <div class="label">Price</div>
   <div class="quote-container">
     <div class="quote-text">5.5132 XMG per TAU</div>
-    <div><button> <img src="assets/images/switch.svg" alt="" /> </button></div>
+    {#if showSwitch}
+      <div><button> <img src="assets/images/switch.svg" alt="" /> </button></div>
+    {/if}
   </div>
 </div>
 
