@@ -1,8 +1,9 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
+  import { show_token_select_store } from '../store'
 </script>
 
-<div class="dimmer-wrapper" transition:fade={{ duration: 300 }}>
+<div on:click={() => show_token_select_store.set({ open: false })} class="dimmer-wrapper" transition:fade={{ duration: 300 }}>
   <slot />
 </div>
 
