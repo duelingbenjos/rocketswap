@@ -2,6 +2,107 @@
 
 ##### Integrate fns on API side
 
+* sell
+
+```
+[
+  {
+    key: 'con_token_test14.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '99997895.168181818181818181818181817185' }
+  },
+  {
+    key: 'con_token_test14.balances:con_amm2',
+    value: { __fixed__: '2104.831818181818181818181818182815' }
+  },
+  {
+    key: 'currency.balances:con_amm2',
+    value: { __fixed__: '3005.792149232393864333794753630638' }
+  },
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '1695.239150767606135666205246369362' }
+  },
+  {
+    key: 'con_amm2.reserves:con_token_test14',
+    value: [ [Object], [Object] ]
+  },
+  {
+    key: 'con_amm2.prices:con_token_test14',
+    value: { __fixed__: '0.995705277318910494151842936703' }
+  }
+]
+```
+
+* buy
+
+```
+[
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def:con_amm2',
+    value: { __fixed__: '105900.0' }
+  },
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '1594.681299999999999999999999999' }
+  },
+  {
+    key: 'currency.balances:con_amm2',
+    value: { __fixed__: '3110.000000000000000000000000001' }
+  },
+  {
+    key: 'con_token_test14.balances:con_amm2',
+    value: { __fixed__: '2004.831818181818181818181818182815' }
+  },
+  {
+    key: 'con_token_test14.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '99997995.168181818181818181818181817185' }
+  },
+  {
+    key: 'con_amm2.reserves:con_token_test14',
+    value: [ [Object], [Object] ]
+  },
+  {
+    key: 'con_amm2.prices:con_token_test14',
+    value: { __fixed__: '1.097348904804982508167767416446' }
+  }
+]
+```
+
+* remove_liquidity
+
+```
+[
+  {
+    key: 'currency.balances:con_amm2',
+    value: { __fixed__: '3010.000000000000000000000000001' }
+  },
+  {
+    key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '1698.481299999999999999999999999' }
+  },
+  {
+    key: 'con_token_test14.balances:con_amm2',
+    value: { __fixed__: '2100.000000000000000000000000001' }
+  },
+  {
+    key: 'con_token_test14.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '99997899.999999999999999999999999999' }
+  },
+  {
+    key: 'con_amm2.lp_points:con_token_test14:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
+    value: { __fixed__: '2100.0' }
+  },
+  {
+    key: 'con_amm2.lp_points:con_token_test14',
+    value: { __fixed__: '2100.0' }
+  },
+  {
+    key: 'con_amm2.reserves:con_token_test14',
+    value: [ { __fixed__: '100.0' }, { __fixed__: '100.0' }  ]
+  }
+]
+```
+
 * create_market
 
 ```

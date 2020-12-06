@@ -38,7 +38,7 @@ export class AddTokenDto {
 	developer: string;
 }
 
-export const processAddToken = async (add_token_dto: AddTokenDto) => {
+export const saveToken = async (add_token_dto: AddTokenDto) => {
 	const {
 		token_symbol,
 		token_name,
@@ -59,14 +59,6 @@ export const processAddToken = async (add_token_dto: AddTokenDto) => {
 	entity.developer = developer;
 	return await entity.save();
 };
-
-// export function prepareAddToken(state: IKvp[]): AddTokenDto {
-// 	const contract_name = getContractName(state);
-// 	const token_symbol = getVal(state, 1);
-// 	const token_name = getVal(state, 0);
-// 	const base_supply = getVal(state, 2);
-// 	return { contract_name, token_name, token_symbol, base_supply };
-// }
 
 export function prepareAddToken(state: IKvp[]): AddTokenDto {
 	const contract_name = getContractName(state);

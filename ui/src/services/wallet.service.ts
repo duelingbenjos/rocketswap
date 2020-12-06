@@ -1,5 +1,5 @@
 import WalletController from 'lamden_wallet_controller'
-import { ApiService } from '../api.service'
+import { ApiService } from './api.service'
 import { config } from '../config'
 import { wallet_store } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
@@ -21,18 +21,22 @@ export class WalletService {
   constructor() {
     this.lwc = new WalletController(config)
     wallet_store.subscribe((update) => {
+      console.log(update)
       this.wallet_state = update
     })
 
     // events
     this.lwc.events.on('newInfo', this.handleWalletInfo)
     this.lwc.events.on('txStatus', handleTxResults)
-    this.lwc.walletIsInstalled().then((installed) => {
-      if (!installed) {
-        console.info('wallet not installed')
-        this.setNotInstalledError()
-      }
-      this.lwc.sendConnection(config)
+    setTimeout(() => {
+      this.lwc.walletIsInstalled().then((installed) => {
+        console.log(installed)
+        if (!installed) {
+          console.info('wallet not installed')
+          this.setNotInstalledError()
+        }
+        this.lwc.sendConnection(config)
+      },1000)
     })
 
     setInterval(() => {
@@ -46,6 +50,7 @@ export class WalletService {
 
   private setNotInstalledError() {
     setTimeout(() => {
+      console.log(this.wallet_state)
       if (!isWalletConnected(this.wallet_state) && !isWalletError(this.wallet_state)) {
         wallet_store.set({ errors: ['not_installed'] })
       }
@@ -54,7 +59,7 @@ export class WalletService {
 
   private handleWalletInfo = async (wallet_update: WalletType) => {
     let wallet_info: WalletType
-
+    console.log(wallet_info)
     if (isWalletConnected(wallet_update)) {
       wallet_info = wallet_update
       console.log(wallet_info)

@@ -6,7 +6,7 @@
   import TokenSelect from './components/token-select.svelte'
   import { onMount } from 'svelte'
   import { WalletService } from './services/wallet.service'
-  import { ApiService } from './api.service'
+  import { ApiService } from './services/api.service'
   import { show_token_select_store } from './store'
   import type { TokenSelectType } from './store'
 

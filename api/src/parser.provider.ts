@@ -1,13 +1,13 @@
 import { Injectable } from "@nestjs/common";
-import { BlockDTO, IGameStateUpdate, IKvp } from "./types/misc.types";
+import { BlockDTO, IKvp } from "./types/misc.types";
 import { config } from "./config";
 import {
 	getTokenList,
 	prepareAddToken,
-	processAddToken
+	saveToken
 } from "./entities/token.entity";
 import { getContractCode, validateTokenContract } from "./utils";
-import { handleTransfer, updateBalance } from "./entities/balance.entity";
+import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
 import { savePrice } from "./entities/price.entity";
@@ -42,7 +42,7 @@ export class ParserProvider {
 				);
 				if (token_is_valid) {
 					const add_token_dto = prepareAddToken(state);
-					await processAddToken(add_token_dto);
+					await saveToken(add_token_dto);
 					const {
 						contract_name,
 						token_seed_holder: vk,
@@ -58,21 +58,17 @@ export class ParserProvider {
 			} else if (contract_name === config.contractName) {
 				// handle events for the AMM contract
 				console.log(`Found AMM contract block ...`);
-				console.log(state)
-				if (fn === "create_market") {
-					await processCreateMarket(state);
-				} else if (fn === 'add_liquidity'){
-					await processAddLiquidity(state)
-				}
+				console.log(state);
+				await processAmmBlock(state);
 				return;
 			} else if (this.token_contract_list.includes(contract_name)) {
+				// this contract is a token
 				console.log(`Found block for token ${contract_name}`);
 				console.log(`function : ${fn}`);
-				console.log(state);
+				// console.log(state);
 				if (fn === "transfer") {
-					handleTransfer(state);
+					saveTransfer(state);
 				}
-				// this contract is a token
 			} else {
 				console.log(`ignoring block for contract: ${contract_name}`);
 				console.log(state);
@@ -85,10 +81,10 @@ export class ParserProvider {
 	}
 }
 
-async function processCreateMarket(state: IKvp[]) {
+async function processAmmBlock(state: IKvp[]) {
 	try {
 		await savePair(state);
-		await handleTransfer(state);
+		await saveTransfer(state);
 		await savePairLp(state);
 		await saveUserLp(state);
 		await saveReserves(state);
@@ -97,48 +93,3 @@ async function processCreateMarket(state: IKvp[]) {
 		console.error(err);
 	}
 }
-
-async function processAddLiquidity(state: IKvp[]) {
-	try {
-		await handleTransfer(state);
-		await savePairLp(state);
-		await saveUserLp(state);
-		await saveReserves(state);
-		await savePrice(state);
-	} catch (err) {
-		console.error(err);
-	}
-}
-
-[
-	{
-	  key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def:con_amm2',
-	  value: { __fixed__: '107000.0' }
-	},
-	{
-	  key: 'currency.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
-	  value: { __fixed__: '1705.93130000' }
-	},
-	{ key: 'currency.balances:con_amm2', value: { __fixed__: '3000.0' } },
-	{
-	  key: 'con_token_test14.balances:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
-	  value: { __fixed__: '99997900.0' }
-	},
-	{
-	  key: 'con_token_test14.balances:con_amm2',
-	  value: { __fixed__: '2100.0' }
-	},
-	{
-	  key: 'con_amm2.lp_points:con_token_test14:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def',
-	  value: { __fixed__: '2100.0' }
-	},
-	{
-	  key: 'con_amm2.lp_points:con_token_test14',
-	  value: { __fixed__: '2100.0' }
-	},
-	{
-	  key: 'con_amm2.reserves:con_token_test14',
-	  value: [ [Object], [Object] ]
-	}
-  ]
-

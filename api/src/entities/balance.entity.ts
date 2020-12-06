@@ -1,4 +1,5 @@
-import { IKvp } from "src/types/misc.types";
+import { IKvp } from "../types/misc.types";
+import { getVal } from "../utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 
 @Entity()
@@ -37,7 +38,7 @@ export interface IBalance {
 	balances?: UserBalancesType;
 }
 
-export async function handleTransfer(state: IKvp[]) {
+export async function saveTransfer(state: IKvp[]) {
 	const balances_kvp = state.filter(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "balances"
 	);
@@ -52,7 +53,7 @@ export async function handleTransfer(state: IKvp[]) {
 
 		const vk = key.split(":")[1];
 		const contract_name = parts[0];
-		const amount = value.__fixed__ ? value.__fixed__ : value;
+		const amount = getVal(kvp)
 		console.log(contract_name, is_balance, vk);
 		if (is_balance && vk && contract_name) {
 			try {

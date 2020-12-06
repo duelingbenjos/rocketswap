@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { token_list_store, wallet_store } from './store'
-import { getBaseUrl } from './utils'
+import { token_list_store, wallet_store } from '../store'
+import { getBaseUrl } from '../utils'
 
 export class ApiService {
   public static getInstance() {
