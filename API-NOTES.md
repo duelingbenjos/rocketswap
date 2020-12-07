@@ -1,5 +1,9 @@
 ### TO-DO
 
+##### Price Feed Type.
+
+
+
 ##### Integrate fns on API side
 
 * sell

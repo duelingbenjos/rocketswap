@@ -61,7 +61,6 @@
           // { token_name: 'TAU', id: 'TAU', token_symbol: 'TAU', contract_name: 'currency', base_supply: 288090567 },
           ...list_with_balances
         ]
-        console.log(token_list)
       } else {
         token_list = update.sort((a, b) => {
           return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0

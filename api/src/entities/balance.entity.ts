@@ -2,6 +2,8 @@ import { IKvp } from "../types/misc.types";
 import { getVal } from "../utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 
+/** Updated when the token balance from one of the token contracts the API detects has a change. */
+
 @Entity()
 export class BalanceEntity extends BaseEntity implements IBalance {
 	@PrimaryColumn()

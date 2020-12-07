@@ -5,6 +5,8 @@ import { wallet_store } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
 import { refreshTAUBalance } from '../utils'
 
+/** Singleton Wallet Service */
+
 export class WalletService {
   private static _instance: WalletService
   private wallet_state: WalletType
@@ -21,7 +23,7 @@ export class WalletService {
   constructor() {
     this.lwc = new WalletController(config)
     wallet_store.subscribe((update) => {
-      console.log(update)
+      // console.log(update)
       this.wallet_state = update
     })
 
@@ -30,7 +32,7 @@ export class WalletService {
     this.lwc.events.on('txStatus', handleTxResults)
     setTimeout(() => {
       this.lwc.walletIsInstalled().then((installed) => {
-        console.log(installed)
+        // console.log(installed)
         if (!installed) {
           console.info('wallet not installed')
           this.setNotInstalledError()
@@ -50,7 +52,7 @@ export class WalletService {
 
   private setNotInstalledError() {
     setTimeout(() => {
-      console.log(this.wallet_state)
+      // console.log(this.wallet_state)
       if (!isWalletConnected(this.wallet_state) && !isWalletError(this.wallet_state)) {
         wallet_store.set({ errors: ['not_installed'] })
       }
@@ -59,10 +61,10 @@ export class WalletService {
 
   private handleWalletInfo = async (wallet_update: WalletType) => {
     let wallet_info: WalletType
-    console.log(wallet_info)
+    // console.log(wallet_info)
     if (isWalletConnected(wallet_update)) {
       wallet_info = wallet_update
-      console.log(wallet_info)
+      // console.log(wallet_info)
       if (wallet_info.wallets[0]) {
         const vk = wallet_info.wallets[0]
         const balances = await this.getBalances(vk)

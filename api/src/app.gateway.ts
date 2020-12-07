@@ -10,6 +10,7 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import blockgrabber from "./blockgrabber";
+import { getPriceUpdate, PriceEntity } from "./entities/price.entity";
 import { ParserProvider } from "./parser.provider";
 import { ClientUpdateType, isPriceUpdate } from "./types/websocket.types";
 
@@ -30,23 +31,22 @@ export class AppGateway
 
 	handleNewBlock = (block: any) => {
 		const { state, fn, contract } = block;
-		this.parser.parseBlock(
-			{
+		this.parser.parseBlock({
+			block: {
 				state,
 				fn,
 				contract
 			},
-			this.handleClientUpdate
-		);
+			handleClientUpdate: this.handleClientUpdate
+		});
 	};
 
 	handleClientUpdate = async (update: ClientUpdateType) => {
 		let contract_name;
 		switch (update.action) {
 			case "price_update":
-				if (isPriceUpdate(update))
-				contract_name = update.contract_name;
-				this.wss.emit(`price_update:${contract_name}`, update);
+				if (isPriceUpdate(update)) contract_name = update.contract_name;
+				this.wss.emit(`price_feed:${contract_name}`, update);
 				this.logger.log("price update sent");
 		}
 	};
@@ -58,7 +58,18 @@ export class AppGateway
 	}
 
 	@SubscribeMessage("join_room")
-	handleJoinRoom(client: Socket, room: string) {
+	async handleJoinRoom(client: Socket, room: string) {
+		this.logger.log(room);
+		let contract_name = room.split(":")[1];
+		if (contract_name) {
+			try {
+				const price_update = await getPriceUpdate(contract_name);
+				this.logger.log(price_update);
+				client.emit(`price_feed:${contract_name}`, price_update);
+			} catch (err) {
+				this.logger.error(err);
+			}
+		}
 		client.join(room);
 		client.emit("joined_room", room);
 	}

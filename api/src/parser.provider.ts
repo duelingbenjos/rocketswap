@@ -11,6 +11,9 @@ import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
 import { savePrice } from "./entities/price.entity";
+import { AppGateway } from "./app.gateway";
+import { Server } from "socket.io";
+import { handleClientUpdate, IBlockParser } from "./types/websocket.types";
 
 @Injectable()
 export class ParserProvider {
@@ -29,7 +32,8 @@ export class ParserProvider {
 	/** This method is passed to the blockgrabber as a callback and checks
 	 * if we're interested in the contents of the block.
 	 */
-	public async parseBlock(block: BlockDTO, handleStateUpdate: Function) {
+	public async parseBlock(update: IBlockParser) {
+		const { block, handleClientUpdate } = update;
 		const { state, fn, contract: contract_name } = block;
 		try {
 			if (contract_name === "submission" && fn === "submit_contract") {
@@ -59,16 +63,16 @@ export class ParserProvider {
 				// handle events for the AMM contract
 				console.log(`Found AMM contract block ...`);
 				console.log(state);
-				await processAmmBlock(state);
+				await processAmmBlock(state, handleClientUpdate);
 				return;
 			} else if (this.token_contract_list.includes(contract_name)) {
 				// this contract is a token
 				console.log(`Found block for token ${contract_name}`);
 				console.log(`function : ${fn}`);
 				// console.log(state);
-				if (fn === "transfer") {
-					saveTransfer(state);
-				}
+				// if (fn === "transfer") {
+				saveTransfer(state);
+				// }
 			} else {
 				console.log(`ignoring block for contract: ${contract_name}`);
 				console.log(state);
@@ -81,14 +85,17 @@ export class ParserProvider {
 	}
 }
 
-async function processAmmBlock(state: IKvp[]) {
+async function processAmmBlock(
+	state: IKvp[],
+	handleClientUpdate: handleClientUpdate
+) {
 	try {
 		await savePair(state);
 		await saveTransfer(state);
 		await savePairLp(state);
 		await saveUserLp(state);
 		await saveReserves(state);
-		await savePrice(state);
+		await savePrice(state, handleClientUpdate);
 	} catch (err) {
 		console.error(err);
 	}

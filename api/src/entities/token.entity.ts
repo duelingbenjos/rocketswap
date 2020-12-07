@@ -8,6 +8,8 @@ import {
 } from "typeorm";
 import { IKvp } from "../types/misc.types";
 
+/** These are tokens added by watching the submission contract / submit_contract fn */
+
 @Entity()
 export class TokenEntity extends BaseEntity {
 	@PrimaryGeneratedColumn()

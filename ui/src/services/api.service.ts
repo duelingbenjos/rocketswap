@@ -2,6 +2,8 @@ import axios from 'axios'
 import { token_list_store, wallet_store } from '../store'
 import { getBaseUrl } from '../utils'
 
+/** Singleton Api Service */
+
 export class ApiService {
   public static getInstance() {
     if (!ApiService.instance) ApiService.instance = new ApiService()

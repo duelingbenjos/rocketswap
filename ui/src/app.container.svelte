@@ -7,12 +7,15 @@
   import { onMount } from 'svelte'
   import { WalletService } from './services/wallet.service'
   import { ApiService } from './services/api.service'
+  import { WsService } from './services/ws.service'
   import { show_token_select_store } from './store'
-  import type { TokenSelectType } from './store'
+  import type { TokenSelectType } from './types/api.types'
 
   let show_token_select: TokenSelectType
 
   onMount(() => {
+    /** Initialise Singleton Instances */
+    WsService.getInstance()
     WalletService.getInstance()
     ApiService.getInstance()
     show_token_select_store.subscribe((update) => {

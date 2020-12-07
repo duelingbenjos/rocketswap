@@ -3,7 +3,7 @@
   import { config } from '../config'
   import { isWalletConnected } from '../services/wallet.service'
   import { pool_panel_store } from '../store'
-  import type { SlotType, SwapPanelType } from '../store'
+  import type { SlotType, SwapPanelType } from '../types/api.types'
   import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
   import TokenSelect from './token-select.svelte'
   export let position: 'from' | 'to'
@@ -42,14 +42,13 @@
   })
 
   function handleStoreUpdate(update) {
-    console.log(update)
     selected = getPosition(update)
     balance = selected.selected_token?.balance
     role = selected.role
     slot_position = selected.position
     selected_token = selected.selected_token
     input_amount = selected.input_amount
-    console.log(selected_token)
+    console.log('selected token : ', selected_token)
   }
 
   function getPosition(update: SwapPanelType) {
@@ -58,7 +57,6 @@
   }
 
   function openTokenSelect() {
-    console.log('open token select')
     show_token_select_store.set({ open: true, context })
   }
 

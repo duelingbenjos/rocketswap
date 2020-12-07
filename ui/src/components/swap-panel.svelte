@@ -19,8 +19,17 @@
   <Quote />
   <SwapButtons />
 </div>
+<div class="slippage-display-container">
+  <div>
+    
+  </div>
+</div>
 
 <style>
+
+  .slippage-display {
+    height: 80px;
+  }
   .switch-symbols-cont {
     margin: 0 auto;
     margin-top: 10px;

@@ -8,6 +8,8 @@ import {
 	PrimaryGeneratedColumn
 } from "typeorm";
 
+/** This entity is created when a new market is detected on the AMM contract. */
+
 @Entity()
 export class PairEntity extends BaseEntity {
 	@PrimaryColumn()

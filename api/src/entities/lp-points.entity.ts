@@ -8,6 +8,8 @@ import {
 	PrimaryGeneratedColumn
 } from "typeorm";
 
+/** This entity is created / updated when the LP points balance of an address changes. */
+
 @Entity()
 export class LpPointsEntity extends BaseEntity {
 	@PrimaryColumn()

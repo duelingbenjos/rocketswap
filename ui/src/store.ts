@@ -1,6 +1,6 @@
 import { Writable, writable } from 'svelte/store'
 
-import type { TokenListType } from './types/api.types'
+import type { SwapPanelType, TokenListType, TokenMetricsType, TokenSelectType } from './types/api.types'
 import type { WalletType } from './types/wallet.types'
 
 export const wallet_store: Writable<WalletType> = writable({ init: true })
@@ -33,19 +33,6 @@ export const pool_panel_store: Writable<SwapPanelType> = writable({
   }
 })
 
-export type TokenSelectType = {
-  open: boolean
-  context?: 'pool' | 'swap'
-}
+export const token_metrics_store: Writable<TokenMetricsType> = writable({})
 
-export type SwapPanelType = {
-  slot_a: SlotType
-  slot_b: SlotType
-}
 
-export type SlotType = {
-  position: 'from' | 'to'
-  selected_token?: TokenListType
-  role: 'currency' | 'token'
-  input_amount: number
-}
