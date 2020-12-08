@@ -111,7 +111,8 @@
   <SwapButtons />
 </div>
 <div class="slippage-display-container">
-  {#if trade_details}{trade_details.token_symbol} {trade_details.currency_slippage} {trade_details.token_slippage}{/if}
+  {#if trade_details}
+  <div>token: {trade_details.token_symbol}</div> <div>currency slippage: {trade_details.currency_slippage} </div><div>token_slippage: {trade_details.token_slippage}</div>{/if}
 </div>
 
 <style>

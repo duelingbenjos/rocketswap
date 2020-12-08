@@ -124,9 +124,9 @@
   </div>
   <div class="token-info">
     {#if role === 'currency'}
-      <div on:click={handleMaxInput} class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance.toFixed(2) || "0.00"}` : ''}</span></div>
+      <div on:click={handleMaxInput} class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance?.toFixed(2) || "0.00"}` : ''}</span></div>
     {:else}
-      <div on:click={handleMaxInput} class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token ? `${balance.toFixed(2) || "0.00"}` : ''}</span></div>
+      <div on:click={handleMaxInput} class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token ? `${balance?.toFixed(2) || "0.00"}` : ''}</span></div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
