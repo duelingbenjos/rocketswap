@@ -1,7 +1,7 @@
 <script lang="ts">
 </script>
 
-<div class="container"><button class="swap-button"> Swap </button></div>
+<div class="container"><button class="swap-button">Swap</button></div>
 
 <style>
   .swap-button {

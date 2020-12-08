@@ -94,7 +94,7 @@ async function processAmmBlock(
 		await saveTransfer(state);
 		await savePairLp(state);
 		await saveUserLp(state);
-		await saveReserves(state);
+		await saveReserves(state, handleClientUpdate);
 		await savePrice(state, handleClientUpdate);
 	} catch (err) {
 		console.error(err);

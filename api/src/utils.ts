@@ -47,11 +47,13 @@ export function getKey(state: IKvp[], idx_1: number, idx_2: number) {
 export function getVal(state: IKvp[] | IKvp, idx?: number) {
 	let val;
 	if (idx) {
-		val = state[idx].value;
+		val = state[idx]?.value;
 	} else {
-		val = (state as IKvp).value;
+		val = (state as IKvp)?.value;
 	}
-	return val.__fixed__ ? parseFloat(val.__fixed__) : val;
+	if (val) {
+		return val.__fixed__ ? parseFloat(val.__fixed__) : val;
+	}
 }
 
 export function getContractName(state: IKvp[]) {

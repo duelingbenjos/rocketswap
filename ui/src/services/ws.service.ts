@@ -1,6 +1,6 @@
 import socket from 'socket.io-client'
 import { token_metrics_store } from '../store'
-import type { PriceUpdateType, TokenMetricsType } from '../types/api.types'
+import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl } from '../utils'
 
 /** Singleton socket.io service */
@@ -49,9 +49,9 @@ export class WsService {
   }
 
   public joinPriceFeed(contract_name: string) {
-    console.log('joined room')
+    console.log(Date.now(), 'joined room')
     this.connection.emit('join_room', `price_feed:${contract_name}`)
-    this.connection.on(`price_feed:${contract_name}`, this.handlePriceUpdate)
+    this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
   }
 
   public leavePriceFeed(contract_name: string) {
@@ -59,11 +59,11 @@ export class WsService {
     this.connection.off(`price_feed:${contract_name}`)
   }
 
-  private handlePriceUpdate = (price_update: PriceUpdateType) => {
-    console.log('price feed : ', price_update)
-    let { contract_name } = price_update
+  private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
+    console.log('metrics feed : ', metrics_update)
+    let { contract_name } = metrics_update
     const metrics = this.token_metrics
-    metrics[contract_name] = { ...metrics[contract_name], ...price_update }
+    metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     token_metrics_store.set(metrics)
     console.log('token_metrics', metrics)
   }

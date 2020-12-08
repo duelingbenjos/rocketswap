@@ -7,6 +7,7 @@ import {
 	BaseEntity,
 	PrimaryGeneratedColumn
 } from "typeorm";
+import { handleClientUpdate } from "src/types/websocket.types";
 
 /** This entity is created when a new market is detected on the AMM contract. */
 
@@ -21,14 +22,27 @@ export class PairEntity extends BaseEntity {
 	@Column()
 	time: string = Date.now().toString();
 
+	@Column({ nullable: true })
+	price: number;
+
 	@Column({ nullable: true, type: "simple-json" })
 	reserves: [number, number];
 }
 
-export async function saveReserves(state: IKvp[]) {
+export async function saveReserves(
+	state: IKvp[],
+	handleClientUpdate: handleClientUpdate
+) {
 	//    [ {key: "con_amm2.reserves:con_token_test7", value: [{ __fixed__: "100.0" }, { __fixed__: "100.0" }]},]
 	const reserve_kvp = state.find(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "reserves"
+	);
+	const price_kvp = state.find(
+		(kvp) => kvp.key.split(".")[1].split(":")[0] === "prices"
+	);
+	const lp_kvp = state.find(
+		(kvp) =>
+			kvp.key.includes("lp_points") && kvp.key.split(":").length === 2
 	);
 	if (reserve_kvp) {
 		let contract_name = reserve_kvp.key.split(".")[0];
@@ -37,11 +51,26 @@ export async function saveReserves(state: IKvp[]) {
 			entity = new PairEntity();
 			entity.contract_name = contract_name;
 		}
-		const values: [number, number] = [
+		let reserves: [number, number] = [
 			reserve_kvp.value[0].__fixed__,
 			reserve_kvp.value[1].__fixed__
 		];
-		entity.reserves = values;
+		console.log('PRICE KVP', price_kvp)
+		let lp: number = getVal(lp_kvp);
+		let price = getVal(price_kvp);
+
+		if (price) entity.price = price;
+		if (lp) entity.price = lp;
+		if (reserves) entity.reserves = reserves;
+		entity.time = Date.now.toString();
+		handleClientUpdate({
+			action: "metrics_update",
+			contract_name,
+			time: parseInt(entity.time),
+			reserves: entity.reserves,
+			lp: entity.lp,
+			price: entity.price
+		});
 		await entity.save();
 	}
 }

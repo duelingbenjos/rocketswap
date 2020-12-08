@@ -24,12 +24,14 @@ export type SlotType = {
   input_amount: number
 }
 
-export type PriceUpdateType = {
-    contract_name: string
-    price: number
-    time: string
-  }
+export type MetricsUpdateType = {
+  contract_name: string
+  price: number
+  time: string
+  lp: number
+  reserves: [string, string]
+}
 
 export type TokenMetricsType = {
-  [key: string]: PriceUpdateType
+  [key: string]: MetricsUpdateType
 }

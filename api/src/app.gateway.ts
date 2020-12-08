@@ -10,9 +10,14 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import blockgrabber from "./blockgrabber";
-import { getPriceUpdate, PriceEntity } from "./entities/price.entity";
+import { getTokenMetrics, PriceEntity } from "./entities/price.entity";
 import { ParserProvider } from "./parser.provider";
-import { ClientUpdateType, isPriceUpdate } from "./types/websocket.types";
+import {
+	ClientUpdateType,
+	isMetricsUpdate,
+	isPriceUpdate,
+	MetricsUpdateType
+} from "./types/websocket.types";
 
 @WebSocketGateway()
 export class AppGateway
@@ -44,8 +49,9 @@ export class AppGateway
 	handleClientUpdate = async (update: ClientUpdateType) => {
 		let contract_name;
 		switch (update.action) {
-			case "price_update":
-				if (isPriceUpdate(update)) contract_name = update.contract_name;
+			case "metrics_update":
+				if (isMetricsUpdate(update))
+					contract_name = update.contract_name;
 				this.wss.emit(`price_feed:${contract_name}`, update);
 				this.logger.log("price update sent");
 		}
@@ -63,9 +69,13 @@ export class AppGateway
 		let contract_name = room.split(":")[1];
 		if (contract_name) {
 			try {
-				const price_update = await getPriceUpdate(contract_name);
-				this.logger.log(price_update);
-				client.emit(`price_feed:${contract_name}`, price_update);
+				const metrics = await getTokenMetrics(contract_name);
+				const metrics_action: MetricsUpdateType = {
+					action: "metrics_update",
+					...metrics
+				};
+				this.logger.log(metrics_action);
+				client.emit(`price_feed:${contract_name}`, metrics_action);
 			} catch (err) {
 				this.logger.error(err);
 			}

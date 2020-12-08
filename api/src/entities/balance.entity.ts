@@ -44,7 +44,7 @@ export async function saveTransfer(state: IKvp[]) {
 	const balances_kvp = state.filter(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "balances"
 	);
-	console.log(balances_kvp);
+	// console.log(balances_kvp);
 	const transfers = balances_kvp.filter(
 		(kvp) => kvp.key.split(":").length === 2
 	);

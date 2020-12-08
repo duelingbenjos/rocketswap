@@ -4,9 +4,9 @@
   import { routes, active } from 'svelte-hash-router'
   let links: any[]
   $: links = Object.values($routes)
-  afterUpdate(() => {
-    console.log(links)
-  })
+  // afterUpdate(() => {
+  //   console.log(links)
+  // })
 </script>
 
 <div class="header">

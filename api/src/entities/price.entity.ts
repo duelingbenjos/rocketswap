@@ -2,7 +2,11 @@ import { IKvp } from "src/types/misc.types";
 import { getVal } from "../utils";
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { Server } from "socket.io";
-import { handleClientUpdate } from "src/types/websocket.types";
+import {
+	handleClientUpdate,
+	MetricsUpdateType
+} from "src/types/websocket.types";
+import { PairEntity } from "./pair.entity";
 
 /** An instance of this entity is created after each action on the AMM that changes the price variable. */
 
@@ -29,30 +33,37 @@ export async function savePrice(
 	const price_kvp = state.find(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "prices"
 	);
+	console.log(price_kvp)
 	if (!price_kvp) return;
 	const contract_name = price_kvp.key.split(".")[1].split(":")[1];
-	const entity = new PriceEntity();
+	const price_entity = new PriceEntity();
 	const price = getVal(price_kvp);
-	entity.contract_name = contract_name;
-	entity.price = price;
+	price_entity.contract_name = contract_name;
+	price_entity.price = price;
+
+	const pair_entity = await PairEntity.findOne(contract_name);
+	pair_entity.price = price;
+	const { lp, reserves } = pair_entity;
 	handleClientUpdate({
-		action: "price_update",
+		action: "metrics_update",
 		contract_name,
 		price,
-		time: parseInt(entity.time)
+		time: parseInt(price_entity.time),
+		lp,
+		reserves
 	});
 
-	await entity.save();
+	await Promise.all([price_entity.save(), pair_entity.save()]);
 }
 
-export async function getPriceUpdate(contract_name: string) {
-	const price_entity = await PriceEntity.findOneOrFail({
-		where: { contract_name },
-		order: {
-			id: "DESC"
-		}
+export async function getTokenMetrics(contract_name: string) {
+	const pair_entity = await PairEntity.findOneOrFail({
+		where: { contract_name }
+		// order: {
+		// 	id: "DESC"
+		// }
 	});
-	console.log(price_entity);
-	const { price, time } = price_entity;
-	return { contract_name, price, time };
+	console.log(pair_entity);
+	const { price, time, lp, reserves } = pair_entity;
+	return { contract_name, price, time: parseInt(time), reserves, lp };
 }

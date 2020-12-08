@@ -2,21 +2,26 @@
   import { onDestroy, onMount } from 'svelte'
   import { config } from '../config'
   import { isWalletConnected } from '../services/wallet.service'
-  import { pool_panel_store } from '../store'
-  import type { SlotType, SwapPanelType } from '../types/api.types'
+  import { pool_panel_store, token_metrics_store } from '../store'
+  import type { SlotType, SwapPanelType, TokenMetricsType } from '../types/api.types'
   import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
   import TokenSelect from './token-select.svelte'
+  import type { Writable } from 'svelte/store'
+
   export let position: 'from' | 'to'
+  export let label
   export let context: 'pool' | 'swap'
+  export let value: number
+  export let token_metrics: TokenMetricsType
 
   let selected: SlotType
   $: selected
   let balance, role, slot_position, selected_token, wallet, input_amount
-  let context_store
+  let context_store: Writable<SwapPanelType>
 
-  $: wallet_balance = wallet.balance
-  $: contract_name = selected_token
+  $: wallet_balance = parseFloat(wallet.balance)
   $: balance
+  $: input_amount
 
   let input_unsub
 
@@ -48,7 +53,6 @@
     slot_position = selected.position
     selected_token = selected.selected_token
     input_amount = selected.input_amount
-    console.log('selected token : ', selected_token)
   }
 
   function getPosition(update: SwapPanelType) {
@@ -61,30 +65,68 @@
   }
 
   function handleInputChange(e) {
-    console.log(e.target.value)
+    let active_input
+    let other_input
+    context_store.update((current_value) => {
+      console.log(role)
+
+      active_input = current_value.slot_a.role === role ? current_value.slot_a : current_value.slot_b
+      other_input = current_value.slot_a.role !== role ? current_value.slot_a : current_value.slot_b
+      console.log('other input', other_input)
+      const contract_name = role === 'currency' ? other_input.selected_token.contract_name : active_input.selected_token.contract_name
+      const update_amount = getUpdateAmount(e.target.value, role, position)
+      console.log(update_amount)
+      console.log(active_input, other_input)
+      active_input.input_amount = update_amount
+      other_input.input_amount =
+        role === 'token'
+          ? parseFloat((update_amount * $token_metrics_store[contract_name].price).toFixed(6))
+          : parseFloat((update_amount * $token_metrics_store[contract_name].price).toFixed(6))
+      console.log(typeof update_amount)
+      return current_value
+    })
+  }
+
+  function getUpdateAmount(value: string, role: string, position: 'to' | 'from'): number {
+    let parsed_value = parseFloat(value)
+    let amount
+    let max_amount = role === 'currency' ? wallet_balance : selected_token.balance
+    if (position === 'from') {
+      amount = parsed_value > max_amount ? max_amount : parsed_value
+    } else {
+      amount = parsed_value
+    }
+    // if (parsed_value === NaN) parsed_value = 0
+    return parseFloat(amount.toFixed(6))
   }
 
   function handleMaxInput() {
     const slots = $context_store
+    let selected_token = slots.slot_b.selected_token
+    const metrics = token_metrics[selected_token?.contract_name]
     if (role === 'currency') {
-      slots.slot_a.input_amount = wallet_balance || 0
+      slots.slot_a.input_amount = parseFloat(wallet_balance.toFixed(6)) || 0
+      console.log(slots.slot_a.input_amount)
+      if (metrics) slots.slot_b.input_amount = parseFloat((wallet_balance * metrics.price).toFixed(6))
     } else if (role === 'token') {
-      slots.slot_b.input_amount = selected_token.balance || 0
+      slots.slot_b.input_amount = parseFloat(selected_token.balance.toFixed(6)) || 0
+      if (metrics) slots.slot_a.input_amount = parseFloat((selected_token.balance * metrics.price).toFixed(6))
     }
+
     context_store.set(slots)
   }
 </script>
 
 <div class="container">
   <div class="amount">
-    <div class="label">{position === 'from' ? 'From' : 'To'}</div>
-    <div class="amount-value number"><input placeholder="0.0" value={input_amount} on:input={handleInputChange} /></div>
+    <div class="label">{label ? label : position === 'from' ? 'From' : 'To'}</div>
+    <div class="amount-value number"><input placeholder="0.0" bind:value={input_amount} type="number" on:input={handleInputChange} /></div>
   </div>
   <div class="token-info">
     {#if role === 'currency'}
-      <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance || 0}` : ''}</span></div>
+      <div on:click={handleMaxInput} class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance.toFixed(2) || "0.00"}` : ''}</span></div>
     {:else}
-      <div class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token && wallet_balance ? `${balance || 0}` : ''}</span></div>
+      <div on:click={handleMaxInput} class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token ? `${balance.toFixed(2) || "0.00"}` : ''}</span></div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
@@ -219,6 +261,16 @@
 
   input::placeholder {
     color: rgba(255, 255, 255, 0.3);
+  }
+
+  input::-webkit-inner-spin-button,
+  input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
   }
 
   button {

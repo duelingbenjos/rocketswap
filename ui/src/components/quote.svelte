@@ -1,45 +1,29 @@
 <script lang="ts">
+  export let showSwitch
+  export let selected_token : TokenListType
+  export let token_metrics : TokenMetricsType
+
   import { onDestroy, onMount } from 'svelte'
   import { config } from '../config'
   import { WsService } from '../services/ws.service'
   import { swap_panel_store, token_metrics_store } from '../store'
   import type { TokenListType, TokenMetricsType } from '../types/api.types'
 
-  const ws = WsService.getInstance()
-  let swap_panel_unsub
-  let token_metrics_unsub
-
-  let selected_token: TokenListType
   $: symbol = selected_token?.token_symbol
-  let token_metrics: TokenMetricsType
 
-  onMount(() => {
-    token_metrics_unsub = token_metrics_store.subscribe((metrics) => {
-      console.log(metrics)
-      token_metrics = metrics
-    })
-    swap_panel_unsub = swap_panel_store.subscribe((update) => {
-      console.log('quote panel update : ', update)
-      if (update.slot_b.selected_token) {
-        ws.leavePriceFeed(selected_token?.contract_name)
-        selected_token = update.slot_b.selected_token
-        ws.joinPriceFeed(update.slot_b.selected_token.contract_name)
-      }
-    })
-  })
-
-  onDestroy(() => {
-    swap_panel_unsub()
-    token_metrics_unsub()
-    ws.leavePriceFeed(selected_token.contract_name)
-  })
 </script>
 
 <div class="container">
-  {#if selected_token && token_metrics[selected_token?.contract_name]}
+  {#if selected_token && token_metrics[selected_token?.contract_name]?.price}
     <div class="label">Last Price :</div>
     <div class="quote-container">
-      <div class="quote-text label">{token_metrics[selected_token?.contract_name].price.toFixed(8)} <b>{symbol} / {config.currencySymbol}</b></div>
+      <div class="quote-text label">
+        {token_metrics[selected_token?.contract_name].price.toFixed(6)}
+        <b>{symbol} / {config.currencySymbol}</b>
+        {#if showSwitch}
+          <div><button> <img src="assets/images/switch.svg" alt="" /> </button></div>
+        {/if}
+      </div>
     </div>
   {/if}
 </div>
