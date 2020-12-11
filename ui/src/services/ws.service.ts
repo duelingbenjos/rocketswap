@@ -24,20 +24,20 @@ export class WsService {
     this.port = 3001
     // console.log(socket)
     this.connection = socket(`${this.base_url}:${this.port}`)
-    console.log(this.connection)
+    // console.log(this.connection)
     this.setupEvents()
     this.setupSubs()
   }
 
   setupEvents = () => {
-    console.log('setup events')
+    // console.log('setup events')
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
       this.connection.on('joined_room', (msg) => {
-        console.log('joined room : ', msg)
+        // console.log('joined room : ', msg)
       })
       this.connection.on('left_room', (msg) => {
-        console.log('left room : ', msg)
+        // console.log('left room : ', msg)
       })
     })
   }
@@ -49,7 +49,7 @@ export class WsService {
   }
 
   public joinPriceFeed(contract_name: string) {
-    console.log(Date.now(), 'joined room')
+    // console.log(Date.now(), 'joined room')
     this.connection.emit('join_room', `price_feed:${contract_name}`)
     this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
   }
@@ -60,11 +60,11 @@ export class WsService {
   }
 
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
-    console.log('metrics feed : ', metrics_update)
+    // console.log('metrics feed : ', metrics_update)
     let { contract_name } = metrics_update
     const metrics = this.token_metrics
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     token_metrics_store.set(metrics)
-    console.log('token_metrics', metrics)
+    // console.log('token_metrics', metrics)
   }
 }

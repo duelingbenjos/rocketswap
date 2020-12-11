@@ -11,11 +11,11 @@
   export let position: 'from' | 'to'
   export let label
   export let context: 'pool' | 'swap'
-  export let value: number
   export let token_metrics: TokenMetricsType
 
   let selected: SlotType
   $: selected
+  $: selected_token
   let balance, role, slot_position, selected_token, wallet, input_amount
   let context_store: Writable<SwapPanelType>
 
@@ -31,7 +31,7 @@
     } else if (context === 'pool') {
       context_store = pool_panel_store
     }
-    input_unsub = context_store.subscribe((update) => handleStoreUpdate(update))
+    input_unsub = context_store.subscribe((update) => handleInputStoreUpdate(update))
   })
 
   let wallet_unsub = wallet_store.subscribe((update) => {
@@ -46,7 +46,7 @@
     wallet_unsub()
   })
 
-  function handleStoreUpdate(update) {
+  function handleInputStoreUpdate(update) {
     selected = getPosition(update)
     balance = selected.selected_token?.balance
     role = selected.role
@@ -68,7 +68,7 @@
     let active_input
     let other_input
     context_store.update((current_value) => {
-      console.log(role)
+      // console.log(role)
 
       active_input = current_value.slot_a.role === role ? current_value.slot_a : current_value.slot_b
       other_input = current_value.slot_a.role !== role ? current_value.slot_a : current_value.slot_b
@@ -79,7 +79,7 @@
         role === 'token'
           ? parseFloat((update_amount * $token_metrics_store[contract_name].price).toFixed(6))
           : parseFloat((update_amount * $token_metrics_store[contract_name].price).toFixed(6))
-      console.log(typeof update_amount)
+      // console.log(typeof update_amount)
       return current_value
     })
   }
@@ -103,8 +103,8 @@
     const metrics = token_metrics[selected_token?.contract_name]
     if (role === 'currency') {
       slots.slot_a.input_amount = parseFloat(wallet_balance.toFixed(6)) || 0
-      console.log(slots.slot_a.input_amount)
-      if (metrics) slots.slot_b.input_amount = parseFloat((wallet_balance * metrics.price).toFixed(6))
+      // console.log(slots.slot_a.input_amount)
+      if (metrics) slots.slot_b.input_amount = parseFloat((wallet_balance / metrics.price).toFixed(6))
     } else if (role === 'token') {
       slots.slot_b.input_amount = parseFloat(selected_token.balance.toFixed(6)) || 0
       if (metrics) slots.slot_a.input_amount = parseFloat((selected_token.balance * metrics.price).toFixed(6))
@@ -121,9 +121,9 @@
   </div>
   <div class="token-info">
     {#if role === 'currency'}
-      <div on:click={handleMaxInput} class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance?.toFixed(2) || "0.00"}` : ''}</span></div>
+      <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance?.toFixed(2)}` : '0.00'}</span></div>
     {:else}
-      <div on:click={handleMaxInput} class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token ? `${balance?.toFixed(2) || "0.00"}` : ''}</span></div>
+      <div class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token ? `${balance?.toFixed(2) || "0.00"}` : ''}</span></div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">

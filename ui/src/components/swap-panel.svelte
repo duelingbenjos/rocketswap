@@ -8,7 +8,6 @@
   import { onDestroy } from 'svelte'
   import { fly } from 'svelte/transition'
 
-
   let ws = WsService.getInstance()
 
   let selected_token: TokenListType
@@ -18,7 +17,7 @@
   let trade_details: { currency_out: number; token_out: number; currency_slippage: number; token_slippage: number; contract_name: string; token_symbol: string }
   $: trade_details
   let swap_panel_unsub = swap_panel_store.subscribe((update) => {
-    console.log('quote panel update : ', update)
+    // console.log('quote panel update : ', update)
     if (update.slot_b.selected_token?.contract_name !== selected_token?.contract_name) {
       ws.leavePriceFeed(selected_token?.contract_name)
       selected_token = update.slot_b.selected_token
@@ -30,7 +29,7 @@
 
   function getTradeDetails(metrics) {
     if (!metrics) return
-    console.log(metrics)
+    // console.log(metrics)
     token_metrics = metrics
     if (Object.keys(token_metrics).length) {
       trade_details = {
@@ -38,7 +37,7 @@
         contract_name: $swap_panel_store.slot_b.selected_token?.contract_name,
         token_symbol: $swap_panel_store.slot_b.selected_token?.token_symbol
       }
-      console.log(trade_details)
+      // console.log(trade_details)
     }
   }
 
@@ -54,8 +53,8 @@
     let currency_direction = swap_panel.slot_a.position === 'from' ? 'in' : 'out'
     let currency_amount = swap_panel.slot_a.input_amount
     let token_amount = swap_panel.slot_b.input_amount
-    console.log(currency_amount - token_amount)
-    console.log('currency_amount : ', currency_amount, 'token amount: ', token_amount)
+    // console.log(currency_amount - token_amount)
+    // console.log('currency_amount : ', currency_amount, 'token amount: ', token_amount)
     // let currency_out = currency_reserve - currency_reserve_new
     // let token_out = token_reserve - token_
     //     # def calculate_trade_details(tau_contract, token_contract, tau_in, token_in):
@@ -64,9 +63,9 @@
     // #     token_reserve = pairs[tau_contract, token_contract, 'token_reserve']
     // #
     // #     lp_total = tau_reserve * token_reserve
-    let contract_name = selected_token.contract_name
+    let contract_name = selected_token?.contract_name
     if (!token_metrics[contract_name]) return
-    let [currency_reserve, token_reserve] = token_metrics[contract_name].reserves.map((reserve) => parseFloat(reserve))
+    let [currency_reserve, token_reserve] = token_metrics ? token_metrics[contract_name].reserves.map((reserve) => parseFloat(reserve)) : [0, 0]
     // console.log(typeof currency_reserve, token_reserve)
     let lp_total = currency_reserve * token_reserve
     // #
@@ -101,7 +100,7 @@
   onDestroy(() => {
     swap_panel_unsub()
     token_metrics_unsub()
-    ws.leavePriceFeed(selected_token.contract_name)
+    ws.leavePriceFeed(selected_token?.contract_name)
   })
 </script>
 
@@ -114,7 +113,7 @@
     <SwapButtons />
   </div>
   {#if trade_details}
-    <div class="slippage-display-container" transition:fly={{ y: -30, duration: 300, delay: 400 }}>
+    <div class="slippage-display-container" in:fly={{ y: -30, duration: 300, delay: 400 }}>
       <div>token: {trade_details.token_symbol}</div>
       <div>currency slippage: {trade_details.currency_slippage}</div>
       <div>token_slippage: {trade_details.token_slippage}</div>
