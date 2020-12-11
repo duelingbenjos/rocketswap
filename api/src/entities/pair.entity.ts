@@ -84,10 +84,12 @@ export async function savePair(state: IKvp[]) {
 	if (!pair_kvp) return;
 	const contract_name = pair_kvp.key.split(".")[1].split(":")[1];
 	const pair_entity = new PairEntity();
-	const token_entity = await TokenEntity.findOne(contract_name);
+	const token_entity = await TokenEntity.findOne({
+		where: { contract_name }
+	});
 	if (token_entity) {
 		token_entity.has_market = true;
-		token_entity.save();
+		await token_entity.save();
 	}
 	pair_entity.contract_name = contract_name;
 	await pair_entity.save();

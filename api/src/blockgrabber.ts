@@ -18,7 +18,7 @@ if (DBUSER) {
 	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}/block-explorer?authSource=admin`;
 }
 
-var wipeOnStartup = false;
+var wipeOnStartup = true;
 if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
 }
