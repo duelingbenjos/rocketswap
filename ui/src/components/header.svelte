@@ -4,17 +4,12 @@
   import { routes, active } from 'svelte-hash-router'
   let links: any[]
   $: links = Object.values($routes)
-  // afterUpdate(() => {
-  //   console.log(links)
-  // })
 </script>
 
 <div class="header">
   <div class="logo-container"><img src="/assets/images/rocketswap.svg" alt="" /></div>
   <div class="links">
-    {#each links as e}<a class:active={e === $active} href={e.$$href}> {e.$$name} </a>{/each}
-    <!-- <div>Swap</div>
-    <div>Pool</div> -->
+    {#each links as e}<button class="nostyle"> <a class:active={e === $active} href={e.$$href}> {e.$$name} </a> </button>{/each}
   </div>
 </div>
 
@@ -44,6 +39,12 @@
 
   a:hover {
     text-decoration: none;
+  }
+
+  button:active,
+  button:focus,
+  button:hover {
+    background: none;
   }
   .header {
     width: 100%;
