@@ -62,8 +62,7 @@
     background-color: rgba(255, 255, 255, 0.9);
     margin-top: 15px;
     border: 1px solid #cccccc;
-    min-height: 50px;
-    height: 50px;
+    min-height: 70px;
     width: 320px;
     background-color: #2a334a;
     border-radius: 8px;

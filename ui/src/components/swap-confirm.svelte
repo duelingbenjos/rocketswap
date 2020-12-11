@@ -26,7 +26,7 @@
     if (action === 'buy') {
       walletService.buy(($wallet_store as WalletConnectedType).wallets[0], amount, contract_name)
     } else if (action === 'sell') {
-      walletService.sell({
+      walletService.sell(($wallet_store as WalletConnectedType).wallets[0], {
         contract: contract_name,
         token_amount: amount
       })

@@ -113,20 +113,9 @@ export class WalletService {
       .catch((e) => console.log(e.message))
   }
 
-  private async approveDifference(vk: string, amount: number, contract_name: string) {
-    let approved_amount = await this.getApprovedAmount(vk, contract_name)
-    if (approved_amount && approved_amount.__fixed__) approved_amount = approved_amount.__fixed__
-    console.log(approved_amount)
-    console.log(amount)
-    approved_amount = approved_amount ? parseFloat(approved_amount) : 0
-    let approve_amount = amount - (approved_amount as number)
-    if (approve_amount <= 0) return
-    await this.approve(approve_amount, contract_name)
-  }
-
   approve = async (amount: number, contract_name: string) => {
     const transaction = {
-      contractName: 'contract_name', // The contract which we're calling approve() on
+      contractName: contract_name, // The contract which we're calling approve() on
       methodName: 'approve',
       networkType: config.networkType,
       kwargs: {
@@ -138,6 +127,7 @@ export class WalletService {
     console.log(transaction)
     const prom = new Promise((resolve, reject) => {
       this.lwc.sendTransaction(transaction, (res) => {
+        console.log(res)
         if (res.status === 'success') {
           this.toastService.addToast({ heading: 'Approval Successful.', text: `Approved ${amount} for transfer from ${contract_name}`, type: 'info' })
           resolve(res)
@@ -152,7 +142,7 @@ export class WalletService {
       swap_confirm_loading.set(true)
       await this.approveDifference(vk, currency_amount, 'currency')
       const tx_info = this.createTxInfo('buy', { currency_amount: returnFloat(currency_amount), contract: contract_name })
-      this.lwc.sendTransaction(tx_info, this.handleBuyResult)
+      this.lwc.sendTransaction(tx_info, this.handleSwapResult)
     } catch (err) {
       console.log(err)
       show_swap_confirm.set(false)
@@ -162,9 +152,34 @@ export class WalletService {
     }
   }
 
-  public async sell(args: { token_amount: number; contract: string }) {
-    console.log(this.createTxInfo('sell', args))
-    this.lwc.sendTransaction(this.createTxInfo('sell', args), handleCreateMarket)
+  public async sell(vk: string, args: { token_amount: number; contract: string }) {
+    try {
+      const { token_amount, contract } = args
+      await this.approveDifference(vk, token_amount, contract)
+      this.lwc.sendTransaction(this.createTxInfo('sell', args), this.handleSwapResult)
+    } catch (err) {
+      this.handleSwapError(err)
+    }
+  }
+
+  private async handleSwapError(err) {
+    show_swap_confirm.set(false)
+    swap_confirm_loading.set(false)
+    this.toastService.addToast({ heading: 'Transaction Failed.', text: err.data.resultInfo.errorInfo[0], type: 'error' })
+    console.error(err)
+  }
+
+  private async approveDifference(vk: string, amount: number, contract_name: string) {
+    let approved_amount = await this.getApprovedAmount(vk, contract_name)
+    if (approved_amount && approved_amount.__fixed__) approved_amount = approved_amount.__fixed__
+    console.log(approved_amount)
+    console.log(amount)
+    approved_amount = approved_amount ? parseFloat(approved_amount) : 0
+    let approve_amount = amount - (approved_amount as number)
+    console.log(approve_amount)
+    if (approve_amount <= 0) return
+    await this.approve(approve_amount, contract_name)
+    this.toastService.addToast({ heading: 'Approval succeeded !', text: `You have approved ${approve_amount} tokens.`, type: 'info' })
   }
 
   public async createMarket(args) {
@@ -172,8 +187,7 @@ export class WalletService {
     this.lwc.sendTransaction(this.createTxInfo('create_market', args), handleCreateMarket)
   }
 
-  private handleBuyResult = (res) => {
-    console.log(res)
+  private handleSwapResult = (res) => {
     swap_confirm_loading.set(false)
     show_swap_confirm.set(false)
     this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
