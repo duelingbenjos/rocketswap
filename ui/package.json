@@ -15,7 +15,6 @@
     "@types/es6-promisify": "^6.0.0",
     "@types/node": "^14.14.10",
     "@types/socket.io-client": "^1.4.34",
-    "es6-promisify": "^6.1.1",
     "rollup": "^2.3.4",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^6.0.0",
@@ -32,9 +31,7 @@
     "bignumber.js": "^9.0.1",
     "lamden-js": "^1.21.0",
     "lamden_wallet_controller": "^0.6.1",
-    "promisify": "0.0.3",
     "sirv-cli": "^1.0.0",
-    "socket.io-client": "^2.3",
-    "svelte-loading-spinners": "^0.1.2"
+    "socket.io-client": "^2.3"
   }
 }
