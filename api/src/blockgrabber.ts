@@ -55,7 +55,7 @@ const databaseLoader = (models, ws_callback) => {
 		console.log("Transactions DB wiped");
 		currBlockNum = 0;
 		console.log("Set currBlockNum = 0");
-		timerId = setTimeout(checkForBlocks, 500);
+		timerId = setTimeout(checkForBlocks, 1000);
 	};
 
 	const send = (url, callback) => {
