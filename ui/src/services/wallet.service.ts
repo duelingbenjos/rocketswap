@@ -153,6 +153,7 @@ export class WalletService {
   }
 
   public async sell(vk: string, args: { token_amount: number; contract: string }) {
+    swap_confirm_loading.set(true)
     try {
       const { token_amount, contract } = args
       await this.approveDifference(vk, token_amount, contract)
