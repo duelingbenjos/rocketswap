@@ -29,6 +29,9 @@ export class TokenEntity extends BaseEntity {
 
 	@Column({ nullable: true })
 	developer: string;
+
+	@Column({ nullable: true })
+	has_market: boolean;
 }
 
 export class AddTokenDto {

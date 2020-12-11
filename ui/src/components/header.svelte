@@ -20,7 +20,7 @@
 
 <style>
   .active {
-    border-bottom: 1px solid rgba(255, 255, 255 );
+    border-bottom: 3px solid rgba(255, 255, 255);
     box-sizing: border-box;
   }
 
@@ -29,9 +29,11 @@
     flex-direction: row;
     align-items: center;
     font-size: 1.4em;
-    font-weight: 400;
+    font-weight: 600;
     color: #fff;
     margin-right: 20px;
+    box-sizing: border-box;
+    /* padding-bottom: 6px */
   }
 
   .links a {
@@ -41,7 +43,7 @@
   }
 
   a:hover {
-	text-decoration:none;
+    text-decoration: none;
   }
   .header {
     width: 100%;

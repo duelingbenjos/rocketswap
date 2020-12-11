@@ -1,12 +1,16 @@
 import { Writable, writable } from 'svelte/store'
 
 import type { SwapPanelType, TokenListType, TokenMetricsType, TokenSelectType } from './types/api.types'
+import type { ToastMetaType } from './types/toast.types'
 import type { WalletType } from './types/wallet.types'
 
+export const toast_store: Writable<ToastMetaType[]> = writable([])
 export const wallet_store: Writable<WalletType> = writable({ init: true })
 export const amount_input_store: Writable<any> = writable('')
 export const token_list_store: Writable<TokenListType[]> = writable([])
 export const show_token_select_store: Writable<TokenSelectType> = writable({ open: false })
+export const show_swap_confirm: Writable<boolean> = writable(false)
+export const swap_confirm_loading: Writable<boolean> = writable(false)
 export const swap_panel_store: Writable<SwapPanelType> = writable({
   slot_a: {
     position: 'from',
@@ -19,7 +23,6 @@ export const swap_panel_store: Writable<SwapPanelType> = writable({
     input_amount: null
   }
 })
-
 export const pool_panel_store: Writable<SwapPanelType> = writable({
   slot_a: {
     position: 'from',
@@ -32,7 +35,4 @@ export const pool_panel_store: Writable<SwapPanelType> = writable({
     input_amount: null
   }
 })
-
 export const token_metrics_store: Writable<TokenMetricsType> = writable({})
-
-

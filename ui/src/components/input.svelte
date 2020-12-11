@@ -72,11 +72,8 @@
 
       active_input = current_value.slot_a.role === role ? current_value.slot_a : current_value.slot_b
       other_input = current_value.slot_a.role !== role ? current_value.slot_a : current_value.slot_b
-      console.log('other input', other_input)
       const contract_name = role === 'currency' ? other_input.selected_token.contract_name : active_input.selected_token.contract_name
       const update_amount = getUpdateAmount(e.target.value, role, position)
-      console.log(update_amount)
-      console.log(active_input, other_input)
       active_input.input_amount = update_amount
       other_input.input_amount =
         role === 'token'

@@ -4,26 +4,32 @@
 <div class="add-liquidity-wrapper">
   <div class="top-wrapper">
     <div class="heading">
-        <span class="big-text">
-            You will receive
-        </span>
+      <div class="big-text">You will receive</div>
     </div>
+    <div class="amount">10.3242</div>
   </div>
   <div class="bottom-wrapper" />
 </div>
 
 <style>
-    .heading {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-    }
-    .big-text {
-        font-size: 30px;
-    }
+  .amount {
+    font-size: 3em;
+    font-weight: 600;
+    padding-top: 10px;
+  }
+  .heading {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .big-text {
+    font-size: 2em;
+  }
   .top-wrapper {
     height: 50%;
-    padding: 15px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
   }
   .bottom-wrapper {
     height: 50%;
@@ -41,6 +47,6 @@
     box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-    color: #D9D9D9;
+    color: #d9d9d9;
   }
 </style>

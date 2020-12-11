@@ -8,6 +8,7 @@ import {
 	PrimaryGeneratedColumn
 } from "typeorm";
 import { handleClientUpdate } from "src/types/websocket.types";
+import { TokenEntity } from "./token.entity";
 
 /** This entity is created when a new market is detected on the AMM contract. */
 
@@ -55,7 +56,7 @@ export async function saveReserves(
 			reserve_kvp.value[0].__fixed__,
 			reserve_kvp.value[1].__fixed__
 		];
-		console.log('PRICE KVP', price_kvp)
+		console.log("PRICE KVP", price_kvp);
 		let lp: number = getVal(lp_kvp);
 		let price = getVal(price_kvp);
 
@@ -81,9 +82,15 @@ export async function savePair(state: IKvp[]) {
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "pairs"
 	);
 	if (!pair_kvp) return;
-	const entity = new PairEntity();
-	entity.contract_name = pair_kvp.key.split(".")[1].split(":")[1];
-	await entity.save();
+	const contract_name = pair_kvp.key.split(".")[1].split(":")[1];
+	const pair_entity = new PairEntity();
+	const token_entity = await TokenEntity.findOne(contract_name);
+	if (token_entity) {
+		token_entity.has_market = true;
+		token_entity.save();
+	}
+	pair_entity.contract_name = contract_name;
+	await pair_entity.save();
 }
 
 export async function savePairLp(state: IKvp[]) {

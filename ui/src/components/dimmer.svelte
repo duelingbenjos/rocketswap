@@ -1,9 +1,14 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
-  import { show_token_select_store } from '../store'
+  import { show_swap_confirm, show_token_select_store } from '../store'
+
+  function closeModals() {
+    show_token_select_store.set({ open: false })
+    show_swap_confirm.set(false)
+  }
 </script>
 
-<div on:click={() => show_token_select_store.set({ open: false })} class="dimmer-wrapper" transition:fade={{ duration: 300 }}>
+<div class="dimmer-wrapper" transition:fade={{ duration: 300 }}>
   <slot />
 </div>
 
@@ -18,5 +23,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 1;
   }
 </style>

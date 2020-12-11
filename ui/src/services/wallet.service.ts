@@ -1,9 +1,10 @@
 import WalletController from 'lamden_wallet_controller'
 import { ApiService } from './api.service'
 import { config } from '../config'
-import { wallet_store } from '../store'
+import { show_swap_confirm, swap_confirm_loading, wallet_store } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
-import { refreshTAUBalance } from '../utils'
+import { refreshTAUBalance, returnFloat } from '../utils'
+import { ToastService } from './toast.service'
 
 /** Singleton Wallet Service */
 
@@ -12,6 +13,7 @@ export class WalletService {
   private wallet_state: WalletType
   private lwc: WalletController
   private apiService = ApiService.getInstance()
+  private toastService = ToastService.getInstance()
 
   public static getInstance() {
     if (!WalletService._instance) {
@@ -38,7 +40,7 @@ export class WalletService {
           this.setNotInstalledError()
         }
         this.lwc.sendConnection(config)
-      },1000)
+      }, 1000)
     })
 
     setInterval(() => {
@@ -92,18 +94,89 @@ export class WalletService {
     return await Promise.all(proms)
   }
 
-  private create_txInfo(method: string, args){
+  private createTxInfo(method: string, args) {
     return {
-      'methodName': method,
-      'networkType': config.networkType,
-      'stampLimit': 100, //TODO Populate with blockexplorer stamp info endpoint
-      'kwargs': args
+      methodName: method,
+      networkType: config.networkType,
+      stampLimit: 100, //TODO Populate with blockexplorer stamp info endpoint
+      kwargs: args
     }
   }
 
-  public async createMarket(args){
-    console.log(this.create_txInfo('create_market', args))
-    this.lwc.sendTransaction(this.create_txInfo('create_market', args), handleCreateMarket)
+  getApprovedAmount = async (vk: string, contract: string) => {
+    return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${config.contractName}`)
+      .then((res) => res.json())
+      .then((json) => {
+        console.log(json)
+        return json.value
+      })
+      .catch((e) => console.log(e.message))
+  }
+
+  private async approveDifference(vk: string, amount: number, contract_name: string) {
+    let approved_amount = await this.getApprovedAmount(vk, contract_name)
+    if (approved_amount && approved_amount.__fixed__) approved_amount = approved_amount.__fixed__
+    console.log(approved_amount)
+    console.log(amount)
+    approved_amount = approved_amount ? parseFloat(approved_amount) : 0
+    let approve_amount = amount - (approved_amount as number)
+    if (approve_amount <= 0) return
+    await this.approve(approve_amount, contract_name)
+  }
+
+  approve = async (amount: number, contract_name: string) => {
+    const transaction = {
+      contractName: 'contract_name', // The contract which we're calling approve() on
+      methodName: 'approve',
+      networkType: config.networkType,
+      kwargs: {
+        amount,
+        to: config.contractName // AMM contract
+      },
+      stampLimit: 150
+    }
+    console.log(transaction)
+    const prom = new Promise((resolve, reject) => {
+      this.lwc.sendTransaction(transaction, (res) => {
+        if (res.status === 'success') {
+          this.toastService.addToast({ heading: 'Approval Successful.', text: `Approved ${amount} for transfer from ${contract_name}`, type: 'info' })
+          resolve(res)
+        } else reject(res)
+      })
+    })
+    return prom
+  }
+
+  public async buy(vk: string, currency_amount: number, contract_name: string) {
+    try {
+      swap_confirm_loading.set(true)
+      await this.approveDifference(vk, currency_amount, 'currency')
+      const tx_info = this.createTxInfo('buy', { currency_amount: returnFloat(currency_amount), contract: contract_name })
+      this.lwc.sendTransaction(tx_info, this.handleBuyResult)
+    } catch (err) {
+      console.log(err)
+      show_swap_confirm.set(false)
+      swap_confirm_loading.set(false)
+      this.toastService.addToast({ heading: 'Transaction Failed.', text: err.data.resultInfo.errorInfo[0], type: 'error' })
+      console.error(err)
+    }
+  }
+
+  public async sell(args: { token_amount: number; contract: string }) {
+    console.log(this.createTxInfo('sell', args))
+    this.lwc.sendTransaction(this.createTxInfo('sell', args), handleCreateMarket)
+  }
+
+  public async createMarket(args) {
+    console.log(this.createTxInfo('create_market', args))
+    this.lwc.sendTransaction(this.createTxInfo('create_market', args), handleCreateMarket)
+  }
+
+  private handleBuyResult = (res) => {
+    console.log(res)
+    swap_confirm_loading.set(false)
+    show_swap_confirm.set(false)
+    this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
   }
 }
 
@@ -115,9 +188,9 @@ function handleCreateMarket(res) {
   // TODO Send error(s) to toast controller
 }
 
-function txResult(txResults){
+function txResult(txResults) {
   if (txResults.errors) return txResults.errors
-  if (txResults.txBlockResult.status){
+  if (txResults.txBlockResult.status) {
     if (txResults.txBlockResult.status === 0) return 'success'
     if (txResults.txBlockResult.status === 1) return txResults.txBlockResult.errors
   }

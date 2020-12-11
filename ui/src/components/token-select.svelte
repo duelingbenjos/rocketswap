@@ -180,6 +180,7 @@
     font-size: 1.2em;
     font-weight: 200;
     overflow-x: hidden;
+
     /* overflow-y: scroll; */
   }
 

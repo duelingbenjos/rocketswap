@@ -6,6 +6,8 @@
   import type { MetricsUpdateType, SwapPanelType, TokenListType, TokenMetricsType } from '../types/api.types'
   import { WsService } from '../services/ws.service'
   import { onDestroy } from 'svelte'
+  import { fly } from 'svelte/transition'
+
 
   let ws = WsService.getInstance()
 
@@ -103,26 +105,42 @@
   })
 </script>
 
-<div class="container">
-  <Input {token_metrics} position="from" context="swap" />
-  <div class="switch-symbols-cont"><button on:click={switchPositions}><img src="/assets/images/down-arrow.svg" alt="" /> </button></div>
-  <Input {token_metrics} position="to" context="swap" />
-  <Quote {selected_token} {token_metrics} />
-  <SwapButtons />
-</div>
-<div class="slippage-display-container">
+<div class="wrapper">
+  <div class="container">
+    <Input {token_metrics} position="from" context="swap" />
+    <div class="switch-symbols-cont"><button on:click={switchPositions}><img src="/assets/images/down-arrow.svg" alt="" /> </button></div>
+    <Input {token_metrics} position="to" context="swap" />
+    <Quote {selected_token} {token_metrics} />
+    <SwapButtons />
+  </div>
   {#if trade_details}
-  <div>token: {trade_details.token_symbol}</div> <div>currency slippage: {trade_details.currency_slippage} </div><div>token_slippage: {trade_details.token_slippage}</div>{/if}
+    <div class="slippage-display-container" transition:fly={{ y: -30, duration: 300, delay: 400 }}>
+      <div>token: {trade_details.token_symbol}</div>
+      <div>currency slippage: {trade_details.currency_slippage}</div>
+      <div>token_slippage: {trade_details.token_slippage}</div>
+    </div>
+  {/if}
 </div>
 
 <style>
+  .wrapper {
+    min-height: 70%;
+    /* display: flex; */
+    /* justify-content: center; */
+  }
   .slippage-display-container {
+    margin: 0 auto;
+    margin-top: 30px;
     height: 100px;
     background-color: #262652;
     color: white;
     width: 300px;
     padding: 15px;
-    /* padding: 15px; */
+    border-radius: 15px;
+    margin-bottom: 40px;
+    box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
   }
   .switch-symbols-cont {
     margin: 0 auto;

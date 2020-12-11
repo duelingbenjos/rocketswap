@@ -14,6 +14,15 @@ export class AppController {
 		}
 	}
 
+	@Get("market_list")
+	public async getMarketList() {
+		try {
+			return await TokenEntity.find({ where: { has_market: true } });
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
 	@Get("balances/:vk")
 	async getBalances(@Param() params): Promise<any> {
 		try {
