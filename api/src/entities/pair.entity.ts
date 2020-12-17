@@ -63,7 +63,7 @@ export async function saveReserves(
 		if (price) entity.price = price;
 		if (lp) entity.price = lp;
 		if (reserves) entity.reserves = reserves;
-		entity.time = Date.now.toString();
+		entity.time = Date.now().toString();
 		handleClientUpdate({
 			action: "metrics_update",
 			contract_name,
