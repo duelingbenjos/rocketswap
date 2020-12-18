@@ -1,5 +1,7 @@
 import { Controller, Get, HttpException, Param } from "@nestjs/common";
 import { BalanceEntity } from "./entities/balance.entity";
+import { LpPointsEntity } from "./entities/lp-points.entity";
+import { PairEntity } from "./entities/pair.entity";
 import { TokenEntity } from "./entities/token.entity";
 
 @Controller("api")
@@ -23,6 +25,40 @@ export class AppController {
 		}
 	}
 
+	@Get("user_lp_balance/:vk")
+	public async getUserLpBalance(@Param() params) {
+		const { vk } = params;
+		try {
+			return await LpPointsEntity.findOneOrFail(vk);
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
+	@Get("get_pairs/:contract_names")
+	public async getPairsInfo(@Param() params) {
+		const { contract_names } = params;
+		const contract_names_arr = contract_names.split(",");
+		try {
+			if (contract_names_arr.length > 20) {
+				throw "You may only request a maximum of 20 pairs at a time.";
+			}
+			const pair_proms: Promise<
+				PairEntity
+			>[] = contract_names_arr.map((contract_name) =>
+				PairEntity.findOne(contract_name)
+			);
+			const res = await Promise.all(pair_proms);
+			const res_obj = {};
+			res.forEach((pair) => {
+				if (pair) res_obj[pair.contract_name] = pair;
+			});
+			return res_obj;
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
 	@Get("balances/:vk")
 	async getBalances(@Param() params): Promise<any> {
 		try {
@@ -39,14 +75,14 @@ export class AppController {
 		}
 	}
 
-	@Get("all_balances")
-	async getAllBalances(): Promise<any> {
-		try {
-			let balances: any = await BalanceEntity.find();
-			return balances;
-		} catch (err) {
-			console.error(err);
-			throw new HttpException(err, 500);
-		}
-	}
+	// @Get("all_balances")
+	// async getAllBalances(): Promise<any> {
+	// 	try {
+	// 		let balances: any = await BalanceEntity.find();
+	// 		return balances;
+	// 	} catch (err) {
+	// 		console.error(err);
+	// 		throw new HttpException(err, 500);
+	// 	}
+	// }
 }

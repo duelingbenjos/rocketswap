@@ -16,7 +16,7 @@ export class LpPointsEntity extends BaseEntity {
 	vk: string;
 
 	@Column({ type: "simple-json" })
-	points: { [key: string]: any };
+	points: { [key: string]: number };
 
 	@Column()
 	time: string = Date.now().toString();

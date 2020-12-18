@@ -17,6 +17,11 @@ export interface PriceUpdateType extends UpdateType {
 	time: number;
 }
 
+export interface UserLpUpdateType extends UpdateType {
+	action: "user_lp_update",
+	points : {[key:string]: number}
+}
+
 export interface MetricsUpdateType extends UpdateType {
 	action: "metrics_update";
 	contract_name: string;
@@ -26,7 +31,7 @@ export interface MetricsUpdateType extends UpdateType {
 	lp: number;
 }
 
-export type UpdateType = { action: "metrics_update" | "price_update" };
+export type UpdateType = { action: "metrics_update" | "price_update" | 'user_lp_update' };
 
 export function isMetricsUpdate(
 	client_update: ClientUpdateType
