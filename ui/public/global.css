@@ -13,7 +13,10 @@ body {
   box-sizing: border-box;
   font-family: 'Open Sans';
   overflow: hidden;
+
+  --info-color: #2fba95; 
 }
+
 
 .number {
   font-family: 'Roboto Mono';
@@ -77,6 +80,19 @@ button:not(:disabled):active {
 
 button:focus {
   border-color: #666;
+}
+
+button.outline{
+  border-radius: 99px;
+  border-width: 2px;
+  border-style: solid;
+  padding: 5px 10px;
+  height: fit-content;
+  font-size: 0.8em; 
+}
+
+.outline.info{
+  border-color: var(--info-color);
 }
 
 .nostyle,

@@ -61,6 +61,24 @@ export const calculateRgba = (input, opacity) => {
   return `rgba(${rgbValues}, ${opacity})`
 }
 
+export const stringToFixed = (value: string, precision: number) => {
+  let values = value.split(".")
+  if (!values[1]) return value;
+  else {
+    if (values[1].length < precision) precision = values[1].length
+    let decValue = parseInt(values[1].substring(0, precision))
+    if (decValue === 0) return `${values[0]}`
+    else {
+      let decimals = values[1].substring(0, precision)
+      for (let i=precision-1; i >= 0; i-- ){
+        if (decimals[i] === "0") precision -= 1
+        else  i = -1
+      }
+      return `${values[0]}.${values[1].substring(0, precision)}`
+    }
+  }
+}
+
 export const range = (size, startAt = 0) => [...Array(size).keys()].map((i) => i + startAt)
 
 export const characterRange = (startChar, endChar) => String.fromCharCode(...range(endChar.charCodeAt(0) - startChar.charCodeAt(0), startChar.charCodeAt(0)))

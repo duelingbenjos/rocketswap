@@ -52,4 +52,26 @@ export class ApiService {
       console.error(err)
     }
   }
+
+  async getUserLpBalance(vk: string) {
+    try {
+      console.log(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
+      const res = await axios.get(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
+      console.log(res)
+      return res.data
+    } catch (err) {
+      return false;
+    }
+  }
+
+  async getPairs(contracts: string) {
+    try {
+      console.log(`${this.base_url}:3001/api/get_pairs/${contracts}`)
+      const res = await axios.get(`${this.base_url}:3001/api/get_pairs/${contracts}`)
+      console.log(res)
+      return res.data
+    } catch (err) {
+      return false;
+    }
+  }
 }

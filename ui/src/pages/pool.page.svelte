@@ -1,8 +1,10 @@
 <script lang="ts">
-  import PoolPanel from '../components/pool-panel.svelte'
+  //import PoolPanel from '../components/pool-panel.svelte'
+  import PoolMain from '../components/pool-main.svelte'
+
 </script>
 
-<PoolPanel />
+<PoolMain />
 <!-- {#if show_token_select} -->
 <!-- <Dimmer>
     <TokenSelect />
