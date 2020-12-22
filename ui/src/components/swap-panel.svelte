@@ -123,7 +123,9 @@
 
 <style>
   .wrapper {
-    min-height: 70%;
+    flex-grow: 1;
+    padding-top: 2%;
+    /* min-height: 100%; */
     /* display: flex; */
     /* justify-content: center; */
   }
