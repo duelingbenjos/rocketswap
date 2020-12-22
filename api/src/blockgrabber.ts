@@ -165,7 +165,7 @@ const databaseLoader = (models, ws_callback) => {
 							numOfStateChanges: 0
 						});
 
-						ws_callback({
+						await ws_callback({
 							state: tx.state,
 							fn: tx.transaction.payload.function,
 							contract: tx.transaction.payload.contract

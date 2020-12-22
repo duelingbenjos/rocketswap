@@ -71,7 +71,7 @@ export class ParserProvider {
 				console.log(`function : ${fn}`);
 				// console.log(state);
 				// if (fn === "transfer") {
-				saveTransfer(state);
+				await saveTransfer(state);
 				// }
 			} else {
 				console.log(`ignoring block for contract: ${contract_name}`);
