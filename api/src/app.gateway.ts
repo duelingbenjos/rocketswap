@@ -40,9 +40,9 @@ export class AppGateway
 		this.logger.log(`Websocket Initialised`);
 	}
 
-	handleNewBlock = (block: any) => {
+	handleNewBlock = async (block: any) => {
 		const { state, fn, contract } = block;
-		this.parser.parseBlock({
+		await this.parser.parseBlock({
 			block: {
 				state,
 				fn,
