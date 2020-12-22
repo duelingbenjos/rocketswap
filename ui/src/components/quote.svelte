@@ -1,7 +1,7 @@
 <script lang="ts">
   export let showSwitch
-  export let selected_token : TokenListType
-  export let token_metrics : TokenMetricsType
+  export let selected_token: TokenListType
+  export let token_metrics: TokenMetricsType
 
   import { onDestroy, onMount } from 'svelte'
   import { config } from '../config'
@@ -10,7 +10,6 @@
   import type { TokenListType, TokenMetricsType } from '../types/api.types'
 
   $: symbol = selected_token?.token_symbol
-
 </script>
 
 <div class="container">
@@ -18,7 +17,7 @@
     <div class="label">Last Price :</div>
     <div class="quote-container">
       <div class="quote-text label">
-        {token_metrics[selected_token?.contract_name].price.toFixed(6)}
+        {(1 / token_metrics[selected_token?.contract_name].price).toFixed(6)}
         <b>{symbol} / {config.currencySymbol}</b>
         {#if showSwitch}
           <div><button> <img src="assets/images/switch.svg" alt="" /> </button></div>
