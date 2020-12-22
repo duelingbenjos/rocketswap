@@ -23,7 +23,7 @@ if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
 }
 
-const databaseLoader = (models, ws_callback) => {
+const databaseLoader = (models, handleNewBlock) => {
 	let currBlockNum = 1;
 	let checkNextIn = 0;
 	let maxCheckCount = 10;
@@ -165,7 +165,7 @@ const databaseLoader = (models, ws_callback) => {
 							numOfStateChanges: 0
 						});
 
-						await ws_callback({
+						await handleNewBlock({
 							state: tx.state,
 							fn: tx.transaction.payload.function,
 							contract: tx.transaction.payload.contract
@@ -335,7 +335,7 @@ const databaseLoader = (models, ws_callback) => {
 		});
 };
 
-export default (ws_callback: Function) => {
+export default (handleNewBlock: Function) => {
 	db.connect(
 		connectionString,
 		{ useNewUrlParser: true, useUnifiedTopology: true },
@@ -343,7 +343,7 @@ export default (ws_callback: Function) => {
 			if (error) console.log(error);
 			else {
 				console.log("connection successful");
-				databaseLoader(mongoose_models, ws_callback);
+				databaseLoader(mongoose_models, handleNewBlock);
 			}
 		}
 	);
