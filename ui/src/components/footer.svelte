@@ -83,6 +83,8 @@
     width: 100%;
     display: flex;
     align-items: center;
+    position: fixed;
+    bottom: 0;
   }
 
   button {

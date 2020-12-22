@@ -68,8 +68,6 @@
     let active_input
     let other_input
     context_store.update((current_value) => {
-      // console.log(role)
-
       active_input = current_value.slot_a.role === role ? current_value.slot_a : current_value.slot_b
       other_input = current_value.slot_a.role !== role ? current_value.slot_a : current_value.slot_b
       const contract_name = role === 'currency' ? other_input.selected_token.contract_name : active_input.selected_token.contract_name
@@ -77,9 +75,8 @@
       active_input.input_amount = update_amount
       other_input.input_amount =
         role === 'token'
-          ? parseFloat((update_amount * $token_metrics_store[contract_name].price).toFixed(6))
-          : parseFloat((update_amount * $token_metrics_store[contract_name].price).toFixed(6))
-      // console.log(typeof update_amount)
+          ? parseFloat(($token_metrics_store[contract_name].price * update_amount).toFixed(6))
+          : parseFloat((update_amount / $token_metrics_store[contract_name].price).toFixed(6))
       return current_value
     })
   }

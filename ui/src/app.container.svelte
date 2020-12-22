@@ -43,10 +43,10 @@
       <Router />
       <ToastsContainer />
 
-      <Footer />
     </div>
   </div>
 </main>
+<Footer />
 
 <style>
   .bg-gradient {
