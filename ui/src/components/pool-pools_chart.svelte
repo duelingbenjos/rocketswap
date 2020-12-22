@@ -13,7 +13,6 @@
     let balances = [];
     let pairs = [];
 
-
     beforeUpdate(() => {
         if ($wallet_store.wallets) checkVk()
     })
@@ -33,25 +32,22 @@
     }
 
     const getLpBalances = async () => {
-        let balancesRes = await apiService.getUserLpBalance('f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def')
-        console.log(balancesRes)
+        //let balancesRes = await apiService.getUserLpBalance(vk)
+
+        // HARDCODED VK FOR TESTING
+            let balancesRes = await apiService.getUserLpBalance('f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def')
+        //
+
         if (balancesRes) {
             balances = balancesRes.points
             getPairs()
-            console.log(balancesRes)
-            console.log(Object.keys(balances))
         }
     }
 
     const getPairs = async () => {
         const contracts = Object.keys(balances).join(',')
-        console.log(contracts)
         let pairsRes = await apiService.getPairs(contracts)
-        console.log(pairsRes)
-        if (pairsRes) {
-            pairs = Object.keys(pairsRes).map(key => pairsRes[key])
-            console.log(pairs)
-        }
+        if (pairsRes) pairs = Object.keys(pairsRes).map(key => pairsRes[key])
     }
 
     const lp_percent = (contract_name, lp_total) => (balances[contract_name] / lp_total)
@@ -71,7 +67,6 @@
         padding: 15px 0 20px;
     }
     table{
-        color: #fff;
         border-collapse: collapse;
     }
     tr:first-child{
@@ -97,36 +92,49 @@
         padding: 10px 6px 2px;
     }
 
+    p{
+        width: 100%;
+        text-align: center;
+        margin: 0 0;
+    }
+
     @media screen and (max-width: 800px) {
         div {
             border-radius: 0px;
         }
+        th:last-child, td:last-child{
+            white-space: nowrap;
+        }
     }
 </style>
 <div>
-    <table>
-        <tr>
-            <th>Symbol</th>
-            <th>Name</th>
-            <th>Contract</th>
-            <th>Amount Token/TAU</th>
-            <th>LP</th>
-            <th>%Pool</th>
-            <th>Value</th>
-            <th></th>
-        </tr>
-        {#each pairs as pair}
+    {#if pairs.length > 0}
+        <table>
             <tr>
-                <td>???</td>
-                <td>???</td>
-                <td>{pair.contract_name}</td>
-                <td>{`${stringToFixed(pair.reserves[1], 4)} / ${stringToFixed(pair.reserves[0], 4)}`}</td>
-                <td>{balances[pair.contract_name]}</td>
-                <td>{`${lp_percent(pair.contract_name, pair.lp) * 100}%` }</td>
-                <td>{calc_value(pair.contract_name, pair.lp, pair.reserves[1], pair.reserves[0], pair.price)} TAU</td>
-                <td>Adjust ></td>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Contract</th>
+                <th>Amount Token/TAU</th>
+                <th>LP</th>
+                <th>%Pool</th>
+                <th>Value</th>
+                <th></th>
             </tr>
-        {/each}
-    </table>
+            {#each pairs as pair}
+                <tr>
+                    <td>???</td>
+                    <td>???</td>
+                    <td>{pair.contract_name}</td>
+                    <td>{`${stringToFixed(pair.reserves[1], 4)} / ${stringToFixed(pair.reserves[0], 4)}`}</td>
+                    <td>{balances[pair.contract_name]}</td>
+                    <td>{`${lp_percent(pair.contract_name, pair.lp) * 100}%` }</td>
+                    <td>{calc_value(pair.contract_name, pair.lp, pair.reserves[1], pair.reserves[0], pair.price)} TAU</td>
+                    <td>Adjust ></td>
+                </tr>
+            {/each}
+        </table>
+    {:else}
+        <p>No liquidity found.</p>
+    {/if}
 </div>
 

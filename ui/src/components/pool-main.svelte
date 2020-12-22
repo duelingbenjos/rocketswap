@@ -7,6 +7,7 @@
 <style>
     main{
         max-width: 750px;
+        color: #fff;
     }
 </style>
 

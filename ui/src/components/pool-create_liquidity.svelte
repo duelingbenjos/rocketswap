@@ -4,7 +4,6 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        color: #fff; 
         width: 100%;
         padding: 20px 32px;
     }
