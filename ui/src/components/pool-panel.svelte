@@ -11,7 +11,7 @@
     pool_panel_store.set(pool_panel)
   }
 
-  pool_panel_store.subscribe(update => console.log(update))
+  pool_panel_store.subscribe((update) => console.log(update))
 </script>
 
 <div class="container">
@@ -19,11 +19,12 @@
   <br />
   <Input label=" " position="to" context="pool" />
   <Quote showSwitch={false} />
-  <PoolButtons buttonFunction="create"/>
+  <PoolButtons buttonFunction="create" />
 </div>
 
 <style>
   .container {
+    margin-top: 15px;
     background-color: #875dd6;
     width: 444px;
     border-radius: 32px;

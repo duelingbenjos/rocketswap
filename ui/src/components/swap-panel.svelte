@@ -124,7 +124,7 @@
 <style>
   .wrapper {
     flex-grow: 1;
-    padding-top: 2%;
+    padding-top: 15px;
     /* min-height: 100%; */
     /* display: flex; */
     /* justify-content: center; */
