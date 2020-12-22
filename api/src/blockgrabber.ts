@@ -300,7 +300,7 @@ const databaseLoader = (models, ws_callback) => {
 						currBatchMax = lastestBlockNum;
 					if (currBatchMax > batchAmount) currBatchMax + batchAmount;
 					for (let i = currBlockNum + 1; i <= currBatchMax; i++) {
-						let timedelay = (i - currBlockNum) * 100;
+						let timedelay = (i - currBlockNum) * 400;
 						console.log(
 							"getting block: " +
 								i +
