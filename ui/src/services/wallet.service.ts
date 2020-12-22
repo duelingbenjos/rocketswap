@@ -5,6 +5,7 @@ import { show_swap_confirm, swap_confirm_loading, wallet_store } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
 import { refreshTAUBalance, returnFloat } from '../utils'
 import { ToastService } from './toast.service'
+import { WsService } from './ws.service'
 
 /** Singleton Wallet Service */
 
@@ -14,6 +15,8 @@ export class WalletService {
   private lwc: WalletController
   private apiService = ApiService.getInstance()
   private toastService = ToastService.getInstance()
+  // private wsService = WsService.getInstance()
+  // private _ws_joined: boolean = false
 
   public static getInstance() {
     if (!WalletService._instance) {
@@ -39,7 +42,7 @@ export class WalletService {
           console.info('wallet not installed')
           this.setNotInstalledError()
         }
-        this.lwc.sendConnection(config)
+        // this.lwc.sendConnection(config)
       }, 1000)
     })
 
@@ -53,6 +56,7 @@ export class WalletService {
   }
 
   private setNotInstalledError() {
+    console.log('wallet not installed error')
     setTimeout(() => {
       // console.log(this.wallet_state)
       if (!isWalletConnected(this.wallet_state) && !isWalletError(this.wallet_state)) {
@@ -62,16 +66,22 @@ export class WalletService {
   }
 
   private handleWalletInfo = async (wallet_update: WalletType) => {
+    console.log(wallet_update)
     let wallet_info: WalletType
     // console.log(wallet_info)
     if (isWalletConnected(wallet_update)) {
       wallet_info = wallet_update
-      // console.log(wallet_info)
+      console.log(wallet_info)
       if (wallet_info.wallets[0]) {
         const vk = wallet_info.wallets[0]
         const balances = await this.getBalances(vk)
         wallet_info.balance = balances[1]
         wallet_info.tokens = balances[0]
+        // join the user lp feed.
+        // if (!this._ws_joined) {
+        //   this.wsService.joinUserLpFeed(vk)
+        //   this._ws_joined = true
+        // }
       }
     } else {
       wallet_info = wallet_update
@@ -142,12 +152,15 @@ export class WalletService {
       swap_confirm_loading.set(true)
       await this.approveDifference(vk, currency_amount, 'currency')
       const tx_info = this.createTxInfo('buy', { currency_amount: returnFloat(currency_amount), contract: contract_name })
+      console.log('sending buy transaction')
       this.lwc.sendTransaction(tx_info, this.handleSwapResult)
     } catch (err) {
       console.log(err)
       show_swap_confirm.set(false)
       swap_confirm_loading.set(false)
-      this.toastService.addToast({ heading: 'Transaction Failed.', text: err.data.resultInfo.errorInfo[0], type: 'error' })
+      console.log(err)
+      let err_message = err.data.resultInfo?.errorInfo[0] ? err.data.resultInfo?.errorInfo[0] : err.data.status
+      this.toastService.addToast({ heading: 'Transaction Failed.', text: err_message, type: 'error' })
       console.error(err)
     }
   }
