@@ -3,7 +3,7 @@
   import type { WalletType, WalletInitType, WalletErrorType } from '../types/wallet.types'
   import { wallet_store } from '../store'
   import { config } from '../config'
-  import { formatAccountAddress } from '../utils'
+  import { formatAccountAddress, stripTrailingZero } from '../utils'
   import { isWalletConnected, isWalletError, isWalletInit } from '../services/wallet.service'
 
   let wallet_info: WalletType
@@ -33,7 +33,7 @@
     {:else if isWalletError(wallet_info)}
       <div class="wallet-message">{wallet_info.errors[0]}</div>
     {:else if isWalletConnected(wallet_info)}
-      <div class="balance">{wallet_info.balance} {config.currencySymbol}</div>
+      <div class="balance">{stripTrailingZero(wallet_info.balance.toFixed(8))} {config.currencySymbol}</div>
       <div class="address">{formatAccountAddress(wallet_info.wallets[0])}</div>
     {/if}
     <div />
@@ -49,6 +49,7 @@
   }
   .balance {
     padding-left: 16px;
+    color: rgba(255,255,255,1)
   }
 
   .wallet-message {

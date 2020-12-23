@@ -3,23 +3,24 @@
   import { config } from '../config'
   import { isWalletConnected } from '../services/wallet.service'
   import { pool_panel_store, token_metrics_store } from '../store'
-  import type { SlotType, SwapPanelType, TokenMetricsType } from '../types/api.types'
   import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
-  import TokenSelect from './token-select.svelte'
+  import { stripTrailingZero } from '../utils'
   import type { Writable } from 'svelte/store'
+  import type { SlotType, SwapPanelType, TokenMetricsType } from '../types/api.types'
+  import type { WalletConnectedType, WalletType } from '../types/wallet.types'
 
   export let position: 'from' | 'to'
   export let label
   export let context: 'pool' | 'swap'
   export let token_metrics: TokenMetricsType
 
-  let selected: SlotType
-  $: selected
+  let selected_slot: SlotType
+  $: selected_slot
   $: selected_token
-  let balance, role, slot_position, selected_token, wallet, input_amount
+  let balance: number, role, slot_position, selected_token, wallet, input_amount
   let context_store: Writable<SwapPanelType>
+  $: wallet_balance = parseFloat(wallet.balance ? stripTrailingZero(wallet.balance.toFixed(8)) : '')
 
-  $: wallet_balance = parseFloat(wallet.balance)
   $: balance
   $: input_amount
 
@@ -35,10 +36,12 @@
   })
 
   let wallet_unsub = wallet_store.subscribe((update) => {
+    // if (isWalletConnected(update)) {
     wallet = update
     if (selected_token && wallet.tokens) {
       balance = wallet.tokens.balances[selected_token.contract_name]
     }
+    // }
   })
 
   onDestroy(() => {
@@ -47,12 +50,12 @@
   })
 
   function handleInputStoreUpdate(update) {
-    selected = getPosition(update)
-    balance = selected.selected_token?.balance
-    role = selected.role
-    slot_position = selected.position
-    selected_token = selected.selected_token
-    input_amount = selected.input_amount
+    selected_slot = getPosition(update)
+    balance = selected_slot.selected_token?.balance
+    role = selected_slot.role
+    slot_position = selected_slot.position
+    selected_token = selected_slot.selected_token
+    input_amount = selected_slot.input_amount
   }
 
   function getPosition(update: SwapPanelType) {
@@ -99,12 +102,13 @@
     let selected_token = slots.slot_b.selected_token
     const metrics = token_metrics[selected_token?.contract_name]
     if (role === 'currency') {
-      slots.slot_a.input_amount = parseFloat(wallet_balance.toFixed(6)) || 0
+      // slots.slot_a.input_amount = parseFloat(wallet_balance.toFixed(6)) || 0
+      slots.slot_a.input_amount = parseFloat(stripTrailingZero(wallet_balance.toFixed(8))) || 0
       // console.log(slots.slot_a.input_amount)
-      if (metrics) slots.slot_b.input_amount = parseFloat((wallet_balance / metrics.price).toFixed(6))
+      if (metrics) slots.slot_b.input_amount = parseFloat(stripTrailingZero((wallet_balance / metrics.price).toFixed(6)))
     } else if (role === 'token') {
-      slots.slot_b.input_amount = parseFloat(selected_token.balance.toFixed(6)) || 0
-      if (metrics) slots.slot_a.input_amount = parseFloat((selected_token.balance * metrics.price).toFixed(6))
+      slots.slot_b.input_amount = parseFloat(stripTrailingZero(selected_token.balance.toFixed(8))) || 0
+      if (metrics) slots.slot_a.input_amount = parseFloat(stripTrailingZero((selected_token.balance * metrics.price).toFixed(6)))
     }
 
     context_store.set(slots)
@@ -114,13 +118,15 @@
 <div class="container">
   <div class="amount">
     <div class="label">{label ? label : position === 'from' ? 'From' : 'To'}</div>
-    <div class="amount-value number"><input placeholder="0.0" bind:value={input_amount} type="number" on:input={handleInputChange} /></div>
+    <div class="amount-value number"><input placeholder="0" bind:value={input_amount} type="number" on:input={handleInputChange} /></div>
   </div>
   <div class="token-info">
     {#if role === 'currency'}
-      <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${wallet_balance?.toFixed(2)}` : '0.00'}</span></div>
+      <div class="label">{wallet_balance ? `Balance: ` : ''}<span class="number">{wallet_balance ? `${stripTrailingZero(wallet_balance.toFixed(8))}` : ''}</span></div>
     {:else}
-      <div class="label">{selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token ? `${balance?.toFixed(2) || "0.00"}` : ''}</span></div>
+      <div class="label">
+        {selected_token && wallet_balance ? `Balance: ` : ''}<span class="number">{selected_token && balance ? `${stripTrailingZero(balance.toFixed(8)) || ''}` : ''}</span>
+      </div>
     {/if}
     <div class="token-controls">
       <div class="max-button-cont">
@@ -128,8 +134,8 @@
       </div>
       <div class="token-button-cont">
         {#if role === 'token'}
-          {#if selected.selected_token}
-            <button class="token-select-button" on:click={openTokenSelect}>{selected.selected_token.token_symbol.toUpperCase()}
+          {#if selected_slot.selected_token}
+            <button class="token-select-button" on:click={openTokenSelect}>{selected_slot.selected_token.token_symbol.toUpperCase()}
               <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button>
           {:else}
             <button on:click={() => openTokenSelect()} class="no-token-button">Select Token

@@ -237,5 +237,5 @@ export function isWalletInit(wallet_info: WalletType): wallet_info is WalletInit
 }
 
 export function isWalletConnected(wallet_info: WalletType): wallet_info is WalletConnectedType {
-  return (wallet_info as WalletConnectedType).wallets !== undefined
+  return (wallet_info as WalletConnectedType)?.wallets !== undefined
 }

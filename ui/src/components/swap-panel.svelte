@@ -16,6 +16,7 @@
   $: metric = token_metrics[selected_token?.contract_name]
   let trade_details: { currency_out: number; token_out: number; currency_slippage: number; token_slippage: number; contract_name: string; token_symbol: string }
   $: trade_details
+  
   let swap_panel_unsub = swap_panel_store.subscribe((update) => {
     // console.log('quote panel update : ', update)
     if (update.slot_b.selected_token?.contract_name !== selected_token?.contract_name) {

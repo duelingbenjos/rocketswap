@@ -8,6 +8,7 @@
   import { WsService } from '../services/ws.service'
   import { swap_panel_store, token_metrics_store } from '../store'
   import type { TokenListType, TokenMetricsType } from '../types/api.types'
+  import { stripTrailingZero } from '../utils'
 
   $: symbol = selected_token?.token_symbol
 </script>
@@ -17,7 +18,7 @@
     <div class="label">Last Price :</div>
     <div class="quote-container">
       <div class="quote-text label">
-        {(1 / token_metrics[selected_token?.contract_name].price).toFixed(6)}
+        {stripTrailingZero((1 / token_metrics[selected_token?.contract_name].price).toFixed(8))}
         <b>{symbol} / {config.currencySymbol}</b>
         {#if showSwitch}
           <div><button> <img src="assets/images/switch.svg" alt="" /> </button></div>
