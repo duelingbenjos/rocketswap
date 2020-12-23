@@ -14,5 +14,8 @@
 
 <div>
     <h2>Your Liquidity</h2>
-    <button class="nostyle outline info">Create Liquidity</button>
+    <button 
+        class="nostyle outline info"
+        on:click={() => location.assign('#/pool-create')}
+    >Create Liquidity</button>
 </div>

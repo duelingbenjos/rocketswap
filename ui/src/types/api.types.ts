@@ -8,7 +8,8 @@ export type TokenListType = {
 }
 
 export type TokenSelectType = {
-  open: boolean
+  open: boolean,
+  content?: string,
   context?: 'pool' | 'swap'
 }
 

@@ -2,8 +2,7 @@
   import { onDestroy, onMount } from 'svelte'
   import { config } from '../config'
   import { isWalletConnected } from '../services/wallet.service'
-  import { pool_panel_store, token_metrics_store } from '../store'
-  import { show_token_select_store, swap_panel_store, wallet_store } from '../store'
+  import { show_token_select_store, swap_panel_store, wallet_store, pool_panel_store, token_metrics_store } from '../store'
   import { stripTrailingZero } from '../utils'
   import type { Writable } from 'svelte/store'
   import type { SlotType, SwapPanelType, TokenMetricsType } from '../types/api.types'
@@ -13,6 +12,7 @@
   export let label
   export let context: 'pool' | 'swap'
   export let token_metrics: TokenMetricsType
+  export let content = "all_tokens_with_market"
 
   let selected_slot: SlotType
   $: selected_slot
@@ -33,6 +33,7 @@
       context_store = pool_panel_store
     }
     input_unsub = context_store.subscribe((update) => handleInputStoreUpdate(update))
+    console.log($token_metrics_store)
   })
 
   let wallet_unsub = wallet_store.subscribe((update) => {
@@ -64,22 +65,30 @@
   }
 
   function openTokenSelect() {
-    show_token_select_store.set({ open: true, context })
+    show_token_select_store.set({ open: true, context, content })
   }
 
   function handleInputChange(e) {
     let active_input
     let other_input
     context_store.update((current_value) => {
+      // Update Context Store with the changed
+      if (current_value.slot_a.role === role) current_value.slot_a.input_amount = e.target.value
+      if (current_value.slot_b.role === role) current_value.slot_b.input_amount = e.target.value
+
+      // If on the swap page then do some price for quotes
+      if (context === 'swap') {
       active_input = current_value.slot_a.role === role ? current_value.slot_a : current_value.slot_b
       other_input = current_value.slot_a.role !== role ? current_value.slot_a : current_value.slot_b
-      const contract_name = role === 'currency' ? other_input.selected_token.contract_name : active_input.selected_token.contract_name
+      const contract_name = role === 'currency' ? 'currency' : active_input.selected_token.contract_name
       const update_amount = getUpdateAmount(e.target.value, role, position)
+      
       active_input.input_amount = update_amount
       other_input.input_amount =
         role === 'token'
           ? parseFloat(($token_metrics_store[contract_name].price * update_amount).toFixed(6))
           : parseFloat((update_amount / $token_metrics_store[contract_name].price).toFixed(6))
+      }
       return current_value
     })
   }
@@ -102,6 +111,7 @@
     let selected_token = slots.slot_b.selected_token
     const metrics = token_metrics[selected_token?.contract_name]
     if (role === 'currency') {
+      console.log(wallet_balance)
       // slots.slot_a.input_amount = parseFloat(wallet_balance.toFixed(6)) || 0
       slots.slot_a.input_amount = parseFloat(stripTrailingZero(wallet_balance.toFixed(8))) || 0
       // console.log(slots.slot_a.input_amount)
@@ -118,7 +128,15 @@
 <div class="container">
   <div class="amount">
     <div class="label">{label ? label : position === 'from' ? 'From' : 'To'}</div>
-    <div class="amount-value number"><input placeholder="0" bind:value={input_amount} type="number" on:input={handleInputChange} /></div>
+    <div class="amount-value number">
+      <input 
+        placeholder="0" 
+        bind:value={input_amount} 
+        type="number" 
+        on:input={handleInputChange}
+        disabled={role === 'token' ? !selected_token : false} 
+        />
+    </div>
   </div>
   <div class="token-info">
     {#if role === 'currency'}
@@ -135,16 +153,19 @@
       <div class="token-button-cont">
         {#if role === 'token'}
           {#if selected_slot.selected_token}
-            <button class="token-select-button" on:click={openTokenSelect}>{selected_slot.selected_token.token_symbol.toUpperCase()}
-              <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" /></button>
+            <button class="token-select-button" on:click={openTokenSelect}>
+              {selected_slot.selected_token.token_symbol.toUpperCase()}
+              <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" />
+            </button>
           {:else}
             <button on:click={() => openTokenSelect()} class="no-token-button">Select Token
               <img src="assets/images/chevron-arrow-down.svg" height="20" width="20" alt="" />
             </button>
           {/if}
         {:else}
-          <button style="pointer-events: none" class="token-select-button" on:click={openTokenSelect}>{config.currencySymbol}
-            <img style="opacity: 0" src="assets/images/chevron-arrow-down.svg" height="16px" width="16px" alt="" /></button>
+          <button style="pointer-events: none" class="token-select-button" on:click={openTokenSelect}>
+            {config.currencySymbol}
+          </button>
         {/if}
       </div>
     </div>
@@ -214,13 +235,14 @@
   .container {
     width: 89%;
     margin-top: 30px;
-    padding: 10px;
+    padding: 10px 10px 20px;
     border-radius: 25px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     display: flex;
-    height: 100px;
+    height: 110px;
     justify-content: space-between;
     margin: 0 auto;
+    box-sizing: border-box;
   }
 
   .amount {

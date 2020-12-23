@@ -31,7 +31,7 @@
     <div class="bg-gradient flex">
       {#if show_token_select?.open}
         <Dimmer>
-          <TokenSelect />
+          <TokenSelect content={show_token_select.content}/>
         </Dimmer>
       {/if}
       {#if $show_swap_confirm}

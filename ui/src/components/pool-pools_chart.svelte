@@ -8,6 +8,7 @@
     import { stringToFixed } from '../utils'
 
     const apiService = ApiService.getInstance();
+    
     let initialized = false;
     let vk;
     let balances = [];

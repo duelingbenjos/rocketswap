@@ -5,6 +5,11 @@
   import { fly } from 'svelte/transition'
   import { pool_panel_store, show_token_select_store, swap_panel_store, token_list_store, wallet_store } from '../store'
   import { isWalletConnected } from '../services/wallet.service'
+  import { ApiService } from '../services/api.service'
+
+  export let content = "all_tokens_with_market";
+
+  const apiService = ApiService.getInstance();
 
   let token_list_unsub
   let wallet_unsub
@@ -21,6 +26,9 @@
     if (context === 'swap') context_store = swap_panel_store
     else if (context === 'pool') context_store = pool_panel_store
     context_panel_unsub = context_store.subscribe((update) => (selected_contract = update.slot_b.selected_token?.contract_name))
+    if (content === "all_tokens_with_market") apiService.getMarketList()
+    if (content === "all_tokens") apiService.getTokenList()
+    if (content === "all_tokens_no_market") apiService.getTokenList(["no-market"])
   })
 
   onDestroy(() => {
@@ -33,9 +41,11 @@
     show_token_select_store.set({ open: false })
   }
 
-  function selectToken(token: TokenListType) {
+  async function selectToken(token: TokenListType) {
     const panel = $context_store
     panel.slot_b.selected_token = token
+    panel.slot_b.selected_token.info = await apiService.getPairs(token.contract_name).then(res => res[token.contract_name])
+    console.log(panel.slot_b.selected_token)
     context_store.set(panel)
     setTimeout(() => {
       closeModal()
@@ -47,6 +57,7 @@
       wallet = update
     })
     token_list_unsub = token_list_store.subscribe((update) => {
+      console.log(update)
       if (wallet && isWalletConnected(wallet)) {
         const list_with_balances = update
           .map((token) => {

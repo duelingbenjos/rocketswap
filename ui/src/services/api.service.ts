@@ -12,20 +12,22 @@ export class ApiService {
   private static instance: ApiService
   private base_url = getBaseUrl(document.location.href)
   constructor() {
-    this.startTimer()
-    this.getMarketList()
+    //this.startTimer()
+    //this.getMarketList()
   }
-
+  /*
   private startTimer() {
     setInterval(async () => {
       await this.getMarketList()
     }, 1000)
-  }
+  }*/
 
-  async getTokenList() {
+  async getTokenList(filter = []) {
     try {
-      const token_list = await axios.get(`${this.base_url}:3001/api/token_list`)
-      token_list_store.set(token_list.data)
+      let token_list = await axios.get(`${this.base_url}:3001/api/token_list`).then(res => res.data)
+      if (filter.includes("no-market")) token_list = token_list.filter(token => !token.has_market)
+      console.log('getting token list')
+      token_list_store.set(token_list)
       return token_list.data
     } catch (err) {
       console.error(err)
@@ -35,8 +37,9 @@ export class ApiService {
 
   async getMarketList() {
     try {
-      const token_list = await axios.get(`${this.base_url}:3001/api/market_list`)
-      token_list_store.set(token_list.data)
+      let token_list = await axios.get(`${this.base_url}:3001/api/market_list`).then(res => res.data)
+      console.log('getting market_list')
+      token_list_store.set(token_list)
       return token_list.data
     } catch (err) {
       console.error(err)

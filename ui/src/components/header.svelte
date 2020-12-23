@@ -4,12 +4,22 @@
   import { routes, active } from 'svelte-hash-router'
   let links: any[]
   $: links = Object.values($routes)
+
+  afterUpdate(() => console.log(links))
 </script>
 
 <div class="header">
   <div class="logo-container"><img src="/assets/images/rocketswap.svg" alt="" /></div>
   <div class="links">
-    {#each links as e}<button class="nostyle"> <a class:active={e === $active} href={e.$$href}> {e.$$name} </a> </button>{/each}
+    {#each links as e}
+      {#if e.$$name === "Pool" || e.$$name === "Swap"}
+        <button class="nostyle"> 
+          <a class:active={e === $active} href={e.$$href}> 
+            {e.$$name} 
+          </a> 
+        </button>
+      {/if}
+    {/each}
   </div>
 </div>
 

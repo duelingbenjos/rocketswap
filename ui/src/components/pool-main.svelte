@@ -1,6 +1,6 @@
 <script>
     import PoolLiquidityMsg from './pool-liqudity_msg.svelte'
-    import PoolCreateLiquidity from './pool-create_liquidity.svelte'
+    import PoolCreateLiquidityButton from './pool-create_liquidity_button.svelte'
     import PoolsChart from './pool-pools_chart.svelte'
 </script>
 
@@ -13,6 +13,6 @@
 
 <main>
     <PoolLiquidityMsg />
-    <PoolCreateLiquidity />
+    <PoolCreateLiquidityButton />
     <PoolsChart />
 </main>

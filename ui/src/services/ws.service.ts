@@ -64,6 +64,7 @@ export class WsService {
     let { contract_name } = metrics_update
     const metrics = this.token_metrics
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
+    console.log(metrics)
     token_metrics_store.set(metrics)
     // console.log('token_metrics', metrics)
   }
