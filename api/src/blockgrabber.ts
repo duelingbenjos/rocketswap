@@ -165,7 +165,7 @@ const databaseLoader = (models, handleNewBlock) => {
 							numOfStateChanges: 0
 						});
 
-						await handleNewBlock({
+						handleNewBlock({
 							state: tx.state,
 							fn: tx.transaction.payload.function,
 							contract: tx.transaction.payload.contract
