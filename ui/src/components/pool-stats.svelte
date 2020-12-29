@@ -3,23 +3,25 @@
     import { ApiService } from '../services/api.service'
     import { pool_panel_store } from '../store'
     import { config } from '../config'
+    import { stringToFixed } from '../utils'
 
     export let statList = []
     export let title
+    export let pageState
 
     const apiService = ApiService.getInstance();
 
     let balances = []
 
-    $: selected_token = $pool_panel_store?.slot_b?.selected_token || undefined;
-    $: token_symbol = selected_token ? selected_token.token_symbol : undefined;
-    $: token_contract = selected_token ? selected_token.contract_name : undefined;
-    $: lp_balance = balances[token_contract] || "0"
-    $: lp_share = selected_token?.info ? lp_balance / selected_token.info.lp : undefined
+    $: selectedToken = pageState?.selectedToken;
+    $: tokenSymbol = selectedToken ? selectedToken.token_symbol : undefined;
+    $: tokenContract = selectedToken ? selectedToken.contract_name : undefined;
+    $: lp_balance = balances[tokenContract] || "0";
+    $: lp_share = selectedToken?.info ? lp_balance / selectedToken.info.lp : undefined;
     $: lp_share_percent = lp_share ? parseFloat(lp_share * 100).toFixed(1) : "0";
-    $: currencyValue = $pool_panel_store?.slot_a?.input_amount || "";
-    $: tokenValue = $pool_panel_store?.slot_b?.input_amount || "";
-    $: bothValues = currencyValue !== "" && tokenValue !== ""
+    $: currencyValue = pageState?.currencyAmount || "";
+    $: tokenValue = pageState?.tokenAmount || "";
+    $: bothValues = currencyValue !== "" && tokenValue !== "";
 
     onMount(async () => {
         // TODO REMOVE HARDCODED VK
@@ -72,16 +74,16 @@
         <p>{statList.includes("poolShare") ? `Current: ${lp_share_percent}%`: ""}</p>
     </div>
     <div class="stats">
-        {#if token_symbol && bothValues}
+        {#if tokenSymbol && bothValues}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p><strong>{`${currencyValue / tokenValue}`}</strong></p>
-                    <p>{`${config.currencySymbol} per ${token_symbol}`}</p>
+                    <p><strong>{`${stringToFixed(currencyValue / tokenValue, 4)}`}</strong></p>
+                    <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p><strong>{`${tokenValue / currencyValue }`}</strong></p>
-                    <p>{`${token_symbol} per ${config.currencySymbol}`}</p>
+                    <p><strong>{`${stringToFixed(tokenValue / currencyValue, 4) }`}</strong></p>
+                    <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}
 

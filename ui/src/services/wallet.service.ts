@@ -66,12 +66,10 @@ export class WalletService {
   }
 
   private handleWalletInfo = async (wallet_update: WalletType) => {
-    console.log(wallet_update)
     let wallet_info: WalletType
     // console.log(wallet_info)
     if (isWalletConnected(wallet_update)) {
       wallet_info = wallet_update
-      console.log(wallet_info)
       if (wallet_info.wallets[0]) {
         const vk = wallet_info.wallets[0]
         const balances = await this.getBalances(vk)
@@ -186,18 +184,15 @@ export class WalletService {
   private async approveDifference(vk: string, amount: number, contract_name: string) {
     let approved_amount = await this.getApprovedAmount(vk, contract_name)
     if (approved_amount && approved_amount.__fixed__) approved_amount = approved_amount.__fixed__
-    console.log(approved_amount)
-    console.log(amount)
     approved_amount = approved_amount ? parseFloat(approved_amount) : 0
     let approve_amount = amount - (approved_amount as number)
-    console.log(approve_amount)
     if (approve_amount <= 0) return
     await this.approve(approve_amount, contract_name)
     this.toastService.addToast({ heading: 'Approval succeeded !', text: `You have approved ${approve_amount} tokens.`, type: 'info' })
   }
 
   public async createMarket(args) {
-    console.log(this.createTxInfo('create_market', args))
+
     this.lwc.sendTransaction(this.createTxInfo('create_market', args), handleCreateMarket)
   }
 

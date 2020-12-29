@@ -41,11 +41,9 @@
 
 </script>
 
-<div class="container">
-  {#if buttonFunction === 'create'}
-    <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
-  {/if}
-</div>
+{#if buttonFunction === 'create'}
+  <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
+{/if}
 
 <style>
   .swap-button {
@@ -57,10 +55,6 @@
     font-size: 1.6em;
     font-weight: 600;
     letter-spacing: 0.1em;
-  }
-
-  .container {
-      padding: 10px 20px 10px 20px;
   }
 
   button {

@@ -28,7 +28,7 @@ export class ApiService {
       if (filter.includes("no-market")) token_list = token_list.filter(token => !token.has_market)
       console.log('getting token list')
       token_list_store.set(token_list)
-      return token_list.data
+      return token_list
     } catch (err) {
       console.error(err)
       throw err
@@ -40,7 +40,7 @@ export class ApiService {
       let token_list = await axios.get(`${this.base_url}:3001/api/market_list`).then(res => res.data)
       console.log('getting market_list')
       token_list_store.set(token_list)
-      return token_list.data
+      return token_list
     } catch (err) {
       console.error(err)
       throw err
@@ -60,7 +60,7 @@ export class ApiService {
     try {
       console.log(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
       const res = await axios.get(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
-      console.log(res)
+      //console.log(res)
       return res.data
     } catch (err) {
       return false;

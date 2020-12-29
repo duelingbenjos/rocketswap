@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { pool_panel_store } from '../store'
-
   //components
   import PoolSwapPanel from '../components/pool-swap-panel.svelte'
   import PoolStats from '../components/pool-stats.svelte'
@@ -8,17 +6,16 @@
   //icons
   import IconBackArrow from '../icons/back-arrow.svelte'
 
-  pool_panel_store.subscribe((update) => {
-    let selected_token = $pool_panel_store?.slot_b?.selected_token || undefined;
-    console.log(selected_token)
-    if (selected_token?.has_market) location.assign(`/#/pool-add/${selected_token.contract_name}`)
-  })
+  let pageState;
+
+  const handleInfoUpdate = (e) => pageState = e.detail
+
 </script>
 
 <style>
-  div{
-    width: 89%;
-    margin: 0 auto;
+  .page-container{
+    display: flex;
+    justify-content: center;
   }
   div.header{
     display: flex;
@@ -36,19 +33,20 @@
 </style>
 
 
-
-<PoolSwapPanel content="all_tokens_no_market">
-  <div class="header" slot="header">
-    <a href="/#/pool-main">
-      <IconBackArrow />
-    </a>
-    <h2>Create Liquidity</h2>
-    <IconBackArrow color="transparent"/>
-  </div>
-  <div class="footer" slot="footer">
-    <PoolStats statList={["ratios"]} title={"Prices"}/>
-  </div>
-</PoolSwapPanel>
+<div class="page-container">
+  <PoolSwapPanel on:infoUpdate={handleInfoUpdate}>
+    <div class="header" slot="header">
+      <a href="/#/pool-main">
+        <IconBackArrow />
+      </a>
+      <h2>Create Liquidity</h2>
+      <IconBackArrow color="transparent"/>
+    </div>
+    <div class="footer" slot="footer">
+      <PoolStats {pageState} statList={["ratios"]} title={"Prices"}/>
+    </div>
+  </PoolSwapPanel>
+</div>
 
 
 

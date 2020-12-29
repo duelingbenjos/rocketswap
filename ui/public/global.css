@@ -19,6 +19,21 @@ body {
   --border-radius: 25px;
 }
 
+.page-container{
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.flex-row{
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-col{
+  display: flex;
+  flex-direction: column;
+}
 
 .number {
   font-family: 'Roboto Mono';
@@ -39,6 +54,16 @@ a:visited {
 
 label {
   display: block;
+}
+
+button {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }
 
 input,
@@ -63,6 +88,16 @@ input:disabled {
   color: #ccc;
 }
 
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
@@ -71,8 +106,6 @@ select:focus {
 }
 
 button {
-  color: #333;
-  background-color: #f4f4f4;
   outline: none;
 }
 
@@ -120,4 +153,75 @@ button.outline:active {
   font: inherit;
   cursor: pointer;
   outline: inherit;
+}
+
+button.max-button {
+  border: 0px;
+  background-color: #3131d98f;
+  border-radius: 18px;
+
+  margin: 2px 8px 0;
+  font-size: 0.8em;
+  font-weight: 600;
+  padding: 7px 10px;
+
+}
+
+.token-label{
+  border: 0px;
+  padding: 0;
+  font-size: 1.5em;
+  font-weight: 600;
+  min-width: fit-content;
+}
+/*
+  Main Token and Currency input components
+*/
+
+.input-container {
+  width: 100%;
+  margin-top: 30px;
+  padding: 10px 20px 20px;
+  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  height: 110px;
+  justify-content: space-between;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.input-row-1 {
+  justify-content: space-between;
+}
+
+.input-label{
+  flex-grow: 1;
+}
+
+.input-balance{
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.input-row-2 {
+  justify-content: space-between;
+}
+
+.input-controls{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+input.input-amount-value::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.input-amount-value {
+  color: #fff;
+  width: 100%;
+  font-size: 1.5em;
+  padding: 0px;
+  background: none;
+  border: none;
 }

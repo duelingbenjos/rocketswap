@@ -62,7 +62,11 @@ export const calculateRgba = (input, opacity) => {
 }
 
 export const stringToFixed = (value: string, precision: number) => {
-  let values = value.split('.')
+  try{
+    var values = value.split('.')
+  } catch {
+    var values = value.toString().split('.')
+  }
   if (!values[1]) return value
   else {
     if (values[1].length < precision) precision = values[1].length
