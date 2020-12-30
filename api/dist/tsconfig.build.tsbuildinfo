@@ -2697,8 +2697,8 @@
         "affectsGlobalScope": false
       },
       "../src/entities/token.entity.ts": {
-        "version": "9052ee00e13d86597382619694354808bd012ef58f32d394c43e1130bea7d5e2",
-        "signature": "b5eaa40de86c1728664a37b65035199916fadcc8f660a4ecd8ee342a0a334ca9",
+        "version": "5a7214b3ca7b57b0c01273e3bbf57a79c3b434ae284f5804793c8d64b25c3a9d",
+        "signature": "ac929a144c375a6e2afff405cc4528156043e73f97df5e7d9f52c12a508f4719",
         "affectsGlobalScope": false
       },
       "../src/entities/pair.entity.ts": {
@@ -2707,8 +2707,8 @@
         "affectsGlobalScope": false
       },
       "../src/app.controller.ts": {
-        "version": "303de6423fcaf978e5b63355dc4b853068c8204386869bb69c2641bd4ce03b0b",
-        "signature": "c9596d857f1dcde78b0bfc3c1bf388e3229667aec96d13699a99167c527979b1",
+        "version": "cbc11a451cceb5a694d09e69286184a88bc3dfb280f32b92f32d5156b482e4b8",
+        "signature": "0a948715550e329a104c28d1a1727bef73825b6084ca6bfb04dec13b2bd05693",
         "affectsGlobalScope": false
       },
       "../node_modules/@nestjs/websockets/adapters/ws-adapter.d.ts": {
@@ -8337,6 +8337,7 @@
       ],
       "../src/app.controller.ts": [
         "../src/entities/lp-points.entity.ts",
+        "../src/entities/pair.entity.ts",
         "../src/entities/token.entity.ts"
       ],
       "../src/app.gateway.ts": [

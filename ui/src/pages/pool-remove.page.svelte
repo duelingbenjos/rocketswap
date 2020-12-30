@@ -14,7 +14,8 @@
   //Components
   import PoolSwapPanel from '../components/pool-swap-panel.svelte'
   import PoolStats from '../components/pool-stats.svelte'
-  import PoolButtons from '../components/pool-buttons.svelte'
+
+  //Icons
   import IconBackArrow from '../icons/back-arrow.svelte'
 
   let pageState = {};
@@ -22,7 +23,7 @@
   $: contractName = $params.contract
   $: getTokenBalance = refreshTokenBalance($wallet_store)
   $: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
-  $: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : `/#/pool-remove`;
+  $: addHref = pageState.selectedToken ? `/#/pool-add/${pageState.selectedToken.contract_name}` : `/#/pool-add`;
 
   onMount(() => {
     if (contractName) refreshTokenInfo()
@@ -30,7 +31,6 @@
 
   function handleInfoUpdate(e) {
     pageState = Object.assign(pageState, e.detail)
-    console.log(pageState)
     updateWindowHistory()
   }
 
@@ -40,7 +40,6 @@
     else{
       tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
     }
-    console.log(tokenRes)
     pageState.selectedToken = tokenRes.token
     pageState.tokenLP = tokenRes.lp_info
   }
@@ -66,9 +65,6 @@
     height: 35px;
     margin: 0 0 1rem;
   }
-  div.footer{
-    padding-top: 1rem;
-  }
   h2{
     position: absolute;
 
@@ -88,6 +84,10 @@
     justify-content: space-between;
     align-items: center;
   }
+  div.footer{
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
   a{
     height: 24px;
   }
@@ -102,21 +102,17 @@
   <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState}>
     <div class="header" slot="header">
       <h2>
-        Add Liquidity
+        Remove Liquidity
       </h2>
       <div class="controls flex-row">
         <a href="/#/pool-main">
           <IconBackArrow />
         </a>
-        <a href={removeHref} >remove</a>
+        <a href={addHref} >add</a>
       </div>
     </div>
-    
     <div class="footer" slot="footer">
-      {#if pageState.selectedToken && pageState.tokenLP}
-        <PoolStats {pageState} statList={["ratios", "poolShare"]} title={"Prices and pool share"}/>
-      {/if}
-      <PoolButtons buttonFunction="add" {pageState} />
+      <PoolStats {pageState} statList={["ratios", "poolShare"]} title={"Prices and pool share"}/>
     </div>
   </PoolSwapPanel>
 </div>

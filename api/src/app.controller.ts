@@ -16,6 +16,19 @@ export class AppController {
 		}
 	}
 
+	@Get("token/:contract_name")
+	public async getToken(@Param() params) {
+		const { contract_name } = params;
+		try {
+			let tokenRes = await TokenEntity.find({contract_name});
+			let token = tokenRes[tokenRes.length - 1]
+			let lp_info = await PairEntity.findOne(contract_name)
+			return { token, lp_info };
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
 	@Get("market_list")
 	public async getMarketList() {
 		try {

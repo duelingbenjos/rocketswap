@@ -56,11 +56,18 @@ export class ApiService {
     }
   }
 
+  async getToken(contract_name: string) {
+    try {
+      const res = await axios.get(`${this.base_url}:3001/api/token/${contract_name}`)
+      return res.data
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   async getUserLpBalance(vk: string) {
     try {
-      console.log(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
       const res = await axios.get(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
-      //console.log(res)
       return res.data
     } catch (err) {
       return false;

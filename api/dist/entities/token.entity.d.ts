@@ -16,7 +16,9 @@ export declare class AddTokenDto {
     contract_name: string;
     token_seed_holder: string;
     developer: string;
+    lp_info?: object;
 }
 export declare const saveToken: (add_token_dto: AddTokenDto) => Promise<TokenEntity>;
 export declare function prepareAddToken(state: IKvp[]): AddTokenDto;
 export declare function getTokenList(): Promise<string[]>;
+export declare function getOneToken(): Promise<string[]>;

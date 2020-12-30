@@ -17,6 +17,7 @@ export type WalletConnectedType = {
   wallets: string[]
   balance?: number
   tokens?: BalanceType
+  lp_balances?: object
 }
 
 export type WalletType = WalletInitType | WalletErrorType | WalletConnectedType

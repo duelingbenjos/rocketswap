@@ -41,6 +41,7 @@ export class AddTokenDto {
 	contract_name: string;
 	token_seed_holder: string;
 	developer: string;
+	lp_info?: object
 }
 
 export const saveToken = async (add_token_dto: AddTokenDto) => {
@@ -93,5 +94,11 @@ export function prepareAddToken(state: IKvp[]): AddTokenDto {
 
 export async function getTokenList(): Promise<string[]> {
 	const tokens = await TokenEntity.find();
+	return tokens.map((token) => token.contract_name);
+}
+
+export async function getOneToken(): Promise<string[]> {
+	const tokens = await TokenEntity.find({contract_name: 'con_jeff_token_v4'});
+	console.log(tokens)
 	return tokens.map((token) => token.contract_name);
 }
