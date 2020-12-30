@@ -13,10 +13,6 @@
 </script>
 
 <style>
-  .page-container{
-    display: flex;
-    justify-content: center;
-  }
   div.header{
     display: flex;
     flex-direction: row;

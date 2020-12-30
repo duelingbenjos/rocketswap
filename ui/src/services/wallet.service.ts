@@ -192,8 +192,7 @@ export class WalletService {
   }
 
   public async createMarket(args) {
-
-    this.lwc.sendTransaction(this.createTxInfo('create_market', args), handleCreateMarket)
+    this.lwc.sendTransaction(this.createTxInfo('create_market', args), this.handleCreateMarket)
   }
 
   private handleSwapResult = (res) => {
@@ -201,21 +200,42 @@ export class WalletService {
     show_swap_confirm.set(false)
     this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
   }
-}
 
-function handleCreateMarket(res) {
-  let status = txResult(res.data)
-  if (status === 'success') {
-    // TODO Send info to toast controller success
+  private handleTxErrors(errors){
+    errors.forEach(error => {
+      let toastType = 'info'
+      if (error.includes("AssertionError")) {
+        error = error.split("'")[1]
+        toastType = "error"
+      }
+      this.toastService.addToast({ 
+        heading: 'Transaction Error.', 
+        type: toastType === 'info' ? 'info' : 'error',
+        text: error
+      })
+    })
   }
-  // TODO Send error(s) to toast controller
-}
 
-function txResult(txResults) {
-  if (txResults.errors) return txResults.errors
-  if (txResults.txBlockResult.status) {
-    if (txResults.txBlockResult.status === 0) return 'success'
-    if (txResults.txBlockResult.status === 1) return txResults.txBlockResult.errors
+  private txResult(txResults) {
+    if (txResults.errors) {
+      this.handleTxErrors(txResults.errors)
+      return txResults.errors
+    }
+    if (txResults.txBlockResult.status) {
+      if (txResults.txBlockResult.status === 0) return 'success'
+      if (txResults.txBlockResult.status === 1) {
+        this.handleTxErrors(txResults.txBlockResult.errors)
+        return txResults.txBlockResult.errors
+      }
+    }
+  }
+
+  private handleCreateMarket = (res) => {
+    console.log(this.txResult)
+    let status = this.txResult(res.data)
+    if (status === 'success') {
+      this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
+    }
   }
 }
 

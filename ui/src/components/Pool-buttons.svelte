@@ -1,43 +1,37 @@
 
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import { pool_panel_store, wallet_store } from '../store'
+
+  //Stores
+  import { wallet_store } from '../store'
+
+  //Services
   import { WalletService } from '../services/wallet.service'
+  const walletService = WalletService.getInstance()
 
+  //Props
   export let buttonFunction;
+  export let state;
 
-  let walletService;
-  let disabled = true;
-
-  onMount(() => {
-    walletService = WalletService.getInstance()
-  })
+  $: disabled = disableButton(state);
 
   const createMarket = () => {
+    const { currencyAmount, tokenAmount, selectedToken } = state
     walletService.createMarket({
-      'contract': $pool_panel_store.slot_b.selected_token.contract_name,
-      'currency_amount': {'__fixed__': $pool_panel_store.slot_a.input_amount},
-      'token_amount': {'__fixed__': $pool_panel_store.slot_b.input_amount}
+      'contract': selectedToken.contract_name,
+      'currency_amount': {'__fixed__': currencyAmount.toString()},
+      'token_amount': {'__fixed__': tokenAmount.toString()}
     })
   }
 
-  pool_panel_store.subscribe(update => {
-    if (!$pool_panel_store.slot_b.selected_token) return
-    let valid = true
-    if (!$pool_panel_store.slot_a.input_amount || !$pool_panel_store.slot_b.input_amount) {
+  const disableButton = (info) => {
+    if (!info) return true
+    const { currencyAmount, tokenAmount, selectedToken } = info
+    if (!currencyAmount || !tokenAmount || !selectedToken) {
       console.log('fill out all inputs')
-      valid = false
+      return true
     }
-    if ($wallet_store.balance.lt($pool_panel_store.slot_a.input_amount)) {
-      console.log('not enough dTAU')
-      valid = false
-    }
-    if ($pool_panel_store.slot_b.input_amount > $pool_panel_store.slot_b.selected_token.balance) {
-      console.log('not enough Tokens')
-      valid = false
-    }
-    disabled = !valid
-  })
+    return false
+  }
 
 </script>
 
