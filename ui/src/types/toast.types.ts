@@ -3,6 +3,7 @@ export type ToastMetaType = {
   type: ToastType
   text?: string
   time_added?: number
+  duration?: number
   id?: number
   done?: boolean
 }

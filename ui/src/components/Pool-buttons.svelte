@@ -26,13 +26,10 @@
   const addLiquidity = () => {
     const { currencyAmount, tokenAmount, selectedToken } = pageState
     console.log(pageState)
-    /*
     walletService.addLiquidity({
       'contract': selectedToken.contract_name,
-      'currency_amount': {'__fixed__': currencyAmount.toString()},
-      'token_amount': {'__fixed__': tokenAmount.toString()}
-    })
-    */
+      'currency_amount': {'__fixed__': currencyAmount.toString()}
+    }, selectedToken, tokenAmount, currencyAmount)
   }
 
   const disableButton = (info) => {
@@ -65,6 +62,10 @@
     font-size: 1.6em;
     font-weight: 600;
     letter-spacing: 0.1em;
+  }
+
+  button:hover {
+    filter: brightness(110%);
   }
 
   button {

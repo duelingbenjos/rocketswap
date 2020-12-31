@@ -108,7 +108,7 @@
         <a href="/#/pool-main">
           <IconBackArrow />
         </a>
-        <a href={addHref} >add</a>
+        <a href={addHref} class="text-link">add</a>
       </div>
     </div>
     <div class="footer" slot="footer">

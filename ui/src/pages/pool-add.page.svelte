@@ -1,52 +1,66 @@
 <script lang="ts">
-  import { onMount, setContext } from 'svelte'
+	import { onMount, setContext } from 'svelte'
 
-  //Router
-  import { params } from 'svelte-hash-router'
+	//Router
+	import { params } from 'svelte-hash-router'
 
-  //Services
-  import { WalletService } from '../services/wallet.service'
-  const walletService = WalletService.getInstance();
+	//Services
+	import { WalletService } from '../services/wallet.service'
+	const walletService = WalletService.getInstance();
 
-  //Stores
-  import { wallet_store } from '../store'
+	//Stores
+	import { wallet_store } from '../store'
 
-  //Components
-  import PoolSwapPanel from '../components/pool-swap-panel.svelte'
-  import PoolStats from '../components/pool-stats.svelte'
-  import PoolButtons from '../components/pool-buttons.svelte'
-  import IconBackArrow from '../icons/back-arrow.svelte'
+	//Components
+	import PoolSwapPanel from '../components/pool-swap-panel.svelte'
+	import PoolStats from '../components/pool-stats.svelte'
+	import PoolButtons from '../components/pool-buttons.svelte'
+	import IconBackArrow from '../icons/back-arrow.svelte'
 
-  let pageState = {};
+	let pageState = {};
 
-  $: contractName = $params.contract
-  $: getTokenBalance = refreshTokenBalance($wallet_store)
-  $: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
-  $: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : `/#/pool-remove`;
+	$: contractName = $params.contract
+	$: getTokenBalance = refreshTokenBalance($wallet_store)
+	$: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
+	$: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : `/#/pool-remove`;
 
-  setContext('pageContext', {
-    getTokenList: async () => await walletService.apiService.getMarketList()
-  });
+	setContext('pageContext', {
+		getTokenList: async () => await walletService.apiService.getMarketList(),
+		determineValues: true
+	});
 
-  onMount(() => {
-    if (contractName) refreshTokenInfo()
-  })
+	onMount(() => {
+		if (contractName) refreshTokenInfo()
+	})
 
-  function handleInfoUpdate(e) {
-    pageState = Object.assign(pageState, e.detail)
-    console.log(pageState)
-    updateWindowHistory()
-  }
+	async function handleInfoUpdate(e) {
+		if (e.detail.selectedToken){
+			let tokenRes = await getTokenInfo(e.detail.selectedToken.contract_name)
+			applyTokenBalance(tokenRes)
+			const { token: selectedToken, lp_info: tokenLP }  = tokenRes
+			pageState = Object.assign(pageState, e.detail, {selectedToken, tokenLP} )
+		}else{
+			pageState = Object.assign(pageState, e.detail)
+		}
+		updateWindowHistory()
+	}
 
-  const refreshTokenInfo = async () => {
-    let tokenRes = await walletService.apiService.getToken(contractName)
-    if ($wallet_store.init) tokenRes.token.balance = 0
-    else{
-      tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
-    }
-    pageState.selectedToken = tokenRes.token
-    pageState.tokenLP = tokenRes.lp_info
-  }
+	const refreshTokenInfo = async () => {
+		let tokenRes = await getTokenInfo(contractName)
+		applyTokenBalance(tokenRes)
+		const { token: selectedToken, lp_info: tokenLP }  = tokenRes
+		pageState = Object.assign(pageState, {selectedToken, tokenLP} )
+	}
+
+	const applyTokenBalance = (tokenRes) => {
+		if ($wallet_store.init) tokenRes.token.balance = 0
+		else tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
+		return tokenRes
+	}
+
+	const getTokenInfo = async (contractName) => {
+		return walletService.apiService.getToken(contractName)
+	}
 
   const refreshTokenBalance = () => {
     if (!pageState.selectedToken) return
@@ -111,7 +125,7 @@
         <a href="/#/pool-main">
           <IconBackArrow />
         </a>
-        <a href={removeHref} >remove</a>
+        <a href={removeHref} class="text-link" >remove</a>
       </div>
     </div>
     

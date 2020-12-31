@@ -3,7 +3,7 @@ import { ApiService } from './api.service'
 import { config } from '../config'
 import { show_swap_confirm, swap_confirm_loading, wallet_store } from '../store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
-import { refreshTAUBalance, returnFloat } from '../utils'
+import { refreshTAUBalance, returnFloat, toBigNumber, stringToFixed } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -108,8 +108,9 @@ export class WalletService {
     return await Promise.all(proms)
   }
 
-  private createTxInfo(method: string, args) {
+  private createTxInfo(method: string, args, contractName = undefined) {
     return {
+      contractName,
       methodName: method,
       networkType: config.networkType,
       stampLimit: 100, //TODO Populate with blockexplorer stamp info endpoint
@@ -120,10 +121,7 @@ export class WalletService {
   getApprovedAmount = async (vk: string, contract: string) => {
     return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${config.contractName}`)
       .then((res) => res.json())
-      .then((json) => {
-        console.log(json)
-        return json.value
-      })
+      .then((json) => json.value)
       .catch((e) => console.log(e.message))
   }
 
@@ -187,6 +185,12 @@ export class WalletService {
     console.error(err)
   }
 
+  private handleSwapResult = (res) => {
+    swap_confirm_loading.set(false)
+    show_swap_confirm.set(false)
+    this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
+  }
+
   private async approveDifference(vk: string, amount: number, contract_name: string) {
     let approved_amount = await this.getApprovedAmount(vk, contract_name)
     if (approved_amount && approved_amount.__fixed__) approved_amount = approved_amount.__fixed__
@@ -201,10 +205,57 @@ export class WalletService {
     this.lwc.sendTransaction(this.createTxInfo('create_market', args), this.handleCreateMarket)
   }
 
-  private handleSwapResult = (res) => {
-    swap_confirm_loading.set(false)
-    show_swap_confirm.set(false)
-    this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
+  private handleCreateMarket = (res) => {
+    let status = this.txResult(res.data)
+    if (status === 'success') {
+      this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
+    }
+  }
+
+  public async addLiquidity(args, selectedToken, tokenAmount, currencyAmount) {
+    const callApprove = (contract, amount) => {
+      return new Promise((resolve) => {
+        this.approveBN(contract, amount, (res, err) => {
+          console.log({contract, amount, res, err})
+          if (err || !res) resolve(false)
+          if (res === true) resolve(true)
+          else {
+            if (res?.data?.txBlockResult?.status === 0) resolve(true)
+            else resolve(false)
+          }
+      })})
+    } 
+
+    let results = await Promise.all([
+      callApprove(args.contract, tokenAmount),
+      callApprove('currency', currencyAmount)
+    ])
+
+    console.log(results)
+
+    if (results.every(v => v === true)){
+        this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken))
+    }
+  }
+
+  private handleAddLiquidity = (res, selectedToken) => {
+    console.log({res, selectedToken})
+    let status = this.txResult(res.data)
+    if (status === 'success') {
+      let lpPoints = "0";
+      res.data.txBlockResult.state.forEach(stateChange => {
+        if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${this.wallet_state.wallets[0]}`){
+          lpPoints = stateChange.value.__fixed__ || stateChange.value
+        }
+      })
+      lpPoints = toBigNumber(lpPoints)
+      this.toastService.addToast({ 
+        heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
+        text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
+        type: 'info',
+        duration: 10000
+      })
+    }
   }
 
   private handleTxErrors(errors){
@@ -227,7 +278,7 @@ export class WalletService {
       this.handleTxErrors(txResults.errors)
       return txResults.errors
     }
-    if (txResults.txBlockResult.status) {
+    if (typeof txResults.txBlockResult.status !== 'undefined') {
       if (txResults.txBlockResult.status === 0) return 'success'
       if (txResults.txBlockResult.status === 1) {
         this.handleTxErrors(txResults.txBlockResult.errors)
@@ -236,11 +287,23 @@ export class WalletService {
     }
   }
 
-  private handleCreateMarket = (res) => {
-    console.log(this.txResult)
-    let status = this.txResult(res.data)
-    if (status === 'success') {
-      this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
+  public async approveBN(contractName, approveAmount, callback = undefined) {
+    let vk = this.wallet_state.wallets[0]
+    let currentApproval = await this.getApprovedAmount(vk, contractName)
+    if (typeof currentApproval?.__fixed__ !== 'undefined') currentApproval = toBigNumber(currentApproval.__fixed__)
+    else currentApproval = toBigNumber(currentApproval)
+    if (currentApproval.isNaN()) currentApproval = toBigNumber("0")
+
+    let adjustedApprovalAmount = approveAmount.minus(currentApproval)
+    console.log({adjustedApprovalAmount: adjustedApprovalAmount.toString(), currentApproval: currentApproval.toString()})
+    if (adjustedApprovalAmount.isGreaterThan(toBigNumber("0"))){
+      let args = {
+        amount: {'__fixed__': adjustedApprovalAmount.toString()},
+        to: config.contractName
+      }
+      this.lwc.sendTransaction(this.createTxInfo('approve', args, contractName), callback)
+    }else{
+      callback(true)
     }
   }
 }

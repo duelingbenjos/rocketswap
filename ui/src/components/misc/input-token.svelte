@@ -19,30 +19,41 @@
 	export let selectedToken;
 
 	const dispatch = createEventDispatcher();
+	let inputElm;
 
 	$: wallet_balance = !$wallet_store.init ? $wallet_store.balance.toString() : toBigNumber("0.0");
 	$: tokenBalance = selectedToken?.balance ? toBigNumber(selectedToken?.balance) : toBigNumber("0.0");
-	$: bigNumber = tokenAmount ? toBigNumber(tokenAmount) : toBigNumber("0.0")
+	$: inputValue = tokenAmount;
 
-	afterUpdate(() => console.log({tokenAmount}))
+	//afterUpdate(() => console.log({tokenAmount}))
 
-	const handleInputChange = () => {
-		if (toBigNumber(tokenAmount).isGreaterThan(tokenBalance)) handleMaxInput()
-		dispatchEvent()
+	const handleInputChange = (e) => {
+		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
+		if (validateValue !== e.target.value) {
+			inputElm.value = validateValue
+		}else{
+			let value = toBigNumber(e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1'))
+			if (value.isGreaterThan(tokenBalance) ) handleMaxInput()
+			else {
+				dispatchEvent(value)
+			}
+		}
 	}
 
 	const handleMaxInput = () => {
-		tokenAmount = tokenBalance.toString();
-		dispatchEvent()
+		inputValue = tokenBalance
+		inputElm.value = inputValue.toString()
+		dispatchEvent(inputValue)
 	}
 
 	const handleTokenSelect = (e) => {
 		selectedToken = e.detail
+		console.log(e.detail)
 		handleMaxInput();
-		dispatchEvent()
+		dispatchEvent(toBigNumber(selectedToken.balance))
 	}
 
-	const dispatchEvent = () => dispatch('input', {tokenAmount: bigNumber, selectedToken})
+	const dispatchEvent = (value) => dispatch('input', {tokenAmount: value, selectedToken})
 </script>
 
 <div class="input-container flex-col"
@@ -60,7 +71,8 @@
 		<input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			bind:value={tokenAmount} 
+			value={inputValue?.toString() || ""}
+			bind:this={inputElm} 
 			on:input={handleInputChange}
 			type="text"
 			disabled={!selectedToken} 

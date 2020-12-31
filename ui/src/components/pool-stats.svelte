@@ -28,7 +28,7 @@
     //$: wallet_store_changes = setLpBalances($wallet_store)
 
     onMount(async () => {
-        console.log($wallet_store)
+        //console.log($wallet_store)
         // TODO REMOVE HARDCODED VK
         //let balancesRes = await apiService.getUserLpBalance($wallet_store.wallet_state.wallets[0])
         //if (balancesRes) balances = balancesRes.points

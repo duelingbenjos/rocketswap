@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, afterUpdate } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -15,24 +15,31 @@
 	export let currencyAmount;
 
 	const dispatch = createEventDispatcher();
-	
+	let inputElm;
 
-	$: walletBalance = !$wallet_store.init ? $wallet_store.balance.toString() : "0";
-	$: bigNumber = currencyAmount ? toBigNumber(currencyAmount) : toBigNumber("0.0")
+	$: walletBalance = !$wallet_store.init ? $wallet_store.balance : toBigNumber("0.0");
+	$: inputValue = currencyAmount;
 
-	const handleInputChange = () => {
-		if (currencyAmount > walletBalance) handleMaxInput()
-		else{
-			dispatchEvent()
+	afterUpdate(() => {currencyAmount, walletBalance, inputValue})
+
+	const handleInputChange = (e) => {
+		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
+		if (validateValue !== e.target.value) {
+			inputElm.value = validateValue
+		}else{
+			let value = toBigNumber(e.target.value)
+			if (value.isGreaterThan(walletBalance) ) handleMaxInput()
+			else dispatchEvent(value)
 		}
 	}
 
 	const handleMaxInput = () => {
-		currencyAmount = walletBalance
-		dispatchEvent()
+		inputValue = walletBalance
+		inputElm.value = inputValue.toString()
+		dispatchEvent(inputValue)
 	}
 	
-	const dispatchEvent = () => dispatch('input', currencyAmount)
+	const dispatchEvent = (value) => dispatch('input', value)
 </script>
 
 <div class="input-container flex-col"
@@ -52,7 +59,8 @@
 	    <input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			bind:value={currencyAmount} 
+			value={inputValue?.toString() || ""} 
+			bind:this={inputElm}
 			type="text"
 			on:input={handleInputChange}
         />

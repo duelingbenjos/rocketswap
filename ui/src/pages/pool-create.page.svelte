@@ -30,7 +30,8 @@
   }
 
   setContext('pageContext', {
-    getTokenList: async () => await walletService.apiService.getTokenList(["no-market"])
+    getTokenList: async () => await walletService.apiService.getTokenList(["no-market"]),
+    determineValues: false
   });
 
   onMount(() => {

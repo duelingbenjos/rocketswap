@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate } from 'svelte'
+	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
 
 	//Router
   	import { active } from 'svelte-hash-router'
@@ -12,15 +12,15 @@
 	import IconPlusSign from '../icons/plus-sign.svelte'
 
 	//Misc
-	import { calcRatios, toBigNumber } from '../utils'
+	import { quoteCalculator } from '../utils'
 
 	//Props
 	export let pageState;
-	export let tokenSelectContext;
 
-	$: ratios = calcRatios(pageState?.tokenLP?.reserves)
+	$: quoteCalc = quoteCalculator(pageState?.tokenLP?.reserves)
 
 	const dispatch = createEventDispatcher();
+	const { determineValues } = getContext('pageContext')
 
 	let state = { };
 
@@ -38,23 +38,41 @@
 	]
 
 	afterUpdate(() => {
+		console.log(pageState)
 		state.selectedToken = pageState.selectedToken
 	})
 
 	function handleCurrencyChange(e){
-		state.currencyAmount = toBigNumber(e.detail)
-		state.tokenAmount = state.currencyAmount.dividedBy(ratios.token)
+		console.log('handleCurrencyChange')
+		if (e.detail.toString() === "NaN") resetAmounts()
+		else{
+			state.currencyAmount = e.detail
+			if (determineValues && state.selectedToken) state.tokenAmount = quoteCalc.calcTokenValue(state.currencyAmount)
+		}
 		dispatchEvent()
 	}
 
 	function handleTokenChange(e) {
-		state.selectedToken = e.detail.selectedToken
-		state.tokenAmount = parseFloat(e.detail.tokenAmount)
+		console.log(e.detail)
+		console.log('token amount ' + e.detail.tokenAmount.toString())
+		console.log('handleTokenChange')
+		if (e.detail.tokenAmount.toString() === "NaN") resetAmounts()
+		else{
+			state.selectedToken = e.detail.selectedToken
+			state.tokenAmount = e.detail.tokenAmount
+			if (determineValues) state.currencyAmount = quoteCalc.calcCurrencyValue(state.tokenAmount) 
+		}
+		console.log(state)
 		dispatchEvent()
 	}
 
 	const switchPositions = async () => {
 		slots = slots.reverse()
+	}
+
+	const resetAmounts = () => {
+		state.tokenAmount = quoteCalc.toBigNumber("0.0")
+		state.currencyAmount = quoteCalc.toBigNumber("0.0")
 	}
 
 	const dispatchEvent = () => dispatch('infoUpdate', state)

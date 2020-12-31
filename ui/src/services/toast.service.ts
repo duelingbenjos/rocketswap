@@ -29,7 +29,7 @@ export class ToastService {
 
     const timeout = setTimeout(() => {
       this.removeToast(toast.id)
-    }, this.remove_interval)
+    }, toast.duration || this.remove_interval)
     this.timeouts[toast.id] = timeout
   }
 

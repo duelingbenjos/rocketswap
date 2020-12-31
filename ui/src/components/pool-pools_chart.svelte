@@ -128,8 +128,8 @@
                     <td>{pair.token_symbol || "none"}</td>
                     <td>{pair.contract_name}</td>
                     <td>{`${stringToFixed(pair.reserves[1], 4)} / ${stringToFixed(pair.reserves[0], 4)}`}</td>
-                    <td>{balances[pair.contract_name]}</td>
-                    <td>{`${lp_percent(pair.contract_name, pair.lp) * 100}%` }</td>
+                    <td>{stringToFixed(balances[pair.contract_name], 4)}</td>
+                    <td>{`${parseFloat(lp_percent(pair.contract_name, pair.lp) * 100).toFixed(1)}%` }</td>
                     <td>{calc_value(pair.contract_name, pair.lp, pair.reserves[1], pair.reserves[0], pair.price)} TAU</td>
                     <td><a href="{`/#/pool-add/${pair.contract_name}`}">Adjust ></a></td>
                 </tr>

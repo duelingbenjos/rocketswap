@@ -247,3 +247,13 @@ input.input-amount-value::placeholder {
   background: none;
   border: none;
 }
+
+.text-link {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.text-link:visited {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
