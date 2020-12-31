@@ -10,7 +10,7 @@ export class ApiService {
     return ApiService.instance
   }
   private static instance: ApiService
-  private base_url = getBaseUrl(document.location.href)
+  private base_url = `${getBaseUrl(document.location.href)}:3002`
   constructor() {
     //this.startTimer()
     //this.getMarketList()
@@ -24,7 +24,7 @@ export class ApiService {
 
   async getTokenList(filter = []) {
     try {
-      let token_list = await axios.get(`${this.base_url}:3001/api/token_list`).then(res => res.data)
+      let token_list = await axios.get(`${this.base_url}/api/token_list`).then(res => res.data)
       if (filter.includes("no-market")) token_list = token_list.filter(token => !token.has_market)
       console.log('getting token list')
       token_list_store.set(token_list)
@@ -37,7 +37,7 @@ export class ApiService {
 
   async getMarketList() {
     try {
-      let token_list = await axios.get(`${this.base_url}:3001/api/market_list`).then(res => res.data)
+      let token_list = await axios.get(`${this.base_url}/api/market_list`).then(res => res.data)
       console.log('getting market_list')
       token_list_store.set(token_list)
       return token_list
@@ -49,7 +49,7 @@ export class ApiService {
 
   async getTokenBalances(vk: string) {
     try {
-      const res = await axios.get(`${this.base_url}:3001/api/balances/${vk}`)
+      const res = await axios.get(`${this.base_url}/api/balances/${vk}`)
       return res.data
     } catch (err) {
       console.error(err)
@@ -58,8 +58,8 @@ export class ApiService {
 
   async getUserLpBalance(vk: string) {
     try {
-      console.log(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
-      const res = await axios.get(`${this.base_url}:3001/api/user_lp_balance/${vk}`)
+      console.log(`${this.base_url}/api/user_lp_balance/${vk}`)
+      const res = await axios.get(`${this.base_url}/api/user_lp_balance/${vk}`)
       //console.log(res)
       return res.data
     } catch (err) {
@@ -69,8 +69,8 @@ export class ApiService {
 
   async getPairs(contracts: string) {
     try {
-      console.log(`${this.base_url}:3001/api/get_pairs/${contracts}`)
-      const res = await axios.get(`${this.base_url}:3001/api/get_pairs/${contracts}`)
+      console.log(`${this.base_url}/api/get_pairs/${contracts}`)
+      const res = await axios.get(`${this.base_url}/api/get_pairs/${contracts}`)
       console.log(res)
       return res.data
     } catch (err) {
