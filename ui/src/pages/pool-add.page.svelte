@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {onMount } from 'svelte'
+  import { onMount, setContext } from 'svelte'
 
   //Router
   import { params } from 'svelte-hash-router'
@@ -24,6 +24,10 @@
   $: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
   $: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : `/#/pool-remove`;
 
+  setContext('pageContext', {
+    getTokenList: async () => await walletService.apiService.getMarketList()
+  });
+
   onMount(() => {
     if (contractName) refreshTokenInfo()
   })
@@ -40,7 +44,6 @@
     else{
       tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
     }
-    console.log(tokenRes)
     pageState.selectedToken = tokenRes.token
     pageState.tokenLP = tokenRes.lp_info
   }

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import {onMount } from 'svelte'
+  import {onMount, setContext } from 'svelte'
 
   //Router
   import { params } from 'svelte-hash-router'
@@ -28,6 +28,10 @@
     pageState = Object.assign(pageState, e.detail)
     if (pageState.selectedToken) refreshTokenInfo(pageState.selectedToken.contract_name)
   }
+
+  setContext('pageContext', {
+    getTokenList: async () => await walletService.apiService.getTokenList(["no-market"])
+  });
 
   onMount(() => {
     if (contractName) refreshTokenInfo(contractName)
@@ -86,7 +90,7 @@
 
 
 <div class="page-container">
-  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState}>
+  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} >
     <div class="header" slot="header">
       <a href="/#/pool-main">
         <IconBackArrow />

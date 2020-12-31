@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte'
+    import { createEventDispatcher, getContext } from 'svelte'
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -10,20 +10,25 @@
     import { WalletService } from '../../services/wallet.service'
     const walletService = WalletService.getInstance();
 
+    //Components
+    import TokenSearch from './token-select-search.svelte'
+
     const dispatch = createEventDispatcher();
+    const { getTokenList } = getContext('pageContext');
 
     export let selectedToken;
 
     let open = false;
     let api_tokens;
-    let done = false;
 
-    $: token_list = createTokenList(api_tokens);
+    $: filter = ""; 
+    $: token_list = createTokenList(api_tokens, filter);
     $: selected_contract = selectedToken?.contract_name;
 
     const openTokenSelect = async () => {
         open = true;
-        api_tokens = await walletService.apiService.getTokenList(["no-market"])
+        //api_tokens = await walletService.apiService.getTokenList(tokenSelectContext)
+        api_tokens = await getTokenList()
     }
     const closeTokenSelect = () => open = false;
 
@@ -33,8 +38,17 @@
         open = false;
     }
 
-    function createTokenList (tokenList) {
+    function createTokenList (tokenList, filter) {
         if (tokenList){
+            if (filter !== "") {
+                if (filter.startsWith("con_")){
+                    tokenList = tokenList.filter(f => f.contract_name.includes(filter))
+                }else{
+                    tokenList = tokenList.filter(f => f.token_symbol.includes(filter) || f.token_symbol.includes(filter.toUpperCase()))
+                }
+                
+            }
+            console.log(tokenList)
             return [...tokenList
                 .map((token) => {
                     token.balance = walletService.wallet_state.tokens.balances[token.contract_name] || 0
@@ -47,6 +61,11 @@
             ]
         }
 
+    }
+
+    const handleSearch = (e) => {
+        const { inputValue } = e.detail
+        filter = inputValue
     }
 </script>
 
@@ -211,7 +230,8 @@
             </button>
         </div>
 
-        <div class="select-heading">Token Name</div>
+        <!--<div class="select-heading">Token Name</div>-->
+        <TokenSearch on:search={handleSearch}/>
         <hr />
         <div class="token-scroll">
             <div class="token-list">
@@ -230,7 +250,7 @@
                         </div>
                     {/each}
                 {:else}
-                    Loading Tokens {token_list}
+                    Loading Tokens
                 {/if}
             </div>
         </div>

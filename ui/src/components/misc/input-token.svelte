@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate } from 'svelte'
+	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -69,7 +69,7 @@
 			{#if selectedToken}
 				<button on:click={handleMaxInput} class="max-button">MAX</button>
 			{/if}
-			<TokenSelect on:selected={handleTokenSelect} {selectedToken}/>
+			<TokenSelect on:selected={handleTokenSelect} {selectedToken} />
 		</div>
 	</div>
 </div>

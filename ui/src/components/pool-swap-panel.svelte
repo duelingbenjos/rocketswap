@@ -15,13 +15,14 @@
 	import { calcRatios, toBigNumber } from '../utils'
 
 	//Props
-	export let pageState
+	export let pageState;
+	export let tokenSelectContext;
 
 	$: ratios = calcRatios(pageState?.tokenLP?.reserves)
 
 	const dispatch = createEventDispatcher();
 
-	let state = {};
+	let state = { };
 
 	let slots = [
 		{
@@ -97,7 +98,7 @@
 	<svelte:component 
 		this={slots[0].component} 
 		label={slots[0].label} 
-		on:input={slots[0].handleInput} 
+		on:input={slots[0].handleInput}
 		{...state}
 	/>
 	

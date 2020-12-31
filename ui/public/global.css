@@ -14,6 +14,10 @@ body {
   font-family: 'Open Sans';
   overflow: hidden;
 
+  --text-primary: #fff;
+
+  --button-secondary: #3131d98f;
+
   --info-color: #2fba95; 
   --border-color: rgba(255, 255, 255, 0.3);
   --border-radius: 25px;
@@ -114,11 +118,29 @@ button:disabled {
 }
 
 button:not(:disabled):active {
-  background-color: #ddd;
+  filter: brightness(130%);
 }
 
 button:focus {
   border-color: #666;
+}
+
+button.secondary{
+  border-radius: 99px;
+  border: 2px solid var(--button-secondary);
+  background: var(--button-secondary);
+  padding: 6px 16px;
+  height: fit-content;
+  font-size: 0.8em; 
+  position: relative;
+}
+
+button.secondary:hover{
+  filter: brightness(120%)
+}
+
+button.secondary:active{
+  top: 1px;
 }
 
 button.outline{

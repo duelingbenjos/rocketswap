@@ -14,31 +14,31 @@
     let balances = [];
     let pairs = [];
 
+    $: vk = getVK($wallet_store)
+
     beforeUpdate(() => {
         console.log(pairs)
         if ($wallet_store.wallets) checkVk()
     })
 
-    const checkVk = () => {
-        if ($wallet_store.wallets.length > 0) {
+    const getVK = () => {
+        if ($wallet_store?.wallets?.length > 0) {
             if (vk !== $wallet_store.wallets[0]) {
                 vk = $wallet_store.wallets[0]
-                initialized = false;
-            }
-            if (!initialized) {
                 getLpBalances();
-                initialized = true;
             }
-
         }
     }
 
+    const checkVk = () => {
+
+    }
+
     const getLpBalances = async () => {
-        //let balancesRes = await apiService.getUserLpBalance(vk)
+        let balancesRes = await apiService.getUserLpBalance(vk)
 
         // HARDCODED VK FOR TESTING
-            let balancesRes = await apiService.getUserLpBalance('f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def')
-        //
+        // let balancesRes = await apiService.getUserLpBalance('f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def')
 
         if (balancesRes) {
             balances = balancesRes.points
@@ -124,8 +124,8 @@
             </tr>
             {#each pairs as pair}
                 <tr>
-                    <td>???</td>
-                    <td>{pair.token_symbol}</td>
+                    <td>{pair.token_name || "none"}</td>
+                    <td>{pair.token_symbol || "none"}</td>
                     <td>{pair.contract_name}</td>
                     <td>{`${stringToFixed(pair.reserves[1], 4)} / ${stringToFixed(pair.reserves[0], 4)}`}</td>
                     <td>{balances[pair.contract_name]}</td>
