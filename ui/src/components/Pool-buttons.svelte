@@ -10,17 +10,29 @@
 
   //Props
   export let buttonFunction;
-  export let state;
+  export let pageState;
 
-  $: disabled = disableButton(state);
+  $: disabled = disableButton(pageState);
 
   const createMarket = () => {
-    const { currencyAmount, tokenAmount, selectedToken } = state
+    const { currencyAmount, tokenAmount, selectedToken } = pageState
     walletService.createMarket({
       'contract': selectedToken.contract_name,
       'currency_amount': {'__fixed__': currencyAmount.toString()},
       'token_amount': {'__fixed__': tokenAmount.toString()}
     })
+  }
+
+  const addLiquidity = () => {
+    const { currencyAmount, tokenAmount, selectedToken } = pageState
+    console.log(pageState)
+    /*
+    walletService.addLiquidity({
+      'contract': selectedToken.contract_name,
+      'currency_amount': {'__fixed__': currencyAmount.toString()},
+      'token_amount': {'__fixed__': tokenAmount.toString()}
+    })
+    */
   }
 
   const disableButton = (info) => {
@@ -37,6 +49,10 @@
 
 {#if buttonFunction === 'create'}
   <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
+{/if}
+
+{#if buttonFunction === 'add'}
+  <button class="swap-button" disabled={disabled} on:click={addLiquidity}> Supply </button>
 {/if}
 
 <style>

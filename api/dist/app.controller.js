@@ -28,6 +28,18 @@ let AppController = class AppController {
             throw new common_1.HttpException(err, 500);
         }
     }
+    async getToken(params) {
+        const { contract_name } = params;
+        try {
+            let tokenRes = await token_entity_1.TokenEntity.find({ contract_name });
+            let token = tokenRes[tokenRes.length - 1];
+            let lp_info = await pair_entity_1.PairEntity.findOne(contract_name);
+            return { token, lp_info };
+        }
+        catch (err) {
+            throw new common_1.HttpException(err, 500);
+        }
+    }
     async getMarketList() {
         try {
             return await token_entity_1.TokenEntity.find({ where: { has_market: true } });
@@ -88,6 +100,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AppController.prototype, "getTokenList", null);
+__decorate([
+    common_1.Get("token/:contract_name"),
+    __param(0, common_1.Param()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AppController.prototype, "getToken", null);
 __decorate([
     common_1.Get("market_list"),
     __metadata("design:type", Function),

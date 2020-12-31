@@ -109,3 +109,17 @@ export const stripTrailingZero = (value: string): string => {
     return value
   }
 }
+
+export const calcRatios = (reserves) => {
+  if (!reserves) return
+  let currencyAmount = Lamden.Encoder.BigNumber(reserves[0])
+  let tokenAmount = Lamden.Encoder.BigNumber(reserves[0])
+  return {
+    'currency': currencyAmount.dividedBy(tokenAmount),
+    'token': tokenAmount.dividedBy(currencyAmount)
+  }
+}
+
+export const toBigNumber = (value) => Lamden.Encoder.BigNumber(value)
+
+export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value)

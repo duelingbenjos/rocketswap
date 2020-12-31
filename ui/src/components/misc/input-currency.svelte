@@ -8,7 +8,7 @@
 
 	//Misc
 	import { config } from '../../config'
-	import { stringToFixed } from '../../utils.js'
+	import { stringToFixed, toBigNumber } from '../../utils.js'
 
 	//Props
 	export let label
@@ -18,6 +18,7 @@
 	
 
 	$: walletBalance = !$wallet_store.init ? $wallet_store.balance.toString() : "0";
+	$: bigNumber = currencyAmount ? toBigNumber(currencyAmount) : toBigNumber("0.0")
 
 	const handleInputChange = () => {
 		if (currencyAmount > walletBalance) handleMaxInput()
@@ -35,7 +36,7 @@
 </script>
 
 <div class="input-container flex-col"
-	 in:scale="{{duration: 500, delay: 0, opacity: 0.5, start: 0.5, easing: quintOut}}">
+	 in:scale="{{duration: 300, delay: 0, opacity: 0.5, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
 		<div class="input-label">
 			{label}
@@ -50,9 +51,9 @@
 	<div class="input-row-2 flex-row">
 	    <input 
 			class="input-amount-value number"
-			placeholder="0" 
+			placeholder="0.0" 
 			bind:value={currencyAmount} 
-			type="number"
+			type="text"
 			on:input={handleInputChange}
         />
 

@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { createEventDispatcher, tick } from 'svelte'
+	import { createEventDispatcher, afterUpdate } from 'svelte'
+
+	//Router
+  	import { active } from 'svelte-hash-router'
 
 	//Components
 	import InputCurrency from './misc/input-currency.svelte'
@@ -7,6 +10,14 @@
 	import Quote from './quote.svelte'
 	import PoolButtons from './pool-buttons.svelte'
 	import IconPlusSign from '../icons/plus-sign.svelte'
+
+	//Misc
+	import { calcRatios, toBigNumber } from '../utils'
+
+	//Props
+	export let pageState
+
+	$: ratios = calcRatios(pageState?.tokenLP?.reserves)
 
 	const dispatch = createEventDispatcher();
 
@@ -25,8 +36,13 @@
 		},
 	]
 
+	afterUpdate(() => {
+		state.selectedToken = pageState.selectedToken
+	})
+
 	function handleCurrencyChange(e){
-		state.currencyAmount = parseFloat(e.detail)
+		state.currencyAmount = toBigNumber(e.detail)
+		state.tokenAmount = state.currencyAmount.dividedBy(ratios.token)
 		dispatchEvent()
 	}
 
@@ -38,7 +54,6 @@
 
 	const switchPositions = async () => {
 		slots = slots.reverse()
-		//await tick();
 	}
 
 	const dispatchEvent = () => dispatch('infoUpdate', state)
@@ -85,9 +100,11 @@
 		on:input={slots[0].handleInput} 
 		{...state}
 	/>
-	<div class="plus-sign" on:click={switchPositions}>
+	
+	<div class="plus-sign">
 		<IconPlusSign width={"20"} height={"20"}/>
 	</div>
+
 	<svelte:component 
 		this={slots[1].component} 
 		label={slots[1].label} 
@@ -95,5 +112,4 @@
 		{...state}
 	/>
 	<slot name="footer"></slot>
-	<PoolButtons buttonFunction="create" {state} />
 </div>

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTokenList = exports.prepareAddToken = exports.saveToken = exports.AddTokenDto = exports.TokenEntity = void 0;
+exports.getOneToken = exports.getTokenList = exports.prepareAddToken = exports.saveToken = exports.AddTokenDto = exports.TokenEntity = void 0;
 const utils_1 = require("../utils");
 const typeorm_1 = require("typeorm");
 let TokenEntity = class TokenEntity extends typeorm_1.BaseEntity {
@@ -87,4 +87,10 @@ async function getTokenList() {
     return tokens.map((token) => token.contract_name);
 }
 exports.getTokenList = getTokenList;
+async function getOneToken() {
+    const tokens = await TokenEntity.find({ contract_name: 'con_jeff_token_v4' });
+    console.log(tokens);
+    return tokens.map((token) => token.contract_name);
+}
+exports.getOneToken = getOneToken;
 //# sourceMappingURL=token.entity.js.map

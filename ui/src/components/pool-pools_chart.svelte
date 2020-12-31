@@ -15,6 +15,7 @@
     let pairs = [];
 
     beforeUpdate(() => {
+        console.log(pairs)
         if ($wallet_store.wallets) checkVk()
     })
 
@@ -124,13 +125,13 @@
             {#each pairs as pair}
                 <tr>
                     <td>???</td>
-                    <td>???</td>
+                    <td>{pair.token_symbol}</td>
                     <td>{pair.contract_name}</td>
                     <td>{`${stringToFixed(pair.reserves[1], 4)} / ${stringToFixed(pair.reserves[0], 4)}`}</td>
                     <td>{balances[pair.contract_name]}</td>
                     <td>{`${lp_percent(pair.contract_name, pair.lp) * 100}%` }</td>
                     <td>{calc_value(pair.contract_name, pair.lp, pair.reserves[1], pair.reserves[0], pair.price)} TAU</td>
-                    <td>Adjust ></td>
+                    <td><a href="{`/#/pool-add/${pair.contract_name}`}">Adjust ></a></td>
                 </tr>
             {/each}
         </table>

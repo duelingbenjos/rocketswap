@@ -89,11 +89,17 @@ export class WalletService {
 
   private async updateBalances(vk?: string) {
     if (isWalletConnected(this.wallet_state)) {
+      let prev = JSON.stringify(this.wallet_state)
       const res = await this.getBalances(vk)
       this.wallet_state.tokens = res[0]
       this.wallet_state.balance = res[1]
-      wallet_store.set(this.wallet_state)
-      // console.log(this.wallet_state)
+
+      // only update the store if state changed
+      if (prev !== JSON.stringify(this.wallet_state)) wallet_store.set(this.wallet_state)
+      
+      //const lpRes = await this.apiService.getUserLpBalance(vk)
+      //if (lpRes) this.wallet_state.lp_balances = lpRes
+      
     }
   }
 

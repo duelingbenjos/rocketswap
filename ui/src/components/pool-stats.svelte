@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte'
     import { ApiService } from '../services/api.service'
-    import { pool_panel_store } from '../store'
+    import { pool_panel_store, wallet_store } from '../store'
     import { config } from '../config'
     import { stringToFixed } from '../utils'
 
@@ -16,24 +16,34 @@
     $: selectedToken = pageState?.selectedToken;
     $: tokenSymbol = selectedToken ? selectedToken.token_symbol : undefined;
     $: tokenContract = selectedToken ? selectedToken.contract_name : undefined;
-    $: lp_balance = balances[tokenContract] || "0";
-    $: lp_share = selectedToken?.info ? lp_balance / selectedToken.info.lp : undefined;
+    $: lp_balances = $wallet_store?.wallet_state?.lp_balances || {};
+    $: lp_balance = lp_balances[tokenContract] || "0";
+    $: lp_share = pageState.tokenLp ? lp_balance / pageState.tokenLp : 0;
     $: lp_share_percent = lp_share ? parseFloat(lp_share * 100).toFixed(1) : "0";
     $: currencyValue = pageState?.currencyAmount || "";
     $: tokenValue = pageState?.tokenAmount || "";
-    $: bothValues = currencyValue !== "" && tokenValue !== "";
+    $: currencyRatio = currencyValue / tokenValue;
+    $: tokenRatio = tokenValue / currencyValue;
+
+    //$: wallet_store_changes = setLpBalances($wallet_store)
 
     onMount(async () => {
+        console.log($wallet_store)
         // TODO REMOVE HARDCODED VK
-        let balancesRes = await apiService.getUserLpBalance('f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def')
-        if (balancesRes) balances = balancesRes.points
+        //let balancesRes = await apiService.getUserLpBalance($wallet_store.wallet_state.wallets[0])
+        //if (balancesRes) balances = balancesRes.points
     })
+
+    const setLpBalances = () => {
+        //if ($wallet_store.wallet_state.lp_balance) lp_balance
+    }
+
 </script>
 
 <style>
     .container {
       width: 100%;
-      
+      margin-bottom: 1rem;
     }
     .header{
         display: flex;
@@ -74,15 +84,15 @@
         <p>{statList.includes("poolShare") ? `Current: ${lp_share_percent}%`: ""}</p>
     </div>
     <div class="stats">
-        {#if tokenSymbol && bothValues}
+        {#if tokenSymbol}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p><strong>{`${stringToFixed(currencyValue / tokenValue, 4)}`}</strong></p>
+                    <p><strong>{isFinite(currencyRatio) ? `${stringToFixed(currencyValue / tokenValue, 4)}` : '-'}</strong></p>
                     <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p><strong>{`${stringToFixed(tokenValue / currencyValue, 4) }`}</strong></p>
+                    <p><strong>{isFinite(tokenRatio) ? `${stringToFixed(tokenValue / currencyValue, 4)}` : '-'}</strong></p>
                     <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}

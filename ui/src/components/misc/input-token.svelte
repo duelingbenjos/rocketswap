@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, afterUpdate } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -11,7 +11,7 @@
 
 	//Misc
 	import { config } from '../../config'
-	import { stringToFixed } from '../../utils.js'
+	import { stringToFixed, toBigNumber } from '../../utils.js'
 
 	//Props
 	export let label
@@ -20,18 +20,19 @@
 
 	const dispatch = createEventDispatcher();
 
-	$: wallet_balance = !$wallet_store.init ? $wallet_store.balance.toString() : "0";
-	$: tokenBalance = selectedToken?.balance;
+	$: wallet_balance = !$wallet_store.init ? $wallet_store.balance.toString() : toBigNumber("0.0");
+	$: tokenBalance = selectedToken?.balance ? toBigNumber(selectedToken?.balance) : toBigNumber("0.0");
+	$: bigNumber = tokenAmount ? toBigNumber(tokenAmount) : toBigNumber("0.0")
+
+	afterUpdate(() => console.log({tokenAmount}))
 
 	const handleInputChange = () => {
-		if (tokenAmount > tokenBalance) handleMaxInput()
-		else{
-			dispatchEvent()
-		}
+		if (toBigNumber(tokenAmount).isGreaterThan(tokenBalance)) handleMaxInput()
+		dispatchEvent()
 	}
 
 	const handleMaxInput = () => {
-		tokenAmount = selectedToken.balance.toFixed(8);
+		tokenAmount = tokenBalance.toString();
 		dispatchEvent()
 	}
 
@@ -41,11 +42,11 @@
 		dispatchEvent()
 	}
 
-	const dispatchEvent = () => dispatch('input', {tokenAmount, selectedToken})
+	const dispatchEvent = () => dispatch('input', {tokenAmount: bigNumber, selectedToken})
 </script>
 
 <div class="input-container flex-col"
-	 in:scale="{{duration: 500, delay: 0, opacity: 0.5, start: 0.5, easing: quintOut}}">
+	 in:scale="{{duration: 300, delay: 0, opacity: 0.0, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
 		<div class="label">{label}</div>
 		<div class="input-balance">
@@ -58,10 +59,10 @@
 	<div class="input-row-2 flex-row">
 		<input 
 			class="input-amount-value number"
-			placeholder="0" 
+			placeholder="0.0" 
 			bind:value={tokenAmount} 
-			type="number" 
 			on:input={handleInputChange}
+			type="text"
 			disabled={!selectedToken} 
 		/>
 		<div class="input-controls">
