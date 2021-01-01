@@ -208,11 +208,6 @@
         padding-bottom: 30px;
     }
 
-    .select-heading {
-        width: 100%;
-        justify-content: space-between;
-        padding-bottom: 15px;
-    }
     .token-label{
         align-items: center;
     }
