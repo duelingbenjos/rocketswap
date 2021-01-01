@@ -51,7 +51,7 @@
                 }
                 
             }
-            console.log(tokenList)
+
             return [...tokenList
                 .map((token) => {
                     token.balance = walletService.wallet_state.tokens.balances[token.contract_name] || 0
@@ -63,7 +63,6 @@
                 .sort((a, b) => b.balance - a.balance)
             ]
         }
-
     }
 
     const handleSearch = (e) => {
@@ -136,6 +135,7 @@
 
     .select-icon {
         width: 10px;
+        transform: rotate(180deg);
     }
 
     .button-item {
@@ -257,9 +257,7 @@
                     {#if token_list.length > 0}
                         {#each token_list as token}
                             <div class="select-wrapper flex-row">
-                                {#if token.contract_name === selected_contract}
-                                    <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />
-                                {/if}
+
                                 <button on:click={() => selectToken(token)} class="nostyle button-item">
                                     <div class="token-container">
                                         <div class="token-name-logo flex-row">
@@ -269,6 +267,9 @@
                                                 <div class="token-plug"></div>
                                             {/if}
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
+                                            {#if token.contract_name === selected_contract}
+                                                <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />
+                                            {/if}
                                         </div>
                                         <span class="token-amount number"> {stringToFixed(token.balance || 0, 8)} </span>
                                     </div>
