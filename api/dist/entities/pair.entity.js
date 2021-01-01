@@ -27,7 +27,7 @@ __decorate([
 ], PairEntity.prototype, "contract_name", void 0);
 __decorate([
     typeorm_1.Column({ nullable: true }),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], PairEntity.prototype, "lp", void 0);
 __decorate([
     typeorm_1.Column(),
@@ -35,7 +35,7 @@ __decorate([
 ], PairEntity.prototype, "time", void 0);
 __decorate([
     typeorm_1.Column({ nullable: true }),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], PairEntity.prototype, "price", void 0);
 __decorate([
     typeorm_1.Column({ nullable: true, type: "simple-json" }),
@@ -60,13 +60,10 @@ async function saveReserves(state, handleClientUpdate) {
             reserve_kvp.value[0].__fixed__,
             reserve_kvp.value[1].__fixed__
         ];
-        console.log("PRICE KVP", price_kvp);
-        let lp = utils_1.getVal(lp_kvp);
-        let price = utils_1.getVal(price_kvp);
-        if (price)
-            entity.price = price;
-        if (lp)
-            entity.price = lp;
+        if (price_kvp)
+            entity.price = utils_1.getVal(price_kvp);
+        if (lp_kvp)
+            entity.lp = utils_1.getVal(lp_kvp);
         if (reserves)
             entity.reserves = reserves;
         entity.time = Date.now().toString();
@@ -96,6 +93,8 @@ async function savePair(state) {
         await token_entity.save();
     }
     pair_entity.contract_name = contract_name;
+    if (contract_name === "con_token_bs")
+        console.log(pair_entity);
     await pair_entity.save();
 }
 exports.savePair = savePair;
@@ -104,15 +103,12 @@ async function savePairLp(state) {
     if (lp_kvp) {
         const parts = lp_kvp.key.split(".")[1].split(":");
         if (parts.length === 2) {
-            console.log(parts);
             const contract_name = parts[1];
             let entity = await PairEntity.findOne(contract_name);
             if (!entity)
                 entity = new PairEntity();
             entity.contract_name = contract_name;
             entity.lp = utils_1.getVal(lp_kvp);
-            console.log(lp_kvp);
-            console.log(entity.lp);
             await entity.save();
         }
     }

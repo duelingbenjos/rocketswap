@@ -3,8 +3,8 @@ export type TokenListType = {
   token_name: string
   token_symbol: string
   contract_name: string
-  base_supply?: number
-  balance?: number
+  base_supply?: string
+  balance?: string
 }
 
 export type TokenSelectType = {
@@ -27,9 +27,9 @@ export type SlotType = {
 
 export type MetricsUpdateType = {
   contract_name: string
-  price: number
+  price: string
   time: string
-  lp: number
+  lp: string
   reserves: [string, string]
 }
 

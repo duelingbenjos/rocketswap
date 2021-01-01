@@ -1,5 +1,5 @@
 export type BalanceType = {
-  [key: string]: number
+  [key: string]: string
 }
 
 export type WalletInitType = { init: true }
@@ -14,10 +14,9 @@ export type WalletConnectedType = {
   locked: boolean
   setup: boolean
   walletVersion: string
-  wallets: string[]
-  balance?: number
+  wallets?: string[]
+  balance?: string
   tokens?: BalanceType
-  lp_balances?: object
 }
 
 export type WalletType = WalletInitType | WalletErrorType | WalletConnectedType

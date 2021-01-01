@@ -50,7 +50,6 @@ let AppController = class AppController {
     }
     async getUserLpBalance(params) {
         const { vk } = params;
-        console.log(vk);
         try {
             return await lp_points_entity_1.LpPointsEntity.findOneOrFail(vk);
         }

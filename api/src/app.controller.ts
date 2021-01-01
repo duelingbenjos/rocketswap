@@ -41,7 +41,7 @@ export class AppController {
 	@Get("user_lp_balance/:vk")
 	public async getUserLpBalance(@Param() params) {
 		const { vk } = params;
-		console.log(vk)
+		//console.log(vk)
 		try {
 			return await LpPointsEntity.findOneOrFail(vk);
 		} catch (err) {

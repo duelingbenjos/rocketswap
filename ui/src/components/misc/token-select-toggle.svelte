@@ -12,6 +12,9 @@
 
     //Components
     import TokenSearch from './token-select-search.svelte'
+    
+    //Misc
+    import { stringToFixed  } from '../../utils'
 
     const dispatch = createEventDispatcher();
     const { getTokenList } = getContext('pageContext');
@@ -148,6 +151,22 @@
         background-color: rgba(255, 255, 255, 0.05) !important;
     }
 
+    .token-name-logo{
+        align-items: center;
+        justify-content: start;
+    }
+
+    .token-logo{
+        width: 27px;
+        height: 27px;
+    }
+
+    .token-plug{
+        width: 27px;
+        height: 27px;
+        margin: 0 5px;
+    }
+
     .token-symbol {
         font-weight: 600;
     }
@@ -230,25 +249,35 @@
             </button>
         </div>
 
-        <!--<div class="select-heading">Token Name</div>-->
         <TokenSearch on:search={handleSearch}/>
         <hr />
         <div class="token-scroll">
             <div class="token-list">
                 {#if token_list}
-                    {#each token_list as token}
-                        <div class="select-wrapper flex-row">
-                            {#if token.contract_name === selected_contract}
-                                <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />
-                            {/if}
-                            <button on:click={() => selectToken(token)} class="nostyle button-item">
-                                <div class="token-container">
-                                    <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
-                                    <span class="token-amount number"> {token.balance || 0} </span>
-                                </div>
-                            </button>
-                        </div>
-                    {/each}
+                    {#if token_list.length > 0}
+                        {#each token_list as token}
+                            <div class="select-wrapper flex-row">
+                                {#if token.contract_name === selected_contract}
+                                    <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />
+                                {/if}
+                                <button on:click={() => selectToken(token)} class="nostyle button-item">
+                                    <div class="token-container">
+                                        <div class="token-name-logo flex-row">
+                                            {#if token.logo_svg_base64}
+                                                <img class="token-logo" src="{`data:image/svg+xml;base64,${token.logo_svg_base64}`}" alt="token logo"/>
+                                            {:else}
+                                                <div class="token-plug"></div>
+                                            {/if}
+                                            <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
+                                        </div>
+                                        <span class="token-amount number"> {stringToFixed(token.balance || 0, 8)} </span>
+                                    </div>
+                                </button>
+                            </div>
+                        {/each}
+                    {:else}
+                        No Tokens Found
+                    {/if}
                 {:else}
                     Loading Tokens
                 {/if}

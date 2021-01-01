@@ -13,22 +13,22 @@ export type ClientUpdateType = PriceUpdateType | MetricsUpdateType;
 export interface PriceUpdateType extends UpdateType {
 	action: "price_update";
 	contract_name: string;
-	price: number;
+	price: string;
 	time: number;
 }
 
 export interface UserLpUpdateType extends UpdateType {
 	action: "user_lp_update",
-	points : {[key:string]: number}
+	points : {[key:string]: string}
 }
 
 export interface MetricsUpdateType extends UpdateType {
 	action: "metrics_update";
 	contract_name: string;
-	price: number;
+	price: string;
 	time: number;
-	reserves: [number, number];
-	lp: number;
+	reserves: [string, string];
+	lp: string;
 }
 
 export type UpdateType = { action: "metrics_update" | "price_update" | 'user_lp_update' };

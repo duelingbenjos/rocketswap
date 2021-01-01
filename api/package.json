@@ -28,6 +28,7 @@
     "@nestjs/platform-socket.io": "^7.5.5",
     "@nestjs/typeorm": "^7.1.4",
     "@nestjs/websockets": "^7.5.5",
+    "bignumber.js": "^9.0.1",
     "mongoose": "^5.10.9",
     "nodemon": "^2.0.6",
     "reflect-metadata": "^0.1.13",

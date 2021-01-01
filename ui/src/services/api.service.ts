@@ -25,6 +25,7 @@ export class ApiService {
   async getTokenList(filter = []) {
     try {
       let token_list = await axios.get(`${this.base_url}/api/token_list`).then(res => res.data)
+      console.log(token_list)
       if (filter.includes("no-market")) token_list = token_list.filter(token => !token.has_market)
       console.log('getting token list')
       token_list_store.set(token_list)

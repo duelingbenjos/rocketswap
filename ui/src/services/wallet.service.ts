@@ -73,6 +73,7 @@ export class WalletService {
       if (wallet_info.wallets[0]) {
         const vk = wallet_info.wallets[0]
         const balances = await this.getBalances(vk)
+        console.log(balances)
         wallet_info.balance = balances[1]
         wallet_info.tokens = balances[0]
         // join the user lp feed.

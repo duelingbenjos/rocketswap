@@ -3,7 +3,7 @@ import { BaseEntity } from "typeorm";
 export declare class LpPointsEntity extends BaseEntity {
     vk: string;
     points: {
-        [key: string]: number;
+        [key: string]: string;
     };
     time: string;
 }

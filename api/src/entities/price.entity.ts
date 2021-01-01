@@ -19,7 +19,7 @@ export class PriceEntity extends BaseEntity {
 	contract_name: string;
 
 	@Column()
-	price: number;
+	price: string;
 
 	@Column()
 	time: string = Date.now().toString();
@@ -33,17 +33,21 @@ export async function savePrice(
 	const price_kvp = state.find(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "prices"
 	);
-	console.log(price_kvp)
+	//console.log(price_kvp)
 	if (!price_kvp) return;
 	const contract_name = price_kvp.key.split(".")[1].split(":")[1];
+
 	const price_entity = new PriceEntity();
 	const price = getVal(price_kvp);
+
 	price_entity.contract_name = contract_name;
 	price_entity.price = price;
 
 	const pair_entity = await PairEntity.findOne(contract_name);
+
 	pair_entity.price = price;
 	const { lp, reserves } = pair_entity;
+
 	handleClientUpdate({
 		action: "metrics_update",
 		contract_name,
@@ -63,7 +67,7 @@ export async function getTokenMetrics(contract_name: string) {
 		// 	id: "DESC"
 		// }
 	});
-	console.log(pair_entity);
+	//console.log(pair_entity);
 	const { price, time, lp, reserves } = pair_entity;
 	return { contract_name, price, time: parseInt(time), reserves, lp };
 }

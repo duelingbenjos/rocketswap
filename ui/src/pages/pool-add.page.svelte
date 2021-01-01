@@ -125,7 +125,7 @@
         <a href="/#/pool-main">
           <IconBackArrow />
         </a>
-        <a href={removeHref} class="text-link" >remove</a>
+        <a href={removeHref} class="text-link underline" >remove</a>
       </div>
     </div>
     

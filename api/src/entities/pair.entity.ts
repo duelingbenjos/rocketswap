@@ -18,16 +18,16 @@ export class PairEntity extends BaseEntity {
 	contract_name: string;
 
 	@Column({ nullable: true })
-	lp: number;
+	lp: string;
 
 	@Column()
 	time: string = Date.now().toString();
 
 	@Column({ nullable: true })
-	price: number;
+	price: string;
 
 	@Column({ nullable: true, type: "simple-json" })
-	reserves: [number, number];
+	reserves: [string, string];
 }
 
 export async function saveReserves(
@@ -42,8 +42,7 @@ export async function saveReserves(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "prices"
 	);
 	const lp_kvp = state.find(
-		(kvp) =>
-			kvp.key.includes("lp_points") && kvp.key.split(":").length === 2
+		(kvp) => kvp.key.includes("lp_points") && kvp.key.split(":").length === 2
 	);
 	if (reserve_kvp) {
 		let contract_name = reserve_kvp.key.split(".")[0];
@@ -52,17 +51,15 @@ export async function saveReserves(
 			entity = new PairEntity();
 			entity.contract_name = contract_name;
 		}
-		let reserves: [number, number] = [
+		let reserves: [string, string] = [
 			reserve_kvp.value[0].__fixed__,
 			reserve_kvp.value[1].__fixed__
 		];
-		console.log("PRICE KVP", price_kvp);
-		let lp: number = getVal(lp_kvp);
-		let price = getVal(price_kvp);
 
-		if (price) entity.price = price;
-		if (lp) entity.price = lp;
+		if (price_kvp) entity.price = getVal(price_kvp);
+		if (lp_kvp) entity.lp = getVal(lp_kvp);
 		if (reserves) entity.reserves = reserves;
+
 		entity.time = Date.now().toString();
 		handleClientUpdate({
 			action: "metrics_update",
@@ -92,6 +89,8 @@ export async function savePair(state: IKvp[]) {
 		await token_entity.save();
 	}
 	pair_entity.contract_name = contract_name;
+	if (contract_name === "con_token_bs") console.log(pair_entity)
+	
 	await pair_entity.save();
 }
 
@@ -104,14 +103,14 @@ export async function savePairLp(state: IKvp[]) {
 	if (lp_kvp) {
 		const parts = lp_kvp.key.split(".")[1].split(":");
 		if (parts.length === 2) {
-			console.log(parts);
+			//console.log(parts);
 			const contract_name = parts[1];
 			let entity = await PairEntity.findOne(contract_name);
 			if (!entity) entity = new PairEntity();
 			entity.contract_name = contract_name;
 			entity.lp = getVal(lp_kvp);
-			console.log(lp_kvp);
-			console.log(entity.lp);
+			//console.log(lp_kvp);
+			//console.log(entity.lp);
 			await entity.save();
 		}
 	}

@@ -31,7 +31,7 @@ __decorate([
 ], PriceEntity.prototype, "contract_name", void 0);
 __decorate([
     typeorm_1.Column(),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], PriceEntity.prototype, "price", void 0);
 __decorate([
     typeorm_1.Column(),
@@ -43,7 +43,6 @@ PriceEntity = __decorate([
 exports.PriceEntity = PriceEntity;
 async function savePrice(state, handleClientUpdate) {
     const price_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "prices");
-    console.log(price_kvp);
     if (!price_kvp)
         return;
     const contract_name = price_kvp.key.split(".")[1].split(":")[1];
@@ -69,7 +68,6 @@ async function getTokenMetrics(contract_name) {
     const pair_entity = await pair_entity_1.PairEntity.findOneOrFail({
         where: { contract_name }
     });
-    console.log(pair_entity);
     const { price, time, lp, reserves } = pair_entity;
     return { contract_name, price, time: parseInt(time), reserves, lp };
 }

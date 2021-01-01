@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getOneToken = exports.getTokenList = exports.prepareAddToken = exports.saveToken = exports.AddTokenDto = exports.TokenEntity = void 0;
+exports.getTokenList = exports.updateLogo = exports.prepareAddToken = exports.saveToken = exports.AddTokenDto = exports.TokenEntity = void 0;
 const utils_1 = require("../utils");
 const typeorm_1 = require("typeorm");
 let TokenEntity = class TokenEntity extends typeorm_1.BaseEntity {
@@ -28,7 +28,7 @@ __decorate([
 ], TokenEntity.prototype, "token_name", void 0);
 __decorate([
     typeorm_1.Column({ nullable: true }),
-    __metadata("design:type", Number)
+    __metadata("design:type", String)
 ], TokenEntity.prototype, "base_supply", void 0);
 __decorate([
     typeorm_1.Column(),
@@ -42,6 +42,10 @@ __decorate([
     typeorm_1.Column({ nullable: true }),
     __metadata("design:type", Boolean)
 ], TokenEntity.prototype, "has_market", void 0);
+__decorate([
+    typeorm_1.Column({ nullable: true }),
+    __metadata("design:type", String)
+], TokenEntity.prototype, "logo_svg_base64", void 0);
 TokenEntity = __decorate([
     typeorm_1.Entity()
 ], TokenEntity);
@@ -50,7 +54,7 @@ class AddTokenDto {
 }
 exports.AddTokenDto = AddTokenDto;
 exports.saveToken = async (add_token_dto) => {
-    const { token_symbol, token_name, base_supply, contract_name, developer } = add_token_dto;
+    const { token_symbol, token_name, base_supply, contract_name, developer, logo_svg_base64 } = add_token_dto;
     if (!token_symbol || !token_name || !base_supply || !contract_name)
         throw new Error("Field missing.");
     const exists = await TokenEntity.findOne(contract_name);
@@ -62,6 +66,7 @@ exports.saveToken = async (add_token_dto) => {
     entity.token_name = token_name;
     entity.contract_name = contract_name;
     entity.developer = developer;
+    entity.logo_svg_base64 = logo_svg_base64;
     return await entity.save();
 };
 function prepareAddToken(state) {
@@ -70,6 +75,7 @@ function prepareAddToken(state) {
     const token_name = state.find((kvp) => kvp.key === `${contract_name}.token_name`).value;
     const developer = state.find((kvp) => kvp.key === `${contract_name}.__developer__`).value;
     const supply_kvp = state.find((kvp) => kvp.key.includes(`${contract_name}.balances`));
+    const logo_svg_base64 = state.find((kvp) => kvp.key === `${contract_name}.token_base64_svg`);
     const base_supply = supply_kvp.value;
     const token_seed_holder = supply_kvp.key.split(":")[1];
     return {
@@ -78,19 +84,27 @@ function prepareAddToken(state) {
         token_symbol,
         base_supply,
         token_seed_holder,
-        developer
+        developer,
+        logo_svg_base64: (logo_svg_base64 === null || logo_svg_base64 === void 0 ? void 0 : logo_svg_base64.value) || null
     };
 }
 exports.prepareAddToken = prepareAddToken;
+async function updateLogo(state, contract_name) {
+    const logo_change = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "token_base64_svg");
+    if (!logo_change)
+        return;
+    const tokenEntity = await TokenEntity.findOne({ contract_name });
+    if (!tokenEntity)
+        return;
+    if (tokenEntity.logo_svg_base64 !== logo_change.value) {
+        tokenEntity.logo_svg_base64 = logo_change.value;
+        tokenEntity.save();
+    }
+}
+exports.updateLogo = updateLogo;
 async function getTokenList() {
     const tokens = await TokenEntity.find();
     return tokens.map((token) => token.contract_name);
 }
 exports.getTokenList = getTokenList;
-async function getOneToken() {
-    const tokens = await TokenEntity.find({ contract_name: 'con_jeff_token_v4' });
-    console.log(tokens);
-    return tokens.map((token) => token.contract_name);
-}
-exports.getOneToken = getOneToken;
 //# sourceMappingURL=token.entity.js.map

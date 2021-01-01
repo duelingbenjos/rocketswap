@@ -65,7 +65,6 @@ let AppGateway = class AppGateway {
                 break;
         }
         let contract_name = room.split(":")[1];
-        console.log(room);
         if (contract_name) {
         }
     }

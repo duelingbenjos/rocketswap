@@ -48,7 +48,6 @@ async function saveTransfer(state) {
         const vk = key.split(":")[1];
         const contract_name = parts[0];
         const amount = utils_1.getVal(kvp);
-        console.log(contract_name, is_balance, vk);
         if (is_balance && vk && contract_name) {
             try {
                 await updateBalance({ vk, contract_name, amount });

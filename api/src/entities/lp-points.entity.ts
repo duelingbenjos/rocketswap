@@ -16,7 +16,7 @@ export class LpPointsEntity extends BaseEntity {
 	vk: string;
 
 	@Column({ type: "simple-json" })
-	points: { [key: string]: number };
+	points: { [key: string]: string };
 
 	@Column()
 	time: string = Date.now().toString();
@@ -39,7 +39,6 @@ export async function saveUserLp(state: IKvp[]) {
 				entity.points = {};
 			}
 			const value = getVal(kvp);
-			console.log(value, typeof value)
 			entity.points[contract_name] = value
 			await entity.save();
 		} else if (parts.length === 2) {
@@ -50,7 +49,6 @@ export async function saveUserLp(state: IKvp[]) {
 				entity.points = {};
 			}
 			const value = getVal(kvp);
-			console.log(value, typeof value)
 			entity.points[contract_name] = value
 			await entity.save();
 		}

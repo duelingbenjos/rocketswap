@@ -9,6 +9,7 @@ import {
 import { getContractCode, validateTokenContract } from "./utils";
 import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
+import { updateLogo } from "./entities/token.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
 import { savePrice } from "./entities/price.entity";
 import { AppGateway } from "./app.gateway";
@@ -26,7 +27,7 @@ export class ParserProvider {
 	private async updateTokenList(): Promise<void> {
 		const token_list_update = await getTokenList();
 		this.token_contract_list = token_list_update;
-		console.log(`Token list updated : ${this.token_contract_list}`);
+		//console.log(`Token list updated : ${this.token_contract_list}`);
 	}
 
 	/** This method is passed to the blockgrabber as a callback and checks
@@ -37,13 +38,13 @@ export class ParserProvider {
 		const { state, fn, contract: contract_name } = block;
 		try {
 			if (contract_name === "submission" && fn === "submit_contract") {
-				console.log(block);
+				//console.log(block);
 				// Check if the submitted contract is a token, if it's a token, add it to the DB
 				const contract_str = getContractCode(state);
 				const token_is_valid = validateTokenContract(contract_str);
-				console.log(
+				/*console.log(
 					`Valid token contract submitted : ${token_is_valid}`
-				);
+				);*/
 				if (token_is_valid) {
 					const add_token_dto = prepareAddToken(state);
 					await saveToken(add_token_dto);
@@ -53,31 +54,34 @@ export class ParserProvider {
 						base_supply: amount
 					} = add_token_dto;
 					await updateBalance({ amount, contract_name, vk });
+					/*
 					console.log(
 						`Updated user balance for contract : ${contract_name}, amount: ${amount}, vk: ${vk}`
-					);
+					);*/
 				}
 				await this.updateTokenList();
 				return;
 			} else if (contract_name === config.contractName) {
 				// handle events for the AMM contract
-				console.log(`Found AMM contract block ...`);
-				console.log(state);
+				//console.log(`Found AMM contract block ...`);
+				//console.log(state);
 				await processAmmBlock(state, handleClientUpdate);
 				return;
 			} else if (this.token_contract_list.includes(contract_name)) {
 				// this contract is a token
-				console.log(`Found block for token ${contract_name}`);
-				console.log(`function : ${fn}`);
+				//console.log(`Found block for token ${contract_name}`);
+				//console.log(`function : ${fn}`);
 				// console.log(state);
 				// if (fn === "transfer") {
 				await saveTransfer(state);
+				await updateLogo(state, contract_name);
 				// }
 			} else {
+				/*
 				console.log(`ignoring block for contract: ${contract_name}`);
 				console.log(state);
 				console.log(state[state.length - 1].value);
-				console.log(fn);
+				console.log(fn);*/
 			}
 		} catch (err) {
 			console.error(err);

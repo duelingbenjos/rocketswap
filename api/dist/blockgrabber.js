@@ -9,7 +9,6 @@ let db = mongoose;
 const MASTERNODE_URL = "https://testnet-master-1.lamden.io";
 const DBUSER = process.env.ROCKETSWAP_DB_USERNAME;
 const DBPWD = process.env.ROCKETSWAP_DB_PASSWORD;
-console.log(DBUSER, DBPWD);
 let connectionString = `mongodb://127.0.0.1:27017/block-explorer`;
 if (DBUSER) {
     connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}/block-explorer?authSource=admin`;
@@ -42,7 +41,7 @@ const databaseLoader = (models, handleNewBlock) => {
         console.log("State DB wiped");
         await db.models.Transactions.deleteMany({}).then((res) => console.log(res));
         console.log("Transactions DB wiped");
-        currBlockNum = 0;
+        currBlockNum = 2345;
         console.log("Set currBlockNum = 0");
         timerId = setTimeout(checkForBlocks, 1000);
     };
@@ -239,8 +238,6 @@ const databaseLoader = (models, handleNewBlock) => {
                 wipeOnStartup = false;
             }
             else {
-                console.log("lastestBlockNum: " + lastestBlockNum);
-                console.log("currBlockNum: " + currBlockNum);
                 if (lastestBlockNum === currBlockNum) {
                     if (alreadyCheckedCount < maxCheckCount)
                         alreadyCheckedCount = alreadyCheckedCount + 1;
@@ -255,11 +252,6 @@ const databaseLoader = (models, handleNewBlock) => {
                         currBatchMax + batchAmount;
                     for (let i = currBlockNum + 1; i <= currBatchMax; i++) {
                         let timedelay = (i - currBlockNum) * 100;
-                        console.log("getting block: " +
-                            i +
-                            " with delay of " +
-                            timedelay +
-                            "ms");
                         setTimeout(() => getBlock_MN(i), 100 + timedelay);
                     }
                 }
@@ -270,7 +262,6 @@ const databaseLoader = (models, handleNewBlock) => {
             }
         }
         else {
-            console.log("Could not contact masternode, trying again in 10 seconds");
             timerId = setTimeout(checkForBlocks, 10000);
         }
     };
@@ -281,7 +272,6 @@ const databaseLoader = (models, handleNewBlock) => {
             currBlockNum = res.blockNum ? res.blockNum : 0;
         else
             currBlockNum = 0;
-        console.log("wipeOnStartup", wipeOnStartup);
         timerId = setTimeout(checkForBlocks, 0);
     });
 };
@@ -290,7 +280,6 @@ exports.default = (handleNewBlock) => {
         if (error)
             console.log(error);
         else {
-            console.log("connection successful");
             databaseLoader(mongoose_models_1.default, handleNewBlock);
         }
     });

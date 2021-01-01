@@ -6,12 +6,12 @@ export declare class BalanceEntity extends BaseEntity implements IBalance {
 }
 export declare function updateBalance(balance_dto: BalanceType): Promise<BalanceEntity>;
 export declare type UserBalancesType = {
-    [key: string]: number;
+    [key: string]: string;
 };
 export declare type BalanceType = {
     contract_name: string;
     vk: string;
-    amount: number;
+    amount: string;
 };
 export interface IBalance {
     vk: string;

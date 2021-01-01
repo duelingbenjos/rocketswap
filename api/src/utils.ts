@@ -1,4 +1,5 @@
 import { IKvp } from "./types/misc.types";
+import BigNumber from "bignumber.js";
 
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;
@@ -51,14 +52,14 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 	} else {
 		val = (state as IKvp)?.value;
 	}
-	if (val) {
-		return val.__fixed__ ? parseFloat(val.__fixed__) : val;
-	}
+	val = new BigNumber(val?.__fixed__ || val)
+	if (val.isNaN()) return "0"
+	return val.toString()
 }
 
 export function getContractName(state: IKvp[]) {
 	let code_entry = getContractEntry(state);
-	console.log(code_entry);
+	//console.log(code_entry);
 	if (code_entry) {
 		let code_key = code_entry.key;
 		let contract_name = code_key.split(".")[0];

@@ -13,6 +13,7 @@ const token_entity_1 = require("./entities/token.entity");
 const utils_1 = require("./utils");
 const balance_entity_1 = require("./entities/balance.entity");
 const pair_entity_1 = require("./entities/pair.entity");
+const token_entity_2 = require("./entities/token.entity");
 const lp_points_entity_1 = require("./entities/lp-points.entity");
 const price_entity_1 = require("./entities/price.entity");
 let ParserProvider = class ParserProvider {
@@ -22,43 +23,32 @@ let ParserProvider = class ParserProvider {
     async updateTokenList() {
         const token_list_update = await token_entity_1.getTokenList();
         this.token_contract_list = token_list_update;
-        console.log(`Token list updated : ${this.token_contract_list}`);
     }
     async parseBlock(update) {
         const { block, handleClientUpdate } = update;
         const { state, fn, contract: contract_name } = block;
         try {
             if (contract_name === "submission" && fn === "submit_contract") {
-                console.log(block);
                 const contract_str = utils_1.getContractCode(state);
                 const token_is_valid = utils_1.validateTokenContract(contract_str);
-                console.log(`Valid token contract submitted : ${token_is_valid}`);
                 if (token_is_valid) {
                     const add_token_dto = token_entity_1.prepareAddToken(state);
                     await token_entity_1.saveToken(add_token_dto);
                     const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto;
                     await balance_entity_1.updateBalance({ amount, contract_name, vk });
-                    console.log(`Updated user balance for contract : ${contract_name}, amount: ${amount}, vk: ${vk}`);
                 }
                 await this.updateTokenList();
                 return;
             }
             else if (contract_name === config_1.config.contractName) {
-                console.log(`Found AMM contract block ...`);
-                console.log(state);
                 await processAmmBlock(state, handleClientUpdate);
                 return;
             }
             else if (this.token_contract_list.includes(contract_name)) {
-                console.log(`Found block for token ${contract_name}`);
-                console.log(`function : ${fn}`);
                 await balance_entity_1.saveTransfer(state);
+                await token_entity_2.updateLogo(state, contract_name);
             }
             else {
-                console.log(`ignoring block for contract: ${contract_name}`);
-                console.log(state);
-                console.log(state[state.length - 1].value);
-                console.log(fn);
             }
         }
         catch (err) {

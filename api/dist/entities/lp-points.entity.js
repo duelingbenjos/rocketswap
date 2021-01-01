@@ -48,7 +48,6 @@ async function saveUserLp(state) {
                 entity.points = {};
             }
             const value = utils_1.getVal(kvp);
-            console.log(value, typeof value);
             entity.points[contract_name] = value;
             await entity.save();
         }
@@ -60,7 +59,6 @@ async function saveUserLp(state) {
                 entity.points = {};
             }
             const value = utils_1.getVal(kvp);
-            console.log(value, typeof value);
             entity.points[contract_name] = value;
             await entity.save();
         }

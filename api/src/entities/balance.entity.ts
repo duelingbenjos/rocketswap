@@ -1,4 +1,5 @@
 import { IKvp } from "../types/misc.types";
+import BigNumber from "bignumber.js";
 import { getVal } from "../utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 
@@ -26,13 +27,13 @@ export async function updateBalance(balance_dto: BalanceType) {
 }
 
 export type UserBalancesType = {
-	[key: string]: number;
+	[key: string]: string;
 };
 
 export type BalanceType = {
 	contract_name: string;
 	vk: string;
-	amount: number;
+	amount: string;
 };
 
 export interface IBalance {
@@ -44,7 +45,7 @@ export async function saveTransfer(state: IKvp[]) {
 	const balances_kvp = state.filter(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "balances"
 	);
-	// console.log(balances_kvp);
+	//console.log(balances_kvp);
 	const transfers = balances_kvp.filter(
 		(kvp) => kvp.key.split(":").length === 2
 	);
@@ -55,8 +56,9 @@ export async function saveTransfer(state: IKvp[]) {
 
 		const vk = key.split(":")[1];
 		const contract_name = parts[0];
+		//console.log(getVal(kvp))
 		const amount = getVal(kvp)
-		console.log(contract_name, is_balance, vk);
+		//console.log(contract_name, is_balance, vk);
 		if (is_balance && vk && contract_name) {
 			try {
 				await updateBalance({ vk, contract_name, amount });

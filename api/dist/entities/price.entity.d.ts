@@ -4,14 +4,14 @@ import { handleClientUpdate } from "src/types/websocket.types";
 export declare class PriceEntity extends BaseEntity {
     id: string;
     contract_name: string;
-    price: number;
+    price: string;
     time: string;
 }
 export declare function savePrice(state: IKvp[], handleClientUpdate: handleClientUpdate): Promise<void>;
 export declare function getTokenMetrics(contract_name: string): Promise<{
     contract_name: string;
-    price: number;
+    price: string;
     time: number;
-    reserves: [number, number];
-    lp: number;
+    reserves: [string, string];
+    lp: string;
 }>;

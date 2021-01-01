@@ -61,7 +61,7 @@ export const calculateRgba = (input, opacity) => {
 	return `rgba(${rgbValues}, ${opacity})`
 	}
 
-	export const stringToFixed = (value: string, precision: number) => {
+export const stringToFixed = (value: string, precision: number) => {
 	try{
 		var values = value.split('.')
 	} catch {
@@ -121,15 +121,28 @@ export const getPrices = (reserves) => {
 	}
 }
 
-export const toBigNumber = (value) => Lamden.Encoder.BigNumber(value)
+export const toBigNumber = (value) => {
+	if (Lamden.Encoder.BigNumber.isBigNumber(value)) return value
+	return Lamden.Encoder.BigNumber(value)
+}
 
 export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value)
 
 export const quoteCalculator = (reserves = ["0","0"]) => {
+	const currencyReserves = toBigNumber(reserves[0])
+	const tokenReserves = toBigNumber(reserves[1])
 	const prices = getPrices(reserves)
 
 	const calcCurrencyValue = (value) =>  prices.currency.multipliedBy(value)
 	const calcTokenValue = (value) =>  prices.token.multipliedBy(value)
+
+	const calcLpPercent = (tokenBalance, lp_total) => tokenBalance.dividedBy(lp_total)
+
+	const calcTokenValueInCurrency = (lp_total, tokenBalance) => {
+        const share = calcLpPercent(tokenBalance, lp_total)
+        let value =  (currencyReserves.multipliedBy(share)) + (tokenBalance.multipliedBy(share).multipliedBy(prices.currency) )
+        return value
+    }
 
 
 	return {
@@ -137,7 +150,8 @@ export const quoteCalculator = (reserves = ["0","0"]) => {
 		toBigNumber,
 		isBigNumber,
 		calcCurrencyValue,
-		calcTokenValue
+		calcTokenValue,
+		calcTokenValueInCurrency
 	}
 }
 
