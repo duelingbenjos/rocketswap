@@ -153,8 +153,6 @@ export function valuesToBigNumber(obj: any) {
 }
 
 export const quoteCalculator = (tokenInfo) => {
-  if (!tokenInfo) return undefined;
-
 	const currencyReserves = toBigNumber(tokenInfo?.reserves[0] || ["0", "0"])
 	const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
   const prices = getPrices(tokenInfo?.reserves || ["0", "0"])

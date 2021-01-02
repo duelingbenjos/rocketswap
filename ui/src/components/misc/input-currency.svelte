@@ -59,7 +59,7 @@
 	    <input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			value={inputValue?.toString() || ""} 
+			value={inputValue ? inputValue.isNaN() ? "" : inputValue?.toString() : ""} 
 			bind:this={inputElm}
 			type="text"
 			on:input={handleInputChange}
