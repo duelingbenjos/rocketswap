@@ -48,6 +48,7 @@
     const getPairs = async () => {
         const contracts = Object.keys(balances).join(',')
         let pairsRes = await apiService.getPairs(contracts)
+        console.log(pairsRes)
         if (pairsRes) pairs = Object.keys(pairsRes).map(key => pairsRes[key])
     }
 

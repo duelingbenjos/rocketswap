@@ -59,8 +59,13 @@ export class AppController {
 			}
 			const pair_proms: Promise<
 				PairEntity
-			>[] = contract_names_arr.map((contract_name) =>
-				PairEntity.findOne(contract_name)
+			>[] = contract_names_arr.map((contract_name) =>  {
+					return new Promise(async (resolve) => {
+						let tokenRes = await TokenEntity.findOne({contract_name});
+						let pairRes = await PairEntity.findOne(contract_name)
+						resolve(Object.assign(pairRes, tokenRes))
+					})
+				}
 			);
 			const res = await Promise.all(pair_proms);
 			const res_obj = {};
