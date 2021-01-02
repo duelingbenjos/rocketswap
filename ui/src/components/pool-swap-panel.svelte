@@ -38,12 +38,10 @@
 	]
 
 	afterUpdate(() => {
-		console.log(pageState)
 		state.selectedToken = pageState.selectedToken
 	})
 
 	function handleCurrencyChange(e){
-		console.log('handleCurrencyChange')
 		if (e.detail.toString() === "NaN") resetAmounts()
 		else{
 			state.currencyAmount = e.detail
@@ -53,16 +51,12 @@
 	}
 
 	function handleTokenChange(e) {
-		console.log(e.detail)
-		console.log('token amount ' + e.detail.tokenAmount.toString())
-		console.log('handleTokenChange')
 		if (e.detail.tokenAmount.toString() === "NaN") resetAmounts()
 		else{
 			state.selectedToken = e.detail.selectedToken
 			state.tokenAmount = e.detail.tokenAmount
 			if (determineValues) state.currencyAmount = quoteCalc.calcCurrencyValue(state.tokenAmount) 
 		}
-		console.log(state)
 		dispatchEvent()
 	}
 

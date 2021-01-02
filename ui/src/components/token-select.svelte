@@ -57,7 +57,6 @@
       wallet = update
     })
     token_list_unsub = token_list_store.subscribe((update) => {
-      console.log(update)
       if (wallet && isWalletConnected(wallet)) {
         const list_with_balances = update
           .map((token) => {

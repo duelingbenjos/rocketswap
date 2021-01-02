@@ -20,7 +20,7 @@
       'contract': selectedToken.contract_name,
       'currency_amount': {'__fixed__': currencyAmount.toString()},
       'token_amount': {'__fixed__': tokenAmount.toString()}
-    })
+    }, selectedToken, tokenAmount, currencyAmount)
   }
 
   const addLiquidity = () => {
@@ -43,14 +43,6 @@
   }
 
 </script>
-
-{#if buttonFunction === 'create'}
-  <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
-{/if}
-
-{#if buttonFunction === 'add'}
-  <button class="swap-button" disabled={disabled} on:click={addLiquidity}> Supply </button>
-{/if}
 
 <style>
   .swap-button {
@@ -83,3 +75,12 @@
   }
 
 </style>
+
+
+{#if buttonFunction === 'create'}
+  <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
+{/if}
+
+{#if buttonFunction === 'add'}
+  <button class="swap-button" disabled={disabled} on:click={addLiquidity}> Supply </button>
+{/if}

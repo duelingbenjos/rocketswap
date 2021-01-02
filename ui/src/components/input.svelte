@@ -33,7 +33,6 @@
       context_store = pool_panel_store
     }
     input_unsub = context_store.subscribe((update) => handleInputStoreUpdate(update))
-    console.log($token_metrics_store)
   })
 
   let wallet_unsub = wallet_store.subscribe((update) => {
@@ -111,7 +110,6 @@
     let selected_token = slots.slot_b.selected_token
     const metrics = token_metrics[selected_token?.contract_name]
     if (role === 'currency') {
-      console.log(wallet_balance)
       // slots.slot_a.input_amount = parseFloat(wallet_balance.toFixed(6)) || 0
       slots.slot_a.input_amount = parseFloat(stripTrailingZero(wallet_balance.toFixed(8))) || 0
       // console.log(slots.slot_a.input_amount)

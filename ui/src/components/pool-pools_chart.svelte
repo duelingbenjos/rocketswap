@@ -17,7 +17,6 @@
     $: vk = getVK($wallet_store)
 
     beforeUpdate(() => {
-        console.log(pairs)
         if ($wallet_store.wallets) checkVk()
     })
 
