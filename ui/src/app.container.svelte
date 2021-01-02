@@ -53,7 +53,7 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    background-image: linear-gradient(rgba(233, 43, 247, 0.3), rgba(0, 0, 0, 0));
+    background-image: linear-gradient(#e92bf74d, rgba(0, 0, 0, 0));
   }
 
   .bg-solid {

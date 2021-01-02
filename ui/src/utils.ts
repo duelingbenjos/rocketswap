@@ -152,30 +152,43 @@ export function valuesToBigNumber(obj: any) {
   return obj
 }
 
-export const quoteCalculator = (reserves = ["0","0"]) => {
-	const currencyReserves = toBigNumber(reserves[0])
-	const tokenReserves = toBigNumber(reserves[1])
-	const prices = getPrices(reserves)
+export const quoteCalculator = (tokenInfo) => {
+  if (!tokenInfo) return undefined;
+
+	const currencyReserves = toBigNumber(tokenInfo?.reserves[0] || ["0", "0"])
+	const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
+  const prices = getPrices(tokenInfo?.reserves || ["0", "0"])
+  const totalLP = tokenInfo?.lp || toBigNumber("0")
 
 	const calcCurrencyValue = (value) =>  prices.token.multipliedBy(value)
 	const calcTokenValue = (value) =>  prices.currency.multipliedBy(value)
 
-	const calcLpPercent = (lp_total, lp_balance) => lp_balance.dividedBy(lp_total)
+	const calcLpPercent = (lp_balance) => lp_balance.dividedBy(totalLP)
 
-	const calcTokenValueInCurrency = (lp_total, lp_balance) => {
-        const share = calcLpPercent(lp_total, lp_balance)
+	const calcTokenValueInCurrency = (lp_balance) => {
+        const share = calcLpPercent(lp_balance)
         return  (currencyReserves.multipliedBy(share)) + (lp_balance.multipliedBy(share).multipliedBy(prices.currency) )
 	}
 
-	const calcPointsPerCurrency = (lp_total) => lp_total.dividedBy(currencyReserves)
+	const calcPointsPerCurrency = () => totalLP.dividedBy(currencyReserves)
 
 	const calcNewLpMintAmount = (pointsPerCurrency, currencyAmount) => pointsPerCurrency.multipliedBy(currencyAmount) 
 
-	const calcNewShare = (lp_total, lp_balance, currencyAmount, tokenAmount) => {
-		let pointsPerCurrency = calcPointsPerCurrency(lp_total)
+	const calcNewShare = (lp_balance, currencyAmount) => {
+		let pointsPerCurrency = calcPointsPerCurrency()
 		let newLpMinted = calcNewLpMintAmount(pointsPerCurrency, currencyAmount)
-		return lp_balance.plus(newLpMinted).dividedBy(lp_total.plus(newLpMinted))
-	}
+		return lp_balance.plus(newLpMinted).dividedBy(totalLP.plus(newLpMinted))
+  }
+  
+  const calcAmountsFromLpTokens = (lpTokenAmount) => {
+    if (!lpTokenAmount) return undefined
+
+    let lp_percent = calcLpPercent(lpTokenAmount)
+    return {
+      currency: currencyReserves.multipliedBy(lp_percent),
+      token: tokenReserves.multipliedBy(lp_percent)
+    }
+  }
 
 	return {
 		prices,
@@ -187,7 +200,8 @@ export const quoteCalculator = (reserves = ["0","0"]) => {
 		calcTokenValueInCurrency,
 		calcNewShare,
 		calcPointsPerCurrency,
-		calcNewLpMintAmount
+    calcNewLpMintAmount,
+    calcAmountsFromLpTokens
 	}
 }
 

@@ -12,7 +12,7 @@
 	import { wallet_store } from '../store'
 
 	//Components
-	import PoolSwapPanel from '../components/pool-swap-panel.svelte'
+  import PoolRemoveLiquidityPanel from '../components/pool-remove-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import PoolButtons from '../components/pool-buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
@@ -42,7 +42,7 @@
 		}else{
 			pageState = Object.assign(pageState, e.detail)
 		}
-		updateWindowHistory()
+		//updateWindowHistory()
 	}
 
 	const refreshTokenInfo = async () => {
@@ -71,7 +71,7 @@
   const updateWindowHistory = () => {
     if (pageState.selectedToken){
       if (!location.pathname.includes(pageState.selectedToken.contract_name))
-        window.history.pushState("", "", `/#/pool-add/${pageState.selectedToken.contract_name}`);
+        window.history.pushState("", "", `/#/pool-remove/${pageState.selectedToken.contract_name}`);
     }
   }
 
@@ -116,7 +116,7 @@
 </svelte:head>
 
 <div class="page-container">
-  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState}>
+  <PoolRemoveLiquidityPanel on:infoUpdate={handleInfoUpdate} {pageState}>
     <div class="header" slot="header">
       <h2>
         Remove Liquidity
@@ -131,11 +131,11 @@
     
     <div class="footer" slot="footer">
       {#if pageState.selectedToken && pageState.tokenLP}
-        <PoolStats {pageState} statList={["ratios", "poolShare"]} title={"Prices and pool share"}/>
+        <!--<PoolStats {pageState} statList={["ratios", "poolShare"]} title={"Prices and pool share"}/>-->
       {/if}
-      <PoolButtons buttonFunction="add" {pageState} />
+      <PoolButtons buttonFunction="remove" {...pageState} />
     </div>
-  </PoolSwapPanel>
+  </PoolRemoveLiquidityPanel>
 </div>
 
 

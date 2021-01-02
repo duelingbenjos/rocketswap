@@ -66,7 +66,7 @@
         />
 
 		<div class="input-controls">
-		<button on:click={handleMaxInput} class="max-button">MAX</button> 
+		<button on:click={handleMaxInput} class="primary">MAX</button> 
 		<span class="token-label"> {config.currencySymbol} </span>
 		</div>
 	</div>

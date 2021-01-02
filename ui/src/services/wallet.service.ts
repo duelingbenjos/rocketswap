@@ -284,6 +284,29 @@ export class WalletService {
     }
   }
 
+  public async removeLiquidity(args, selectedToken) {
+    this.lwc.sendTransaction(this.createTxInfo('remove_liquidity', args), (res) => this.handleRemoveLiquidity(res, selectedToken))
+  }
+
+  private handleRemoveLiquidity = (res, selectedToken) => {
+    let status = this.txResult(res.data)
+    if (status === 'success') {
+      let lpPoints = "0";
+      res.data.txBlockResult.state.forEach(stateChange => {
+        if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${this.wallet_state.wallets[0]}`){
+          lpPoints = stateChange.value.__fixed__ || stateChange.value
+        }
+      })
+      lpPoints = toBigNumber(lpPoints)
+      this.toastService.addToast({ 
+        heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
+        text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
+        type: 'info',
+        duration: 10000
+      })
+    }
+  }
+
   private handleTxErrors(errors){
     errors.forEach(error => {
       let toastType = 'info'

@@ -48,7 +48,6 @@ export class ApiService {
   async getToken(contract_name: string) {
     try {
       const res = await axios.get(`${this.base_url}/api/token/${contract_name}`).then((res) => valuesToBigNumber(res.data))
-      console.log(res)
       return res
     } catch (err) {
       console.error(err)
@@ -59,7 +58,6 @@ export class ApiService {
     try {
       console.log(`${this.base_url}/api/user_lp_balance/${vk}`)
       const res = await axios.get(`${this.base_url}/api/user_lp_balance/${vk}`).then((res) => valuesToBigNumber(res.data))
-      console.log(res)
       return res
     } catch (err) {
       return false
@@ -70,7 +68,6 @@ export class ApiService {
     try {
       console.log(`${this.base_url}/api/get_pairs/${contracts}`)
       const res = await axios.get(`${this.base_url}/api/get_pairs/${contracts}`).then((res) => valuesToBigNumber(res.data))
-      console.log(res)
       return res
     } catch (err) {
       return false

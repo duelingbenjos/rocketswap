@@ -21,25 +21,24 @@
     $: tokenSymbol = selectedToken ? selectedToken.token_symbol : undefined;
     $: tokenContract = selectedToken ? selectedToken.contract_name : undefined;
     $: calc = calcValues(pageState)
+    $: wallet_store_changes = setLpBalances($wallet_store, pageState)
 
     const calcValues = () => {
         if (pageState?.tokenLP){
             const { currencyAmount, tokenAmount, tokenLP } = pageState
 
-            let quoteCalc = quoteCalculator(tokenLP.reserves)
+            let quoteCalc = quoteCalculator(tokenLP)
             currencyRatio = stringToFixed(quoteCalc.prices.currency, 4)
             tokenRatio = stringToFixed(quoteCalc.prices.token, 4)
 
             let lp_balance = lp_balances[tokenContract] || toBigNumber("0")
-            lp_share_percent = stringToFixed(quoteCalc.calcLpPercent(tokenLP.lp, lp_balance).multipliedBy(100), 1)
+            lp_share_percent = stringToFixed(quoteCalc.calcLpPercent(lp_balance).multipliedBy(100), 1)
 
             if (currencyAmount && tokenAmount) {
-                new_lp_share_percent = stringToFixed(quoteCalc.calcNewShare(tokenLP.lp, lp_balance, currencyAmount).multipliedBy(100), 1) + "%"
+                new_lp_share_percent = stringToFixed(quoteCalc.calcNewShare(lp_balance, currencyAmount).multipliedBy(100), 1) + "%"
             }
         }
     }
-
-    $: wallet_store_changes = setLpBalances($wallet_store, pageState)
 
     const setLpBalances = async () => {
         if (!$wallet_store.init){
@@ -65,14 +64,14 @@
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         padding: 0 20px;
-        font-size: 0.8em;
+        font-size: var(--text-size-xsmall);
     }
     .stats{
         border: 1px solid var(--border-color);
         border-radius: 0 0 var(--border-radius) var(--border-radius);
         border-top: 0px;
         padding: 20px;
-        font-size: 0.9em;
+        font-size: var(--text-size-small);
 
         display: flex;
         flex-wrap: wrap;

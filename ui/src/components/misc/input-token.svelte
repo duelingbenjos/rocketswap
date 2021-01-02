@@ -76,7 +76,7 @@
 		/>
 		<div class="input-controls">
 			{#if selectedToken}
-				<button on:click={handleMaxInput} class="max-button">MAX</button>
+				<button on:click={handleMaxInput} class="primary">MAX</button>
 			{/if}
 			<TokenSelect on:selected={handleTokenSelect} {selectedToken} />
 		</div>

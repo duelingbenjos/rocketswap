@@ -17,10 +17,10 @@
 	//Props
 	export let pageState;
 
-	$: quoteCalc = quoteCalculator(pageState?.tokenLP?.reserves)
+	$: quoteCalc = quoteCalculator(pageState?.tokenLP);
 
 	const dispatch = createEventDispatcher();
-	const { determineValues } = getContext('pageContext')
+	const { determineValues,  } = getContext('pageContext')
 
 	let state = { };
 
