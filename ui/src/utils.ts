@@ -1,5 +1,6 @@
 import Lamden from 'lamden-js'
 import { config } from './config'
+import BigNumber from 'bignumber.js'
 
 let API = new Lamden.Masternode_API({ hosts: [config.masternode] })
 
@@ -127,6 +128,29 @@ export const toBigNumber = (value) => {
 }
 
 export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value)
+
+/**
+ * Recurses through any object, converts stringified numbers and numbers to BigNumber.
+ * Probably some edge cases I've ignored here, like what happens if it finds a BigNumber in the object ?
+ */
+
+export function valuesToBigNumber(obj: any) {
+	if (typeof obj === "object") {
+		for (let property in obj) {
+			console.log(property);
+			// Check if item is a string
+			if (typeof obj[property] === "string") {
+				if (!isNaN(parseFloat(obj[property])))
+					obj[property] = new BigNumber(obj[property]);
+			} else if (typeof obj[property] === "number") {
+				obj[property] = new BigNumber(obj[property]);
+			} else if (typeof obj[property] === "object") {
+				valuesToBigNumber(obj[property]);
+			}
+		}
+	}
+	return obj;
+}
 
 export const quoteCalculator = (reserves = ["0","0"]) => {
 	const currencyReserves = toBigNumber(reserves[0])
