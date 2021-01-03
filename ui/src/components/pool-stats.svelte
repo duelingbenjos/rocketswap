@@ -3,7 +3,7 @@
     import { ApiService } from '../services/api.service'
     import { pool_panel_store, wallet_store } from '../store'
     import { config } from '../config'
-    import { stringToFixed } from '../utils'
+    import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
 
     export let statList = []
     export let title
@@ -11,31 +11,43 @@
 
     const apiService = ApiService.getInstance();
 
-    let balances = []
+    let lp_balances = []
+    let new_lp_share_percent;
+    let currencyRatio;
+    let tokenRatio;
+    let lp_share_percent = "0%"
 
     $: selectedToken = pageState?.selectedToken;
     $: tokenSymbol = selectedToken ? selectedToken.token_symbol : undefined;
     $: tokenContract = selectedToken ? selectedToken.contract_name : undefined;
-    $: lp_balances = $wallet_store?.wallet_state?.lp_balances || {};
-    $: lp_balance = lp_balances[tokenContract] || "0";
-    $: lp_share = pageState.tokenLp ? lp_balance / pageState.tokenLp : 0;
-    $: lp_share_percent = lp_share ? parseFloat(lp_share * 100).toFixed(1) : "0";
-    $: currencyValue = pageState?.currencyAmount || "";
-    $: tokenValue = pageState?.tokenAmount || "";
-    $: currencyRatio = currencyValue / tokenValue;
-    $: tokenRatio = tokenValue / currencyValue;
+    $: calc = calcValues(pageState)
+    $: wallet_store_changes = setLpBalances($wallet_store, pageState)
 
-    //$: wallet_store_changes = setLpBalances($wallet_store)
+    const calcValues = () => {
+        if (pageState?.tokenLP){
+            const { currencyAmount, tokenAmount, tokenLP } = pageState
 
-    onMount(async () => {
-        //console.log($wallet_store)
-        // TODO REMOVE HARDCODED VK
-        //let balancesRes = await apiService.getUserLpBalance($wallet_store.wallet_state.wallets[0])
-        //if (balancesRes) balances = balancesRes.points
-    })
+            let quoteCalc = quoteCalculator(tokenLP)
+            currencyRatio = stringToFixed(quoteCalc.prices.currency, 4)
+            tokenRatio = stringToFixed(quoteCalc.prices.token, 4)
 
-    const setLpBalances = () => {
-        //if ($wallet_store.wallet_state.lp_balance) lp_balance
+            let lp_balance = lp_balances[tokenContract] || toBigNumber("0")
+            lp_share_percent = stringToFixed(quoteCalc.calcLpPercent(lp_balance).multipliedBy(100), 1)
+
+            if (currencyAmount && tokenAmount) {
+                new_lp_share_percent = stringToFixed(quoteCalc.calcNewShare(lp_balance, currencyAmount).multipliedBy(100), 1) + "%"
+            }
+        }
+    }
+
+    const setLpBalances = async () => {
+        if (!$wallet_store.init){
+            let vk = $wallet_store?.wallets[0];
+            if (vk){
+                let balancesRes = await apiService.getUserLpBalance(vk)
+                if (balancesRes) lp_balances = balancesRes.points
+            }
+        }
     }
 
 </script>
@@ -52,14 +64,14 @@
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         padding: 0 20px;
-        font-size: 0.8em;
+        font-size: var(--text-size-xsmall);
     }
     .stats{
         border: 1px solid var(--border-color);
         border-radius: 0 0 var(--border-radius) var(--border-radius);
         border-top: 0px;
         padding: 20px;
-        font-size: 0.9em;
+        font-size: var(--text-size-small);
 
         display: flex;
         flex-wrap: wrap;
@@ -81,28 +93,31 @@
 <div class="container">
     <div class="header">
         <p>{title}</p>
-        <p>{statList.includes("poolShare") ? `Current: ${lp_share_percent}%`: ""}</p>
+        <p>{statList.includes("poolShare") ? `Current: ${lp_share_percent || "0"}%`: ""}</p>
     </div>
     <div class="stats">
         {#if tokenSymbol}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p><strong>{isFinite(currencyRatio) ? `${stringToFixed(currencyValue / tokenValue, 4)}` : '-'}</strong></p>
+                    <p><strong>{currencyRatio || '-'}</strong></p>
                     <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p><strong>{isFinite(tokenRatio) ? `${stringToFixed(tokenValue / currencyValue, 4)}` : '-'}</strong></p>
+                    <p><strong>{tokenRatio || '-'}</strong></p>
                     <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}
 
             {#if statList.includes("poolShare")}
                 <div class="stat">
-                    <p><strong>{`${lp_share_percent}%`}</strong></p>
-                    <p>Share of Pool</p>
+                    <p><strong>{new_lp_share_percent || "-"}</strong></p>
+                    <p>New share of Pool</p>
                 </div>
             {/if}
         {/if}
     </div>
 </div>
+
+
+

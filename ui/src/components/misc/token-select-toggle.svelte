@@ -12,6 +12,9 @@
 
     //Components
     import TokenSearch from './token-select-search.svelte'
+
+    //Icons
+    import Base64Svg from '../../icons/base64_svg.svelte'
     
     //Misc
     import { stringToFixed  } from '../../utils'
@@ -83,7 +86,7 @@
         border: none;
         border-radius: 10px;
         
-        font-size: 0.8em;
+        font-size: var(--text-size-xsmall);
         font-weight: 600;
 
         width: max-content;
@@ -154,11 +157,6 @@
     .token-name-logo{
         align-items: center;
         justify-content: start;
-    }
-
-    .token-logo{
-        width: 27px;
-        height: 27px;
     }
 
     .token-plug{
@@ -256,11 +254,14 @@
                                 <button on:click={() => selectToken(token)} class="nostyle button-item">
                                     <div class="token-container">
                                         <div class="token-name-logo flex-row">
+                                            <Base64Svg string={token.logo_svg_base64} width={'27px'} height={'27px'} />
+                                            <!--
                                             {#if token.logo_svg_base64}
-                                                <img class="token-logo" src="{`data:image/svg+xml;base64,${token.logo_svg_base64}`}" alt="token logo"/>
+                                                
                                             {:else}
                                                 <div class="token-plug"></div>
                                             {/if}
+                                            -->
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
                                             {#if token.contract_name === selected_contract}
                                                 <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />

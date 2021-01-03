@@ -140,7 +140,7 @@ export function valuesToBigNumber(obj: any) {
   if (typeof obj === 'object') {
     for (let property in obj) {
       if (property === 'time' || property === 'vk') {
-        // ignore this value
+        // ignore these values
       } else if (typeof obj[property] === 'string') {
         // Check if item is a string
         if (!isNaN(parseFloat(obj[property]))) obj[property] = new BigNumber(obj[property])
@@ -154,28 +154,54 @@ export function valuesToBigNumber(obj: any) {
   return obj
 }
 
-export const quoteCalculator = (reserves = ['0', '0']) => {
-  const currencyReserves = toBigNumber(reserves[0])
-  const tokenReserves = toBigNumber(reserves[1])
-  const prices = getPrices(reserves)
+export const quoteCalculator = (tokenInfo) => {
+	const currencyReserves = toBigNumber(tokenInfo?.reserves[0] || ["0", "0"])
+	const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
+  const prices = getPrices(tokenInfo?.reserves || ["0", "0"])
+  const totalLP = tokenInfo?.lp || toBigNumber("0")
 
-  const calcCurrencyValue = (value) => prices.currency.multipliedBy(value)
-  const calcTokenValue = (value) => prices.token.multipliedBy(value)
+	const calcCurrencyValue = (value) =>  prices.token.multipliedBy(value)
+	const calcTokenValue = (value) =>  prices.currency.multipliedBy(value)
 
-  const calcLpPercent = (tokenBalance, lp_total) => tokenBalance.dividedBy(lp_total)
+	const calcLpPercent = (lp_balance) => lp_balance.dividedBy(totalLP)
 
-  const calcTokenValueInCurrency = (lp_total, tokenBalance) => {
-    const share = calcLpPercent(tokenBalance, lp_total)
-    let value = currencyReserves.multipliedBy(share) + tokenBalance.multipliedBy(share).multipliedBy(prices.currency)
-    return value
+	const calcTokenValueInCurrency = (lp_balance) => {
+        const share = calcLpPercent(lp_balance)
+        return  (currencyReserves.multipliedBy(share)) + (lp_balance.multipliedBy(share).multipliedBy(prices.currency) )
+	}
+
+	const calcPointsPerCurrency = () => totalLP.dividedBy(currencyReserves)
+
+	const calcNewLpMintAmount = (pointsPerCurrency, currencyAmount) => pointsPerCurrency.multipliedBy(currencyAmount) 
+
+	const calcNewShare = (lp_balance, currencyAmount) => {
+		let pointsPerCurrency = calcPointsPerCurrency()
+		let newLpMinted = calcNewLpMintAmount(pointsPerCurrency, currencyAmount)
+		return lp_balance.plus(newLpMinted).dividedBy(totalLP.plus(newLpMinted))
+  }
+  
+  const calcAmountsFromLpTokens = (lpTokenAmount) => {
+    if (!lpTokenAmount) return undefined
+
+    let lp_percent = calcLpPercent(lpTokenAmount)
+    return {
+      currency: currencyReserves.multipliedBy(lp_percent),
+      token: tokenReserves.multipliedBy(lp_percent)
+    }
   }
 
-  return {
-    prices,
-    toBigNumber,
-    isBigNumber,
-    calcCurrencyValue,
-    calcTokenValue,
-    calcTokenValueInCurrency
-  }
+	return {
+		prices,
+		toBigNumber,
+		isBigNumber,
+		calcCurrencyValue,
+		calcTokenValue,
+		calcLpPercent,
+		calcTokenValueInCurrency,
+		calcNewShare,
+		calcPointsPerCurrency,
+    calcNewLpMintAmount,
+    calcAmountsFromLpTokens
+	}
 }
+

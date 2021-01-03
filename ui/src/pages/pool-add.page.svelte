@@ -12,7 +12,7 @@
 	import { wallet_store } from '../store'
 
 	//Components
-	import PoolSwapPanel from '../components/pool-swap-panel.svelte'
+	import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import PoolButtons from '../components/pool-buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
@@ -133,7 +133,7 @@
       {#if pageState.selectedToken && pageState.tokenLP}
         <PoolStats {pageState} statList={["ratios", "poolShare"]} title={"Prices and pool share"}/>
       {/if}
-      <PoolButtons buttonFunction="add" {pageState} />
+      <PoolButtons buttonFunction="add" {...pageState} />
     </div>
   </PoolSwapPanel>
 </div>

@@ -25,8 +25,6 @@
 	$: tokenBalance = selectedToken?.balance ? toBigNumber(selectedToken?.balance) : toBigNumber("0.0");
 	$: inputValue = tokenAmount;
 
-	//afterUpdate(() => console.log({tokenAmount}))
-
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
 		if (validateValue !== e.target.value) {
@@ -48,7 +46,6 @@
 
 	const handleTokenSelect = (e) => {
 		selectedToken = e.detail
-		console.log(e.detail)
 		handleMaxInput();
 		dispatchEvent(toBigNumber(selectedToken.balance))
 	}
@@ -79,7 +76,7 @@
 		/>
 		<div class="input-controls">
 			{#if selectedToken}
-				<button on:click={handleMaxInput} class="max-button">MAX</button>
+				<button on:click={handleMaxInput} class="primary">MAX</button>
 			{/if}
 			<TokenSelect on:selected={handleTokenSelect} {selectedToken} />
 		</div>

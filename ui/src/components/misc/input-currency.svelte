@@ -59,14 +59,14 @@
 	    <input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			value={inputValue?.toString() || ""} 
+			value={inputValue ? inputValue.isNaN() ? "" : inputValue?.toString() : ""} 
 			bind:this={inputElm}
 			type="text"
 			on:input={handleInputChange}
         />
 
 		<div class="input-controls">
-		<button on:click={handleMaxInput} class="max-button">MAX</button> 
+		<button on:click={handleMaxInput} class="primary">MAX</button> 
 		<span class="token-label"> {config.currencySymbol} </span>
 		</div>
 	</div>

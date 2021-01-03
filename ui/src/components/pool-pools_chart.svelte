@@ -17,7 +17,6 @@
     $: vk = getVK($wallet_store)
 
     beforeUpdate(() => {
-        console.log(pairs)
         if ($wallet_store.wallets) checkVk()
     })
 
@@ -49,6 +48,7 @@
     const getPairs = async () => {
         const contracts = Object.keys(balances).join(',')
         let pairsRes = await apiService.getPairs(contracts)
+        console.log(pairsRes)
         if (pairsRes) pairs = Object.keys(pairsRes).map(key => pairsRes[key])
     }
 
@@ -89,7 +89,7 @@
       white-space: nowrap;
     }
     td{
-        font-size: 0.8em;
+        font-size: var(--text-size-xsmall);
         text-align: left;
         padding: 10px 6px 2px;
     }
@@ -131,7 +131,7 @@
                     <td>{stringToFixed(balances[pair.contract_name], 4)}</td>
                     <td>{`${stringToFixed( lp_percent(pair.contract_name, pair.lp) * 100, 4) }%` }</td>
                     <td>
-                        {stringToFixed(quoteCalculator(pair.reserves).calcTokenValueInCurrency(toBigNumber(pair.lp), toBigNumber(balances[pair.contract_name])), 4)}
+                        {stringToFixed(quoteCalculator(pair).calcTokenValueInCurrency(toBigNumber(balances[pair.contract_name])), 4)}
                          TAU
                     </td>
                     <td><a href="{`/#/pool-add/${pair.contract_name}`}" class="text-link">Adjust ></a></td>

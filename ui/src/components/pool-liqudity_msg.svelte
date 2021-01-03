@@ -3,7 +3,7 @@
         box-sizing: border-box;
         background-color: #2b284b;
         color: #ebeafc;
-        font-size: 0.9em;
+        font-size: var(--text-size-small);
         border-radius: 32px;
         padding: 30px;
         box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);

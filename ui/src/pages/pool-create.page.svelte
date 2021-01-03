@@ -12,8 +12,9 @@
   const walletService = WalletService.getInstance();
 
   //Components
-  import PoolSwapPanel from '../components/pool-swap-panel.svelte'
+  import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
   import PoolStats from '../components/pool-stats.svelte'
+  import PoolButtons from '../components/pool-buttons.svelte'
 
   //Icons
   import IconBackArrow from '../icons/back-arrow.svelte'
@@ -103,6 +104,7 @@
       {#if pageState.selectedToken }
         <PoolStats {pageState} statList={["ratios"]} title={"Initial prices and pool share"}/>
       {/if}
+      <PoolButtons buttonFunction="create" {...pageState} />
     </div>
   </PoolSwapPanel>
 </div>

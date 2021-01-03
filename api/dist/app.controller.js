@@ -64,7 +64,13 @@ let AppController = class AppController {
             if (contract_names_arr.length > 20) {
                 throw "You may only request a maximum of 20 pairs at a time.";
             }
-            const pair_proms = contract_names_arr.map((contract_name) => pair_entity_1.PairEntity.findOne(contract_name));
+            const pair_proms = contract_names_arr.map((contract_name) => {
+                return new Promise(async (resolve) => {
+                    let tokenRes = await token_entity_1.TokenEntity.findOne({ contract_name });
+                    let pairRes = await pair_entity_1.PairEntity.findOne(contract_name);
+                    resolve(Object.assign(pairRes, tokenRes));
+                });
+            });
             const res = await Promise.all(pair_proms);
             const res_obj = {};
             res.forEach((pair) => {

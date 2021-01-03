@@ -10,47 +10,51 @@
 
   //Props
   export let buttonFunction;
-  export let pageState;
+  export let currencyAmount;
+  export let tokenAmount;
+  export let selectedToken;
+  export let lpTokenAmount;
 
-  $: disabled = disableButton(pageState);
+  $: disabled = disableButton(currencyAmount, tokenAmount, selectedToken, lpTokenAmount);
 
   const createMarket = () => {
-    const { currencyAmount, tokenAmount, selectedToken } = pageState
+    if (!currencyAmount || !tokenAmount || !selectedToken) return
     walletService.createMarket({
       'contract': selectedToken.contract_name,
       'currency_amount': {'__fixed__': currencyAmount.toString()},
       'token_amount': {'__fixed__': tokenAmount.toString()}
-    })
+    }, selectedToken, tokenAmount, currencyAmount)
   }
 
   const addLiquidity = () => {
-    const { currencyAmount, tokenAmount, selectedToken } = pageState
-    console.log(pageState)
+    if (!currencyAmount || !tokenAmount || !selectedToken) return
     walletService.addLiquidity({
       'contract': selectedToken.contract_name,
       'currency_amount': {'__fixed__': currencyAmount.toString()}
     }, selectedToken, tokenAmount, currencyAmount)
   }
 
+  const removeLiquidity = () => {
+    if (!lpTokenAmount) return
+    walletService.removeLiquidity({
+      'contract': selectedToken.contract_name,
+      'amount': {'__fixed__': lpTokenAmount.toString()}
+    }, selectedToken)
+  }
+
   const disableButton = (info) => {
-    if (!info) return true
-    const { currencyAmount, tokenAmount, selectedToken } = info
-    if (!currencyAmount || !tokenAmount || !selectedToken) {
-      console.log('fill out all inputs')
-      return true
+    if (buttonFunction === "create" || buttonFunction === "add"){
+      if (!currencyAmount || !tokenAmount || !selectedToken) return true
+    }
+    if (buttonFunction === "remove"){
+
+      if (!lpTokenAmount) return true
+      if (lpTokenAmount.isEqualTo(0)) return true
     }
     return false
   }
 
 </script>
-
-{#if buttonFunction === 'create'}
-  <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
-{/if}
-
-{#if buttonFunction === 'add'}
-  <button class="swap-button" disabled={disabled} on:click={addLiquidity}> Supply </button>
-{/if}
 
 <style>
   .swap-button {
@@ -83,3 +87,16 @@
   }
 
 </style>
+
+
+{#if buttonFunction === 'create'}
+  <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
+{/if}
+
+{#if buttonFunction === 'add'}
+  <button class="swap-button" disabled={disabled} on:click={addLiquidity}> Supply </button>
+{/if}
+
+{#if buttonFunction === 'remove'}
+  <button class="swap-button" disabled={disabled} on:click={removeLiquidity}> Remove </button>
+{/if}

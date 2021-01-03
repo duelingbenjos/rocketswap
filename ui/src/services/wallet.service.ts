@@ -129,10 +129,9 @@ export class WalletService {
       },
       stampLimit: 150
     }
-    console.log(transaction)
+
     const prom = new Promise((resolve, reject) => {
       this.lwc.sendTransaction(transaction, (res) => {
-        console.log(res)
         if (res.status === 'success') {
           this.toastService.addToast({ heading: 'Approval Successful.', text: `Approved ${amount} for transfer from ${contract_name}`, type: 'info' })
           resolve(res)
@@ -194,14 +193,45 @@ export class WalletService {
     this.toastService.addToast({ heading: 'Approval succeeded !', text: `You have approved ${approve_amount} tokens.`, type: 'info' })
   }
 
-  public async createMarket(args) {
-    this.lwc.sendTransaction(this.createTxInfo('create_market', args), this.handleCreateMarket)
+  public async createMarket(args, selectedToken, tokenAmount, currencyAmount) {
+    const callApprove = (contract, amount) => {
+      return new Promise((resolve) => {
+        this.approveBN(contract, amount, (res, err) => {
+          if (err || !res) resolve(false)
+          if (res === true) resolve(true)
+          else {
+            if (res?.data?.txBlockResult?.status === 0) resolve(true)
+            else resolve(false)
+          }
+      })})
+    } 
+
+    let results = await Promise.all([
+      callApprove(args.contract, tokenAmount),
+      callApprove('currency', currencyAmount)
+    ])
+
+    if (results.every(v => v === true)){
+      this.lwc.sendTransaction(this.createTxInfo('create_market', args), (res) => this.handleCreateMarket(res, selectedToken))
+    }
   }
 
-  private handleCreateMarket = (res) => {
+  private handleCreateMarket = (res, selectedToken) => {
     let status = this.txResult(res.data)
     if (status === 'success') {
-      this.toastService.addToast({ heading: 'Transaction Succeeded.', type: 'info' })
+      let lpPoints = "0";
+      res.data.txBlockResult.state.forEach(stateChange => {
+        if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${(this.wallet_state as WalletConnectedType).wallets[0]}`){
+          lpPoints = stateChange.value.__fixed__ || stateChange.value
+        }
+      })
+      lpPoints = toBigNumber(lpPoints)
+      this.toastService.addToast({ 
+        heading: `Created Liquidity for ${selectedToken.token_symbol}!`,
+        text: `You have created liquidity for ${selectedToken.token_name} and were minted ${stringToFixed(lpPoints.toString(), 4)} LP tokens.`, 
+        type: 'info',
+        duration: 10000
+      })
     }
   }
 
@@ -209,7 +239,6 @@ export class WalletService {
     const callApprove = (contract, amount) => {
       return new Promise((resolve) => {
         this.approveBN(contract, amount, (res, err) => {
-          console.log({ contract, amount, res, err })
           if (err || !res) resolve(false)
           if (res === true) resolve(true)
           else {
@@ -222,15 +251,12 @@ export class WalletService {
 
     let results = await Promise.all([callApprove(args.contract, tokenAmount), callApprove('currency', currencyAmount)])
 
-    console.log(results)
-
-    if (results.every((v) => v === true)) {
-      this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken))
+    if (results.every(v => v === true)){
+        this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken))
     }
   }
 
   private handleAddLiquidity = (res, selectedToken) => {
-    console.log({ res, selectedToken })
     let status = this.txResult(res.data)
     if (status === 'success') {
       let lpPoints = '0'
@@ -249,8 +275,31 @@ export class WalletService {
     }
   }
 
-  private handleTxErrors(errors) {
-    errors.forEach((error) => {
+  public async removeLiquidity(args, selectedToken) {
+    this.lwc.sendTransaction(this.createTxInfo('remove_liquidity', args), (res) => this.handleRemoveLiquidity(res, selectedToken))
+  }
+
+  private handleRemoveLiquidity = (res, selectedToken) => {
+    let status = this.txResult(res.data)
+    if (status === 'success') {
+      let lpPoints = "0";
+      res.data.txBlockResult.state.forEach(stateChange => {
+        if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${(this.wallet_state as WalletConnectedType).wallets[0]}`){
+          lpPoints = stateChange.value.__fixed__ || stateChange.value
+        }
+      })
+      lpPoints = toBigNumber(lpPoints)
+      this.toastService.addToast({ 
+        heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
+        text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
+        type: 'info',
+        duration: 10000
+      })
+    }
+  }
+
+  private handleTxErrors(errors){
+    errors.forEach(error => {
       let toastType = 'info'
       if (error.includes('AssertionError')) {
         error = error.split("'")[1]
@@ -286,8 +335,7 @@ export class WalletService {
     if (currentApproval.isNaN()) currentApproval = toBigNumber('0')
 
     let adjustedApprovalAmount = approveAmount.minus(currentApproval)
-    console.log({ adjustedApprovalAmount: adjustedApprovalAmount.toString(), currentApproval: currentApproval.toString() })
-    if (adjustedApprovalAmount.isGreaterThan(toBigNumber('0'))) {
+    if (adjustedApprovalAmount.isGreaterThan(toBigNumber("0"))){
       let args = {
         amount: { __fixed__: adjustedApprovalAmount.toString() },
         to: config.contractName

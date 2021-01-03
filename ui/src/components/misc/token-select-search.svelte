@@ -11,14 +11,12 @@
     let timer;
 
     const handleInput = (e) => {
-        console.log()
         if (!walletService) return;
         clearTimeout(timer)
         timer = setTimeout(getToken, 500);
     }
 
     const getToken = async () => {
-        console.log('getting token')
         let tokenRes = await walletService.apiService.getToken(inputValue)
         dispatchEvent(tokenRes)
     }

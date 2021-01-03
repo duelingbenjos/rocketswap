@@ -14,7 +14,14 @@ body {
   font-family: 'Open Sans';
   overflow: hidden;
 
+  --primary-color: #5b49dc;
+
   --text-primary: #fff;
+
+  --text-size-xsmall: 0.8em; 
+  --text-size-small: 0.9em;
+  --text-size-large: 1.5em;
+  --text-size-massive: 4em; 
 
   --button-secondary: #3131d98f;
 
@@ -113,12 +120,19 @@ button {
   outline: none;
 }
 
+
+button:hover {
+  filter: brightness(110%)
+}
+
 button:disabled {
   color: #999;
 }
 
 button:not(:disabled):active {
-  filter: brightness(130%);
+  position:relative;
+  filter: brightness(120%);
+  top: 1px;
 }
 
 button:focus {
@@ -135,14 +149,6 @@ button.secondary{
   position: relative;
 }
 
-button.secondary:hover{
-  filter: brightness(120%)
-}
-
-button.secondary:active{
-  top: 1px;
-}
-
 button.outline{
   border-radius: 99px;
   border-width: 2px;
@@ -156,9 +162,6 @@ button.outline{
 button.outline:hover{
   background: #ffffff20;
   filter: brightness(110%);
-}
-button.outline:active {
-  top: 1px;
 }
 
 .outline.info{
@@ -177,9 +180,9 @@ button.outline:active {
   outline: inherit;
 }
 
-button.max-button {
+button.primary {
   border: 0px;
-  background-color: #3131d98f;
+  background-color: var(--primary-color);
   border-radius: 18px;
 
   margin: 2px 8px 0;
