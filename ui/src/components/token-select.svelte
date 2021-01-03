@@ -6,10 +6,12 @@
   import { pool_panel_store, show_token_select_store, swap_panel_store, token_list_store, wallet_store } from '../store'
   import { isWalletConnected } from '../services/wallet.service'
   import { ApiService } from '../services/api.service'
+  import BigNumber from 'bignumber.js'
+  import { stripTrailingZero } from '../utils'
 
-  export let content = "all_tokens_with_market";
+  export let content = 'all_tokens_with_market'
 
-  const apiService = ApiService.getInstance();
+  const apiService = ApiService.getInstance()
 
   let token_list_unsub
   let wallet_unsub
@@ -20,20 +22,22 @@
   let context
   let context_store
 
+  // $: wallet
+
   onMount(() => {
     createSubscriptions()
     context = $show_token_select_store.context
     if (context === 'swap') context_store = swap_panel_store
     else if (context === 'pool') context_store = pool_panel_store
     context_panel_unsub = context_store.subscribe((update) => (selected_contract = update.slot_b.selected_token?.contract_name))
-    if (content === "all_tokens_with_market") apiService.getMarketList()
-    if (content === "all_tokens") apiService.getTokenList()
-    if (content === "all_tokens_no_market") apiService.getTokenList(["no-market"])
+    if (content === 'all_tokens_with_market') apiService.getMarketList()
+    if (content === 'all_tokens') apiService.getTokenList()
+    if (content === 'all_tokens_no_market') apiService.getTokenList(['no-market'])
   })
 
   onDestroy(() => {
     token_list_unsub()
-    wallet_unsub()
+    // wallet_unsub()
     context_panel_unsub()
   })
 
@@ -44,7 +48,7 @@
   async function selectToken(token: TokenListType) {
     const panel = $context_store
     panel.slot_b.selected_token = token
-    panel.slot_b.selected_token.info = await apiService.getPairs(token.contract_name).then(res => res[token.contract_name])
+    panel.slot_b.selected_token.info = await apiService.getPairs(token.contract_name).then((res) => res[token.contract_name])
     console.log(panel.slot_b.selected_token)
     context_store.set(panel)
     setTimeout(() => {
@@ -53,21 +57,22 @@
   }
 
   function createSubscriptions() {
-    wallet_unsub = wallet_store.subscribe((update) => {
-      wallet = update
-    })
+    // wallet_unsub = wallet_store.subscribe((update) => {
+    //   wallet = update
+    //   console.log(wallet)
+    // })
     token_list_unsub = token_list_store.subscribe((update) => {
       console.log(update)
-      if (wallet && isWalletConnected(wallet)) {
+      if (isWalletConnected($wallet_store)) {
         const list_with_balances = update
           .map((token) => {
-            token.balance = (wallet as WalletConnectedType).tokens.balances[token.contract_name] || 0
+            token.balance = ($wallet_store as WalletConnectedType).tokens?.balances[token.contract_name] || new BigNumber(0)
             return token
           })
           .sort((a, b) => {
             return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
           })
-          .sort((a, b) => b.balance - a.balance)
+          .sort((a, b) => b.balance.minus(a.balance).toNumber())
         token_list = [
           // { token_name: 'TAU', id: 'TAU', token_symbol: 'TAU', contract_name: 'currency', base_supply: 288090567 },
           ...list_with_balances
@@ -96,7 +101,7 @@
           <button on:click={() => selectToken(token)} class="nostyle button-item">
             <div class="token-container">
               <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
-              <span class="token-amount number"> {token.balance || 0} </span>
+              <span class="token-amount number"> {stripTrailingZero(token.balance.toFixed(8)) || 0} </span>
             </div>
           </button>
         </div>

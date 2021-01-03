@@ -1,7 +1,9 @@
 import socket from 'socket.io-client'
-import { token_metrics_store } from '../store'
+import { token_metrics_store, wallet_store } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
-import { getBaseUrl } from '../utils'
+import type { WalletConnectedType } from '../types/wallet.types'
+import { getBaseUrl, valuesToBigNumber } from '../utils'
+import { isWalletConnected } from './wallet.service'
 
 /** Singleton socket.io service */
 export class WsService {
@@ -21,10 +23,8 @@ export class WsService {
   constructor() {
     console.log('WS Service STARTED')
     this.base_url = getBaseUrl(document.location.href)
-    this.port = 3001
-    // console.log(socket)
+    this.port = 3002
     this.connection = socket(`${this.base_url}:${this.port}`)
-    // console.log(this.connection)
     this.setupEvents()
     this.setupSubs()
   }
@@ -48,6 +48,26 @@ export class WsService {
     })
   }
 
+  public joinBalanceFeed(vk: string) {
+    this.connection.emit('join_room', `balance_feed:${vk}`)
+    this.connection.on(`balance_list:${vk}`, this.handleBalanceList)
+    this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
+  }
+
+  private handleBalanceList(payload) {
+    console.log(payload)
+    wallet_store.update((state) => {
+      if (isWalletConnected(state)) {
+      state.tokens = valuesToBigNumber(payload)
+      }
+      return state
+    })
+  }
+
+  private handleBalanceUpdate(payload) {
+    console.log("balance update received", payload)
+  }
+
   public joinPriceFeed(contract_name: string) {
     // console.log(Date.now(), 'joined room')
     this.connection.emit('join_room', `price_feed:${contract_name}`)
@@ -65,7 +85,11 @@ export class WsService {
     const metrics = this.token_metrics
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     console.log(metrics)
-    token_metrics_store.set(metrics)
+    token_metrics_store.set(valuesToBigNumber(metrics))
     // console.log('token_metrics', metrics)
+  }
+
+  private handlePriceFeedUpdate(update) {
+    console.log(update)
   }
 }

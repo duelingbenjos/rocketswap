@@ -3,6 +3,7 @@
   export let selected_token: TokenListType
   export let token_metrics: TokenMetricsType
 
+  import BigNumber from 'bignumber.js'
   import { onDestroy, onMount } from 'svelte'
   import { config } from '../config'
   import { WsService } from '../services/ws.service'
@@ -18,7 +19,7 @@
     <div class="label">Last Price :</div>
     <div class="quote-container">
       <div class="quote-text label">
-        {stripTrailingZero((1 / token_metrics[selected_token?.contract_name].price).toFixed(8))}
+        {stripTrailingZero(new BigNumber(1).dividedBy(token_metrics[selected_token?.contract_name].price).toFixed(8))}
         <b>{symbol} / {config.currencySymbol}</b>
         {#if showSwitch}
           <div><button> <img src="assets/images/switch.svg" alt="" /> </button></div>

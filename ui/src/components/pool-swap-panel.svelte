@@ -22,7 +22,7 @@
 	const dispatch = createEventDispatcher();
 	const { determineValues } = getContext('pageContext')
 
-	let state = { };
+	let state: any = { };
 
 	let slots = [
 		{

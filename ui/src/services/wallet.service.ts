@@ -13,10 +13,9 @@ export class WalletService {
   private static _instance: WalletService
   private wallet_state: WalletType
   private lwc: WalletController
-  private apiService = ApiService.getInstance()
   private toastService = ToastService.getInstance()
-  // private wsService = WsService.getInstance()
-  // private _ws_joined: boolean = false
+  private wsService = WsService.getInstance()
+  private _ws_joined: boolean = false
 
   public static getInstance() {
     if (!WalletService._instance) {
@@ -28,8 +27,7 @@ export class WalletService {
   constructor() {
     this.lwc = new WalletController(config)
     wallet_store.subscribe((update) => {
-      // console.log(update)
-      this.wallet_state = update
+      this.wallet_state = { ...this.wallet_state, ...update }
     })
 
     // events
@@ -37,12 +35,10 @@ export class WalletService {
     this.lwc.events.on('txStatus', handleTxResults)
     setTimeout(() => {
       this.lwc.walletIsInstalled().then((installed) => {
-        // console.log(installed)
         if (!installed) {
           console.info('wallet not installed')
           this.setNotInstalledError()
         }
-        // this.lwc.sendConnection(config)
       }, 1000)
     })
 
@@ -72,16 +68,16 @@ export class WalletService {
       wallet_info = wallet_update
       if (wallet_info.wallets[0]) {
         const vk = wallet_info.wallets[0]
-        const balances = await this.getBalances(vk)
-        console.log(balances)
-        wallet_info.balance = balances[1]
-        wallet_info.tokens = balances[0]
-        // join the user lp feed.
-        // if (!this._ws_joined) {
-        //   this.wsService.joinUserLpFeed(vk)
-        //   this._ws_joined = true
-        // }
+
+        wallet_info.balance = await refreshTAUBalance(vk)
+
+        // Join Websocket Feeds
+        if (!this._ws_joined) {
+          this.wsService.joinBalanceFeed(vk)
+          this._ws_joined = true
+        }
       }
+      delete (this.wallet_state as WalletInitType).init
     } else {
       wallet_info = wallet_update
     }
@@ -91,22 +87,18 @@ export class WalletService {
   private async updateBalances(vk?: string) {
     if (isWalletConnected(this.wallet_state)) {
       let prev = JSON.stringify(this.wallet_state)
-      const res = await this.getBalances(vk)
-      this.wallet_state.tokens = res[0]
-      this.wallet_state.balance = res[1]
+      // this.wallet_state.tokens = res[0]
+      this.wallet_state.balance = await refreshTAUBalance(vk)
 
       // only update the store if state changed
-      if (prev !== JSON.stringify(this.wallet_state)) wallet_store.set(this.wallet_state)
-      
+      // if (prev !== JSON.stringify(this.wallet_state))
+      wallet_store.update((state) => {
+        return { ...state, ...this.wallet_state }
+      })
+
       //const lpRes = await this.apiService.getUserLpBalance(vk)
       //if (lpRes) this.wallet_state.lp_balances = lpRes
-      
     }
-  }
-
-  private async getBalances(vk: string) {
-    const proms = [this.apiService.getTokenBalances(vk), refreshTAUBalance(vk)]
-    return await Promise.all(proms)
   }
 
   private createTxInfo(method: string, args, contractName = undefined) {
@@ -217,57 +209,55 @@ export class WalletService {
     const callApprove = (contract, amount) => {
       return new Promise((resolve) => {
         this.approveBN(contract, amount, (res, err) => {
-          console.log({contract, amount, res, err})
+          console.log({ contract, amount, res, err })
           if (err || !res) resolve(false)
           if (res === true) resolve(true)
           else {
             if (res?.data?.txBlockResult?.status === 0) resolve(true)
             else resolve(false)
           }
-      })})
-    } 
+        })
+      })
+    }
 
-    let results = await Promise.all([
-      callApprove(args.contract, tokenAmount),
-      callApprove('currency', currencyAmount)
-    ])
+    let results = await Promise.all([callApprove(args.contract, tokenAmount), callApprove('currency', currencyAmount)])
 
     console.log(results)
 
-    if (results.every(v => v === true)){
-        this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken))
+    if (results.every((v) => v === true)) {
+      this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken))
     }
   }
 
   private handleAddLiquidity = (res, selectedToken) => {
-    console.log({res, selectedToken})
+    console.log({ res, selectedToken })
     let status = this.txResult(res.data)
     if (status === 'success') {
-      let lpPoints = "0";
-      res.data.txBlockResult.state.forEach(stateChange => {
-        if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${this.wallet_state.wallets[0]}`){
+      let lpPoints = '0'
+      res.data.txBlockResult.state.forEach((stateChange) => {
+        if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${(this.wallet_state as WalletConnectedType).wallets[0]}`) {
           lpPoints = stateChange.value.__fixed__ || stateChange.value
         }
       })
       lpPoints = toBigNumber(lpPoints)
-      this.toastService.addToast({ 
+      this.toastService.addToast({
         heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
-        text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
+        text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
         type: 'info',
         duration: 10000
       })
     }
   }
 
-  private handleTxErrors(errors){
-    errors.forEach(error => {
+  private handleTxErrors(errors) {
+    errors.forEach((error) => {
       let toastType = 'info'
-      if (error.includes("AssertionError")) {
+      if (error.includes('AssertionError')) {
         error = error.split("'")[1]
-        toastType = "error"
+        toastType = 'error'
       }
-      this.toastService.addToast({ 
-        heading: 'Transaction Error.', 
+      this.toastService.addToast({
+        heading: 'Transaction Error.',
         type: toastType === 'info' ? 'info' : 'error',
         text: error
       })
@@ -289,21 +279,21 @@ export class WalletService {
   }
 
   public async approveBN(contractName, approveAmount, callback = undefined) {
-    let vk = this.wallet_state.wallets[0]
+    let vk = (this.wallet_state as WalletConnectedType).wallets[0]
     let currentApproval = await this.getApprovedAmount(vk, contractName)
     if (typeof currentApproval?.__fixed__ !== 'undefined') currentApproval = toBigNumber(currentApproval.__fixed__)
     else currentApproval = toBigNumber(currentApproval)
-    if (currentApproval.isNaN()) currentApproval = toBigNumber("0")
+    if (currentApproval.isNaN()) currentApproval = toBigNumber('0')
 
     let adjustedApprovalAmount = approveAmount.minus(currentApproval)
-    console.log({adjustedApprovalAmount: adjustedApprovalAmount.toString(), currentApproval: currentApproval.toString()})
-    if (adjustedApprovalAmount.isGreaterThan(toBigNumber("0"))){
+    console.log({ adjustedApprovalAmount: adjustedApprovalAmount.toString(), currentApproval: currentApproval.toString() })
+    if (adjustedApprovalAmount.isGreaterThan(toBigNumber('0'))) {
       let args = {
-        amount: {'__fixed__': adjustedApprovalAmount.toString()},
+        amount: { __fixed__: adjustedApprovalAmount.toString() },
         to: config.contractName
       }
       this.lwc.sendTransaction(this.createTxInfo('approve', args, contractName), callback)
-    }else{
+    } else {
       callback(true)
     }
   }

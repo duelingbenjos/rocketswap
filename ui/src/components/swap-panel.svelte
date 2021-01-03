@@ -6,7 +6,7 @@
   import type { MetricsUpdateType, SwapPanelType, TokenListType, TokenMetricsType } from '../types/api.types'
   import { WsService } from '../services/ws.service'
   import { onDestroy } from 'svelte'
-  import { fly } from 'svelte/transition'
+  import { scale } from 'svelte/transition'
 
   let ws = WsService.getInstance()
 
@@ -114,7 +114,7 @@
     <SwapButtons />
   </div>
   {#if trade_details}
-    <div class="slippage-display-container" in:fly={{ y: -30, duration: 300, delay: 400 }}>
+    <div class="slippage-display-container" in:scale={{ duration: 100, delay: 300 }}>
       <div>token: {trade_details.token_symbol}</div>
       <div>currency slippage: {trade_details.currency_slippage}</div>
       <div>token_slippage: {trade_details.token_slippage}</div>

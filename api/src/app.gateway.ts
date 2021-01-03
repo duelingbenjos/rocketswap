@@ -10,11 +10,13 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import blockgrabber from "./blockgrabber";
+import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics, PriceEntity } from "./entities/price.entity";
 import { ParserProvider } from "./parser.provider";
 import {
 	ClientUpdateType,
+	isBalanceUpdate,
 	isMetricsUpdate,
 	isPriceUpdate,
 	MetricsUpdateType,
@@ -60,6 +62,12 @@ export class AppGateway
 					contract_name = update.contract_name;
 				this.wss.emit(`price_feed:${contract_name}`, update);
 				this.logger.log("price update sent");
+				break;
+			case "balance_update":
+				if (isBalanceUpdate(update)) {
+					this.wss.emit(`balance_update:${update.vk}`, update);
+					this.logger.log(`balance update sent to : ${update.vk}`);
+				}
 		}
 	};
 
@@ -84,10 +92,24 @@ export class AppGateway
 			case "user_lp_feed":
 				this.handleJoinUserLpFeed(subject, client);
 				break;
+			case "balance_feed":
+				this.handleJoinBalanceFeed(subject, client);
+				break;
 		}
-		let contract_name = room.split(":")[1];
-		//console.log(room);
-		if (contract_name) {
+	}
+
+	private async handleJoinBalanceFeed(vk: string, client: Socket) {
+		console.log(`${vk} joined balance feed`);
+		try {
+			let balances: any = await BalanceEntity.findOne(vk);
+			if (!balances)
+				balances = {
+					vk: vk,
+					balances: {}
+				};
+			client.emit(`balance_list:${vk}`, balances);
+		} catch (err) {
+			console.error(err);
 		}
 	}
 

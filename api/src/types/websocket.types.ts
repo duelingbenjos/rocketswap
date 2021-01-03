@@ -8,7 +8,10 @@ export interface IBlockParser {
 	handleClientUpdate: handleClientUpdate;
 }
 
-export type ClientUpdateType = PriceUpdateType | MetricsUpdateType;
+export type ClientUpdateType =
+	| PriceUpdateType
+	| MetricsUpdateType
+	| BalanceUpdateType;
 
 export interface PriceUpdateType extends UpdateType {
 	action: "price_update";
@@ -18,8 +21,8 @@ export interface PriceUpdateType extends UpdateType {
 }
 
 export interface UserLpUpdateType extends UpdateType {
-	action: "user_lp_update",
-	points : {[key:string]: string}
+	action: "user_lp_update";
+	points: { [key: string]: string };
 }
 
 export interface MetricsUpdateType extends UpdateType {
@@ -31,12 +34,29 @@ export interface MetricsUpdateType extends UpdateType {
 	lp: string;
 }
 
-export type UpdateType = { action: "metrics_update" | "price_update" | 'user_lp_update' };
+export interface BalanceUpdateType extends UpdateType {
+	action: "balance_update";
+	vk: string
+}
+
+export type UpdateType = {
+	action:
+		| "metrics_update"
+		| "price_update"
+		| "user_lp_update"
+		| "balance_update";
+};
 
 export function isMetricsUpdate(
 	client_update: ClientUpdateType
 ): client_update is MetricsUpdateType {
 	return (client_update as MetricsUpdateType).action === "metrics_update";
+}
+
+export function isBalanceUpdate(
+	client_update: ClientUpdateType
+): client_update is BalanceUpdateType {
+	return (client_update as BalanceUpdateType).action === "balance_update";
 }
 
 export function isPriceUpdate(

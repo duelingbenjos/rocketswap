@@ -101,6 +101,8 @@ export const stripTrailingZero = (value: string): string => {
     return numParts[0] + '.' + formatted
   }
   const isDecmailString = (v) => {
+    if (typeof v !== 'string') return false
+    // console.log(typeof v)
     if (v.includes('.')) return true
     return false
   }
@@ -137,11 +139,10 @@ export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value
 export function valuesToBigNumber(obj: any) {
   if (typeof obj === 'object') {
     for (let property in obj) {
-      console.log(property)
-      // Check if item is a string
-      if (property === 'time') {
-		  // ignore this value
+      if (property === 'time' || property === 'vk') {
+        // ignore this value
       } else if (typeof obj[property] === 'string') {
+        // Check if item is a string
         if (!isNaN(parseFloat(obj[property]))) obj[property] = new BigNumber(obj[property])
       } else if (typeof obj[property] === 'number') {
         obj[property] = new BigNumber(obj[property])
