@@ -2697,8 +2697,8 @@
         "affectsGlobalScope": false
       },
       "../src/types/websocket.types.ts": {
-        "version": "c2e1f0280bd879e7185fedd5a2324cf712e47443b89144db9bd4b7d4d1114979",
-        "signature": "2dd635bf218f6bcdebd56b904e1c6d40f700fa55d37cf5c832e0eaa19f7131c7",
+        "version": "8a4cc95ff633a8f706da3a7d4d9b54e213ba6cff8aedcb30ba19bb42cc8e5120",
+        "signature": "92c82c5bb8ab39c2b25082ca0333817b72373ee1ac120f1c520e4592c1d339e2",
         "affectsGlobalScope": false
       },
       "../src/entities/token.entity.ts": {
@@ -2862,8 +2862,8 @@
         "affectsGlobalScope": false
       },
       "../src/app.gateway.ts": {
-        "version": "37c06e77ad8badab1edd780606eea1265a9245042a42717c4081106e9c11aae1",
-        "signature": "7f944442409aab2d57c8a333ee839ed3926503aacdd4ba9bd126ebc758fecf5e",
+        "version": "6846d1d125f62afc74364fd16feaeac87f92b643e63faab54cc369ecb44eee8a",
+        "signature": "ef836fa7b32e60e00329a282bb48889121ee0a0ba66bee86c0a8c96f53410f5a",
         "affectsGlobalScope": false
       },
       "../node_modules/@nestjs/typeorm/dist/interfaces/entity-class-or-schema.type.d.ts": {
@@ -5846,6 +5846,7 @@
         "../node_modules/@nestjs/websockets/index.d.ts",
         "../node_modules/@types/socket.io/index.d.ts",
         "../src/blockgrabber.ts",
+        "../src/entities/balance.entity.ts",
         "../src/entities/lp-points.entity.ts",
         "../src/entities/price.entity.ts",
         "../src/parser.provider.ts",

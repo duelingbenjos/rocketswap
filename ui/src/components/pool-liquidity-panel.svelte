@@ -12,17 +12,18 @@
 	import IconPlusSign from '../icons/plus-sign.svelte'
 
 	//Misc
-	import { quoteCalculator } from '../utils'
+	import { quoteCalculator, toBigNumber } from '../utils'
 
 	//Props
 	export let pageState;
+	export const resetInputAmounts = resetAmounts;
 
 	$: quoteCalc = quoteCalculator(pageState?.tokenLP);
 
 	const dispatch = createEventDispatcher();
 	const { determineValues,  } = getContext('pageContext')
 
-	let state: any = { };
+	let state = { };
 
 	let slots = [
 		{
@@ -64,9 +65,8 @@
 		slots = slots.reverse()
 	}
 
-	const resetAmounts = () => {
-		state.tokenAmount = quoteCalc.toBigNumber("0.0")
-		state.currencyAmount = quoteCalc.toBigNumber("0.0")
+	function resetAmounts() {
+		state = Object.assign({selectedToken: state.selectedToken})
 	}
 
 	const dispatchEvent = () => dispatch('infoUpdate', state)

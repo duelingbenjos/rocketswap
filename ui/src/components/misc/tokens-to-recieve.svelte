@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { config } from '../../config'
+    import { getContext } from 'svelte'
 
     //Icons
     import LamdenLogo from '../../icons/lamden-logo.svelte'
@@ -7,12 +7,13 @@
 
     //Misc
     import { stringToFixed, quoteCalculator, toBigNumber } from '../../utils' 
+    import { config } from '../../config'
 
-    export let lpTokenAmount;
+    //Props
     export let selectedToken;
-    export let tokenLP;
 
-    $: amounts = quoteCalculator(tokenLP)?.calcAmountsFromLpTokens(lpTokenAmount);
+    const { pageStats } = getContext('pageContext');
+
     $: tokenSymbol = selectedToken?.token_symbol || "-";
     $: logo_svg_base64 = selectedToken?.logo_svg_base64;
 </script>
@@ -36,6 +37,7 @@
     }
     .amount{
         flex-grow: 1;
+        margin: 0.25rem 0;
         font-size: var(--text-size-large);
     }
     .symbol{
@@ -46,14 +48,14 @@
 
 <div class="container flex-col">
     <div class="flex-row">
-        <p class="amount">{amounts ? stringToFixed(amounts?.token.toString(), 8) : "-"}</p>
+        <p class="amount">{$pageStats?.amounts ? stringToFixed($pageStats.amounts.token.toString(), 8) : "-"}</p>
         <div class="flex-row">
             <p class="symbol">{tokenSymbol}</p>
             <Base64Logo string={logo_svg_base64} width={'27px'} height={'27px'} margin={"0 10px"}/>
         </div>
     </div>
     <div class="flex-row">
-        <p class="amount">{amounts ? stringToFixed(amounts?.currency.toString(), 8) : "-"}</p>
+        <p class="amount">{$pageStats?.amounts ? stringToFixed($pageStats.amounts.currency.toString(), 8) : "-"}</p>
         <div class="flex-row">
             <p class="symbol">{config.currencySymbol}</p>
             <LamdenLogo width={'27px'} height={'27px'} margin={"0 10px"}/>

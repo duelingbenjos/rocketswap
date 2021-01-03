@@ -20,8 +20,6 @@
 	$: walletBalance = !$wallet_store.init ? $wallet_store.balance : toBigNumber("0.0");
 	$: inputValue = currencyAmount;
 
-	afterUpdate(() => {currencyAmount, walletBalance, inputValue})
-
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
 		if (validateValue !== e.target.value) {

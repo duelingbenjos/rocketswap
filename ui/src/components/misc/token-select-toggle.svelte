@@ -33,7 +33,6 @@
 
     const openTokenSelect = async () => {
         open = true;
-        //api_tokens = await walletService.apiService.getTokenList(tokenSelectContext)
         api_tokens = await getTokenList()
     }
     const closeTokenSelect = () => open = false;
@@ -86,48 +85,11 @@
         border: none;
         border-radius: 10px;
         
-        font-size: var(--text-size-xsmall);
+        font-size: var(--text-size-small);
         font-weight: 600;
 
         width: max-content;
         padding: 7px 10px;
-    }
-
-    .token-select {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        margin: auto;
-
-        z-index: 100;
-
-        display: flex;
-        flex-direction: column;
-
-        box-sizing: border-box;
- 
-        color: #d9d9d9;
-        background-color: #312a43;
-
-        font-size: 1.2em;
-        font-weight: 200;
-        overflow-x: hidden;
-
-        min-height: 600px;
-        height: 70%;
-        width: 480px;
-
-        margin: 0 auto;
-        padding: 30px;
-
-        border-radius: 30px;
-        
-        box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-        -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-        -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-
     }
 
     .select-wrapper {
@@ -181,7 +143,7 @@
     }
 
     .token-scroll {
-        height: 100%;
+        flex-grow: 1;
         overflow-y: scroll;
         -ms-overflow-style: none; /* IE and Edge */
         scrollbar-width: none; /* Firefox */
@@ -218,6 +180,12 @@
     img{
         margin: 0 5px;
     }
+    .modal-style{
+        width: 400px;
+        min-height: 600px;
+        height: 70%;
+    }
+
 </style>
 {#if !selectedToken}
     <button on:click={openTokenSelect} class="open-button flex-row" >
@@ -232,11 +200,12 @@
 {/if}
 
 {#if open}
-    <div class="token-select" 
-         in:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
-         out:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
+<div class="modal">
+    <div class="modal-style flex-col"
+        in:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
+        out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
         <div class="heading">
-            <span> Select a token </span> 
+            <span class="text-large"> Select a token </span> 
             <button class="nostyle" on:click={closeTokenSelect}> 
                 <img src="assets/images/cancel.svg" alt="" />
             </button>
@@ -250,18 +219,10 @@
                     {#if token_list.length > 0}
                         {#each token_list as token}
                             <div class="select-wrapper flex-row">
-
                                 <button on:click={() => selectToken(token)} class="nostyle button-item">
                                     <div class="token-container">
                                         <div class="token-name-logo flex-row">
                                             <Base64Svg string={token.logo_svg_base64} width={'27px'} height={'27px'} />
-                                            <!--
-                                            {#if token.logo_svg_base64}
-                                                
-                                            {:else}
-                                                <div class="token-plug"></div>
-                                            {/if}
-                                            -->
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
                                             {#if token.contract_name === selected_contract}
                                                 <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />
@@ -281,4 +242,5 @@
             </div>
         </div>
     </div>
+</div>
 {/if}

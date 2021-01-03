@@ -1,9 +1,9 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte'
 
-    //Services
-    import { WalletService } from '../../services/wallet.service'
-    const walletService = WalletService.getInstance();
+	//Services
+	import { ApiService } from '../../services/api.service'
+	const apiService = ApiService.getInstance();
 
     const dispatch = createEventDispatcher();
 
@@ -11,13 +11,12 @@
     let timer;
 
     const handleInput = (e) => {
-        if (!walletService) return;
         clearTimeout(timer)
         timer = setTimeout(getToken, 500);
     }
 
     const getToken = async () => {
-        let tokenRes = await walletService.apiService.getToken(inputValue)
+        let tokenRes = await apiService.getToken(inputValue)
         dispatchEvent(tokenRes)
     }
 
@@ -35,7 +34,7 @@
 </style>
 
 <input 
-    placeholder="Token Name"
+    placeholder="Token Name or Contract"
     bind:value={inputValue}
     on:input={handleInput}
 />

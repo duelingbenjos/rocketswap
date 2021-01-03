@@ -13,6 +13,7 @@ exports.AppGateway = void 0;
 const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const blockgrabber_1 = require("./blockgrabber");
+const balance_entity_1 = require("./entities/balance.entity");
 const lp_points_entity_1 = require("./entities/lp-points.entity");
 const price_entity_1 = require("./entities/price.entity");
 const parser_provider_1 = require("./parser.provider");
@@ -40,6 +41,12 @@ let AppGateway = class AppGateway {
                         contract_name = update.contract_name;
                     this.wss.emit(`price_feed:${contract_name}`, update);
                     this.logger.log("price update sent");
+                    break;
+                case "balance_update":
+                    if (websocket_types_1.isBalanceUpdate(update)) {
+                        this.wss.emit(`balance_update:${update.vk}`, update);
+                        this.logger.log(`balance update sent to : ${update.vk}`);
+                    }
             }
         };
         blockgrabber_1.default(this.handleNewBlock);
@@ -63,9 +70,24 @@ let AppGateway = class AppGateway {
             case "user_lp_feed":
                 this.handleJoinUserLpFeed(subject, client);
                 break;
+            case "balance_feed":
+                this.handleJoinBalanceFeed(subject, client);
+                break;
         }
-        let contract_name = room.split(":")[1];
-        if (contract_name) {
+    }
+    async handleJoinBalanceFeed(vk, client) {
+        console.log(`${vk} joined balance feed`);
+        try {
+            let balances = await balance_entity_1.BalanceEntity.findOne(vk);
+            if (!balances)
+                balances = {
+                    vk: vk,
+                    balances: {}
+                };
+            client.emit(`balance_list:${vk}`, balances);
+        }
+        catch (err) {
+            console.error(err);
         }
     }
     async handleJoinUserLpFeed(vk, client) {

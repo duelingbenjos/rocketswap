@@ -4,7 +4,7 @@
     export let string;
     export let width = '24px';
     export let height = '24px';
-    export let margin = '0 5px';
+    export let margin = '0 10px';
     
     $: logo_string = string || genericIcon_base64_svg;
 

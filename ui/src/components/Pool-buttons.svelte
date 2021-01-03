@@ -1,5 +1,12 @@
 
 <script lang="ts">
+  import { getContext } from 'svelte'
+	import { fly } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
+
+  //Components
+  import ConfirmAdd from './confirms/confirm-add.svelte'
+  import ConfirmRemove from './confirms/confirm-remove.svelte'
 
   //Stores
   import { wallet_store } from '../store'
@@ -13,9 +20,16 @@
   export let currencyAmount;
   export let tokenAmount;
   export let selectedToken;
-  export let lpTokenAmount;
 
-  $: disabled = disableButton(currencyAmount, tokenAmount, selectedToken, lpTokenAmount);
+  const { pageStats } = getContext('pageContext');
+
+  let open = false;
+
+  $: disabled = disableButton(currencyAmount, tokenAmount, selectedToken, $pageStats);
+  $: lpTokenAmount = $pageStats?.lpTokenAmount
+
+  const openConfirm = () => open = true;
+  const closeConfirm = () => open = false;
 
   const createMarket = () => {
     if (!currencyAmount || !tokenAmount || !selectedToken) return
@@ -26,28 +40,11 @@
     }, selectedToken, tokenAmount, currencyAmount)
   }
 
-  const addLiquidity = () => {
-    if (!currencyAmount || !tokenAmount || !selectedToken) return
-    walletService.addLiquidity({
-      'contract': selectedToken.contract_name,
-      'currency_amount': {'__fixed__': currencyAmount.toString()}
-    }, selectedToken, tokenAmount, currencyAmount)
-  }
-
-  const removeLiquidity = () => {
-    if (!lpTokenAmount) return
-    walletService.removeLiquidity({
-      'contract': selectedToken.contract_name,
-      'amount': {'__fixed__': lpTokenAmount.toString()}
-    }, selectedToken)
-  }
-
   const disableButton = (info) => {
     if (buttonFunction === "create" || buttonFunction === "add"){
       if (!currencyAmount || !tokenAmount || !selectedToken) return true
     }
     if (buttonFunction === "remove"){
-
       if (!lpTokenAmount) return true
       if (lpTokenAmount.isEqualTo(0)) return true
     }
@@ -85,18 +82,30 @@
     filter: saturate(40%);
     color: rgb(230, 230, 230);
   }
-
 </style>
 
 
 {#if buttonFunction === 'create'}
-  <button class="swap-button" disabled={disabled} on:click={createMarket}> Create Market </button>
+  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Create Market </button>
 {/if}
 
 {#if buttonFunction === 'add'}
-  <button class="swap-button" disabled={disabled} on:click={addLiquidity}> Supply </button>
+  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Supply </button>
 {/if}
 
 {#if buttonFunction === 'remove'}
-  <button class="swap-button" disabled={disabled} on:click={removeLiquidity}> Remove </button>
+  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Remove </button>
+{/if}
+
+{#if open}
+  <div class="modal"
+       in:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
+       out:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
+    {#if buttonFunction === 'add'}
+      <ConfirmAdd {currencyAmount} {tokenAmount} {selectedToken} {closeConfirm}/>
+    {/if}
+    {#if buttonFunction === 'remove'}
+      <ConfirmRemove {selectedToken} {closeConfirm}/>
+    {/if}
+  </div>
 {/if}

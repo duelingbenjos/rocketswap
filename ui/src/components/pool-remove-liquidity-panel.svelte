@@ -5,63 +5,27 @@
 	import { ApiService } from '../services/api.service'
 	const apiService = ApiService.getInstance();
 
-	//Router
-	import { active } from 'svelte-hash-router'
-	  
-	//Stores
-	import { wallet_store } from '../store'
-
 	//Components
 	import InputLpTokens from './misc/input-lp-tokens.svelte'
 	import PoolButtons from './pool-buttons.svelte'
 	import Prices from './misc/prices.svelte'
 	import TokensToReceive from './misc/tokens-to-recieve.svelte'
 
-	//Misc
-	import { quoteCalculator, toBigNumber } from '../utils'
-
 	//Props
 	export let pageState;
 
-	$: quoteCalc = quoteCalculator(pageState?.tokenLP);
-	$: wallet_store_changes = setLpBalances($wallet_store, pageState)
-
 	const dispatch = createEventDispatcher();
 
-	let state = { 
-		lpTokenAmount: toBigNumber("0.0")
-	};
+	let state = { };
 
 	afterUpdate(() => {
 		state.selectedToken = pageState.selectedToken
 	})
 
-	function handleLpTokensChange(e){
-		if (state?.lp_balances && pageState?.selectedToken){
-			const { lp_balances } = state;
-			const { selectedToken } = pageState;
-			let lpTokenPercent = e.detail / 100;
-			let lpBalance = lp_balances[selectedToken.contract_name]
-			state = Object.assign(state, { 
-				lpTokenAmount: lpBalance.multipliedBy(lpTokenPercent),
-				lpBalance
-			})
-			dispatchEvent()
-		}
-		
+	const handleLpTokensChange = (e) => {
+		state = Object.assign(state, {lpTokenPercentInput: e.detail})
+		dispatch('infoUpdate', state)
 	}
-
-	const setLpBalances = async () => {
-        if (!$wallet_store.init && !state.lp_balances){
-            let vk = $wallet_store?.wallets[0];
-            if (vk){
-				let balancesRes = await apiService.getUserLpBalance(vk)
-                if (balancesRes) state = Object.assign(state, {lp_balances: balancesRes.points})
-            }
-        }
-    }
-
-	const dispatchEvent = () => dispatch('infoUpdate', state)
 </script>
 
 <style>
@@ -96,7 +60,6 @@
 	<InputLpTokens 
 		label={'Amount'} 
 		on:input={handleLpTokensChange}
-		{...state}
 	/>
 	<TokensToReceive {...pageState} {...state}/>
 	<Prices {pageState} />

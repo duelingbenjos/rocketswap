@@ -1,15 +1,23 @@
 <script lang="ts">
-    import { onMount } from 'svelte'
+    import { onMount, getContext } from 'svelte'
+
+    //Services
     import { ApiService } from '../services/api.service'
-    import { pool_panel_store, wallet_store } from '../store'
+    const apiService = ApiService.getInstance();
+    
+    //Stores
+    import { wallet_store } from '../store'
+
+    //Misc
     import { config } from '../config'
     import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
 
+    //Props
     export let statList = []
     export let title
     export let pageState
 
-    const apiService = ApiService.getInstance();
+    const { pageStats } = getContext('pageContext');
 
     let lp_balances = []
     let new_lp_share_percent;
@@ -24,6 +32,7 @@
     $: wallet_store_changes = setLpBalances($wallet_store, pageState)
 
     const calcValues = () => {
+        console.log($pageStats)
         if (pageState?.tokenLP){
             const { currencyAmount, tokenAmount, tokenLP } = pageState
 
@@ -64,7 +73,7 @@
         border: 1px solid var(--border-color);
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         padding: 0 20px;
-        font-size: var(--text-size-xsmall);
+        font-size: var(--text-size-small);
     }
     .stats{
         border: 1px solid var(--border-color);
@@ -93,25 +102,25 @@
 <div class="container">
     <div class="header">
         <p>{title}</p>
-        <p>{statList.includes("poolShare") ? `Current: ${lp_share_percent || "0"}%`: ""}</p>
+        <p>{statList.includes("poolShare") ? `Current: ${$pageStats?.currentLpSharePercent || "0"}%`: ""}</p>
     </div>
     <div class="stats">
         {#if tokenSymbol}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p><strong>{currencyRatio || '-'}</strong></p>
+                    <p><strong>{$pageStats ? stringToFixed($pageStats.quoteCalc.prices.currency, 4) : '-'}</strong></p>
                     <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p><strong>{tokenRatio || '-'}</strong></p>
+                    <p><strong>{$pageStats ? stringToFixed($pageStats.quoteCalc.prices.token, 4) : '-'}</strong></p>
                     <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}
 
             {#if statList.includes("poolShare")}
                 <div class="stat">
-                    <p><strong>{new_lp_share_percent || "-"}</strong></p>
+                    <p><strong>{$pageStats?.newLpSharePercent || "-"}</strong></p>
                     <p>New share of Pool</p>
                 </div>
             {/if}

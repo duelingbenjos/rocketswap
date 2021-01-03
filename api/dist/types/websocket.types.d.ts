@@ -4,7 +4,7 @@ export interface IBlockParser {
     block: BlockDTO;
     handleClientUpdate: handleClientUpdate;
 }
-export declare type ClientUpdateType = PriceUpdateType | MetricsUpdateType;
+export declare type ClientUpdateType = PriceUpdateType | MetricsUpdateType | BalanceUpdateType;
 export interface PriceUpdateType extends UpdateType {
     action: "price_update";
     contract_name: string;
@@ -25,8 +25,13 @@ export interface MetricsUpdateType extends UpdateType {
     reserves: [string, string];
     lp: string;
 }
+export interface BalanceUpdateType extends UpdateType {
+    action: "balance_update";
+    vk: string;
+}
 export declare type UpdateType = {
-    action: "metrics_update" | "price_update" | 'user_lp_update';
+    action: "metrics_update" | "price_update" | "user_lp_update" | "balance_update";
 };
 export declare function isMetricsUpdate(client_update: ClientUpdateType): client_update is MetricsUpdateType;
+export declare function isBalanceUpdate(client_update: ClientUpdateType): client_update is BalanceUpdateType;
 export declare function isPriceUpdate(client_update: ClientUpdateType): client_update is PriceUpdateType;

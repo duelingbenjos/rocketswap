@@ -7,9 +7,9 @@
   //Stores
   import { wallet_store } from '../store'
 
-  //Services
-  import { WalletService } from '../services/wallet.service'
-  const walletService = WalletService.getInstance();
+	//Services
+	import { ApiService } from '../services/api.service'
+	const apiService = ApiService.getInstance();
 
   //Components
   import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
@@ -31,7 +31,7 @@
   }
 
   setContext('pageContext', {
-    getTokenList: async () => await walletService.apiService.getTokenList(["no-market"]),
+    getTokenList: async () => await apiService.getTokenList(["no-market"]),
     determineValues: false
   });
 
@@ -40,7 +40,7 @@
   })
 
   const refreshTokenInfo = async (contractName) => {
-    let tokenRes = await walletService.apiService.getToken(contractName)
+    let tokenRes = await apiService.getToken(contractName)
 
     if (tokenRes.lp_info) {
       redirectToAddPool(tokenRes.token.contract_name)

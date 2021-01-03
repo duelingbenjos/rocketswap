@@ -1,7 +1,7 @@
 <style>
     div{
         box-sizing: border-box;
-        background-color: #2b284b;
+        background-color: var(--msg-box-background);
         color: #ebeafc;
         font-size: var(--text-size-small);
         border-radius: 32px;

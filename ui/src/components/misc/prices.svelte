@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { config } from '../../config'
+    import { getContext } from 'svelte'
 
     //Misc
     import { stringToFixed, quoteCalculator } from '../../utils' 
+    import { config } from '../../config'
 
     export let pageState;
     export let label = "Price:"
 
-    console.log(pageState)
+    const { pageStats } = getContext('pageContext');
 
-    $: prices = quoteCalculator(pageState?.tokenLP)?.prices || {currency: "0", token: "0"};
     $: tokenSymbol = pageState?.selectedToken?.token_symbol || "-";
 </script>
 
@@ -26,9 +26,6 @@
     p{
         margin: 0;
     }
-    .label{
-
-    }
     .prices{
         flex-grow: 1;
         align-items: flex-end;
@@ -40,7 +37,7 @@
         <p>{label}</p>
     </div>
     <div class="flex-col prices">
-        <p>{`1 ${tokenSymbol} = ${stringToFixed(prices?.currency, 8)} ${config.currencySymbol}`}</p>
-        <p>{`1 ${config.currencySymbol} = ${stringToFixed(prices?.token, 8)} ${tokenSymbol}`}</p>
+        <p>{`1 ${tokenSymbol} = ${$pageStats?.quoteCalc?.prices ? stringToFixed($pageStats.quoteCalc.prices.currency, 8) : "0.0"} ${config.currencySymbol}`}</p>
+        <p>{`1 ${config.currencySymbol} = ${$pageStats?.quoteCalc?.prices ? stringToFixed($pageStats.quoteCalc.prices.token, 8) : "0.0"} ${tokenSymbol}`}</p>
     </div>
 </div>

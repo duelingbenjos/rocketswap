@@ -172,12 +172,15 @@ export const quoteCalculator = (tokenInfo) => {
 
 	const calcPointsPerCurrency = () => totalLP.dividedBy(currencyReserves)
 
-	const calcNewLpMintAmount = (pointsPerCurrency, currencyAmount) => pointsPerCurrency.multipliedBy(currencyAmount) 
+	const calcNewLpMintAmount = (currencyAmount) => calcPointsPerCurrency().multipliedBy(currencyAmount) 
 
 	const calcNewShare = (lp_balance, currencyAmount) => {
-		let pointsPerCurrency = calcPointsPerCurrency()
-		let newLpMinted = calcNewLpMintAmount(pointsPerCurrency, currencyAmount)
+		let newLpMinted = calcNewLpMintAmount(currencyAmount)
 		return lp_balance.plus(newLpMinted).dividedBy(totalLP.plus(newLpMinted))
+  }
+
+  const calcNewShare_removeTokens = (lpCurrentBalance, lpTokensToRemove) => {
+    return lpCurrentBalance.minus(lpTokensToRemove).dividedBy(totalLP.minus(lpTokensToRemove))
   }
   
   const calcAmountsFromLpTokens = (lpTokenAmount) => {
@@ -201,7 +204,8 @@ export const quoteCalculator = (tokenInfo) => {
 		calcNewShare,
 		calcPointsPerCurrency,
     calcNewLpMintAmount,
-    calcAmountsFromLpTokens
+    calcAmountsFromLpTokens,
+    calcNewShare_removeTokens
 	}
 }
 

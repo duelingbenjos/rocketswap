@@ -1,15 +1,19 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte'
+  import { onMount, setContext } from 'svelte'
+  import { writable } from 'svelte/store'
 
 	//Router
 	import { params } from 'svelte-hash-router'
 
 	//Services
-	import { WalletService } from '../services/wallet.service'
-	const walletService = WalletService.getInstance();
+	import { ApiService } from '../services/api.service'
+	const apiService = ApiService.getInstance();
 
 	//Stores
-	import { wallet_store } from '../store'
+  import { wallet_store } from '../store'
+  
+  //Misc
+  import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
 
 	//Components
 	import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
@@ -17,39 +21,90 @@
 	import PoolButtons from '../components/pool-buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
 
-	let pageState = {};
+  let pageState = {};
+  let pageStats = writable()
+  let resetInputAmounts
 
 	$: contractName = $params.contract
 	$: getTokenBalance = refreshTokenBalance($wallet_store)
 	$: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
-	$: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : `/#/pool-remove`;
+  $: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : `/#/pool-remove`;
+  
 
 	setContext('pageContext', {
-		getTokenList: async () => await walletService.apiService.getMarketList(),
-		determineValues: true
+		getTokenList: async () => await apiService.getMarketList(),
+    determineValues: true,
+    pageStats,
+    resetPage
 	});
 
 	onMount(() => {
 		if (contractName) refreshTokenInfo()
-	})
+  })
+  
+  function resetPage () {
+    resetInputAmounts()
+    setTimeout(refreshTokenInfo, 2000)
+  }
 
 	async function handleInfoUpdate(e) {
 		if (e.detail.selectedToken){
 			let tokenRes = await getTokenInfo(e.detail.selectedToken.contract_name)
 			applyTokenBalance(tokenRes)
 			const { token: selectedToken, lp_info: tokenLP }  = tokenRes
-			pageState = Object.assign(pageState, e.detail, {selectedToken, tokenLP} )
+      pageState = Object.assign(pageState, e.detail, {selectedToken, tokenLP} )
+      updateStatsStore()
 		}else{
 			pageState = Object.assign(pageState, e.detail)
 		}
 		updateWindowHistory()
-	}
+  }
+  
+  const updateStatsStore = async () => {
+    const { currencyAmount, tokenAmount, tokenLP, selectedToken } = pageState
+
+    let lp_balances = await setLpBalances();
+    let lp_balance = lp_balances[selectedToken.contract_name]
+
+    let quoteCalc = quoteCalculator(tokenLP)
+    let lpToMint = quoteCalc.calcNewLpMintAmount(currencyAmount)
+
+    let currentLpSharePercent = "0"
+    let newLpSharePercent = "0%"
+
+    if (lp_balance) {
+      currentLpSharePercent = stringToFixed(quoteCalc.calcLpPercent(lp_balance).multipliedBy(100), 1)
+      newLpSharePercent = stringToFixed(quoteCalc.calcNewShare(lp_balance, currencyAmount).multipliedBy(100), 1) + "%"
+    } else {
+      lp_balance = toBigNumber("0")
+    }
+
+    pageStats.set({
+      quoteCalc,
+      lp_balances,
+      lp_balance,
+      currentLpSharePercent,
+      newLpSharePercent,
+      lpToMint
+    })
+  }
+
+  const setLpBalances = async () => {
+    if ($wallet_store.init) return {}
+      let vk = $wallet_store?.wallets[0];
+      if (vk){
+          let balancesRes = await apiService.getUserLpBalance(vk)
+          if (balancesRes) return balancesRes.points
+          else return {}
+      }
+  }
 
 	const refreshTokenInfo = async () => {
 		let tokenRes = await getTokenInfo(contractName)
 		applyTokenBalance(tokenRes)
 		const { token: selectedToken, lp_info: tokenLP }  = tokenRes
-		pageState = Object.assign(pageState, {selectedToken, tokenLP} )
+    pageState = Object.assign(pageState, {selectedToken, tokenLP} )
+    updateStatsStore();
 	}
 
 	const applyTokenBalance = (tokenRes) => {
@@ -59,7 +114,7 @@
 	}
 
 	const getTokenInfo = async (contractName) => {
-		return walletService.apiService.getToken(contractName)
+		return apiService.getToken(contractName)
 	}
 
   const refreshTokenBalance = () => {
@@ -116,7 +171,7 @@
 </svelte:head>
 
 <div class="page-container">
-  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState}>
+  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} bind:resetInputAmounts>
     <div class="header" slot="header">
       <h2>
         Add Liquidity

@@ -235,10 +235,12 @@ export class WalletService {
     }
   }
 
-  public async addLiquidity(args, selectedToken, tokenAmount, currencyAmount) {
+  public async addLiquidity(args, selectedToken, tokenAmount, currencyAmount, callbacks = undefined) {
+    console.log({args, selectedToken, tokenAmount, currencyAmount})
     const callApprove = (contract, amount) => {
       return new Promise((resolve) => {
         this.approveBN(contract, amount, (res, err) => {
+          console.log({res, err})
           if (err || !res) resolve(false)
           if (res === true) resolve(true)
           else {
@@ -250,14 +252,18 @@ export class WalletService {
     }
 
     let results = await Promise.all([callApprove(args.contract, tokenAmount), callApprove('currency', currencyAmount)])
-
+    console.log(results)
     if (results.every(v => v === true)){
-        this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken))
+        this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken, callbacks))
+    }else{
+      if (callbacks) callbacks.error();
     }
   }
 
-  private handleAddLiquidity = (res, selectedToken) => {
-    let status = this.txResult(res.data)
+  private handleAddLiquidity = (res, selectedToken, callbacks = undefined) => {
+    let status = this.txResult(res.data, callbacks)
+    console.log(status)
+    console.log(res)
     if (status === 'success') {
       let lpPoints = '0'
       res.data.txBlockResult.state.forEach((stateChange) => {
@@ -272,14 +278,15 @@ export class WalletService {
         type: 'info',
         duration: 10000
       })
+      if (callbacks) callbacks.success()
     }
   }
 
-  public async removeLiquidity(args, selectedToken) {
-    this.lwc.sendTransaction(this.createTxInfo('remove_liquidity', args), (res) => this.handleRemoveLiquidity(res, selectedToken))
+  public async removeLiquidity(args, selectedToken, callbacks) {
+    this.lwc.sendTransaction(this.createTxInfo('remove_liquidity', args), (res) => this.handleRemoveLiquidity(res, selectedToken, callbacks))
   }
 
-  private handleRemoveLiquidity = (res, selectedToken) => {
+  private handleRemoveLiquidity = (res, selectedToken, callbacks = undefined) => {
     let status = this.txResult(res.data)
     if (status === 'success') {
       let lpPoints = "0";
@@ -295,10 +302,11 @@ export class WalletService {
         type: 'info',
         duration: 10000
       })
+      if (callbacks) callbacks.success()
     }
   }
 
-  private handleTxErrors(errors){
+  private handleTxErrors(errors, callback = undefined){
     errors.forEach(error => {
       let toastType = 'info'
       if (error.includes('AssertionError')) {
@@ -311,17 +319,18 @@ export class WalletService {
         text: error
       })
     })
+    if (callback) callback.error()
   }
 
-  private txResult(txResults) {
+  private txResult(txResults, callback = undefined) {
     if (txResults.errors) {
-      this.handleTxErrors(txResults.errors)
+      this.handleTxErrors(txResults.errors, callback)
       return txResults.errors
     }
     if (typeof txResults.txBlockResult.status !== 'undefined') {
       if (txResults.txBlockResult.status === 0) return 'success'
       if (txResults.txBlockResult.status === 1) {
-        this.handleTxErrors(txResults.txBlockResult.errors)
+        this.handleTxErrors(txResults.txBlockResult.errors, callback)
         return txResults.txBlockResult.errors
       }
     }
@@ -337,7 +346,7 @@ export class WalletService {
     let adjustedApprovalAmount = approveAmount.minus(currentApproval)
     if (adjustedApprovalAmount.isGreaterThan(toBigNumber("0"))){
       let args = {
-        amount: { __fixed__: adjustedApprovalAmount.toString() },
+        amount: { __fixed__: stringToFixed(adjustedApprovalAmount.toString(), 30) },
         to: config.contractName
       }
       this.lwc.sendTransaction(this.createTxInfo('approve', args, contractName), callback)
