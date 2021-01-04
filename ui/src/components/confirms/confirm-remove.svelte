@@ -78,7 +78,7 @@
                 <Base64SvgLogo string={selectedToken?.logo_svg_base64} width="30px" height="30px" />
             </div>
         </div>
-        <PlusSign width="20px" height="20px" margin="0 40px"/>
+        <PlusSign width="20px" height="20px" margin="0 auto"/>
         <div class="flex-row flex-center-spacebetween amount-row">
             <span>{stringToFixed($pageStats.amounts.currency, 4)}</span>
             <div class="flex-row flex-center-spacebetween">
