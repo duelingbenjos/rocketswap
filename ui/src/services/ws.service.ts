@@ -58,14 +58,21 @@ export class WsService {
     console.log(payload)
     wallet_store.update((state) => {
       if (isWalletConnected(state)) {
-      state.tokens = valuesToBigNumber(payload)
+        state.tokens = valuesToBigNumber(payload)
       }
       return state
     })
   }
 
-  private handleBalanceUpdate(payload) {
-    console.log("balance update received", payload)
+  private handleBalanceUpdate(data) {
+    const { payload } = data
+    console.log('balance update received', payload)
+    wallet_store.update((state) => {
+      if (isWalletConnected(state)) {
+        state.tokens = valuesToBigNumber(payload)
+      }
+      return state
+    })
   }
 
   public joinPriceFeed(contract_name: string) {

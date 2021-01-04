@@ -2,6 +2,7 @@ import { IKvp } from "../types/misc.types";
 import BigNumber from "bignumber.js";
 import { getVal } from "../utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
+import { handleClientUpdate } from "../types/websocket.types";
 
 /** Updated when the token balance from one of the token contracts the API detects has a change. */
 
@@ -41,7 +42,10 @@ export interface IBalance {
 	balances?: UserBalancesType;
 }
 
-export async function saveTransfer(state: IKvp[]) {
+export async function saveTransfer(
+	state: IKvp[],
+	handleClientUpdate: handleClientUpdate
+) {
 	const balances_kvp = state.filter(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "balances"
 	);
@@ -57,11 +61,15 @@ export async function saveTransfer(state: IKvp[]) {
 		const vk = key.split(":")[1];
 		const contract_name = parts[0];
 		//console.log(getVal(kvp))
-		const amount = getVal(kvp)
+		const amount = getVal(kvp);
 		//console.log(contract_name, is_balance, vk);
 		if (is_balance && vk && contract_name) {
 			try {
-				await updateBalance({ vk, contract_name, amount });
+				const res = await updateBalance({ vk, contract_name, amount });
+				handleClientUpdate({
+					action: "balance_update",
+					payload: res
+				});
 			} catch (err) {
 				console.error(err);
 			}

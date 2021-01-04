@@ -53,7 +53,15 @@ export class ParserProvider {
 						token_seed_holder: vk,
 						base_supply: amount
 					} = add_token_dto;
-					await updateBalance({ amount, contract_name, vk });
+					const res = await updateBalance({
+						amount,
+						contract_name,
+						vk
+					});
+					handleClientUpdate({
+						action: "balance_update",
+						payload: res
+					});
 					/*
 					console.log(
 						`Updated user balance for contract : ${contract_name}, amount: ${amount}, vk: ${vk}`
@@ -73,7 +81,7 @@ export class ParserProvider {
 				//console.log(`function : ${fn}`);
 				// console.log(state);
 				// if (fn === "transfer") {
-				await saveTransfer(state);
+				await saveTransfer(state, handleClientUpdate);
 				await updateLogo(state, contract_name);
 				// }
 			} else {
@@ -95,7 +103,7 @@ async function processAmmBlock(
 ) {
 	try {
 		await savePair(state);
-		await saveTransfer(state);
+		await saveTransfer(state, handleClientUpdate);
 		await savePairLp(state);
 		await saveUserLp(state);
 		await saveReserves(state, handleClientUpdate);

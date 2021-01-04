@@ -65,8 +65,8 @@ export class AppGateway
 				break;
 			case "balance_update":
 				if (isBalanceUpdate(update)) {
-					this.wss.emit(`balance_update:${update.vk}`, update);
-					this.logger.log(`balance update sent to : ${update.vk}`);
+					this.wss.emit(`balance_update:${update.payload.vk}`, update);
+					this.logger.log(`balance update sent to : ${update.payload.vk}`);
 				}
 		}
 	};

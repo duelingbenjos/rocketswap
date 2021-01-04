@@ -36,7 +36,7 @@ export interface MetricsUpdateType extends UpdateType {
 
 export interface BalanceUpdateType extends UpdateType {
 	action: "balance_update";
-	vk: string
+	payload: any;
 }
 
 export type UpdateType = {

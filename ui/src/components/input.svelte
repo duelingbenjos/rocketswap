@@ -33,7 +33,9 @@
 
   let wallet_unsub = wallet_store.subscribe((update) => {
     wallet = update as WalletConnectedType
-    if (selected_token && wallet.tokens) {
+    // const bool: boolean = !!selected_token && !!wallet.tokens
+    console.log(!!selected_token && !!wallet.tokens)
+    if (!!selected_token && !!wallet.tokens) {
       balance = new BigNumber(wallet.tokens.balances[selected_token.contract_name])
     }
   })
@@ -48,8 +50,9 @@
   })
 
   function handleInputStoreUpdate(update) {
+    console.log($wallet_store)
     selected_slot = getPosition(update)
-    // balance = selected_slot.selected_token?.balance
+    balance = selected_slot.selected_token?.balance
     role = selected_slot.role
     slot_position = selected_slot.position
     selected_token = selected_slot.selected_token
@@ -123,7 +126,7 @@
     {:else if selected_token}
       <div class="label">
         {selected_token && wallet_balance ? `Balance: ` : ''}<span
-          class="number">{selected_token && selected_token.balance ? `${stripTrailingZero(selected_token.balance.toFixed(8))}` : '0'}</span>
+          class="number">{selected_token && selected_token.balance ? `${stripTrailingZero($wallet_store.tokens.balances[selected_token.contract_name].toFixed(8))}` : '0'}</span>
       </div>
     {/if}
     <div class="token-controls">
