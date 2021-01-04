@@ -5,7 +5,7 @@
     import Button from '../button.svelte';
 
     //Icons
-    import Base64Svg from '../../icons/base64_svg.svelte'
+    import Base64SvgLogo from '../../icons/base64_svg.svelte'
     import LamdenLogo from '../../icons/lamden-logo.svelte'
     import PlusSign from '../../icons/plus-sign.svelte'
 
@@ -75,7 +75,7 @@
             <span>{stringToFixed($pageStats.amounts.token, 4)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span>{selectedToken.token_symbol}</span>
-                <Base64Svg string={selectedToken?.logo_svg_base64} width="30px" height="30px" />
+                <Base64SvgLogo string={selectedToken?.logo_svg_base64} width="30px" height="30px" />
             </div>
         </div>
         <PlusSign width="20px" height="20px" margin="0 40px"/>
@@ -100,7 +100,7 @@
             <p class="text-bold">{`${$pageStats.currentLpSharePercent}% => ${$pageStats.newLpSharePercent}%`}</p>
         </div>
         <div class="modal-confirm-buttons flex-col">
-            <Button style="secondary" loading={loading} callback={removeLiquidity} text="Confirm Remove" />
+            <Button style="secondary" loading={loading} callback={removeLiquidity} text="Confirm Remove Supply" />
         </div>
     </div>
 </div>

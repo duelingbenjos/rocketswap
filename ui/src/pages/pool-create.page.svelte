@@ -1,5 +1,6 @@
 <script lang="ts">
-  import {onMount, setContext } from 'svelte'
+  import {onMount, setContext, beforeUpdate } from 'svelte'
+  import { writable } from 'svelte/store'
 
   //Router
   import { params } from 'svelte-hash-router'
@@ -19,38 +20,71 @@
   //Icons
   import IconBackArrow from '../icons/back-arrow.svelte'
 
+  //Misc
+  import { quoteCalculator } from '../utils'
+
   let pageState = {};
+  let pageStats = writable({})
+  let resetInputAmounts;
 
   $: contractName = $params.contract
   $: getTokenBalance = refreshTokenBalance($wallet_store)
   $: pageTitle = pageState.selectedToken ? `RocketSwap Create ${pageState.selectedToken.token_symbol} Pool` : 'RocketSwap Create Pool';
 
-  const handleInfoUpdate = (e) => {
-    pageState = Object.assign(pageState, e.detail)
-    if (pageState.selectedToken) refreshTokenInfo(pageState.selectedToken.contract_name)
-  }
-
   setContext('pageContext', {
     getTokenList: async () => await apiService.getTokenList(["no-market"]),
-    determineValues: false
+    determineValues: false,
+    pageStats,
+    resetPage
   });
 
   onMount(() => {
     if (contractName) refreshTokenInfo(contractName)
   })
 
+  beforeUpdate(() => {
+    if(typeof $pageStats === 'undefined') pageStats = writable({});
+  })
+
+  function resetPage () {
+    resetInputAmounts()
+    setTimeout(() => refreshTokenInfo(pageState.selectedToken.contract_name), 2000)
+  }
+
+  const handleInfoUpdate = (e) => {
+    pageState = Object.assign(pageState, e.detail)
+    if (pageState.selectedToken) refreshTokenInfo(pageState.selectedToken.contract_name)
+  }
+
   const refreshTokenInfo = async (contractName) => {
-    let tokenRes = await apiService.getToken(contractName)
+    if (contractName){
+      let tokenRes = await apiService.getToken(contractName)
 
-    if (tokenRes.lp_info) {
-      redirectToAddPool(tokenRes.token.contract_name)
-      return
+      if (tokenRes.lp_info) {
+        redirectToAddPool(tokenRes.token.contract_name)
+        return
+      }
+      if ($wallet_store.init) tokenRes.token.balance = 0
+      else tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
+
+      pageState.selectedToken = tokenRes.token
+      pageState.tokenLP = tokenRes.lp_info
+
+      updateStatsStore()
+      updateWindowHistory()
     }
-    if ($wallet_store.init) tokenRes.token.balance = 0
-    else tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
 
-    pageState.selectedToken = tokenRes.token
-    pageState.tokenLP = tokenRes.lp_info
+  }
+
+  const updateStatsStore = async () => {
+    const { currencyAmount, tokenAmount } = pageState
+    let quoteCalc = quoteCalculator({reserves: [currencyAmount, tokenAmount]})
+    let initialLPToMint = quoteCalc.calcInitialLpMintAmount()
+
+    pageStats.set({
+      quoteCalc,
+      initialLPToMint
+    })
   }
 
   const refreshTokenBalance = () => {
@@ -62,7 +96,7 @@
   const updateWindowHistory = () => {
     if (pageState.selectedToken){
       if (!location.pathname.includes(pageState.selectedToken.contract_name))
-        window.history.pushState("", "", `/#/pool-add/${pageState.selectedToken.contract_name}`);
+        window.history.pushState("", "", `/#/pool-create/${pageState.selectedToken.contract_name}`);
     }
   }
 
@@ -92,9 +126,9 @@
 
 
 <div class="page-container">
-  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} >
+  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} bind:resetInputAmounts>
     <div class="header" slot="header">
-      <a href="/#/pool-main">
+      <a href="/#/pool-main/">
         <IconBackArrow />
       </a>
       <h2>Create Liquidity</h2>

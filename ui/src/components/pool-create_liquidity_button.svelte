@@ -19,11 +19,11 @@
     <div class="buttons flex-row">
         <button 
             class="nostyle outline info"
-            on:click={() => location.assign('#/pool-create')}
+            on:click={() => location.assign('#/pool-create/')}
         >Create Liquidity</button>
         <button 
             class="nostyle secondary info"
-            on:click={() => location.assign('#/pool-add')}
+            on:click={() => location.assign('#/pool-add/')}
         >Add Liquidity</button>
     </div>
 </div>

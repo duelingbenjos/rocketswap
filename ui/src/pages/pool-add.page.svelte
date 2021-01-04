@@ -28,7 +28,7 @@
 	$: contractName = $params.contract
 	$: getTokenBalance = refreshTokenBalance($wallet_store)
 	$: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
-  $: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : `/#/pool-remove`;
+  $: removeHref = pageState.selectedToken ? `/#/pool-remove/${pageState.selectedToken.contract_name}` : false;
   
 
 	setContext('pageContext', {
@@ -36,10 +36,11 @@
     determineValues: true,
     pageStats,
     resetPage
-	});
+  });
 
-	onMount(() => {
-		if (contractName) refreshTokenInfo()
+  onMount(() => {
+    console.log('mount')
+    if (contractName) refreshTokenInfo()
   })
   
   function resetPage () {
@@ -177,10 +178,12 @@
         Add Liquidity
       </h2>
       <div class="controls flex-row">
-        <a href="/#/pool-main">
+        <a href="/#/pool-main/">
           <IconBackArrow />
         </a>
-        <a href={removeHref} class="text-link underline" >remove</a>
+        {#if removeHref}
+          <a href={removeHref} class="text-link underline" >remove</a>
+        {/if}
       </div>
     </div>
     

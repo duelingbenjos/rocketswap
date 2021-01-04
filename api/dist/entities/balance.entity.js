@@ -38,7 +38,7 @@ async function updateBalance(balance_dto) {
     return await entity.save();
 }
 exports.updateBalance = updateBalance;
-async function saveTransfer(state) {
+async function saveTransfer(state, handleClientUpdate) {
     const balances_kvp = state.filter((kvp) => kvp.key.split(".")[1].split(":")[0] === "balances");
     const transfers = balances_kvp.filter((kvp) => kvp.key.split(":").length === 2);
     for (let kvp of transfers) {
@@ -50,7 +50,11 @@ async function saveTransfer(state) {
         const amount = utils_1.getVal(kvp);
         if (is_balance && vk && contract_name) {
             try {
-                await updateBalance({ vk, contract_name, amount });
+                const res = await updateBalance({ vk, contract_name, amount });
+                handleClientUpdate({
+                    action: "balance_update",
+                    payload: res
+                });
             }
             catch (err) {
                 console.error(err);

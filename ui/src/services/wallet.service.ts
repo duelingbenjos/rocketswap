@@ -193,7 +193,7 @@ export class WalletService {
     this.toastService.addToast({ heading: 'Approval succeeded !', text: `You have approved ${approve_amount} tokens.`, type: 'info' })
   }
 
-  public async createMarket(args, selectedToken, tokenAmount, currencyAmount) {
+  public async createMarket(args, selectedToken, tokenAmount, currencyAmount, callbacks = undefined) {
     const callApprove = (contract, amount) => {
       return new Promise((resolve) => {
         this.approveBN(contract, amount, (res, err) => {
@@ -212,12 +212,14 @@ export class WalletService {
     ])
 
     if (results.every(v => v === true)){
-      this.lwc.sendTransaction(this.createTxInfo('create_market', args), (res) => this.handleCreateMarket(res, selectedToken))
+      this.lwc.sendTransaction(this.createTxInfo('create_market', args), (res) => this.handleCreateMarket(res, selectedToken, callbacks))
+    }else{
+      if (callbacks) callbacks.error()
     }
   }
 
-  private handleCreateMarket = (res, selectedToken) => {
-    let status = this.txResult(res.data)
+  private handleCreateMarket = (res, selectedToken, callbacks=undefined) => {
+    let status = this.txResult(res.data, callbacks)
     if (status === 'success') {
       let lpPoints = "0";
       res.data.txBlockResult.state.forEach(stateChange => {
@@ -227,16 +229,16 @@ export class WalletService {
       })
       lpPoints = toBigNumber(lpPoints)
       this.toastService.addToast({ 
-        heading: `Created Liquidity for ${selectedToken.token_symbol}!`,
-        text: `You have created liquidity for ${selectedToken.token_name} and were minted ${stringToFixed(lpPoints.toString(), 4)} LP tokens.`, 
+        heading: `Created Supply for ${selectedToken.token_symbol}!`,
+        text: `You have created liquidity for ${selectedToken.token_name} / ${config.currencySymbol}.`, 
         type: 'info',
         duration: 10000
       })
+      callbacks.success()
     }
   }
 
   public async addLiquidity(args, selectedToken, tokenAmount, currencyAmount, callbacks = undefined) {
-    console.log({args, selectedToken, tokenAmount, currencyAmount})
     const callApprove = (contract, amount) => {
       return new Promise((resolve) => {
         this.approveBN(contract, amount, (res, err) => {

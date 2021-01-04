@@ -11,24 +11,27 @@ routes.set({
     $$component: Swap,
     $$name: 'Swap'
   },
-  '/pool-main': {
+  '/pool-main/': {
     $$component: Pools,
     $$name: 'Pool'
   },
-  '/pool-create': {
+  '/pool-create/': {
     $$component: CreatePool,
     $$name: 'Create Pool',
-    '/:contract': CreatePool,
+    ':contract': CreatePool,
   },
-  '/pool-add': {
+  '/pool-add/': {
     $$component: AddPool,
     $$name: 'Create Pool',
-    '/:contract': AddPool,
+    ':contract': AddPool,
   },
-  '/pool-remove': {
+  '/pool-remove/': {
     $$component: RemovePool,
     $$name: 'Create Pool',
-    '/:contract': RemovePool,
+    ':contract': RemovePool,
+  },
+  '*': {
+    $$redirect: '/'
   }
 })
 

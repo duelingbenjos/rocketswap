@@ -1,5 +1,6 @@
 import { IKvp } from "../types/misc.types";
 import { BaseEntity } from "typeorm";
+import { handleClientUpdate } from "../types/websocket.types";
 export declare class BalanceEntity extends BaseEntity implements IBalance {
     vk: string;
     balances: UserBalancesType;
@@ -17,4 +18,4 @@ export interface IBalance {
     vk: string;
     balances?: UserBalancesType;
 }
-export declare function saveTransfer(state: IKvp[]): Promise<void>;
+export declare function saveTransfer(state: IKvp[], handleClientUpdate: handleClientUpdate): Promise<void>;

@@ -35,7 +35,15 @@ let ParserProvider = class ParserProvider {
                     const add_token_dto = token_entity_1.prepareAddToken(state);
                     await token_entity_1.saveToken(add_token_dto);
                     const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto;
-                    await balance_entity_1.updateBalance({ amount, contract_name, vk });
+                    const res = await balance_entity_1.updateBalance({
+                        amount,
+                        contract_name,
+                        vk
+                    });
+                    handleClientUpdate({
+                        action: "balance_update",
+                        payload: res
+                    });
                 }
                 await this.updateTokenList();
                 return;
@@ -45,7 +53,7 @@ let ParserProvider = class ParserProvider {
                 return;
             }
             else if (this.token_contract_list.includes(contract_name)) {
-                await balance_entity_1.saveTransfer(state);
+                await balance_entity_1.saveTransfer(state, handleClientUpdate);
                 await token_entity_2.updateLogo(state, contract_name);
             }
             else {
@@ -63,7 +71,7 @@ exports.ParserProvider = ParserProvider;
 async function processAmmBlock(state, handleClientUpdate) {
     try {
         await pair_entity_1.savePair(state);
-        await balance_entity_1.saveTransfer(state);
+        await balance_entity_1.saveTransfer(state, handleClientUpdate);
         await pair_entity_1.savePairLp(state);
         await lp_points_entity_1.saveUserLp(state);
         await pair_entity_1.saveReserves(state, handleClientUpdate);

@@ -28,12 +28,19 @@
     $: selectedToken = pageState?.selectedToken;
     $: tokenSymbol = selectedToken ? selectedToken.token_symbol : undefined;
     $: tokenContract = selectedToken ? selectedToken.contract_name : undefined;
-    $: calc = calcValues(pageState)
+    $: calc = calcValues(pageState, $pageStats)
+    $: currencyRatio = "-"
+    $: tokenRatio = "-"
     $: wallet_store_changes = setLpBalances($wallet_store, pageState)
 
     const calcValues = () => {
-        console.log($pageStats)
-        if (pageState?.tokenLP){
+        if ($pageStats?.quoteCalc?.prices){
+            const { currency, token } = $pageStats.quoteCalc?.prices;
+            currencyRatio = currency.isNaN() ? "-" : stringToFixed(currency, 4);
+            tokenRatio = token.isNaN() ? "-" : stringToFixed(token, 4);
+        }
+
+        if (pageState?.tokenLP && statList.includes("poolShare")){
             const { currencyAmount, tokenAmount, tokenLP } = pageState
 
             let quoteCalc = quoteCalculator(tokenLP)
@@ -108,12 +115,12 @@
         {#if tokenSymbol}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p><strong>{$pageStats ? stringToFixed($pageStats.quoteCalc.prices.currency, 4) : '-'}</strong></p>
+                    <p><strong>{currencyRatio}</strong></p>
                     <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p><strong>{$pageStats ? stringToFixed($pageStats.quoteCalc.prices.token, 4) : '-'}</strong></p>
+                    <p><strong>{tokenRatio}</strong></p>
                     <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}

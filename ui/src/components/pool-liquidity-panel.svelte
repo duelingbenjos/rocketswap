@@ -25,40 +25,27 @@
 
 	let state = { };
 
-	let slots = [
-		{
-			component: InputCurrency,
-			handleInput: handleCurrencyChange,
-			label: 'Currency'
-		},
-		{
-			component: InputToken,
-			handleInput: handleTokenChange,
-			label: 'Token'
-		},
-	]
-
 	afterUpdate(() => {
 		state.selectedToken = pageState.selectedToken
 	})
 
 	function handleCurrencyChange(e){
-		if (e.detail.toString() === "NaN") resetAmounts()
+		if (e.detail.toString() === "NaN") state.currencyAmount = null
 		else{
 			state.currencyAmount = e.detail
 			if (determineValues && state.selectedToken) state.tokenAmount = quoteCalc.calcTokenValue(state.currencyAmount)
 		}
-		dispatchEvent()
+		dispatchEvent(state)
 	}
 
 	function handleTokenChange(e) {
-		if (e.detail.tokenAmount.toString() === "NaN") resetAmounts()
+		if (e.detail.tokenAmount.toString() === "NaN") state.tokenAmount = null
 		else{
 			state.selectedToken = e.detail.selectedToken
 			state.tokenAmount = e.detail.tokenAmount
 			if (determineValues) state.currencyAmount = quoteCalc.calcCurrencyValue(state.tokenAmount) 
 		}
-		dispatchEvent()
+		dispatchEvent(state)
 	}
 
 	const switchPositions = async () => {
@@ -66,10 +53,11 @@
 	}
 
 	function resetAmounts() {
-		state = Object.assign({selectedToken: state.selectedToken})
+		state = Object.assign({currencyAmount: null, tokenAmount: null})
+		dispatchEvent(state)
 	}
 
-	const dispatchEvent = () => dispatch('infoUpdate', state)
+	const dispatchEvent = (value) => dispatch('infoUpdate', value)
 </script>
 
 <style>
@@ -107,10 +95,9 @@
 
 <div class="panel-container">
 	<slot name="header"></slot>
-	<svelte:component 
-		this={slots[0].component} 
-		label={slots[0].label} 
-		on:input={slots[0].handleInput}
+	<InputCurrency 
+		label={'Base Currency'}
+		on:input={handleCurrencyChange}
 		{...state}
 	/>
 	
@@ -118,10 +105,9 @@
 		<IconPlusSign width={"20"} height={"20"}/>
 	</div>
 
-	<svelte:component 
-		this={slots[1].component} 
-		label={slots[1].label} 
-		on:input={slots[1].handleInput} 
+	<InputToken 
+		label={'Token'}
+		on:input={handleTokenChange} 
 		{...state}
 	/>
 	<slot name="footer"></slot>

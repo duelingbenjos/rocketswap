@@ -14,7 +14,7 @@
     import TokenSearch from './token-select-search.svelte'
 
     //Icons
-    import Base64Svg from '../../icons/base64_svg.svelte'
+    import Base64SvgLogo from '../../icons/base64_svg.svelte'
     
     //Misc
     import { stringToFixed  } from '../../utils'
@@ -222,7 +222,7 @@
                                 <button on:click={() => selectToken(token)} class="nostyle button-item">
                                     <div class="token-container">
                                         <div class="token-name-logo flex-row">
-                                            <Base64Svg string={token.logo_svg_base64} width={'27px'} height={'27px'} />
+                                            <Base64SvgLogo string={token.logo_svg_base64} width={'27px'} height={'27px'} />
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
                                             {#if token.contract_name === selected_contract}
                                                 <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />

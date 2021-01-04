@@ -2441,16 +2441,6 @@
         "signature": "46383b35adb89b63a1fb1dac5bb057e9037f5b729f9f84b4cddff67c6b8c0aa4",
         "affectsGlobalScope": false
       },
-      "../src/entities/balance.entity.ts": {
-        "version": "7a1167aecc8e32aa698e7b8bfee52400e35f4d56bd04c77517651f3ef17fa008",
-        "signature": "d47387c2cc9aedc5aa1cb9cee92afb691638f13a24235ffcd5246680b0f55d69",
-        "affectsGlobalScope": false
-      },
-      "../src/entities/lp-points.entity.ts": {
-        "version": "a609454a80f3f144c4b795a9bb62a612cdf241696aaca08f82cd018e1c1bfbe3",
-        "signature": "41891635e5200d9401095cc169b9c6a8d654ed8efa28f3fcd865bf1da34f3b44",
-        "affectsGlobalScope": false
-      },
       "../node_modules/@types/node/globals.d.ts": {
         "version": "7445e72f48c68a1343819c5d375ef8d2ff486fccd0230bb998cd9ab908fff19c",
         "signature": "7445e72f48c68a1343819c5d375ef8d2ff486fccd0230bb998cd9ab908fff19c",
@@ -2691,16 +2681,6 @@
         "signature": "7d666a6623022683b640930047127f754d79393a29c0f51f3447325f8435809f",
         "affectsGlobalScope": false
       },
-      "../src/entities/price.entity.ts": {
-        "version": "191e8a4db5d6398d0b432e275f2112786b8110dd1f275d68fec958cad025d185",
-        "signature": "331021d3d4a8ae4642da6382be886bee29668b10d7b65aa62071627a51484116",
-        "affectsGlobalScope": false
-      },
-      "../src/types/websocket.types.ts": {
-        "version": "8a4cc95ff633a8f706da3a7d4d9b54e213ba6cff8aedcb30ba19bb42cc8e5120",
-        "signature": "92c82c5bb8ab39c2b25082ca0333817b72373ee1ac120f1c520e4592c1d339e2",
-        "affectsGlobalScope": false
-      },
       "../src/entities/token.entity.ts": {
         "version": "c741375dc531e15c5da737f797f61d1d3c0e7d3ef7224ddcfc8c4df5d19b5c68",
         "signature": "fe59827efc7c755f9055b15d62a6115c364fb110e9cf5d48b65fe8ebc8871464",
@@ -2709,6 +2689,26 @@
       "../src/entities/pair.entity.ts": {
         "version": "bb9f43ff6c5c3d81b842fa2625870aba5076cc3567fa01f5f203c38e2e526bb8",
         "signature": "ef7faea2070af42db0503708bf43e0fb27b07a7af6381e39355eaed6b08f0c4d",
+        "affectsGlobalScope": false
+      },
+      "../src/entities/price.entity.ts": {
+        "version": "191e8a4db5d6398d0b432e275f2112786b8110dd1f275d68fec958cad025d185",
+        "signature": "331021d3d4a8ae4642da6382be886bee29668b10d7b65aa62071627a51484116",
+        "affectsGlobalScope": false
+      },
+      "../src/types/websocket.types.ts": {
+        "version": "d1ed97d2be86a661ac268e3e17e893435a419f88dfa162d3b6ae982856439442",
+        "signature": "9a85c0aa262ae89daebbf2f110c6a6803556299aa5d80bfadeb0aa92017f4a89",
+        "affectsGlobalScope": false
+      },
+      "../src/entities/balance.entity.ts": {
+        "version": "7b91e99cd189f778a65c0375b4aea3f5d1438bb22295964fafde55aaaaf02d2f",
+        "signature": "851d87bbc976be829481ba196a9b94e4ff5cb0deae7a27b661f58687aedbe715",
+        "affectsGlobalScope": false
+      },
+      "../src/entities/lp-points.entity.ts": {
+        "version": "a609454a80f3f144c4b795a9bb62a612cdf241696aaca08f82cd018e1c1bfbe3",
+        "signature": "41891635e5200d9401095cc169b9c6a8d654ed8efa28f3fcd865bf1da34f3b44",
         "affectsGlobalScope": false
       },
       "../src/app.controller.ts": {
@@ -2857,12 +2857,12 @@
         "affectsGlobalScope": false
       },
       "../src/parser.provider.ts": {
-        "version": "727fe8b87b4690f34713b82d0db7e780eeefcfdd2e9c5294d687fd40279f57c8",
+        "version": "37ee3b6a5dc64fd66a467318854e23f435a6c6a7b220ffaf41f99325fa96b275",
         "signature": "717be34c42181e4ac50668b00ff84b4f8f95c7a3c187733dc09065ff4b9dcc00",
         "affectsGlobalScope": false
       },
       "../src/app.gateway.ts": {
-        "version": "6846d1d125f62afc74364fd16feaeac87f92b643e63faab54cc369ecb44eee8a",
+        "version": "7fecf3d475ca00e16d04b3ecf7bcac2e7f01f36a72b3ab84ae556a714b51333b",
         "signature": "ef836fa7b32e60e00329a282bb48889121ee0a0ba66bee86c0a8c96f53410f5a",
         "affectsGlobalScope": false
       },
@@ -5872,6 +5872,7 @@
         "../node_modules/bignumber.js/bignumber.d.ts",
         "../node_modules/typeorm/index.d.ts",
         "../src/types/misc.types.ts",
+        "../src/types/websocket.types.ts",
         "../src/utils.ts"
       ],
       "../src/entities/lp-points.entity.ts": [
@@ -8356,7 +8357,8 @@
       ],
       "../src/entities/balance.entity.ts": [
         "../node_modules/typeorm/index.d.ts",
-        "../src/types/misc.types.ts"
+        "../src/types/misc.types.ts",
+        "../src/types/websocket.types.ts"
       ],
       "../src/entities/lp-points.entity.ts": [
         "../node_modules/typeorm/index.d.ts",

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, setContext } from 'svelte'
+  import { onMount, setContext, beforeUpdate } from 'svelte'
   import { writable } from 'svelte/store'
 
 	//Router
@@ -27,7 +27,7 @@
 	$: contractName = $params.contract
 	$: getTokenBalance = refreshTokenBalance($wallet_store)
 	$: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
-	$: addHref = pageState.selectedToken ? `/#/pool-add/${pageState.selectedToken.contract_name}` : `/#/pool-add`;
+	$: addHref = pageState.selectedToken ? `/#/pool-add/${pageState.selectedToken.contract_name}` : `/#/pool-add/`;
 
 	setContext('pageContext', {
 		getTokenList: async () => await apiService.getMarketList(),
@@ -38,11 +38,19 @@
 
 	onMount(() => {
     if (contractName) refreshTokenInfo()
-	})
+    else {
+      redirectPoolMain()
+    }
+  })
 
 	async function handleInfoUpdate(e) {
 		if (e.detail.selectedToken){
-			let tokenRes = await getTokenInfo(e.detail.selectedToken.contract_name)
+      let tokenRes = await getTokenInfo(e.detail.selectedToken.contract_name)
+      console.log(tokenRes)
+      if (!tokenRes.lp_info) {
+        redirectPoolMain()
+        return
+      }
 			applyTokenBalance(tokenRes)
       const { token: selectedToken, lp_info: tokenLP }  = tokenRes
       const { lpTokenPercentInput } = e.detail;
@@ -93,7 +101,6 @@
       lpTokenAmount,
       amounts
     })
-
   }
 
   const setLpBalances = async () => {
@@ -129,6 +136,8 @@
     let newBal = $wallet_store?.tokens?.balances[pageState.selectedToken.contract_name] || 0;
     if (newBal !== pageState.selectedToken.balance) pageState.selectedToken.balance = newBal
   }
+
+  const redirectPoolMain = (contractName) => window.location.assign(`/#/pool-main/`)
 </script>
 
 <style>
@@ -176,7 +185,7 @@
         Remove Liquidity
       </h2>
       <div class="controls flex-row">
-        <a href="/#/pool-main">
+        <a href="/#/pool-main/">
           <IconBackArrow />
         </a>
         <a href={addHref} class="text-link underline" >add</a>

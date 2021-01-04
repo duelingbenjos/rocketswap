@@ -3,7 +3,7 @@
 
     //Icons
     import LamdenLogo from '../../icons/lamden-logo.svelte'
-    import Base64Logo from '../../icons/base64_svg.svelte'
+    import Base64SvgLogo from '../../icons/base64_svg.svelte'
 
     //Misc
     import { stringToFixed, quoteCalculator, toBigNumber } from '../../utils' 
@@ -16,6 +16,9 @@
 
     $: tokenSymbol = selectedToken?.token_symbol || "-";
     $: logo_svg_base64 = selectedToken?.logo_svg_base64;
+    $: tokensToReceive = $pageStats?.amounts ? $pageStats.amounts.currency : toBigNumber("0");
+    $: currencyToReceive = $pageStats?.amounts ? $pageStats.amounts.token : toBigNumber("0");
+
 </script>
 
 <style>
@@ -48,14 +51,14 @@
 
 <div class="container flex-col">
     <div class="flex-row">
-        <p class="amount">{$pageStats?.amounts ? stringToFixed($pageStats.amounts.token.toString(), 8) : "-"}</p>
+        <p class="amount">{currencyToReceive.isNaN() ? "0" : stringToFixed(currencyToReceive, 8)}</p>
         <div class="flex-row">
             <p class="symbol">{tokenSymbol}</p>
-            <Base64Logo string={logo_svg_base64} width={'27px'} height={'27px'} margin={"0 10px"}/>
+            <Base64SvgLogo string={logo_svg_base64} width={'27px'} height={'27px'} margin={"0 10px"}/>
         </div>
     </div>
     <div class="flex-row">
-        <p class="amount">{$pageStats?.amounts ? stringToFixed($pageStats.amounts.currency.toString(), 8) : "-"}</p>
+        <p class="amount">{tokensToReceive.isNaN() ? "0" : stringToFixed(tokensToReceive, 8)}</p>
         <div class="flex-row">
             <p class="symbol">{config.currencySymbol}</p>
             <LamdenLogo width={'27px'} height={'27px'} margin={"0 10px"}/>

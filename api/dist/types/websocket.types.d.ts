@@ -27,7 +27,7 @@ export interface MetricsUpdateType extends UpdateType {
 }
 export interface BalanceUpdateType extends UpdateType {
     action: "balance_update";
-    vk: string;
+    payload: any;
 }
 export declare type UpdateType = {
     action: "metrics_update" | "price_update" | "user_lp_update" | "balance_update";

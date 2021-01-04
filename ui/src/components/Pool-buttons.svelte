@@ -7,6 +7,7 @@
   //Components
   import ConfirmAdd from './confirms/confirm-add.svelte'
   import ConfirmRemove from './confirms/confirm-remove.svelte'
+  import ConfirmCreate from './confirms/confirm-create.svelte'
 
   //Stores
   import { wallet_store } from '../store'
@@ -26,25 +27,18 @@
   let open = false;
 
   $: disabled = disableButton(currencyAmount, tokenAmount, selectedToken, $pageStats);
-  $: lpTokenAmount = $pageStats?.lpTokenAmount
+
 
   const openConfirm = () => open = true;
   const closeConfirm = () => open = false;
 
-  const createMarket = () => {
-    if (!currencyAmount || !tokenAmount || !selectedToken) return
-    walletService.createMarket({
-      'contract': selectedToken.contract_name,
-      'currency_amount': {'__fixed__': currencyAmount.toString()},
-      'token_amount': {'__fixed__': tokenAmount.toString()}
-    }, selectedToken, tokenAmount, currencyAmount)
-  }
-
-  const disableButton = (info) => {
+  const disableButton = () => {
     if (buttonFunction === "create" || buttonFunction === "add"){
-      if (!currencyAmount || !tokenAmount || !selectedToken) return true
+      if ((!currencyAmount || !tokenAmount || !selectedToken)) return true
+      if (currencyAmount.isEqualTo(0) || tokenAmount.isEqualTo(0)) return true
     }
     if (buttonFunction === "remove"){
+      let lpTokenAmount = $pageStats?.lpTokenAmount;
       if (!lpTokenAmount) return true
       if (lpTokenAmount.isEqualTo(0)) return true
     }
@@ -86,21 +80,24 @@
 
 
 {#if buttonFunction === 'create'}
-  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Create Market </button>
+  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Create Supply </button>
 {/if}
 
 {#if buttonFunction === 'add'}
-  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Supply </button>
+  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Add Supply </button>
 {/if}
 
 {#if buttonFunction === 'remove'}
-  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Remove </button>
+  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Remove Supply </button>
 {/if}
 
 {#if open}
   <div class="modal"
        in:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
        out:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
+    {#if buttonFunction === 'create'}
+      <ConfirmCreate {currencyAmount} {tokenAmount} {selectedToken} {closeConfirm}/>
+    {/if}
     {#if buttonFunction === 'add'}
       <ConfirmAdd {currencyAmount} {tokenAmount} {selectedToken} {closeConfirm}/>
     {/if}
