@@ -8,7 +8,7 @@
 	import InputCurrency from './misc/input-currency.svelte'
 	import InputToken from './misc/input-token.svelte'
 	import Quote from './quote.svelte'
-	import PoolButtons from './pool-buttons.svelte'
+	import PoolButtons from './Pool-buttons.svelte'
 	import IconPlusSign from '../icons/plus-sign.svelte'
 
 	//Misc

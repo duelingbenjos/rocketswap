@@ -18,7 +18,7 @@
 	//Components
 	import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
-	import PoolButtons from '../components/pool-buttons.svelte'
+	import PoolButtons from '../components/Pool-buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
 
   let pageState = {};

@@ -7,7 +7,7 @@
 
 	//Components
 	import InputLpTokens from './misc/input-lp-tokens.svelte'
-	import PoolButtons from './pool-buttons.svelte'
+	import PoolButtons from './Pool-buttons.svelte'
 	import Prices from './misc/prices.svelte'
 	import TokensToReceive from './misc/tokens-to-recieve.svelte'
 
