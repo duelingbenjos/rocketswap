@@ -47,7 +47,7 @@ services:
     networks:
       - rocketswap-network
     ports:
-      - 3001:3001
+      - 3002:3002
 
 volumes:
   rocketswap-volume:
