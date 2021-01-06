@@ -14,7 +14,8 @@
     import TokenSearch from './token-select-search.svelte'
 
     //Icons
-    import Base64SvgLogo from '../../icons/base64_svg.svelte'
+    import Base64Svg from '../../icons/base64_svg.svelte'
+    import DirectionalChevron from '../../icons/directional-chevron.svelte'
     
     //Misc
     import { stringToFixed  } from '../../utils'
@@ -74,24 +75,6 @@
 </script>
 
 <style>
-    button.open-button {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        color: #fff;
-        background-color: #3131d98f;
-
-        border: none;
-        border-radius: 10px;
-        
-        font-size: var(--text-size-small);
-        font-weight: 600;
-
-        width: max-content;
-        padding: 7px 10px;
-    }
-
     .select-wrapper {
         justify-content: space-between;
         width: 100%;
@@ -120,13 +103,6 @@
         align-items: center;
         justify-content: start;
     }
-
-    .token-plug{
-        width: 27px;
-        height: 27px;
-        margin: 0 5px;
-    }
-
     .token-symbol {
         font-weight: 600;
     }
@@ -168,10 +144,6 @@
         padding-bottom: 30px;
     }
 
-    .token-label{
-        align-items: center;
-    }
-
     hr {
         width: 100%;
         border-top: 0.5px solid #d9d9d90a;
@@ -182,30 +154,35 @@
     }
     .modal-style{
         width: 400px;
-        min-height: 600px;
         height: 70%;
+    }
+    .input-token-label{
+        margin: 0 3px 0 0;
     }
 
 </style>
 {#if !selectedToken}
-    <button on:click={openTokenSelect} class="open-button flex-row" >
-        Select Token
-        <img src="assets/images/chevron-arrow-down.svg" height="7" alt="arrow-down" />
+    <button on:click={openTokenSelect} class="select-token flex-row" >
+        <span class="input-token-label">Select Token</span> 
+        <DirectionalChevron width="10px" direction="down" />
     </button>
 {:else}
-    <button class="token-label flex-row" on:click={openTokenSelect}>
-        {selectedToken.token_symbol.toUpperCase()}
-        <img src="assets/images/chevron-arrow-down.svg" height="7" alt="arrow-down" />
+    <button class="select-token flex-row" on:click={openTokenSelect}>
+    	{#if selectedToken}
+			<Base64Svg string={selectedToken.logo_svg_base64} width="21px" margin="0 3px 0 0" />
+		{/if}
+        <span class="input-token-label">{selectedToken.token_symbol.toUpperCase()}</span> 
+        <DirectionalChevron width="12px" direction="down" margin="0 0 -5px 0"/>
     </button>
 {/if}
 
 {#if open}
 <div class="modal">
-    <div class="modal-style flex-col"
+    <div class="modal-style flex-col text-large"
         in:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
         out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
         <div class="heading">
-            <span class="text-large"> Select a token </span> 
+            <span class=""> Select a token </span> 
             <button class="nostyle" on:click={closeTokenSelect}> 
                 <img src="assets/images/cancel.svg" alt="" />
             </button>
@@ -222,7 +199,7 @@
                                 <button on:click={() => selectToken(token)} class="nostyle button-item">
                                     <div class="token-container">
                                         <div class="token-name-logo flex-row">
-                                            <Base64SvgLogo string={token.logo_svg_base64} width={'27px'} height={'27px'} />
+                                            <Base64Svg string={token.logo_svg_base64} width={'27px'} height={'27px'} />
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
                                             {#if token.contract_name === selected_contract}
                                                 <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />

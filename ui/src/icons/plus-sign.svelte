@@ -1,11 +1,17 @@
 <script>
-    export let width = "24";
-    export let height = "24";
+    export let width = "24px";
+    export let height = "24px";
     export let margin = "0 10px";
-    export let color = '#fff';
 </script>
 
-<svg {width} {height} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" data-reactroot="" style={`margin: ${margin};`}>
-<path fill={color} d="M10.5 4.5C10.5 3.66772 11.1677 3 12 3C12.8323 3 13.5 3.66772 13.5 4.5V19.5C13.5 20.3323 12.8323 21 12 21C11.1677 21 10.5 20.3323 10.5 19.5V4.5Z" clip-rule="evenodd" fill-rule="evenodd" undefined="1"></path>
-<path fill={color} d="M3 12C3 11.1677 3.66772 10.5 4.5 10.5H19.5C20.3323 10.5 21 11.1677 21 12C21 12.8323 20.3323 13.5 19.5 13.5H4.5C3.66772 13.5 3 12.8323 3 12Z" clip-rule="evenodd" fill-rule="evenodd" undefined="1"></path>
+<style>
+    path{
+        fill: var(--text-primary-color);
+    }
+</style>
+
+<svg style={`margin: ${margin};`} {height} {width} xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"  version="1.1" viewBox="0 0 100 100">
+    <g transform="translate(0,-952.36218)">
+    <path d="m 49,987.36218 0,14.00002 -14,0 0,2 14,0 0,14 2,0 0,-14 14,0 0,-2 -14,0 0,-14.00002 z" fill-opacity="1" stroke="none" marker="none" visibility="visible" display="inline" overflow="visible"></path>
+    </g>
 </svg>

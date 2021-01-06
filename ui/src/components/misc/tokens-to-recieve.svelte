@@ -23,9 +23,9 @@
 
 <style>
     .container{
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--box-border-color);
         border-radius: var(--border-radius);
-        padding: 20px;
+        padding: 0.5rem 20px;
         font-size: var(--text-size-small);
 
         flex-wrap: wrap;
@@ -41,10 +41,10 @@
     .amount{
         flex-grow: 1;
         margin: 0.25rem 0;
-        font-size: var(--text-size-large);
+        font-size: var(--text-size-xlarge);
     }
     .symbol{
-        font-size: var(--text-size-large);
+        font-size: var(--text-size-xlarge);
         font-weight: bold;
     }
 </style>

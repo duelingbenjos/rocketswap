@@ -9,7 +9,7 @@
   <div class="logo-container"><img src="/assets/images/rocketswap.svg" alt="" /></div>
   <div class="links">
     {#each links as e}
-      {#if e.$$name === "Pool" || e.$$name === "Swap"}
+      {#if e.$$name === "Pools" || e.$$name === "Swap"}
         <button class="nostyle"> 
           <a class:active={e === $active} href={e.$$href}> 
             {e.$$name} 
@@ -46,6 +46,11 @@
 
   a:hover {
     text-decoration: none;
+    cursor: pointer;
+  }
+
+  button{
+    cursor: pointer;
   }
 
   button:active,

@@ -217,7 +217,7 @@
     margin-top: 30px;
     padding: 10px;
     border-radius: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--box-border-color);
     display: flex;
     height: 100px;
     justify-content: space-between;

@@ -4,7 +4,7 @@
         background-color: var(--msg-box-background);
         color: #ebeafc;
         font-size: var(--text-size-small);
-        border-radius: 32px;
+        border-radius: var(--border-radius);
         padding: 30px;
         box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
         -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);

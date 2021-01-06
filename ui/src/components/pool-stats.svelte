@@ -77,25 +77,25 @@
         display: flex;
         flex-direction: row;
         justify-content: space-between;
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--box-border-color);
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         padding: 0 20px;
-        font-size: var(--text-size-small);
+        font-weight: 400;
     }
     .stats{
-        border: 1px solid var(--border-color);
+        border: 1px solid var(--box-border-color);
         border-radius: 0 0 var(--border-radius) var(--border-radius);
         border-top: 0px;
-        padding: 20px;
-        font-size: var(--text-size-small);
+        padding: 0.5rem 20px;
 
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
     }
     .stat{
-        width: 45%;
+        width: 30%;
+
         text-align: center;
     }
     p{
@@ -115,12 +115,12 @@
         {#if tokenSymbol}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p><strong>{currencyRatio}</strong></p>
+                    <p><strong>{tokenRatio}</strong></p>
                     <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p><strong>{tokenRatio}</strong></p>
+                    <p><strong>{currencyRatio}</strong></p>
                     <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}
@@ -128,7 +128,7 @@
             {#if statList.includes("poolShare")}
                 <div class="stat">
                     <p><strong>{$pageStats?.newLpSharePercent || "-"}</strong></p>
-                    <p>New share of Pool</p>
+                    <p>New share</p>
                 </div>
             {/if}
         {/if}

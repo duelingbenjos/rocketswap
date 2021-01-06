@@ -15,7 +15,7 @@
   //Components
   import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
   import PoolStats from '../components/pool-stats.svelte'
-  import PoolButtons from '../components/Pool-buttons.svelte'
+  import Buttons from '../components/buttons.svelte'
 
   //Icons
   import IconBackArrow from '../icons/back-arrow.svelte'
@@ -106,17 +106,37 @@
 
 <style>
   div.header{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    position: relative;
+    height: 35px;
+    margin: 0 0 1rem;
   }
   div.footer{
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    margin: 1rem 0;
   }
   a{
     height: 24px;
+  }
+  h2{
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+    margin: 0;
+
+    font-size: var(--text-size-xlarge);
+    font-weight: 400;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+  }
+  .controls{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+    align-items: center;
   }
 </style>
 
@@ -128,17 +148,18 @@
 <div class="page-container">
   <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} bind:resetInputAmounts>
     <div class="header" slot="header">
-      <a href="/#/pool-main/">
-        <IconBackArrow />
-      </a>
-      <h2>Create Liquidity</h2>
-      <IconBackArrow color="transparent"/>
+      <h2>create a pair</h2>
+      <div class="controls flex-row">
+        <a href="/#/pool-main/">
+          <IconBackArrow />
+        </a>
+      </div>
     </div>
     <div class="footer" slot="footer">
       {#if pageState.selectedToken }
         <PoolStats {pageState} statList={["ratios"]} title={"Initial prices and pool share"}/>
       {/if}
-      <PoolButtons buttonFunction="create" {...pageState} />
+      <Buttons buttonFunction="create" buttonText="Create Supply" {...pageState} />
     </div>
   </PoolSwapPanel>
 </div>

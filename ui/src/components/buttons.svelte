@@ -8,8 +8,10 @@
   import ConfirmAdd from './confirms/confirm-add.svelte'
   import ConfirmRemove from './confirms/confirm-remove.svelte'
   import ConfirmCreate from './confirms/confirm-create.svelte'
+  import ConfirmSwap from './confirms/confirm-swap.svelte'
 
-  //Stores
+  //Misc
+  import { config } from '../config'
   import { wallet_store } from '../store'
 
   //Services
@@ -21,21 +23,35 @@
   export let currencyAmount;
   export let tokenAmount;
   export let selectedToken;
+  export let buy;
+  export let buttonText;
 
   const { pageStats } = getContext('pageContext');
 
   let open = false;
 
   $: disabled = disableButton(currencyAmount, tokenAmount, selectedToken, $pageStats);
+  $: disabledText = undefined;
 
 
   const openConfirm = () => open = true;
   const closeConfirm = () => open = false;
 
   const disableButton = () => {
-    if (buttonFunction === "create" || buttonFunction === "add"){
+    disabledText = undefined;
+    if (buttonFunction === "create" || buttonFunction === "add" || buttonFunction === "swap"){
       if ((!currencyAmount || !tokenAmount || !selectedToken)) return true
       if (currencyAmount.isEqualTo(0) || tokenAmount.isEqualTo(0)) return true
+
+      if (currencyAmount.isGreaterThan($wallet_store.balance)){
+        disabledText = `Insufficent ${config.currencySymbol}`
+        return true
+      }
+      let tokenBalance = $wallet_store.tokens.balances[selectedToken.contract_name]
+      if (tokenAmount.isGreaterThan(tokenBalance)){
+        disabledText = `Insufficent ${selectedToken.token_symbol}`
+        return true
+      }
     }
     if (buttonFunction === "remove"){
       let lpTokenAmount = $pageStats?.lpTokenAmount;
@@ -47,49 +63,8 @@
 
 </script>
 
-<style>
-  .swap-button {
-    width: 100%;
-    background-color: #1d2fba;
-    color: #fff;
-    height: 56px;
-    border-radius: 24px;
-    font-size: 1.6em;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-  }
 
-  button:hover {
-    filter: brightness(110%);
-  }
-
-  button {
-    background: none;
-    color: inherit;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    outline: inherit;
-  }
-  button:disabled{
-    filter: saturate(40%);
-    color: rgb(230, 230, 230);
-  }
-</style>
-
-
-{#if buttonFunction === 'create'}
-  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Create Supply </button>
-{/if}
-
-{#if buttonFunction === 'add'}
-  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Add Supply </button>
-{/if}
-
-{#if buttonFunction === 'remove'}
-  <button class="swap-button" disabled={disabled} on:click={openConfirm}> Remove Supply </button>
-{/if}
+<button class="primary large full" disabled={disabled} on:click={openConfirm}> {disabledText || buttonText} </button>
 
 {#if open}
   <div class="modal"
@@ -103,6 +78,9 @@
     {/if}
     {#if buttonFunction === 'remove'}
       <ConfirmRemove {selectedToken} {closeConfirm}/>
+    {/if}
+    {#if buttonFunction === 'swap'}
+      <ConfirmSwap {currencyAmount} {tokenAmount} {selectedToken} {closeConfirm} {buy}/>
     {/if}
   </div>
 {/if}

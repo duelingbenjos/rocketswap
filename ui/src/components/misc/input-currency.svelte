@@ -3,6 +3,9 @@
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
+	//Icons
+	import LamdenLogo from '../../icons/lamden-logo.svelte'
+
 	//Stores
 	import { wallet_store } from '../../store'
 
@@ -26,8 +29,7 @@
 			inputElm.value = validateValue
 		}else{
 			let value = toBigNumber(e.target.value)
-			if (value.isGreaterThan(walletBalance) ) handleMaxInput()
-			else dispatchEvent(value)
+			dispatchEvent(value)
 		}
 	}
 
@@ -64,8 +66,11 @@
         />
 
 		<div class="input-controls">
-		<button on:click={handleMaxInput} class="primary">MAX</button> 
-		<span class="token-label"> {config.currencySymbol} </span>
+		{#if !inputElm?.value}
+			<button on:click={handleMaxInput} class="primary small">MAX</button> 
+		{/if}
+		<LamdenLogo width="21px" margin="0 3px 0 0"/>
+		<span class="input-token-label"> {config.currencySymbol} </span>
 		</div>
 	</div>
 </div>

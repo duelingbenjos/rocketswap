@@ -61,25 +61,25 @@
     flex-direction: row;
     background-color: rgba(255, 255, 255, 0.9);
     margin-top: 15px;
-    border: 1px solid #cccccc;
+    border: 1px solid var(--box-border-color);
     min-height: 70px;
     width: 320px;
     background-color: #2a334a;
     border-radius: 8px;
-    border: 3px solid #2fba95;
+    border: 3px solid var(--info-color);
     color: #fff;
     padding: 10px;
   }
 
   .warning {
-    border: 3px solid #b7ce36;
+    border: 3px solid var(--warning-color);
   }
 
   .error {
-    border: 3px solid #ea4c1c;
+    border: 3px solid var(--error-color);
   }
 
   .info {
-    border: 3px solid #2fba95;
+    border: 3px solid var(--info-color);
   }
 </style>

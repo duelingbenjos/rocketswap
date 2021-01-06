@@ -40,7 +40,7 @@
   .add-liquidity-wrapper {
     height: 600px;
     width: 450px;
-    border-radius: 30px;
+    border-radius: var(--border-radius);
     background-color: #312a43;
     display: flex;
     flex-direction: column;

@@ -1,4 +1,5 @@
 import Swap from './pages/swap.page.svelte'
+import SwapTest from './pages/swap-test.page.svelte'
 import Pools from './pages/pool.page.svelte'
 import CreatePool from './pages/pool-create.page.svelte'
 import AddPool from './pages/pool-add.page.svelte'
@@ -13,7 +14,7 @@ routes.set({
   },
   '/pool-main/': {
     $$component: Pools,
-    $$name: 'Pool'
+    $$name: 'Pools'
   },
   '/pool-create/': {
     $$component: CreatePool,
@@ -29,6 +30,11 @@ routes.set({
     $$component: RemovePool,
     $$name: 'Create Pool',
     ':contract': RemovePool,
+  },
+  '/swap-test/': {
+    $$component: SwapTest,
+    $$name: 'Swap Test',
+    ':contract': SwapTest,
   },
   '*': {
     $$redirect: '/'

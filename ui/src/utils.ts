@@ -63,6 +63,7 @@ export const calculateRgba = (input, opacity) => {
 }
 
 export const stringToFixed = (value: string, precision: number) => {
+  if (!value) return "0.0"
   try {
     var values = value.split('.')
   } catch {
@@ -113,16 +114,6 @@ export const stripTrailingZero = (value: string): string => {
   }
 }
 
-export const getPrices = (reserves) => {
-  if (!reserves) return
-  let currencyReserve = Lamden.Encoder.BigNumber(reserves[0])
-  let tokenReserve = Lamden.Encoder.BigNumber(reserves[1])
-  return {
-    reserves,
-    currency: tokenReserve.dividedBy(currencyReserve),
-    token: currencyReserve.dividedBy(tokenReserve)
-  }
-}
 
 export const toBigNumber = (value) => {
   if (Lamden.Encoder.BigNumber.isBigNumber(value)) return value
@@ -156,9 +147,21 @@ export function valuesToBigNumber(obj: any) {
 
 export const quoteCalculator = (tokenInfo) => {
 	const currencyReserves = toBigNumber(tokenInfo?.reserves[0] || ["0", "0"])
-	const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
-  const prices = getPrices(tokenInfo?.reserves || ["0", "0"])
+  const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
+  
+  const prices = getPrices([currencyReserves, tokenReserves])
+
   const totalLP = tokenInfo?.lp || toBigNumber("0")
+  const k = currencyReserves.multipliedBy(tokenReserves)
+
+  function getPrices(reserves) {
+    if (!reserves) return
+    return {
+      reserves,
+      currency: reserves[1].dividedBy(reserves[0]),
+      token: reserves[0].dividedBy(reserves[1])
+    }
+  }
 
 	const calcCurrencyValue = (value) =>  prices.token.multipliedBy(value)
 	const calcTokenValue = (value) =>  prices.currency.multipliedBy(value)
@@ -197,8 +200,53 @@ export const quoteCalculator = (tokenInfo) => {
     }
   }
 
+  const calcBuyPrice = (currencyAmount) => {
+    let newCurrencyReserve = currencyReserves.plus(currencyAmount)
+    let newTokenReserve = k.dividedBy(newCurrencyReserve)
+    let tokensPurchased = tokenReserves.minus(newTokenReserve)
+    let fee = tokensPurchased.multipliedBy(0.03)
+    let tokensPurchasedLessFee = tokensPurchased.minus(fee)
+
+    return {
+      tokensPurchased,
+      fee,
+      tokensPurchasedLessFee,
+      ...calcSlippage(newTokenReserve, newCurrencyReserve)
+    }
+  }
+
+  const calcSellPrice = (tokenAmount) => {
+    let newTokenReserve = tokenReserves.plus(tokenAmount)
+    let newCurrencyReserve = k.dividedBy(newTokenReserve)
+    let currencyPurchased = currencyReserves.minus(newCurrencyReserve)
+    let fee = currencyPurchased.multipliedBy(0.03)
+    let currencyPurchasedLessFee = currencyPurchased.minus(fee)
+
+    return {
+      currencyPurchased,
+      fee,
+      currencyPurchasedLessFee,
+      ...calcSlippage(newTokenReserve, newCurrencyReserve)
+    }
+  }
+
+  const calcSlippage = (newTokenReserve, newCurrencyReserve) => {
+    let newPrices = getPrices([newCurrencyReserve, newTokenReserve])
+
+    if (newPrices.currency.isNaN()) newPrices.currency = toBigNumber("0.0")
+    if (newPrices.token.isNaN()) newPrices.token = toBigNumber("0.0")
+
+    return {
+      newPrices,
+      tokenSlippage: prices.token.dividedBy(newPrices.token).minus(1).multipliedBy(100).absoluteValue(),
+      currencySlippage: prices.currency.dividedBy(newPrices.currency).minus(1).multipliedBy(100).absoluteValue()
+    }
+  }
+  
 	return {
-		prices,
+    prices,
+    currencyReserves,
+    tokenReserves,
 		toBigNumber,
 		isBigNumber,
 		calcCurrencyValue,
@@ -208,8 +256,8 @@ export const quoteCalculator = (tokenInfo) => {
 		calcNewShare, calcNewShare_removeTokens,
 		calcPointsPerCurrency,
     calcNewLpMintAmount, calcInitialLpMintAmount,
-    calcAmountsFromLpTokens
-    
+    calcAmountsFromLpTokens,
+    calcBuyPrice, calcSellPrice,
 	}
 }
 

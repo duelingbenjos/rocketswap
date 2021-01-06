@@ -19,6 +19,8 @@
         border: 1px solid var(--box-border-color);
         border-radius: var(--border-radius);
         padding: 0.5rem 20px;
+        font-size: var(--text-size-small);
+
         flex-wrap: wrap;
         margin: 1rem 0 0;
     }
@@ -29,34 +31,22 @@
         flex-grow: 1;
         align-items: flex-end;
     }
-    .flex-row{
-        justify-content: space-between;
-    }
 </style>
 
-<div class="container container-border flex-col">
+<div class="container container-border flex-row">
     <div class="flex-col label">
         <p>{label}</p>
     </div>
     <div class="flex-col prices">
         {#if showAll}
-            <p>{`1 ${tokenSymbol} = ${stringToFixed($pageStats?.newPrices?.currency || "0.0", 8)} ${config.currencySymbol}`}</p>
-            <p>{`1 ${config.currencySymbol} = ${stringToFixed($pageStats?.newPrices?.token || "0.0", 8)} ${tokenSymbol}`}</p>
+            <p>{`1 ${tokenSymbol} = ${stringToFixed($pageStats?.quoteCalc.prices.currency, 8)} ${config.currencySymbol}`}</p>
+            <p>{`1 ${config.currencySymbol} = ${stringToFixed($pageStats?.quoteCalc.prices.token, 8)} ${tokenSymbol}`}</p>
         {:else}
             {#if pageState.buy}
-                <p>{`${stringToFixed($pageStats?.newPrices?.currency, 8)} ${tokenSymbol} per  ${config.currencySymbol}`}</p>
+                <p>{`${stringToFixed($pageStats?.quoteCalc.prices.currency, 8)} ${tokenSymbol} per  ${config.currencySymbol}`}</p>
             {:else}
-                <p>{`${stringToFixed($pageStats?.newPrices?.token, 8)} ${config.currencySymbol} per ${tokenSymbol}`}</p>
+                <p>{`${stringToFixed($pageStats?.quoteCalc.prices.token, 8)} ${config.currencySymbol} per ${tokenSymbol}`}</p>
             {/if}
         {/if}
-    </div>
-
-    <div class="flex-row">
-        <p>Fee</p>
-        <p>{`${stringToFixed($pageStats?.fee, 8)} ${pageState.buy ?  tokenSymbol : config.currencySymbol}`}</p>
-    </div>
-    <div class="flex-row">
-        <p>Slippage</p>
-        <p>{`${stringToFixed(pageState.buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage, 2)}%`}</p>
     </div>
 </div>

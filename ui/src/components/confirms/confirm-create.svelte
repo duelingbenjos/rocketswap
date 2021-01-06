@@ -110,7 +110,7 @@
             <p class="text-bold">100%</p>
         </div>
         <div class="modal-confirm-buttons flex-col">
-            <Button style="secondary" loading={loading} callback={createMarket} text="Confirm Create Supply" />
+            <Button style="primary full" loading={loading} callback={createMarket} text="Confirm Create Supply" />
         </div>
     </div>
 </div>

@@ -7,8 +7,8 @@
 
 	//Components
 	import InputLpTokens from './misc/input-lp-tokens.svelte'
-	import PoolButtons from './Pool-buttons.svelte'
-	import Prices from './misc/prices.svelte'
+	import Buttons from './buttons.svelte'
+	import Ratios from './misc/ratios.svelte'
 	import TokensToReceive from './misc/tokens-to-recieve.svelte'
 
 	//Props
@@ -28,32 +28,6 @@
 	}
 </script>
 
-<style>
-  .panel-container {
-    margin: 0 auto;
-    margin-top: 15px;
-    padding: 30px;
-    background-color: #875dd6;
-    color: #fff;
-    width: 380px;
-    border-radius: 32px;
-    box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-    -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-    -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-    padding-top: 15px;
-  }
-
-
-  @media screen and (max-width: 800px) {
-    .panel-container {
-      margin: 0;
-      height: 100%;
-      width: 100%;
-      border-radius: 0px;
-    }
-
-  }
-</style>
 
 <div class="panel-container">
 	<slot name="header"></slot>
@@ -62,6 +36,6 @@
 		on:input={handleLpTokensChange}
 	/>
 	<TokensToReceive {...pageState} {...state}/>
-	<Prices {pageState} />
+	<Ratios {pageState} showAll={true} />
 	<slot name="footer"></slot>
 </div>

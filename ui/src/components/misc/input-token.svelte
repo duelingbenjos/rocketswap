@@ -6,12 +6,13 @@
 	//Components
 	import TokenSelect from './token-select-toggle.svelte'
 
-	//Stores
-	import { wallet_store } from '../../store'
+	//Icons
+	import Base64Svg from '../../icons/base64_svg.svelte'
 
 	//Misc
 	import { config } from '../../config'
 	import { stringToFixed, toBigNumber } from '../../utils.js'
+	import { wallet_store } from '../../store'
 
 	//Props
 	export let label
@@ -31,10 +32,7 @@
 			inputElm.value = validateValue
 		}else{
 			let value = toBigNumber(e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1'))
-			if (value.isGreaterThan(tokenBalance) ) handleMaxInput()
-			else {
-				dispatchEvent(value)
-			}
+			dispatchEvent(value)
 		}
 	}
 
@@ -56,7 +54,7 @@
 <div class="input-container flex-col"
 	 in:scale="{{duration: 300, delay: 0, opacity: 0.0, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
-		<div class="label">{label}</div>
+		<div class="input-label">{label}</div>
 		<div class="input-balance">
 			{#if selectedToken}
 				Balance: 
@@ -75,8 +73,8 @@
 			disabled={!selectedToken} 
 		/>
 		<div class="input-controls">
-			{#if selectedToken}
-				<button on:click={handleMaxInput} class="primary">MAX</button>
+			{#if !inputElm?.value}
+				<button disabled={!selectedToken} on:click={handleMaxInput} class="primary small">MAX</button>
 			{/if}
 			<TokenSelect on:selected={handleTokenSelect} {selectedToken} />
 		</div>

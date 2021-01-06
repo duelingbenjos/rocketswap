@@ -9,10 +9,10 @@
 	import InputToken from './misc/input-token.svelte'
 	import Quote from './quote.svelte'
 	import Buttons from './buttons.svelte'
-	import IconPlusSign from '../icons/plus-sign.svelte'
+	import IconArrow from '../icons/directional-arrow.svelte'
 
 	//Misc
-	import { quoteCalculator, toBigNumber, stringToFixed } from '../utils'
+	import { quoteCalculator, toBigNumber } from '../utils'
 
 	//Props
 	export let pageState;
@@ -23,22 +23,39 @@
 	const dispatch = createEventDispatcher();
 	const { determineValues,  } = getContext('pageContext')
 
-	let state = { };
+	let state = { buy: true };
+
+	let slots = [
+		{
+			component: InputCurrency,
+			handler: handleCurrencyChange,
+		},
+		{
+			component: InputToken,
+			handler: handleTokenChange,
+		}
+	]
+
+	const swapSlots = () => {
+		slots = [...slots.reverse()]
+		state = Object.assign(state, {buy: !state.buy});
+		dispatchEvent(state)
+	}
 
 	afterUpdate(() => {
 		state.selectedToken = pageState.selectedToken
+
 	})
 
 	function handleCurrencyChange(e){
 		if (e.detail.toString() === "NaN") state.currencyAmount = null
 		else{
 			state.currencyAmount = e.detail
-			const { tokenLP } = pageState 
-			if (tokenLP){
-				let qc = quoteCalculator(tokenLP)
+			if (state.selectedToken && pageState.tokenLP) {
+				let quoteCalc = quoteCalculator(pageState.tokenLP)
+				let quote = quoteCalc.calcBuyPrice(state.currencyAmount)
+				state.tokenAmount = quote.tokensPurchasedLessFee
 			}
-
-			if (determineValues && state.selectedToken) state.tokenAmount = quoteCalc.calcTokenValue(state.currencyAmount)
 		}
 		dispatchEvent(state)
 	}
@@ -48,15 +65,11 @@
 		else{
 			state.selectedToken = e.detail.selectedToken
 			state.tokenAmount = e.detail.tokenAmount
-
-			
-			if (determineValues) state.currencyAmount = quoteCalc.calcCurrencyValue(state.tokenAmount) 
+			let quoteCalc = quoteCalculator(pageState.tokenLP)
+			let quote = quoteCalc.calcSellPrice(state.tokenAmount)
+			state.currencyAmount = quote.currencyPurchasedLessFee
 		}
 		dispatchEvent(state)
-	}
-
-	const switchPositions = async () => {
-		slots = slots.reverse()
 	}
 
 	function resetAmounts() {
@@ -68,31 +81,29 @@
 </script>
 
 <style>
-  .plus-sign{
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    margin: 0;
-  }
-
-
+.plus-sign{
+	display: flex;
+	justify-content: center;
+	text-align: center;
+}
 </style>
 
 <div class="panel-container">
 	<slot name="header"></slot>
-	<InputCurrency 
-		label={'Base Currency'}
-		on:input={handleCurrencyChange}
+	<svelte:component 
+		label={'From'}
+		this={slots[0].component}
+		on:input={slots[0].handler}
 		{...state}
 	/>
-	
-	<div class="plus-sign">
-		<IconPlusSign width={"50px"} height={"50px"}/>
+	<div class="plus-sign" on:click={swapSlots}>
+		<IconArrow direction="down" width={"20"} height={"20"}/>
 	</div>
 
-	<InputToken 
-		label={'Token'}
-		on:input={handleTokenChange} 
+	<svelte:component 
+		label={'To'}
+		this={slots[1].component}
+		on:input={slots[1].handler}
 		{...state}
 	/>
 	<slot name="footer"></slot>
