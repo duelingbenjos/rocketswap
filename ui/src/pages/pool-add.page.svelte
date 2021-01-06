@@ -142,25 +142,6 @@
   div.footer{
     padding-top: 1rem;
   }
-  h2{
-    position: absolute;
-
-    width: 100%;
-    height: 100%;
-    margin: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-  }
-  .controls{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    align-items: center;
-  }
   a{
     height: 24px;
   }
@@ -174,10 +155,8 @@
 <div class="page-container">
   <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} bind:resetInputAmounts>
     <div class="header" slot="header">
-      <h2>
-        Add Liquidity
-      </h2>
-      <div class="controls flex-row">
+      <span class="page-heading">Add Liquidity</span>
+      <div class="page-controls flex-row">
         <a href="/#/pool-main/">
           <IconBackArrow />
         </a>

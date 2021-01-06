@@ -42,6 +42,12 @@
 	const dispatchEvent = (value) => dispatch('input', value)
 </script>
 
+<style>
+	button.primary.small{
+		margin-right: 6px;
+	}
+</style>
+
 <div class="input-container flex-col"
 	 in:scale="{{duration: 300, delay: 0, opacity: 0.5, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
@@ -50,7 +56,7 @@
 		</div>
 		<div class="input-balance">
 			{walletBalance ? `Balance: ` : ''}
-			<span class="number">
+			<span class="number text-small">
 				{stringToFixed(walletBalance, 8)}
 			</span>
 		</div>
@@ -66,11 +72,11 @@
         />
 
 		<div class="input-controls">
-		{#if !inputElm?.value}
-			<button on:click={handleMaxInput} class="primary small">MAX</button> 
-		{/if}
-		<LamdenLogo width="21px" margin="0 3px 0 0"/>
-		<span class="input-token-label"> {config.currencySymbol} </span>
+			{#if !inputElm?.value}
+				<button on:click={handleMaxInput} class="primary small">MAX</button> 
+			{/if}
+			<LamdenLogo width="23px" margin="0 3px 0 0" color="white"/>
+			<span class="input-token-label text-xlarge"> {config.currencySymbol} </span>
 		</div>
 	</div>
 </div>

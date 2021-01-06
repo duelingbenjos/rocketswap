@@ -1,17 +1,26 @@
 <script>
     export let width = "24px";
-    export let height = "24px";
     export let margin = "0 10px";
+
+    let height = width;
 </script>
 
 <style>
     path{
-        fill: var(--text-primary-color);
+        fill: var(--color-gray-3);
     }
 </style>
 
-<svg style={`margin: ${margin};`} {height} {width} xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"  version="1.1" viewBox="0 0 100 100">
-    <g transform="translate(0,-952.36218)">
-    <path d="m 49,987.36218 0,14.00002 -14,0 0,2 14,0 0,14 2,0 0,-14 14,0 0,-2 -14,0 0,-14.00002 z" fill-opacity="1" stroke="none" marker="none" visibility="visible" display="inline" overflow="visible"></path>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" 
+     {width} {height}
+     style={`margin: ${margin}; isolation:isolate`}
+     >
+    <defs>
+        <clipPath id="_clipPath_JxrvM6gVbZIiW4dCF55UShKbJInhfjar">
+            <rect width="100" height="100"/>
+        </clipPath>
+    </defs>
+    <g clip-path="url(#_clipPath_JxrvM6gVbZIiW4dCF55UShKbJInhfjar)">
+        <path d=" M 47.417 9.775 L 47.417 47.148 L 9.869 47.148 L 9.869 52.487 L 47.417 52.487 L 47.417 89.859 L 52.781 89.859 L 52.781 52.487 L 90.329 52.487 L 90.329 47.148 L 52.781 47.148 L 52.781 9.775 L 47.417 9.775 Z " fill="rgb(0,0,0)"/>
     </g>
 </svg>

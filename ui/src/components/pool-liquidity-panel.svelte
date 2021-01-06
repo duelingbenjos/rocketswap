@@ -36,22 +36,20 @@
 			const { tokenLP } = pageState 
 			if (tokenLP){
 				let qc = quoteCalculator(tokenLP)
+				if (determineValues && state.selectedToken) state.tokenAmount = quoteCalc.calcTokenValue(state.currencyAmount)
 			}
-
-			if (determineValues && state.selectedToken) state.tokenAmount = quoteCalc.calcTokenValue(state.currencyAmount)
+			
 		}
 		dispatchEvent(state)
 	}
 
 	function handleTokenChange(e) {
-		if (e.detail.tokenAmount.toString() === "NaN") state.tokenAmount = null
-		else{
-			state.selectedToken = e.detail.selectedToken
-			state.tokenAmount = e.detail.tokenAmount
+		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") state.tokenAmount = null
+		else state.tokenAmount = e.detail.tokenAmount
 
-			
-			if (determineValues) state.currencyAmount = quoteCalc.calcCurrencyValue(state.tokenAmount) 
-		}
+		if (e.detail.selectedToken) state.selectedToken = e.detail.selectedToken
+
+		if (determineValues && state.tokenAmount) state.currencyAmount = quoteCalc.calcCurrencyValue(state.tokenAmount) 
 		dispatchEvent(state)
 	}
 
@@ -72,7 +70,7 @@
     display: flex;
     justify-content: center;
     text-align: center;
-    margin: 0;
+    margin: 0.5rem 0;
   }
 
 
@@ -81,13 +79,13 @@
 <div class="panel-container">
 	<slot name="header"></slot>
 	<InputCurrency 
-		label={'Base Currency'}
+		label={'Base'}
 		on:input={handleCurrencyChange}
 		{...state}
 	/>
 	
 	<div class="plus-sign">
-		<IconPlusSign width={"50px"} height={"50px"}/>
+		<IconPlusSign width={"20px"} height={"50px"} />
 	</div>
 
 	<InputToken 

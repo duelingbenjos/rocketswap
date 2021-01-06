@@ -30,6 +30,7 @@
         background-color: transparent;
         border: none;
         color: var(--text-primary);
+        padding: 0;
     }
 </style>
 

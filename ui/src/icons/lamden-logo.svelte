@@ -5,7 +5,7 @@
 
     let height = width;
     
-    $: border = color === "black" ? '#FFF' : color
+    $: border = color === "black" ? 'white' : "black"
 
 </script>
 

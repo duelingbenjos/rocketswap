@@ -44,8 +44,7 @@
 
 	const handleTokenSelect = (e) => {
 		selectedToken = e.detail
-		handleMaxInput();
-		dispatchEvent(toBigNumber(selectedToken.balance))
+		dispatchEvent(inputValue)
 	}
 
 	const dispatchEvent = (value) => dispatch('input', {tokenAmount: value, selectedToken})
@@ -58,7 +57,7 @@
 		<div class="input-balance">
 			{#if selectedToken}
 				Balance: 
-				<span class="number">{stringToFixed(tokenBalance, 8)}</span>
+				<span class="number text-small">{stringToFixed(tokenBalance, 8)}</span>
 			{/if}
 		</div>
 	</div>
@@ -73,7 +72,7 @@
 			disabled={!selectedToken} 
 		/>
 		<div class="input-controls">
-			{#if !inputElm?.value}
+			{#if !inputElm?.value && selectedToken}
 				<button disabled={!selectedToken} on:click={handleMaxInput} class="primary small">MAX</button>
 			{/if}
 			<TokenSelect on:selected={handleTokenSelect} {selectedToken} />

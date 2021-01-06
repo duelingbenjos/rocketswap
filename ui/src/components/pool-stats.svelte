@@ -29,15 +29,15 @@
     $: tokenSymbol = selectedToken ? selectedToken.token_symbol : undefined;
     $: tokenContract = selectedToken ? selectedToken.contract_name : undefined;
     $: calc = calcValues(pageState, $pageStats)
-    $: currencyRatio = "-"
-    $: tokenRatio = "-"
+    $: currencyRatio = "—"
+    $: tokenRatio = "—"
     $: wallet_store_changes = setLpBalances($wallet_store, pageState)
 
     const calcValues = () => {
         if ($pageStats?.quoteCalc?.prices){
             const { currency, token } = $pageStats.quoteCalc?.prices;
-            currencyRatio = currency.isNaN() ? "-" : stringToFixed(currency, 4);
-            tokenRatio = token.isNaN() ? "-" : stringToFixed(token, 4);
+            currencyRatio = currency.isNaN() ? "—" : stringToFixed(currency, 4);
+            tokenRatio = token.isNaN() ? "—" : stringToFixed(token, 4);
         }
 
         if (pageState?.tokenLP && statList.includes("poolShare")){
@@ -74,13 +74,12 @@
       margin-bottom: 1rem;
     }
     .header{
-        display: flex;
-        flex-direction: row;
         justify-content: space-between;
         border: 1px solid var(--box-border-color);
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         padding: 0 20px;
         font-weight: 400;
+        color: var(--color-gray-5);
     }
     .stats{
         border: 1px solid var(--box-border-color);
@@ -90,44 +89,47 @@
 
         display: flex;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: space-evenly;
         align-items: center;
     }
     .stat{
-        width: 30%;
-
+        min-width: max-content;
         text-align: center;
+        color: var(--color-gray-5);
     }
     p{
-        margin: 0.4rem 0;
+        margin: 0;
+        color: var(--color-gray-5)
     }
     p > strong{
         margin:0;
+        color: var(--text-primary-color);
+        font-weight: 400;
     }
 </style>
 
-<div class="container">
-    <div class="header">
+<div class="container ">
+    <div class="header flex-row text-small">
         <p>{title}</p>
         <p>{statList.includes("poolShare") ? `Current: ${$pageStats?.currentLpSharePercent || "0"}%`: ""}</p>
     </div>
-    <div class="stats">
+    <div class="stats text-small">
         {#if tokenSymbol}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p><strong>{tokenRatio}</strong></p>
+                    <p class="number"><strong >{tokenRatio}</strong></p>
                     <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p><strong>{currencyRatio}</strong></p>
+                    <p class="number"><strong>{currencyRatio}</strong></p>
                     <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}
 
             {#if statList.includes("poolShare")}
                 <div class="stat">
-                    <p><strong>{$pageStats?.newLpSharePercent || "-"}</strong></p>
+                    <p class="number"><strong>{$pageStats?.newLpSharePercent || "—"}</strong></p>
                     <p>New share</p>
                 </div>
             {/if}

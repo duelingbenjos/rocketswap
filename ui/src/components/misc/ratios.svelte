@@ -11,7 +11,7 @@
 
     const { pageStats } = getContext('pageContext');
 
-    $: tokenSymbol = pageState?.selectedToken?.token_symbol || "-";
+    $: tokenSymbol = pageState?.selectedToken?.token_symbol || "—";
 </script>
 
 <style>
@@ -31,16 +31,34 @@
         flex-grow: 1;
         align-items: flex-end;
     }
+    .prices > .flex-row{
+        align-items: baseline;
+        justify-content: flex-end;
+    }
+    .number{
+        margin: 0 3px;
+    }
+
 </style>
 
-<div class="container container-border flex-row">
+<div class="container container-border flex-row text-gray-5">
     <div class="flex-col label">
         <p>{label}</p>
     </div>
     <div class="flex-col prices">
         {#if showAll}
-            <p>{`1 ${tokenSymbol} = ${stringToFixed($pageStats?.quoteCalc.prices.currency, 8)} ${config.currencySymbol}`}</p>
-            <p>{`1 ${config.currencySymbol} = ${stringToFixed($pageStats?.quoteCalc.prices.token, 8)} ${tokenSymbol}`}</p>
+            <div class="flex-row weight-400">
+                <span class="number">1</span>
+                <span class="">{` ${tokenSymbol} = `}</span>
+                <span class="number">{stringToFixed($pageStats?.quoteCalc.prices.currency, 8)}</span>
+                <span class="">{` ${config.currencySymbol}`}</span>
+            </div>
+            <div class="flex-row weight-400">
+                <span class="number">1</span>
+                <span class="">{` ${config.currencySymbol} = `}</span>
+                <span class="number">{stringToFixed($pageStats?.quoteCalc.prices.token, 8)}</span>
+                <span class="">{` ${tokenSymbol}`}</span>
+            </div>
         {:else}
             {#if pageState.buy}
                 <p>{`${stringToFixed($pageStats?.quoteCalc.prices.currency, 8)} ${tokenSymbol} per  ${config.currencySymbol}`}</p>

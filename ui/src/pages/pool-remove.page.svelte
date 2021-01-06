@@ -149,25 +149,6 @@
   div.footer{
     padding-top: 1rem;
   }
-  h2{
-    position: absolute;
-
-    width: 100%;
-    height: 100%;
-    margin: 0;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-  }
-  .controls{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    align-items: center;
-  }
   a{
     height: 24px;
   }
@@ -181,10 +162,8 @@
 <div class="page-container">
   <PoolRemoveLiquidityPanel on:infoUpdate={handleInfoUpdate} {pageState}>
     <div class="header" slot="header">
-      <h2>
-        Remove Liquidity
-      </h2>
-      <div class="controls flex-row">
+      <span class="page-heading">Remove Liquidity</span>
+      <div class="page-controls flex-row">
         <a href="/#/pool-main/">
           <IconBackArrow />
         </a>

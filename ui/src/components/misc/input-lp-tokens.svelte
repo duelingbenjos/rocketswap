@@ -68,15 +68,11 @@
     .big-number{
         font-size: var(--text-size-massive);
         margin: 0;
+        line-height: 1;
     }
 
     .input-row-3{
         justify-content: space-between;
-    }
-
-    button.primary{
-        padding: 7px 16px 8px;
-        margin: 2px 5px 0;
     }
 
 </style>
@@ -101,9 +97,9 @@
         />
 	</div>
     <div class="input-row-3 flex-row">
-        <button on:click={() => handleButtonInput(25)} class="primary">25%</button> 
-        <button on:click={() => handleButtonInput(50)} class="primary">50%</button>
-        <button on:click={() => handleButtonInput(75)} class="primary">75%</button>
-        <button on:click={() => handleButtonInput(100)} class="primary">MAX</button>
+        <button on:click={() => handleButtonInput(25)} class="primary medium">25%</button> 
+        <button on:click={() => handleButtonInput(50)} class="primary medium">50%</button>
+        <button on:click={() => handleButtonInput(75)} class="primary medium">75%</button>
+        <button on:click={() => handleButtonInput(100)} class="primary medium">MAX</button>
     </div>
 </div>

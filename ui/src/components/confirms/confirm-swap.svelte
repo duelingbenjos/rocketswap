@@ -7,7 +7,8 @@
     //Icons
     import Base64SvgLogo from '../../icons/base64_svg.svelte'
     import LamdenLogo from '../../icons/lamden-logo.svelte'
-    import IconArrow from '../../icons/directional-arrow.svelte'
+    import DirectionalArrow from '../../icons/directional-arrow.svelte'
+    import CloseIcon from '../../icons/close.svelte';
 
     //Services
     import { WalletService } from '../../services/wallet.service'
@@ -114,8 +115,8 @@
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
         <p class="text-large header-text">Confirm Swap</p>
-        <button class="nostyle" on:click={closeConfirm}>
-            <img class="confirm-modal-close-img" src="assets/images/cancel.svg" alt="" />
+        <button class="close nostyle" on:click={closeConfirm}>
+            <CloseIcon width="18px" />
         </button>
     </div>
     <div class="flex-col text-large">
@@ -125,36 +126,42 @@
                     this={slots[0].logoComponent} 
                     string={selectedToken.logo_svg_base64}
                     width={logoSize} 
-                    height={logoSize}
+                    margin="0 10px 0 0"
                 />
                 <span>{slots[0].amount}</span>
             </div>
             <span>{slots[0].symbol}</span>
         </div>
-        <IconArrow direction="down" width="20px" height="20px" margin="0 0 0 12px"/>
+        <DirectionalArrow direction="down" width="20px" height="20px" margin="0.5rem 0 0 7px"/>
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[1].logoComponent}
                     string={selectedToken.logo_svg_base64}
                     width={logoSize} 
-                    height={logoSize}
+                    margin="0 10px 0 0"
                 />
                 <span>{slots[1].amount}</span>
             </div>
             <span>{slots[1].symbol}</span>
         </div>
     </div>
-    <p class="text-xsmall sub-text">
+    <p class="text-xsmall sub-text text-gray-4">
         ** Output is estimated. <!--You will receive at least {minimumReceivedString} {receivedSymbol} or the transaction will revert.-->
     </p>
-    <div class="flex-col modal-confirm-details-box">
+    <div class="flex-col modal-confirm-details-box color-gray-3 text-small weight-200">
         <div class="flex-row modal-confirm-item">
             <p>Price</p>
             {#if buy}
-                <p>{`${stringToFixed($pageStats.newPrices.currency, 8)} ${selectedToken.token_symbol} per ${config.currencySymbol}`}</p>
+                <div class="flex-row flex-align-center text-primary-inverted">
+                    <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
+                    <span>{`${selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
+                </div>
             {:else}
-                <p>{`${stringToFixed($pageStats.newPrices.token, 8)} ${config.currencySymbol} per ${selectedToken.token_symbol}`}</p>
+                <div class="flex-row flex-align-center text-primary-inverted">
+                    <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
+                    <span>{`${config.currencySymbol} per ${selectedToken.token_symbol}`}</span>
+                </div>
             {/if}
         </div>
         <!--
@@ -165,16 +172,20 @@
         -->
         <div class="flex-row modal-confirm-item">
             <p>Price Impacted</p>
-            <p  class="text-bold" 
+            <p  class="number text-primary-inverted" 
                 class:text-warning={slippage.isLessThan(5)}
                 class:text-error={slippage.isGreaterThanOrEqualTo(5)}
             >
                 {`${stringToFixed(slippage, 2)}%`}
             </p>
         </div>
-        <div class="flex-row modal-confirm-item">
+        <div class="flex-row flex-align-center modal-confirm-item">
             <p>Liquidity Provider Fee</p>
-            <p class="text-bold">{stringToFixed($pageStats.fee, 8)} {receivedSymbol}</p>
+            <div class="flex-row flex-align-center">
+                <span class="number text-primary-inverted margin-r-3">{stringToFixed($pageStats.fee, 8)}</span>
+                <span class="text-primary-inverted">{receivedSymbol}</span>
+            </div>
+            
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button style="secondary" loading={loading} callback={buy ? swapBuy : swapSell} text="Confirm Swap" />

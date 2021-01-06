@@ -14,7 +14,7 @@
 
     const { pageStats } = getContext('pageContext');
 
-    $: tokenSymbol = selectedToken?.token_symbol || "-";
+    $: tokenSymbol = selectedToken?.token_symbol || "—";
     $: logo_svg_base64 = selectedToken?.logo_svg_base64;
     $: tokensToReceive = $pageStats?.amounts ? $pageStats.amounts.currency : toBigNumber("0");
     $: currencyToReceive = $pageStats?.amounts ? $pageStats.amounts.token : toBigNumber("0");
@@ -38,30 +38,26 @@
         justify-content: flex-end;
         align-items: center;
     }
-    .amount{
-        flex-grow: 1;
-        margin: 0.25rem 0;
-        font-size: var(--text-size-xlarge);
-    }
-    .symbol{
-        font-size: var(--text-size-xlarge);
-        font-weight: bold;
+    .number{
+        position: relative;
+        top: -1px;
+        font-weight: 400;
     }
 </style>
 
 <div class="container flex-col">
     <div class="flex-row">
-        <p class="amount">{currencyToReceive.isNaN() ? "0" : stringToFixed(currencyToReceive, 8)}</p>
+        <p class="number flex-grow text-large">{currencyToReceive.isNaN() ? "0" : stringToFixed(currencyToReceive, 8)}</p>
         <div class="flex-row">
-            <p class="symbol">{tokenSymbol}</p>
-            <Base64SvgLogo string={logo_svg_base64} width={'27px'} height={'27px'} margin={"0 10px"}/>
+            <p class="input-token-label text-large">{tokenSymbol}</p>
+            <Base64SvgLogo string={logo_svg_base64} width={'25px'}  margin={"0 10px"}/>
         </div>
     </div>
     <div class="flex-row">
-        <p class="amount">{tokensToReceive.isNaN() ? "0" : stringToFixed(tokensToReceive, 8)}</p>
+        <p class="number flex-grow text-large">{tokensToReceive.isNaN() ? "0" : stringToFixed(tokensToReceive, 8)}</p>
         <div class="flex-row">
-            <p class="symbol">{config.currencySymbol}</p>
-            <LamdenLogo width={'27px'} height={'27px'} margin={"0 10px"}/>
+            <p class="input-token-label text-large">{config.currencySymbol}</p>
+            <LamdenLogo width={'25px'} margin={"0 10px"} />
         </div>
 
     </div>

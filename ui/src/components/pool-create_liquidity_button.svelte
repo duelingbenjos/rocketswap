@@ -18,11 +18,11 @@
     <h2>Your Liquidity</h2>
     <div class="buttons flex-row">
         <button 
-            class="nostyle outline info"
+            class="nostyle primary outline"
             on:click={() => location.assign('#/pool-create/')}
         >Create Liquidity</button>
         <button 
-            class="nostyle secondary info"
+            class="nostyle primary"
             on:click={() => location.assign('#/pool-add/')}
         >Add Liquidity</button>
     </div>

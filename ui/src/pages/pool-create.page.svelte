@@ -108,35 +108,13 @@
   div.header{
     position: relative;
     height: 35px;
-    margin: 0 0 1rem;
+    margin: 0 0 0.5rem;
   }
   div.footer{
-    margin: 1rem 0;
+    margin: 1rem 0 0;
   }
   a{
     height: 24px;
-  }
-  h2{
-    position: absolute;
-
-    width: 100%;
-    height: 100%;
-    margin: 0;
-
-    font-size: var(--text-size-xlarge);
-    font-weight: 400;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-  }
-  .controls{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
-    align-items: center;
   }
 </style>
 
@@ -148,8 +126,8 @@
 <div class="page-container">
   <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} bind:resetInputAmounts>
     <div class="header" slot="header">
-      <h2>create a pair</h2>
-      <div class="controls flex-row">
+      <span class="page-heading">Create Pair</span>
+      <div class="page-controls flex-row">
         <a href="/#/pool-main/">
           <IconBackArrow />
         </a>

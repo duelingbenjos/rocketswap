@@ -3,6 +3,11 @@
 
     //Components
     import Button from '../button.svelte';
+    import ConfirmRates from './confirm-rates.svelte'
+    import ShareChange from './confirm-share-change.svelte'
+
+    //Icons
+    import CloseIcon from '../../icons/close.svelte';
 
     //Services
     import { WalletService } from '../../services/wallet.service'
@@ -45,59 +50,47 @@
 
 
 <style>
-    .rates{
-        margin-top: 0.5rem;
-    }
-    .lp-amount{
-        margin: 1rem 0;
-    }
     .modal-style{
-        width: 330px;
+        width: 290px;
     }
     .modal-sub-box{
-        width: 360px;
+        width: 345px;
     }
     .sub-text{
-        margin: 2rem 0 1rem;
-        width: 90%;
+        margin: 0.5rem 0;
     }
-    .rates > p {
-        margin: 0.5px 0;
+    .number{
+        color: var(--text-primary-inverted);
     }
 
 </style>
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
         <p class="text-large margin-0">You will receive</p>
-        <button class="nostyle" on:click={closeConfirm}>
-            <img class="confirm-modal-close-img" src="assets/images/cancel.svg" alt="" />
+        <button class="close nostyle" on:click={closeConfirm}>
+            <CloseIcon width="18px" />
         </button>
     </div>
-    <p class="text-xlarge text-bold lp-amount">{stringToFixed($pageStats.lpToMint, 4)}</p>
-    <p class="text-large margin-0">{`${selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
-    <p class="text-xsmall sub-text">
+    <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 4)}</p>
+    <p class="text-large margin-0 text-gray-3">{`${selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
+    <p class="text-xsmall sub-text text-gray-4">
         Output is estimated. If the price changes by more than 0.5% your transaction will revert.
     </p>
-    <div class="flex-col modal-confirm-details-box">
+    <div class="flex-col modal-confirm-details-box text-small text-gray-3">
         <div class="flex-row modal-confirm-item">
             <p>TAU Deposited</p>
-            <p class="text-bold">{stringToFixed(currencyAmount, 4)}</p>
+            <p class="number modal-confirm-value">{stringToFixed(currencyAmount, 4)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p>{`${selectedToken.token_symbol} Deposited`}</p>
-            <p class="text-bold">{stringToFixed(tokenAmount, 4)}</p>
+            <p class="number modal-confirm-value">{stringToFixed(tokenAmount, 4)}</p>
         </div>
-        <div class="flex-row modal-confirm-item">
-            <p>Rates</p>
-            <div class="flex-col rates">
-                <p class="text-bold">{`1 TAU = ${stringToFixed($pageStats.quoteCalc.prices.currency, 4)} ${selectedToken.token_symbol}`}</p>
-                <p class="text-bold">{`1 ${selectedToken.token_symbol} = ${stringToFixed($pageStats.quoteCalc.prices.token, 4)} TAU`}</p>
-            </div>
-        </div>
-        <div class="flex-row modal-confirm-item">
-            <p>Share Change</p>
-            <p class="text-bold">{`${$pageStats.currentLpSharePercent}% => ${$pageStats.newLpSharePercent}`}</p>
-        </div>
+        <ConfirmRates 
+            currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}
+            tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 4)}
+            {selectedToken}
+        />
+        <ShareChange />
         <div class="modal-confirm-buttons flex-col">
             <Button style="secondary" loading={loading} callback={addLiquidity} text="Confirm Add Supply" />
         </div>

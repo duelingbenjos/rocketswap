@@ -9,7 +9,7 @@
 	import InputToken from './misc/input-token.svelte'
 	import Quote from './quote.svelte'
 	import Buttons from './buttons.svelte'
-	import IconArrow from '../icons/directional-arrow.svelte'
+	import DirectionalArrow from '../icons/directional-arrow.svelte'
 
 	//Misc
 	import { quoteCalculator, toBigNumber } from '../utils'
@@ -43,8 +43,9 @@
 	}
 
 	afterUpdate(() => {
-		state.selectedToken = pageState.selectedToken
-
+		if (pageState.selectedToken && (state.selectedToken?.contract_name !== pageState.selectedToken?.contract_name)){
+			state.selectedToken = pageState.selectedToken
+		}
 	})
 
 	function handleCurrencyChange(e){
@@ -61,10 +62,12 @@
 	}
 
 	function handleTokenChange(e) {
-		if (e.detail.tokenAmount.toString() === "NaN") state.tokenAmount = null
-		else{
-			state.selectedToken = e.detail.selectedToken
-			state.tokenAmount = e.detail.tokenAmount
+		console.log(e)
+		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") state.tokenAmount = null
+		else state.tokenAmount = e.detail.tokenAmount
+
+		if (e.detail.selectedToken) state.selectedToken = e.detail.selectedToken
+		if (pageState.tokenLP && state.tokenAmount){
 			let quoteCalc = quoteCalculator(pageState.tokenLP)
 			let quote = quoteCalc.calcSellPrice(state.tokenAmount)
 			state.currencyAmount = quote.currencyPurchasedLessFee
@@ -97,7 +100,9 @@
 		{...state}
 	/>
 	<div class="plus-sign" on:click={swapSlots}>
-		<IconArrow direction="down" width={"20"} height={"20"}/>
+		<DirectionalArrow 
+			direction={state.buy ? "down" : "up"} width={"20"} 
+			margin={state.buy ? "0 0.5rem 0 0" : "0 0 0.5rem 0"} />
 	</div>
 
 	<svelte:component 

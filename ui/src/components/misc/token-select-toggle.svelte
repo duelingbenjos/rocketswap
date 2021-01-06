@@ -16,6 +16,8 @@
     //Icons
     import Base64Svg from '../../icons/base64_svg.svelte'
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
+    import CloseIcon from '../../icons/close.svelte'
+    import SelectedArrow from '../../icons/selected-arrow.svelte'
     
     //Misc
     import { stringToFixed  } from '../../utils'
@@ -81,17 +83,12 @@
         align-items: center;
     }
 
-    .select-icon {
-        width: 10px;
-        transform: rotate(180deg);
-    }
-
     .button-item {
         width: 100%;
         display: flex;
-        padding: 10px 10px 10px -30px;
-        justify-content: space-around;
-        /* padding: 10px; */
+        flex-direction: row;
+        justify-content: space-between;
+        margin: 0.25rem 0;
         align-items: center;
     }
 
@@ -111,13 +108,6 @@
         font-weight: 400;
     }
 
-    .token-container {
-        width: 95%;
-        display: flex;
-        padding: 10px;
-        justify-content: space-between;
-    }
-
     .token-scroll {
         flex-grow: 1;
         overflow-y: scroll;
@@ -130,7 +120,6 @@
     }
 
     .token-list {
-        padding-top: 15px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -141,38 +130,39 @@
         display: flex;
         width: 100%;
         justify-content: space-between;
-        padding-bottom: 30px;
+        margin: 0 0 1rem;
     }
 
     hr {
         width: 100%;
         border-top: 0.5px solid #d9d9d90a;
     }
-
-    img{
-        margin: 0 5px;
-    }
     .modal-style{
         width: 400px;
         height: 70%;
     }
-    .input-token-label{
-        margin: 0 3px 0 0;
+    .chevron{
+        position: relative;
+        top: 2px;
+        margin: 0 3px;
     }
 
 </style>
 {#if !selectedToken}
     <button on:click={openTokenSelect} class="select-token flex-row" >
-        <span class="input-token-label">Select Token</span> 
+        <span class="input-token-label text-small ">Select Token</span> 
         <DirectionalChevron width="10px" direction="down" />
     </button>
 {:else}
     <button class="select-token flex-row" on:click={openTokenSelect}>
     	{#if selectedToken}
-			<Base64Svg string={selectedToken.logo_svg_base64} width="21px" margin="0 3px 0 0" />
+			<Base64Svg string={selectedToken.logo_svg_base64} width="21px" margin="0 3px" />
 		{/if}
-        <span class="input-token-label">{selectedToken.token_symbol.toUpperCase()}</span> 
-        <DirectionalChevron width="12px" direction="down" margin="0 0 -5px 0"/>
+        <span class="input-token-label text-xlarge">{selectedToken.token_symbol.toUpperCase()}</span> 
+        <div class="chevron">
+            <DirectionalChevron width="12px" direction="down" margin="0"/>
+        </div>
+        
     </button>
 {/if}
 
@@ -182,9 +172,9 @@
         in:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
         out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
         <div class="heading">
-            <span class=""> Select a token </span> 
+            <span> Select a token </span> 
             <button class="nostyle" on:click={closeTokenSelect}> 
-                <img src="assets/images/cancel.svg" alt="" />
+                <CloseIcon width="18px" />
             </button>
         </div>
 
@@ -197,16 +187,14 @@
                         {#each token_list as token}
                             <div class="select-wrapper flex-row">
                                 <button on:click={() => selectToken(token)} class="nostyle button-item">
-                                    <div class="token-container">
-                                        <div class="token-name-logo flex-row">
-                                            <Base64Svg string={token.logo_svg_base64} width={'27px'} height={'27px'} />
-                                            <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
-                                            {#if token.contract_name === selected_contract}
-                                                <img class="select-icon" src="assets/images/token-select-arrow.svg" alt="" />
-                                            {/if}
-                                        </div>
-                                        <span class="token-amount number"> {stringToFixed(token.balance || 0, 8)} </span>
+                                    <div class="token-name-logo flex-row">
+                                        <Base64Svg string={token.logo_svg_base64} width={'27px'} height={'27px'} />
+                                        <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
+                                        {#if token.contract_name === selected_contract}
+                                            <SelectedArrow width="10px" margin="0 8px" direction="left"/>
+                                        {/if}
                                     </div>
+                                    <span class="token-amount number"> {stringToFixed(token.balance || 0, 8)} </span>
                                 </button>
                             </div>
                         {/each}

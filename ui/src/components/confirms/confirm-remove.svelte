@@ -3,11 +3,13 @@
 
     //Components
     import Button from '../button.svelte';
+    import ShareChange from './confirm-share-change.svelte'
 
     //Icons
     import Base64SvgLogo from '../../icons/base64_svg.svelte'
     import LamdenLogo from '../../icons/lamden-logo.svelte'
     import PlusSign from '../../icons/plus-sign.svelte'
+    import CloseIcon from '../../icons/close.svelte';
 
     //Services
     import { WalletService } from '../../services/wallet.service'
@@ -22,6 +24,8 @@
     export let closeConfirm;
 
     const { pageStats, resetPage } = getContext('pageContext')
+
+    pageStats.subscribe((value) => console.log(value))
 
     let loading = false;
 
@@ -49,58 +53,57 @@
 
 <style>
     .modal-style{
-        width: 330px;
+        width: 290px;
     }
     .sub-text{
-        margin: 1rem 0;
+        margin: 0.5rem 0;
         width: 90%;
     }
     .amount-row{
-        margin: 1rem 0;
+        margin: 0.5rem 0;
     }
     .modal-confirm-details-box{
         padding-top: 1rem;
     }
-
+    .number{
+        color: var(--text-primary-inverted);
+    }
 </style>
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
         <p class="text-large margin-0">You will receive</p>
-        <button class="nostyle" on:click={closeConfirm}>
-            <img class="confirm-modal-close-img" src="assets/images/cancel.svg" alt="" />
+        <button class="close nostyle" on:click={closeConfirm}>
+            <CloseIcon width="18px" />
         </button>
     </div>
-    <div class="flex-col text-large">
+    <div class="flex-col text-xlarge to-receive">
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span>{stringToFixed($pageStats.amounts.token, 4)}</span>
+            <span class="number-reg">{stringToFixed($pageStats.amounts.token, 4)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span>{selectedToken.token_symbol}</span>
                 <Base64SvgLogo string={selectedToken?.logo_svg_base64} width="30px" height="30px" />
             </div>
         </div>
-        <PlusSign width="20px" height="20px" margin="0 auto"/>
+        <PlusSign width="18px" height="18px" margin="0"/>
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span>{stringToFixed($pageStats.amounts.currency, 4)}</span>
+            <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 4)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span >{config.currencySymbol}</span>
                 <LamdenLogo width={'30px'} height={'30px'} margin={"0 10px"}/>
             </div>
         </div>
     </div>
-    <p class="text-xsmall sub-text">
+    <p class="text-xsmall sub-text text-gray-3">
         Output is estimated. If the price changes by more than 0.5% your transaction will revert.
     </p>
-    <div class="flex-col modal-confirm-details-box">
-        <div class="flex-row modal-confirm-item">
-            <p>{`${selectedToken.token_symbol} / ${config.currencySymbol} Tokens Burned`}</p>
-            <p class="text-bold">{stringToFixed($pageStats.lpTokenAmount, 4)}</p>
+    <div class="flex-col modal-confirm-details-box text-small">
+        <div class="flex-row flex-align-center modal-confirm-item">
+            <p>{`Pool Tokens Burned`}</p>
+            <p class="number">{stringToFixed($pageStats.lpTokenAmount, 4)}</p>
         </div>
-        <div class="flex-row modal-confirm-item">
-            <p>Share Change</p>
-            <p class="text-bold">{`${$pageStats.currentLpSharePercent}% => ${$pageStats.newLpSharePercent}%`}</p>
-        </div>
+        <ShareChange />
         <div class="modal-confirm-buttons flex-col">
-            <Button style="secondary" loading={loading} callback={removeLiquidity} text="Confirm Remove Supply" />
+            <Button style="secondary" loading={loading} callback={removeLiquidity} text="Confirm Remove" />
         </div>
     </div>
 </div>
