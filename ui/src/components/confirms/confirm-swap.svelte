@@ -94,7 +94,7 @@
 
 <style>
     .modal-style{
-        width: 380px;
+        width: 330px;
     }
     .sub-text{
         margin: 1rem 0;

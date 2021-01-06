@@ -54,7 +54,7 @@
         margin-top: 0.5rem;
     }
     .modal-style{
-        width: 380px;
+        width: 330px;
     }
     .modal-sub-box{
         width: 360px;
@@ -83,10 +83,10 @@
         </button>
     </div>
     <div class="flex-row pair-display text-xlarge text-bold">
-        <LamdenLogo width="35px" height="30px" margin="0 5px 0 0"/>
+        <LamdenLogo width="20px"  margin="0 5px 0 0"/>
         <span>{`${config.currencySymbol}`}</span>
         <span class="separator">/</span>
-        <Base64SvgLogo string={selectedToken.logo_svg_base64} width="30px" height="35px" margin="0 5px 0 0"/>
+        <Base64SvgLogo string={selectedToken.logo_svg_base64} width="25px"  margin="0 5px 0 0"/>
         <span>{`${selectedToken.token_symbol}`}</span>
     </div>
     <div class="flex-col modal-confirm-details-box">

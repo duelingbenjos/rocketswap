@@ -52,7 +52,7 @@
         margin: 1rem 0;
     }
     .modal-style{
-        width: 380px;
+        width: 330px;
     }
     .modal-sub-box{
         width: 360px;
