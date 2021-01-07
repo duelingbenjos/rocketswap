@@ -1,47 +1,42 @@
 <script type="ts">
   import { onDestroy } from 'svelte'
   import type { WalletType, WalletInitType, WalletErrorType } from '../types/wallet.types'
-  import { wallet_store } from '../store'
+  import { lwc_info, walletBalance } from '../store'
   import { config } from '../config'
-  import { formatAccountAddress, stripTrailingZero } from '../utils'
+  import { formatAccountAddress, stringToFixed } from '../utils'
   import { isWalletConnected, isWalletError, isWalletInit } from '../services/wallet.service'
 
-  let wallet_info: WalletType
-  $: wallet_info
+  //Services
+	import { WalletService } from '../services/wallet.service'
+	const walletService = WalletService.getInstance();
 
-  const wallet_unsub = wallet_store.subscribe((wallet_update) => {
-    wallet_info = wallet_update
-  })
-
-  onDestroy(() => {
-    wallet_unsub()
-  })
 
   function refreshPage() {
     location.reload()
   }
 
-  const openWalletUrl = () => window.open(`${config.blockExplorer}/addresses/${wallet_info.wallets[0]}`);
+  const connnectToWallet = () => walletService.connectToWallet();
+
+  const openWalletUrl = () => window.open(`${config.blockExplorer}/addresses/${$lwc_info.walletAddress}`);
 </script>
 
 <div class="container">
-  <div class="wallet-info">
-    {#if isWalletInit(wallet_info)}
-      <div class="wallet-message">Connecting to wallet...</div>
-    {:else if (isWalletError(wallet_info) && wallet_info.errors[0] === 'Wallet is Locked') || (isWalletConnected(wallet_info) && wallet_info.locked)}
-      <div class="wallet-button">
-        <button on:click={() => refreshPage()}>Wallet is Locked</button>
-      </div>
-    {:else if isWalletError(wallet_info) && wallet_info.errors[0] === 'not_installed'}
-      <div class="wallet-message">Wallet not Installed</div>
-    {:else if isWalletError(wallet_info)}
-      <div class="wallet-message">{wallet_info.errors[0]}</div>
-    {:else if isWalletConnected(wallet_info)}
-      <div class="balance">{stripTrailingZero(wallet_info.balance.toFixed(8))} {config.currencySymbol}</div>
-      <button class="primary medium" on:click={openWalletUrl}>{formatAccountAddress(wallet_info.wallets[0],4,2)}</button>
-    {/if}
-    <div />
-  </div>
+	<div class="wallet-info">
+		{#if !$lwc_info.installed}
+			<button class="wallet-message" on:click={refreshPage}>Wallet not Installed</button>
+		{:else}
+			{#if $lwc_info.locked }
+				<div class="wallet-message">Wallet is Locked</div>
+			{:else}
+				{#if $lwc_info.approved}
+					<div class="balance">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
+					<button class="primary medium" on:click={openWalletUrl}>{formatAccountAddress($lwc_info.walletAddress,4,2)}</button>
+				{:else}
+					<button class="wallet-message" on:click={connnectToWallet}>Connect to Lamden Wallet</button>
+				{/if}
+			{/if}
+		{/if}
+	</div>
 </div>
 
 <style>

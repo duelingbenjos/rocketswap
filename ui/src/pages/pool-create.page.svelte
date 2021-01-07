@@ -6,7 +6,7 @@
   import { params } from 'svelte-hash-router'
 
   //Stores
-  import { wallet_store } from '../store'
+  import { walletIsReady, tokenBalances } from '../store'
 
 	//Services
 	import { ApiService } from '../services/api.service'
@@ -28,7 +28,7 @@
   let resetInputAmounts;
 
   $: contractName = $params.contract
-  $: getTokenBalance = refreshTokenBalance($wallet_store)
+  $: getTokenBalance = refreshTokenBalance($walletIsReady)
   $: pageTitle = pageState.selectedToken ? `RocketSwap Create ${pageState.selectedToken.token_symbol} Pool` : 'RocketSwap Create Pool';
 
   setContext('pageContext', {
@@ -64,8 +64,8 @@
         redirectToAddPool(tokenRes.token.contract_name)
         return
       }
-      if ($wallet_store.init) tokenRes.token.balance = 0
-      else tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
+      if (!$walletIsReady) tokenRes.token.balance = 0
+      else tokenRes.token.balance = $tokenBalances[tokenRes.token.contract_name] || 0;
 
       pageState.selectedToken = tokenRes.token
       pageState.tokenLP = tokenRes.lp_info
@@ -89,7 +89,7 @@
 
   const refreshTokenBalance = () => {
     if (!pageState.selectedToken) return
-    let newBal = $wallet_store?.tokens?.balances[pageState.selectedToken.contract_name] || 0;
+    let newBal = $tokenBalances[pageState.selectedToken.contract_name] || 0;
     if (newBal !== pageState.selectedToken.balance) pageState.selectedToken.balance = newBal
   }
 

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { token_list_store, wallet_store } from '../store'
+import { token_list_store } from '../store'
 import { getBaseUrl, valuesToBigNumber } from '../utils'
 import { config } from '../config'
 
@@ -28,6 +28,7 @@ export class ApiService {
     try {
       let token_list = await axios.get(`${this.base_url}/api/market_list`).then((res) => valuesToBigNumber(res.data))
       console.log('getting market_list')
+      console.log(token_list)
       token_list_store.set(token_list)
       return token_list
     } catch (err) {

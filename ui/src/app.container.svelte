@@ -4,7 +4,6 @@
   import Footer from './components/footer.svelte'
   import Dimmer from './components/dimmer.svelte'
   import ToastsContainer from './components/toasts-container.svelte'
-  import TokenSelect from './components/token-select.svelte'
   import { onMount, setContext } from 'svelte'
   import { writable } from 'svelte/store'
   import { WalletService } from './services/wallet.service'
@@ -12,7 +11,6 @@
   import { WsService } from './services/ws.service'
   import { show_token_select_store, show_swap_confirm } from './store'
   import type { TokenSelectType } from './types/api.types'
-  import SwapConfirm from './components/swap-confirm.svelte'
 
   let show_token_select: TokenSelectType
   let currentThemeName = writable()
@@ -68,11 +66,6 @@
       {#if show_token_select?.open}
         <Dimmer>
           <TokenSelect content={show_token_select.content}/>
-        </Dimmer>
-      {/if}
-      {#if $show_swap_confirm}
-        <Dimmer>
-          <SwapConfirm />
         </Dimmer>
       {/if}
       <Header />

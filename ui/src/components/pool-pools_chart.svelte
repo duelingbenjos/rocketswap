@@ -1,11 +1,13 @@
 <script>
-    import { onMount, beforeUpdate } from 'svelte';
-
     //Services
     import { ApiService } from '../services/api.service'
+    import { WalletService } from '../services/wallet.service'
+
+    const apiService = ApiService.getInstance();
+    const walletService = WalletService.getInstance();
 
     //Stores
-    import { wallet_store } from '../store'
+    import { lwc_info, walletIsReady } from '../store'
 
     //Icons
     import Base64SvgLogo from '../icons/base64_svg.svelte'
@@ -14,37 +16,13 @@
     import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
     import { config } from '../config'
 
-    const apiService = ApiService.getInstance();
-    
-    let initialized = false;
-    let vk;
-    let balances = [];
     let pairs = [];
+    $: balances = getLpBalances($walletIsReady);
+    
 
-    $: vk = getVK($wallet_store)
-
-    beforeUpdate(() => {
-        if ($wallet_store.wallets) checkVk()
-    })
-
-    const getVK = () => {
-        if ($wallet_store?.wallets?.length > 0) {
-            if (vk !== $wallet_store.wallets[0]) {
-                vk = $wallet_store.wallets[0]
-                getLpBalances();
-            }
-        }
-    }
-
-    const checkVk = () => {
-
-    }
-
-    const getLpBalances = async () => {
-        let balancesRes = await apiService.getUserLpBalance(vk)
-
-        // HARDCODED VK FOR TESTING
-        // let balancesRes = await apiService.getUserLpBalance('f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def')
+    async function getLpBalances (ready) {
+        if (!ready) return []
+        let balancesRes = await apiService.getUserLpBalance($lwc_info.walletAddress)
 
         if (balancesRes) {
             balances = balancesRes.points
@@ -168,7 +146,11 @@
             {/each}
         </table>
     {:else}
-        <p>No liquidity found.</p>
+        {#if $walletIsReady}
+            <p>No liquidity found.</p>
+        {:else}
+            <p>Wallet is not Connected.</p>
+        {/if}
     {/if}
 </div>
 

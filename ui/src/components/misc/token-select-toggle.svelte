@@ -4,7 +4,7 @@
 	import { quintOut } from 'svelte/easing';
 
     // Stores
-    import { token_list_store, wallet_store } from '../../store'
+    import { token_list_store, tokenBalances, walletIsReady } from '../../store'
 
     //Services
     import { WalletService } from '../../services/wallet.service'
@@ -56,17 +56,19 @@
                 }
                 
             }
-
-            return [...tokenList
-                .map((token) => {
-                    token.balance = walletService.wallet_state.tokens.balances[token.contract_name] || 0
-                    return token
-                })
-                .sort((a, b) => {
-                    return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
-                })
-                .sort((a, b) => b.balance - a.balance)
-            ]
+            if ($walletIsReady){
+                tokenList = [...tokenList
+                    .map((token) => {
+                        token.balance = $tokenBalances[token.contract_name] || 0
+                        return token
+                    })
+                    .sort((a, b) => {
+                        return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
+                    })
+                    .sort((a, b) => b.balance - a.balance)
+                ]
+            }
+            return tokenList
         }
     }
 

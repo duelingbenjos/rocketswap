@@ -12,7 +12,7 @@
 	//Misc
 	import { config } from '../../config'
 	import { stringToFixed, toBigNumber } from '../../utils.js'
-	import { wallet_store } from '../../store'
+	import { tokenBalances } from '../../store'
 
 	//Props
 	export let label
@@ -22,8 +22,7 @@
 	const dispatch = createEventDispatcher();
 	let inputElm;
 
-	$: wallet_balance = !$wallet_store.init ? $wallet_store.balance.toString() : toBigNumber("0.0");
-	$: tokenBalance = selectedToken?.balance ? toBigNumber(selectedToken?.balance) : toBigNumber("0.0");
+	$: tokenBalance = selectedToken ? $tokenBalances[selectedToken.contract_name] : toBigNumber("0.0")
 	$: inputValue = tokenAmount;
 
 	const handleInputChange = (e) => {

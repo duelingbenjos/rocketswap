@@ -328,12 +328,16 @@ button {
   outline: none;
 }
 
-button:hover {
+button:not(:disabled):hover {
   filter: brightness(105%)
 }
 
 button:disabled {
-  color: #999;
+  filter: brightness(90%)
+}
+
+button.full:disabled {
+  color: var(--color-gray-5);
 }
 
 button:not(:disabled):active {
@@ -358,7 +362,7 @@ button.primary {
   padding: 3px 10px;
 }
 
-button.primary:hover{
+button.primary:not(:disabled):hover{
   border: 1px solid var(--button-primary-border-color);
 }
 
@@ -379,7 +383,7 @@ button.outline{
   background: transparent;
 }
 
-button.outline:hover{
+button.outline:not(:disabled):hover{
   border: 2px solid var(--color-primary);
   background: #ffffff20;
 }

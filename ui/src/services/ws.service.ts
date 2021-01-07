@@ -1,9 +1,7 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, wallet_store } from '../store'
+import { token_metrics_store, tokenBalances } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
-import type { WalletConnectedType } from '../types/wallet.types'
 import { getBaseUrl, valuesToBigNumber } from '../utils'
-import { isWalletConnected } from './wallet.service'
 
 /** Singleton socket.io service */
 export class WsService {
@@ -55,24 +53,15 @@ export class WsService {
   }
 
   private handleBalanceList(payload) {
-    console.log(payload)
-    wallet_store.update((state) => {
-      if (isWalletConnected(state)) {
-        state.tokens = valuesToBigNumber(payload)
-      }
-      return state
-    })
+    console.log('balance update received', payload)
+    tokenBalances.set(valuesToBigNumber(payload).balances)
+    
   }
 
   private handleBalanceUpdate(data) {
     const { payload } = data
     console.log('balance update received', payload)
-    wallet_store.update((state) => {
-      if (isWalletConnected(state)) {
-        state.tokens = valuesToBigNumber(payload)
-      }
-      return state
-    })
+    tokenBalances.set(valuesToBigNumber(payload).balances)
   }
 
   public joinPriceFeed(contract_name: string) {

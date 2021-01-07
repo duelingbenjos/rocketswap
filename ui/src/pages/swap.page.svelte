@@ -10,13 +10,13 @@
 	const apiService = ApiService.getInstance();
 
 	//Stores
-  import { wallet_store } from '../store'
+  import { lwc_info, tokenBalances, walletIsReady } from '../store'
   
   //Misc
   import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
 
 	//Components
-  import SwapPanel from '../components/swap-panel-2.svelte'
+  import SwapPanel from '../components/swap-panel.svelte'
   import SwapInfoBox from '../components/misc/swap-info-box.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
@@ -27,7 +27,7 @@
   let resetInputAmounts
 
 	$: contractName = $params.contract
-	$: getTokenBalance = refreshTokenBalance($wallet_store)
+	$: getTokenBalance = refreshTokenBalance($walletIsReady, $tokenBalances)
 	$: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
   $: addHref = pageState.selectedToken ? `/#/pool-add/${pageState.selectedToken.contract_name}` : false;
   
@@ -78,13 +78,13 @@
   }
 
   const setLpBalances = async () => {
-    if ($wallet_store.init) return {}
-      let vk = $wallet_store?.wallets[0];
-      if (vk){
-          let balancesRes = await apiService.getUserLpBalance(vk)
-          if (balancesRes) return balancesRes.points
-          else return {}
-      }
+    if (!$walletIsReady) return {}
+    let vk = $lwc_info.walletAddress;
+    if (vk){
+        let balancesRes = await apiService.getUserLpBalance(vk)
+        if (balancesRes) return balancesRes.points
+        else return {}
+    }
   }
 
 	const refreshTokenInfo = async () => {
@@ -96,8 +96,8 @@
 	}
 
 	const applyTokenBalance = (tokenRes) => {
-		if ($wallet_store.init) tokenRes.token.balance = 0
-		else tokenRes.token.balance = $wallet_store?.tokens?.balances[tokenRes.token.contract_name] || 0;
+		if (!$walletIsReady) tokenRes.token.balance = toBigNumber("0")
+		else tokenRes.token.balance = $tokenBalances[tokenRes.token.contract_name] || toBigNumber("0");
 		return tokenRes
 	}
 
@@ -106,8 +106,9 @@
 	}
 
   const refreshTokenBalance = () => {
+    console.log("refreshing")
     if (!pageState.selectedToken) return
-    let newBal = $wallet_store?.tokens?.balances[pageState.selectedToken.contract_name] || 0;
+    let newBal = $tokenBalances[pageState.selectedToken.contract_name] || 0;
     if (newBal !== pageState.selectedToken.balance) pageState.selectedToken.balance = newBal
   }
 

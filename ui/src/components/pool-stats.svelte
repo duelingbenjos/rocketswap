@@ -6,7 +6,7 @@
     const apiService = ApiService.getInstance();
     
     //Stores
-    import { wallet_store } from '../store'
+    import { walletIsReady, lwc_info } from '../store'
 
     //Misc
     import { config } from '../config'
@@ -31,7 +31,7 @@
     $: calc = calcValues(pageState, $pageStats)
     $: currencyRatio = "—"
     $: tokenRatio = "—"
-    $: wallet_store_changes = setLpBalances($wallet_store, pageState)
+    $: wallet_store_changes = setLpBalances($walletIsReady, pageState)
 
     const calcValues = () => {
         if ($pageStats?.quoteCalc?.prices){
@@ -57,8 +57,8 @@
     }
 
     const setLpBalances = async () => {
-        if (!$wallet_store.init){
-            let vk = $wallet_store?.wallets[0];
+        if ($walletIsReady){
+            let vk = $lwc_info.walletAddress;
             if (vk){
                 let balancesRes = await apiService.getUserLpBalance(vk)
                 if (balancesRes) lp_balances = balancesRes.points

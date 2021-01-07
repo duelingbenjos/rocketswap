@@ -7,7 +7,6 @@
 	//Components
 	import InputCurrency from './misc/input-currency.svelte'
 	import InputToken from './misc/input-token.svelte'
-	import Quote from './quote.svelte'
 	import Buttons from './buttons.svelte'
 	import IconPlusSign from '../icons/plus-sign.svelte'
 

@@ -7,7 +7,7 @@
 	import LamdenLogo from '../../icons/lamden-logo.svelte'
 
 	//Stores
-	import { wallet_store } from '../../store'
+	import { walletBalance } from '../../store'
 
 	//Misc
 	import { config } from '../../config'
@@ -20,7 +20,6 @@
 	const dispatch = createEventDispatcher();
 	let inputElm;
 
-	$: walletBalance = !$wallet_store.init ? $wallet_store.balance : toBigNumber("0.0");
 	$: inputValue = currencyAmount;
 
 	const handleInputChange = (e) => {
@@ -34,7 +33,7 @@
 	}
 
 	const handleMaxInput = () => {
-		inputValue = walletBalance
+		inputValue = $walletBalance
 		inputElm.value = inputValue.toString()
 		dispatchEvent(inputValue)
 	}
@@ -54,12 +53,9 @@
 		<div class="input-label">
 			{label}
 		</div>
-		<div class="input-balance">
-			{walletBalance ? `Balance: ` : ''}
-			<span class="number text-small">
-				{stringToFixed(walletBalance, 8)}
-			</span>
-		</div>
+		<span class="number text-small">
+			{`Balance: ${stringToFixed($walletBalance, 8)}`}
+		</span>
 	</div>
 	<div class="input-row-2 flex-row">
 	    <input 
