@@ -1,27 +1,22 @@
 <script>
     export let width = "24px";
-    export let height = "24px";
     export let margin = "0";
     export let padding = "0";
-    export let direction = "left"
-    export let color = "var(--color-gray-3)"
+    export let direction = "right"
+    export let color = "var(--text-primary-color-dim)";
 
     const directionMap = {
-      'up' : 180,
-      'right': -90,
-      'down': 0,
-      'left': 90,
+      'left' : 180,
+      'up': -90,
+      'right': 0,
+      'down': 90,
     }
-
-    $: rotation = directionMap[direction] || 0
 </script>
 
 
-<div style={`transform: rotate(${rotation}deg); margin: ${margin}; padding: ${padding};`}>
-  <svg xmlns="http://www.w3.org/2000/svg" {width} {height} viewBox="0 0 21 21">
-    <g id="Group_3" data-name="Group 3" transform={`translate(17.999) rotate(90)`}>
-      <path style={`fill: ${color};`} id="Path_3" data-name="Path 3" d="M20.473,8.683,11.886.124a.434.434,0,0,0-.468-.093.429.429,0,0,0-.264.4V5.147H.429A.429.429,0,0,0,0,5.576V12.44a.429.429,0,0,0,.429.429H11.154v4.7a.43.43,0,0,0,.265.4.423.423,0,0,0,.164.033.432.432,0,0,0,.3-.125l8.587-8.584a.43.43,0,0,0,0-.607Z" transform="translate(0 0)"/>
-    </g>
+<div style={` margin: ${margin}; padding: ${padding};`}>
+  <svg {width} xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 100 100">
+    <path style={`fill: ${color}; `} transform={`rotate(${directionMap[direction]}, 50, 50)`} d="M69.36,18.05a3.54,3.54,0,0,0-2.24-.93,2.88,2.88,0,0,0-3,3V38H0V62H64.13V79.89a3,3,0,0,0,3,3A2.92,2.92,0,0,0,69.27,82L99.16,52.15a3.17,3.17,0,0,0,0-4.3Z"></path>
   </svg>
 </div>
 

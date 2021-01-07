@@ -20,6 +20,8 @@
   function refreshPage() {
     location.reload()
   }
+
+  const openWalletUrl = () => window.open(`${config.blockExplorer}/addresses/${wallet_info.wallets[0]}`);
 </script>
 
 <div class="container">
@@ -27,14 +29,16 @@
     {#if isWalletInit(wallet_info)}
       <div class="wallet-message">Connecting to wallet...</div>
     {:else if (isWalletError(wallet_info) && wallet_info.errors[0] === 'Wallet is Locked') || (isWalletConnected(wallet_info) && wallet_info.locked)}
-      <div class="wallet-button"><button on:click={() => refreshPage()}>Wallet is Locked</button></div>
+      <div class="wallet-button">
+        <button on:click={() => refreshPage()}>Wallet is Locked</button>
+      </div>
     {:else if isWalletError(wallet_info) && wallet_info.errors[0] === 'not_installed'}
       <div class="wallet-message">Wallet not Installed</div>
     {:else if isWalletError(wallet_info)}
       <div class="wallet-message">{wallet_info.errors[0]}</div>
     {:else if isWalletConnected(wallet_info)}
       <div class="balance">{stripTrailingZero(wallet_info.balance.toFixed(8))} {config.currencySymbol}</div>
-      <div class="address">{formatAccountAddress(wallet_info.wallets[0])}</div>
+      <button class="primary medium" on:click={openWalletUrl}>{formatAccountAddress(wallet_info.wallets[0],4,2)}</button>
     {/if}
     <div />
   </div>
@@ -48,8 +52,7 @@
     height: 100%;
   }
   .balance {
-    padding-left: 16px;
-    color: rgba(255,255,255,1)
+    padding-left: 8px;
   }
 
   .wallet-message {
@@ -59,42 +62,34 @@
     margin: 3px 3px 0px 32px;
     padding: 5px 16px 4px 16px;
     height: 33px;
-    background-color: #333862;
-    border-radius: 10px;
+    background-color: var(--color-gray-2);
+    border-radius: var(--border-radius);
     align-self: stretch;
     display: flex;
     align-items: center;
     font-weight: 200;
   }
   .wallet-info {
-    background-color: #ffffff55;
+    background-color: var(--color-secondary);
     margin-left: 48px;
-    border-radius: 12px;
-    font-size: 1.6em;
-    color: #ffffffa5;
-    height: 48px;
+    border-radius: var(--border-radius);
+    font-size: var(--text-size-large);
     padding-left: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .container {
-    background-color: #333862;
-    height: 72px;
+    background-color: transparent;
     width: 100%;
     display: flex;
     align-items: center;
     position: fixed;
-    bottom: 0;
+    bottom: 15px;
+    color: var(--wallet-info-text);
   }
-
-  button {
-    background: none;
-    color: inherit;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    outline: inherit;
+  button.primary{
+    border-radius: var(--border-radius);
+    margin-left: 10px;
   }
 </style>

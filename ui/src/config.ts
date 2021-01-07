@@ -16,7 +16,7 @@ const connectionRequest = {
   contractName: 'con_amm2',
   currencySymbol: 'DTAU',
   // domainName: "https://demoapp.lamden.io",
-  blockExplorer: 'https://testnet.lamden.io/api',
+  blockExplorer: 'https://testnet.lamden.io',
   masternode: 'https://testnet-master-1.lamden.io',
   networkType: 'testnet' // or 'mainnet'
 }

@@ -101,8 +101,8 @@
 	/>
 	<div class="plus-sign" on:click={swapSlots}>
 		<DirectionalArrow 
-			direction={state.buy ? "down" : "up"} width={"20"} 
-			margin={state.buy ? "0 0.5rem 0 0" : "0 0 0.5rem 0"} />
+			direction={state.buy ? "down" : "up"} width={"20px"} 
+			margin={"1rem 0"} />
 	</div>
 
 	<svelte:component 

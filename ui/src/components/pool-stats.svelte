@@ -99,7 +99,7 @@
     }
     p{
         margin: 0;
-        color: var(--color-gray-5)
+        color: var(--text-primary-color-dim)
     }
     p > strong{
         margin:0;

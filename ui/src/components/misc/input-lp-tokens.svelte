@@ -47,7 +47,7 @@
         border-radius: 99px;
         width: 25px;
         height: 25px;
-        background: var(--primary-color);
+        background: var(--text-primary-color);
         cursor: pointer;
     }
 

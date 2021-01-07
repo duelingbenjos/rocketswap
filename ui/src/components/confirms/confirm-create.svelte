@@ -78,7 +78,7 @@
     <div class="flex-row modal-confirm-header">
         <p class="text-large margin-0">You are creating a pair</p>
         <button class="close nostyle" on:click={closeConfirm}>
-            <CloseIcon width="18px" />
+            <CloseIcon />
         </button>
     </div>
     <div class="flex-row pair-display text-xxlarge">
@@ -88,14 +88,14 @@
         <Base64SvgLogo string={selectedToken.logo_svg_base64} width="29px"  margin="0 5px 0 0"/>
         <span>{`${selectedToken.token_symbol}`}</span>
     </div>
-    <div class="flex-col modal-confirm-details-box text-small">
+    <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
-            <p>TAU Deposited</p>
-            <p class="number modal-confirm-value">{stringToFixed(currencyAmount, 4)}</p>
+            <p class="text-primary-dim">TAU Deposited</p>
+            <p class="number">{stringToFixed(currencyAmount, 4)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
-            <p>{`${selectedToken.token_symbol} Deposited`}</p>
-            <p class="number modal-confirm-value">{stringToFixed(tokenAmount, 4)}</p>
+            <p class="text-primary-dim">{`${selectedToken.token_symbol} Deposited`}</p>
+            <p class="number">{stringToFixed(tokenAmount, 4)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}
@@ -103,8 +103,8 @@
             {selectedToken}
         />
         <div class="flex-row modal-confirm-item">
-            <p>Share of Pool</p>
-            <p class="number modal-confirm-value">100%</p>
+            <p class="text-primary-dim">Share of Pool</p>
+            <p class="number">100%</p>
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button style="primary full" loading={loading} callback={createMarket} text="Confirm Create Pair" />

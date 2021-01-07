@@ -20,7 +20,7 @@
 
 <style>
     path{
-        fill: var(--primary-color);
+        fill: var(--color-primary);
         animation: blinker 2s linear infinite;
     }
 

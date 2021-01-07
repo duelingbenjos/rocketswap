@@ -2,7 +2,7 @@
     div{
         box-sizing: border-box;
         background-color: var(--msg-box-background);
-        color: #ebeafc;
+        color: var(--text-primary-color);
         font-size: var(--text-size-small);
         border-radius: var(--border-radius);
         padding: 30px;

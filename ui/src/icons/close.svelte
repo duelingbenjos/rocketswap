@@ -1,5 +1,5 @@
 <script>
-    export let width = "24px";
+    export let width = "16px";
     export let opacity = "1"
 
     let height = width;
@@ -7,7 +7,7 @@
 
 <style>
     path{
-        fill: var(--color-gray-3);
+        fill: var(--text-primary-color-dimmer);
     }
 </style>
 

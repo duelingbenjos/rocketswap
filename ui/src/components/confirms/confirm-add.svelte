@@ -59,31 +59,27 @@
     .sub-text{
         margin: 0.5rem 0;
     }
-    .number{
-        color: var(--text-primary-inverted);
-    }
-
 </style>
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
         <p class="text-large margin-0">You will receive</p>
         <button class="close nostyle" on:click={closeConfirm}>
-            <CloseIcon width="18px" />
+            <CloseIcon />
         </button>
     </div>
     <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 4)}</p>
-    <p class="text-large margin-0 text-gray-3">{`${selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
-    <p class="text-xsmall sub-text text-gray-4">
+    <p class="text-large margin-0 text-primary-dim">{`${selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
+    <p class="text-xsmall sub-text text-primary-dimmer">
         Output is estimated. If the price changes by more than 0.5% your transaction will revert.
     </p>
-    <div class="flex-col modal-confirm-details-box text-small text-gray-3">
+    <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
-            <p>TAU Deposited</p>
-            <p class="number modal-confirm-value">{stringToFixed(currencyAmount, 4)}</p>
+            <p class="text-primary-dim">TAU Deposited</p>
+            <p class="number">{stringToFixed(currencyAmount, 4)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
-            <p>{`${selectedToken.token_symbol} Deposited`}</p>
-            <p class="number modal-confirm-value">{stringToFixed(tokenAmount, 4)}</p>
+            <p class="text-primary-dim">{`${selectedToken.token_symbol} Deposited`}</p>
+            <p class="number">{stringToFixed(tokenAmount, 4)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}

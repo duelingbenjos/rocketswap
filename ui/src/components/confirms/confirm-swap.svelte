@@ -101,25 +101,19 @@
         margin: 1rem 0;
         width: 90%;
     }
-    .amount-row{
-        margin: 0.5rem 0;
-    }
+
     .modal-confirm-details-box{
         padding-top: 1rem;
     }
-    .header-text{
-        margin: 0 0 1rem;
-    }
-
 </style>
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
-        <p class="text-large header-text">Confirm Swap</p>
+        <span class="text-large">Confirm Swap</span>
         <button class="close nostyle" on:click={closeConfirm}>
-            <CloseIcon width="18px" />
+            <CloseIcon />
         </button>
     </div>
-    <div class="flex-col text-large">
+    <div class="flex-col text-xlarge">
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
@@ -132,7 +126,7 @@
             </div>
             <span>{slots[0].symbol}</span>
         </div>
-        <DirectionalArrow direction="down" width="20px" height="20px" margin="0.5rem 0 0 7px"/>
+        <DirectionalArrow direction="down" width="20px" margin="0 0 0 5px" color="var(--text-primary-color-dimmer)"/>
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
@@ -146,19 +140,19 @@
             <span>{slots[1].symbol}</span>
         </div>
     </div>
-    <p class="text-xsmall sub-text text-gray-4">
+    <p class="text-xsmall sub-text text-primary-dim">
         ** Output is estimated. <!--You will receive at least {minimumReceivedString} {receivedSymbol} or the transaction will revert.-->
     </p>
-    <div class="flex-col modal-confirm-details-box color-gray-3 text-small weight-200">
+    <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
-            <p>Price</p>
+            <p class="text-primary-dim">Price</p>
             {#if buy}
-                <div class="flex-row flex-align-center text-primary-inverted">
+                <div class="flex-row flex-align-center">
                     <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
                     <span>{`${selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
                 </div>
             {:else}
-                <div class="flex-row flex-align-center text-primary-inverted">
+                <div class="flex-row flex-align-center">
                     <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
                     <span>{`${config.currencySymbol} per ${selectedToken.token_symbol}`}</span>
                 </div>
@@ -171,8 +165,8 @@
         </div>
         -->
         <div class="flex-row modal-confirm-item">
-            <p>Price Impacted</p>
-            <p  class="number text-primary-inverted" 
+            <p class="text-primary-dim">Price Impacted</p>
+            <p  class="number" 
                 class:text-warning={slippage.isLessThan(5)}
                 class:text-error={slippage.isGreaterThanOrEqualTo(5)}
             >
@@ -180,10 +174,10 @@
             </p>
         </div>
         <div class="flex-row flex-align-center modal-confirm-item">
-            <p>Liquidity Provider Fee</p>
+            <p class="text-primary-dim">Liquidity Provider Fee</p>
             <div class="flex-row flex-align-center">
-                <span class="number text-primary-inverted margin-r-3">{stringToFixed($pageStats.fee, 8)}</span>
-                <span class="text-primary-inverted">{receivedSymbol}</span>
+                <span class="number margin-r-3">{stringToFixed($pageStats.fee, 8)}</span>
+                <span>{receivedSymbol}</span>
             </div>
             
         </div>

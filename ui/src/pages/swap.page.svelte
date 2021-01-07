@@ -112,7 +112,6 @@
   }
 
   const updateWindowHistory = () => {
-    console.log("updating window")
     if (pageState.selectedToken){
       if (!location.pathname.includes(pageState.selectedToken.contract_name))
         window.history.pushState("", "", `/#/${pageState.selectedToken.contract_name}`);

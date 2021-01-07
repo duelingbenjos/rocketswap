@@ -1,28 +1,23 @@
 <script lang="ts">
+  import { getContext, onMount } from 'svelte';
   import { routes, active } from 'svelte-hash-router'
+
+  //Icons
+  import RocketSwap from '../icons/rocketswap.svelte'
+
+  const { themeToggle, currentThemeName } = getContext('app')
+
   let links: any[]
   $: links = Object.values($routes)
+  //$: toggleButtonText = $currentTheme === 'dark' ? 'light' : 'dark';
+
 
 </script>
 
-<div class="header">
-  <div class="logo-container"><img src="/assets/images/rocketswap.svg" alt="" /></div>
-  <div class="links">
-    {#each links as e}
-      {#if e.$$name === "Pools" || e.$$name === "Swap"}
-        <button class="nostyle"> 
-          <a class:active={e === $active} href={e.$$href}> 
-            {e.$$name} 
-          </a> 
-        </button>
-      {/if}
-    {/each}
-  </div>
-</div>
 
 <style>
   .active {
-    border-bottom: 3px solid rgba(255, 255, 255);
+    border-bottom: 3px solid var(--color-primary);
     box-sizing: border-box;
   }
 
@@ -30,18 +25,19 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    font-size: 1.4em;
+    font-size: var(--text-size-xlarge);
     font-weight: 600;
-    color: #fff;
     margin-right: 20px;
+    padding: 5px 12px;
     box-sizing: border-box;
     /* padding-bottom: 6px */
   }
 
-  .links a {
-    color: #fff;
+  a {
+    color: var(--header-primary-color);
     margin-right: 40px;
-    /* padding: 5px 15px; */
+    padding: 0 5px;
+
   }
 
   a:hover {
@@ -49,15 +45,7 @@
     cursor: pointer;
   }
 
-  button{
-    cursor: pointer;
-  }
 
-  button:active,
-  button:focus,
-  button:hover {
-    background: none;
-  }
   .header {
     width: 100%;
     height: 95px;
@@ -69,4 +57,26 @@
   .logo-container {
     padding: 60px;
   }
+
+  button.primary.small{
+    color: var(--text-primary-color-inverted-color);
+  }
 </style>
+
+
+<div class="header">
+  <div class="logo-container">
+    <RocketSwap />
+  </div>
+  <div class="links">
+    {#each links as e}
+      {#if e.$$name === "Pools" || e.$$name === "Swap"}
+        <a class:active={e === $active} href={e.$$href}> 
+          {e.$$name} 
+        </a> 
+      {/if}
+    {/each}
+    <button on:click={themeToggle} class="primary outline small">{$currentThemeName === 'dark' ? 'light' : 'dark'}</button>
+  </div>
+
+</div>

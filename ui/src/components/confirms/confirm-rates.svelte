@@ -6,16 +6,16 @@
 </script>
 
 <div class="flex-row modal-confirm-item">
-    <p>Rates</p>
+    <p class="text-primary-dim">Rates</p>
     <div class="flex-col rates">
-        <div class="rate flex-row flex-align-center modal-confirm-value weight-200">
+        <div class="rate flex-row flex-align-center">
             <span class="number">1</span>
             <span >TAU</span>
             <span class="equals">= </span>
             <span class="number">{currencyPrice}</span>
             <span >{selectedToken.token_symbol}</span>
         </div>
-        <div class="rate flex-row flex-align-center modal-confirm-value weight-200">
+        <div class="rate flex-row flex-align-center">
             <span class="number">1</span>
             <span class="equals">{selectedToken.token_symbol} = </span>
             <span class="number">{tokenPrice}</span>

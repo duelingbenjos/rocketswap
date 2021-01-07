@@ -10,11 +10,11 @@
 
 </script>
 
-<div class="flex-row flex-align-center modal-confirm-item text-gray-3">
-    <p>Share Change</p>
-    <div class="number flex-row flex-align-center text-primary-inverted">
+<div class="flex-row flex-align-center modal-confirm-item">
+    <p class="text-primary-dim">Share Change</p>
+    <div class="number flex-row flex-align-center">
         <span>{`${$pageStats.currentLpSharePercent}%`}</span>
-        <DirectionalArrow width="14px" direction="right" margin="0 3px 0 11px" color="var(--text-primary-inverted)"/>
+        <DirectionalArrow width="14px" direction="right" margin="3px 5px 0 5px" color="var(--text-primary-color)"/>
         <span>{`${$pageStats.newLpSharePercent}%`}</span>
     </div>
 </div>

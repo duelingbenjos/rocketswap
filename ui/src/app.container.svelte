@@ -5,7 +5,8 @@
   import Dimmer from './components/dimmer.svelte'
   import ToastsContainer from './components/toasts-container.svelte'
   import TokenSelect from './components/token-select.svelte'
-  import { onMount } from 'svelte'
+  import { onMount, setContext } from 'svelte'
+  import { writable } from 'svelte/store'
   import { WalletService } from './services/wallet.service'
   import { ApiService } from './services/api.service'
   import { WsService } from './services/ws.service'
@@ -14,8 +15,16 @@
   import SwapConfirm from './components/swap-confirm.svelte'
 
   let show_token_select: TokenSelectType
+  let currentThemeName = writable()
+
+  setContext("app", {
+    themeToggle,
+    currentThemeName
+  })
+  
 
   onMount(() => {
+    themeSet();
     /** Initialise Singleton Instances */
     WsService.getInstance()
     WalletService.getInstance()
@@ -24,6 +33,33 @@
       show_token_select = update
     })
   })
+
+  function themeToggle() {
+    let body = document.getElementById("theme-toggle")
+    let lighttheme = getThemeSetting()
+    if (!lighttheme) {
+      body.classList.add("light");
+      currentThemeName.set('light')  
+    }
+    else {
+      body.classList.remove("light");
+      currentThemeName.set('dark')
+    }
+    localStorage.setItem("lighttheme", !lighttheme)
+  }
+
+  function themeSet() {
+    let body = document.getElementById("theme-toggle")
+    let lighttheme = getThemeSetting()
+    if (lighttheme) {
+      body.classList.add("light");
+      currentThemeName.set('light')
+    }else currentThemeName.set('dark')
+  }
+
+  function getThemeSetting() {
+    return JSON.parse(localStorage.getItem("lighttheme"))
+  }
 </script>
 
 <main>
@@ -53,14 +89,16 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    background-image: linear-gradient(#e92bf74d, rgba(0, 0, 0, 0));
+    background-image: var(--main-background-gradient);
+
+    overflow-y: scroll;
   }
 
   .bg-solid {
     position: absolute;
     height: 100%;
     width: 100%;
-    background-color: #120e4a;
+    background-color: var(--main-background-solid);
   }
 
   .flex {

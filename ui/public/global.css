@@ -19,20 +19,24 @@ body {
   font-family: 'Mukta';
   overflow: hidden;
 
-  --primary-color-light: #41e4b8;
-  --primary-color: #3dd6ad;
-  --primary-color-dark: #138465;
+  --color-primary-light: #41e4b8;
+  --color-primary: #3dd6ad;
+  --color-primary-dark: #138465;
 
-  --secondary-color: #5b49dc;
+  --color-secondary: #9100ff;
 
   --success-color: #2fba95;
   --info-color: #2fba95; 
   --warning-color: #b7ce36;
   --error-color: #ea4c1c;
-  
 
-  --text-primary-color: #412e50;
-  --text-primary-inverted: #fff;
+  --text-primary-color: #fff;
+  --text-primary-color-dim: #ffffffb8;
+  --text-primary-color-dimmer: #ffffff7d;
+
+  --text-primary-color-inverted: #120e4a;
+  --text-primary-color-inverted-dim: #120e4a;
+  --text-primary-color-inverted-dimmer: #120e4a;
 
   --color-gray-1: #f2f2f2;
   --color-gray-2: #d6d6d6;
@@ -47,19 +51,59 @@ body {
   --text-size-xxlarge: 1.8em;
   --text-size-massive: 3.4em; 
 
-  --button-primary-border-color: var(--primary-color-dark);
-  --button-primary: var(--primary-color);
-  --button-secondary: var(--secondary-color);
+  --button-primary-border-color: var(--color-primary-dark);
+  --button-primary: var(--color-primary);
+  --button-secondary: var(--color-secondary);
 
   --button-border-radius: 8px;
 
-  --box-border-color: #f2f2f2db;
+  --pool-main-box-border-color: var(--color-gray-4);
+  --box-border-color: #ffffff26;
   --border-radius: 16px;
+
+  --main-background-solid: #120e4a;
+  --main-background-gradient: linear-gradient(#e92bf74d, rgba(0, 0, 0, 0));
+
+  --panel-background-gradient:  linear-gradient(333deg, #7d0000 0%, #9100ff 80%);
 
   --modal-background-primary: #312a43;
   --modal-background-secondary: #e400ff12;
-
+  --modal-text-color: var(--text-primary-color);
   --msg-box-background: #2b284b;
+
+  --wallet-info-text: var(--text-primary-color-dim);
+
+  color: var(--text-primary-color);
+}
+
+body.light{
+  --text-primary-color: #120e4a;
+  --text-primary-color-dim: #120e4aba;
+  --text-primary-color-dimmer: #120e4a80;
+
+  --text-primary-color-inverted: #fff;
+  --text-primary-color-inverted-dim: #fff;
+  --text-primary-color-inverted-dimmer: #fff;
+
+  --color-gray-1: #f2f2f2;
+  --color-gray-2: #d6d6d6;
+  --color-gray-3: #aaaaaa;
+  --color-gray-4: #888888;
+  --color-gray-5: #5e5e5e;
+
+  --pool-main-box-border-color: var(--text-primary-color);
+
+  --main-background-solid: #fff;
+  --main-background-gradient: linear-gradient(#ddbeff, rgb(255 0 252 / 3%));
+
+  --panel-background-gradient: linear-gradient(333deg, #f1eaff 0%, rgba(255,255,255,1) 80%);
+  --box-border-color: #0000000f;
+
+  --modal-background-primary: #ffffff;
+  --modal-background-secondary: #673ab712;
+  --msg-box-background: #f0f0f0;
+
+  --wallet-info-text: var(--text-primary-color-inverted-dim);
 
   color: var(--text-primary-color);
 }
@@ -102,8 +146,22 @@ body {
 .text-primary{
   color: var(--text-primary-color);
 }
+.text-primary-dim{
+  color: var(--text-primary-color-dim);
+}
+.text-primary-dimmer{
+  color: var(--text-primary-color-dimmer);
+}
 .text-primary-inverted{
-  color: var(--text-primary-inverted);
+  color: var(--text-primary-color-inverted);
+}
+
+.text-primary-inverted-dim{
+  color: var(--text-primary-color-inverted-dim);
+}
+
+.text-primary-inverted-dimmer{
+  color: var(--text-primary-color-inverted-dimmer);
 }
 
 .text-gray-1{
@@ -289,10 +347,10 @@ button:focus {
 }
 
 button.primary {
-  color: var(--text-primary-inverted);
-  background-color: var(--primary-color);
+  color: var(--text-primary-color);
+  background-color: var(--color-primary);
 
-  border: 1px solid var(--primary-color);
+  border: 1px solid var(--color-primary);
   border-radius: var(--button-border-radius);
   
   font-weight: 600;
@@ -317,12 +375,12 @@ button.secondary{
 }
 
 button.outline{
-  border: 2px solid var(--primary-color);
+  border: 2px solid var(--color-primary);
   background: transparent;
 }
 
 button.outline:hover{
-  border: 2px solid var(--primary-color);
+  border: 2px solid var(--color-primary);
   background: #ffffff20;
 }
 
@@ -342,7 +400,7 @@ button.select-token:hover{
 }
 
 .outline.primary{
-  border-color: var(--primary-color);
+  border-color: var(--color-primary);
 }
 
 button.small{
@@ -389,7 +447,7 @@ button.close{
   font-weight: 400;
   justify-content: space-between;
   margin-bottom: 0.5rem;
-  color: var(--color-gray-4);
+  color: var(--text-primary-color-dim);
   font-size: var(--text-size-small);
 }
 
@@ -416,11 +474,12 @@ button.close{
 }
 
 input.input-amount-value::placeholder {
-  color: var(--color-gray-3);
+  color: var(--text-primary-color-dimmer);
 }
 
 .input-amount-value {
   width: 100%;
+  color: var(--text-primary-color);
   font-size: var(--text-size-large);
   padding: 0px;
   background: none;
@@ -467,7 +526,7 @@ input.input-amount-value::placeholder {
 }
 
 .modal-style{
-  color: var(--text-primary-inverted);
+  color: var(--modal-text-color);
   margin-top: 100px;
 
   width: 480px;
@@ -478,20 +537,19 @@ input.input-amount-value::placeholder {
 
   border-radius: var(--border-radius);
 
-  box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.5);
-  -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.5);
-  -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
 }
 
 .modal-sub-box{
   background-color: var(--msg-box-background);
   font-size: var(--text-size-xsmall);
   border-radius: calc(var(--border-radius) / 2);
-  color: var(--text-primary-inverted);
   box-sizing: border-box;
   padding: 15px;
   z-index: 99;
-
+  color: var(--text-primary-color);
   box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
   -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
   -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
@@ -503,7 +561,6 @@ input.input-amount-value::placeholder {
   padding: 1rem 30px 30px;
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   margin-bottom: -30px;
-  color: var(--color-gray-3);
 }
 
 .confirm-modal-close-img{
@@ -531,10 +588,6 @@ input.input-amount-value::placeholder {
   justify-content: flex-end;
 }
 
-.modal-confirm-value{
-  color: var(--text-primary-inverted);
-}
-
 .rate{
   justify-content: flex-end;
   align-items: center;
@@ -551,13 +604,13 @@ input.input-amount-value::placeholder {
   margin: 0 auto;
   margin-top: 15px;
   padding: 30px;
-  background: linear-gradient(333deg, #dccaff 0%, rgba(255,255,255,1) 80%);
+  background: var(--panel-background-gradient);
   width: 380px;
   border-radius: 32px;
 
-  box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
+  box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
 }
 
 @media screen and (max-width: 800px) {

@@ -70,7 +70,7 @@
 <style>
     div{
         box-sizing: border-box;
-        border: 1px solid var(--box-border-color);
+        border: 1px solid var(--pool-main-box-border-color);
         border-radius: var(--border-radius);
         padding: 15px 0 20px;
     }
@@ -78,7 +78,7 @@
         border-collapse: collapse;
     }
     tr:first-child{
-        border-bottom: 1pt solid #fff;
+        border-bottom: 1pt solid var(--pool-main-box-border-color);
     }
     th{
         padding: 0 6px 15px;   
