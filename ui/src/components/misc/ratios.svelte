@@ -5,13 +5,13 @@
     import { stringToFixed, quoteCalculator } from '../../utils' 
     import { config } from '../../config'
 
-    export let pageState;
     export let label = "Price"
     export let showAll =  false;
 
-    const { pageStats } = getContext('pageContext');
+    const { pageStats, pageStores } = getContext('pageContext');
+    const { selectedToken, buy } = pageStores
 
-    $: tokenSymbol = pageState?.selectedToken?.token_symbol || "—";
+    $: tokenSymbol = $selectedToken?.token_symbol || "—";
 </script>
 
 <style>
@@ -60,7 +60,7 @@
                 <span class="">{` ${tokenSymbol}`}</span>
             </div>
         {:else}
-            {#if pageState.buy}
+            {#if $buy}
                 <p>{`${stringToFixed($pageStats?.quoteCalc.prices.currency, 8)} ${tokenSymbol} per  ${config.currencySymbol}`}</p>
             {:else}
                 <p>{`${stringToFixed($pageStats?.quoteCalc.prices.token, 8)} ${config.currencySymbol} per ${tokenSymbol}`}</p>

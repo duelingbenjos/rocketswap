@@ -5,11 +5,10 @@
     import { stringToFixed, quoteCalculator } from '../../utils' 
     import { config } from '../../config'
 
-    export let pageState;
+    const { pageStats, pageStores } = getContext('pageContext');
+    const { selectedToken, buy } = pageStores
 
-    const { pageStats } = getContext('pageContext');
-
-    $: tokenSymbol = pageState?.selectedToken?.token_symbol || "-";
+    $: tokenSymbol = $selectedToken?.token_symbol || "-";
 </script>
 
 <style>
@@ -28,7 +27,7 @@
 <div class="container container-border flex-col text-small weight-400">
     <div class="flex-row flex-align-center">
         <span class="text-primary-dim">Price</span>
-        {#if pageState.buy}
+        {#if $buy}
             <div class="flex-row flex-align-center">
                 <span class="number margin-r-3">{stringToFixed($pageStats?.newPrices?.currency, 8)}</span>
                 <span>{` ${tokenSymbol} per  ${config.currencySymbol}`}</span>
@@ -44,11 +43,11 @@
         <span class="text-primary-dim">Fee</span>
         <div class="flex-row flex-align-center">
             <span class="number margin-r-3">{stringToFixed($pageStats?.fee, 8)}</span>
-            <span>{pageState.buy ?  tokenSymbol : config.currencySymbol}</span>
+            <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>
         </div>
     </div>
     <div class="flex-row flex-align-center ">
         <span class="text-primary-dim">Slippage</span>
-        <span class="number text-primary">{`${stringToFixed(pageState.buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage, 2)}%`}</span>
+        <span class="number text-primary">{`${stringToFixed($buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage, 2)}%`}</span>
     </div>
 </div>

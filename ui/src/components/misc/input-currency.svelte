@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate } from 'svelte'
+	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -15,12 +15,15 @@
 
 	//Props
 	export let label
-	export let currencyAmount;
 
 	const dispatch = createEventDispatcher();
+
+	const { pageStores } = getContext('pageContext')
+	const { currencyAmount } = pageStores
+
 	let inputElm;
 
-	$: inputValue = currencyAmount;
+	$: inputValue = $currencyAmount;
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')

@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
-
-	//Router
-  	import { active } from 'svelte-hash-router'
+	import { getContext } from 'svelte'
 
 	//Components
 	import InputCurrency from './misc/input-currency.svelte'
@@ -13,16 +10,8 @@
 	//Misc
 	import { quoteCalculator, toBigNumber } from '../utils'
 
-	//Props
-	export let pageState;
-	export const resetInputAmounts = resetAmounts;
-
-	$: quoteCalc = quoteCalculator(pageState?.tokenLP);
-
-	const dispatch = createEventDispatcher();
-	const { determineValues,  } = getContext('pageContext')
-
-	let state = { buy: true };
+	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
+	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP } = pageStores
 
 	let slots = [
 		{
@@ -37,49 +26,36 @@
 
 	const swapSlots = () => {
 		slots = [...slots.reverse()]
-		state = Object.assign(state, {buy: !state.buy});
-		dispatchEvent(state)
+		buy.set(!buy)
 	}
 
-	afterUpdate(() => {
-		if (pageState.selectedToken && (state.selectedToken?.contract_name !== pageState.selectedToken?.contract_name)){
-			state.selectedToken = pageState.selectedToken
-		}
-	})
-
 	function handleCurrencyChange(e){
-		if (e.detail.toString() === "NaN") state.currencyAmount = null
+		console.log(e)
+		if (e.detail.toString() === "NaN") saveStoreValue(currencyAmount, null)
 		else{
-			state.currencyAmount = e.detail
-			if (state.selectedToken && pageState.tokenLP) {
-				let quoteCalc = quoteCalculator(pageState.tokenLP)
-				let quote = quoteCalc.calcBuyPrice(state.currencyAmount)
-				state.tokenAmount = quote.tokensPurchasedLessFee
+			saveStoreValue(currencyAmount, e.detail)
+			if ($selectedToken && $tokenLP) {
+				console.log("in here currency?")
+				let quoteCalc = quoteCalculator($tokenLP)
+				let quote = quoteCalc.calcBuyPrice($currencyAmount)
+				saveStoreValue(tokenAmount, quote.tokensPurchasedLessFee)
 			}
 		}
-		dispatchEvent(state)
 	}
 
 	function handleTokenChange(e) {
-		console.log(e)
-		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") state.tokenAmount = null
-		else state.tokenAmount = e.detail.tokenAmount
+		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") saveStoreValue(tokenAmount, null)
+		else saveStoreValue(tokenAmount, e.detail.tokenAmount)
 
-		if (e.detail.selectedToken) state.selectedToken = e.detail.selectedToken
-		if (pageState.tokenLP && state.tokenAmount){
-			let quoteCalc = quoteCalculator(pageState.tokenLP)
-			let quote = quoteCalc.calcSellPrice(state.tokenAmount)
-			state.currencyAmount = quote.currencyPurchasedLessFee
+		if (e.detail.selected) saveStoreValue(selectedToken, e.detail.selected)
+
+		if ($tokenLP && $tokenAmount){
+			console.log("in here token?")
+			let quoteCalc = quoteCalculator($tokenLP)
+			let quote = quoteCalc.calcSellPrice($tokenAmount)
+			saveStoreValue(currencyAmount, quote.currencyPurchasedLessFee)
 		}
-		dispatchEvent(state)
 	}
-
-	function resetAmounts() {
-		state = Object.assign({currencyAmount: null, tokenAmount: null})
-		dispatchEvent(state)
-	}
-
-	const dispatchEvent = (value) => dispatch('infoUpdate', value)
 </script>
 
 <style>
@@ -96,11 +72,10 @@
 		label={'From'}
 		this={slots[0].component}
 		on:input={slots[0].handler}
-		{...state}
 	/>
 	<div class="plus-sign" on:click={swapSlots}>
 		<DirectionalArrow 
-			direction={state.buy ? "down" : "up"} width={"20px"} 
+			direction={$buy ? "down" : "up"} width={"20px"} 
 			margin={"1rem 0"} />
 	</div>
 
@@ -108,7 +83,6 @@
 		label={'To'}
 		this={slots[1].component}
 		on:input={slots[1].handler}
-		{...state}
 	/>
 	<slot name="footer"></slot>
 </div>

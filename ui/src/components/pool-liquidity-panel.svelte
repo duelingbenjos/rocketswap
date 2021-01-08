@@ -1,8 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
-
-	//Router
-  	import { active } from 'svelte-hash-router'
+	import { getContext } from 'svelte'
 
 	//Components
 	import InputCurrency from './misc/input-currency.svelte'
@@ -13,55 +10,28 @@
 	//Misc
 	import { quoteCalculator, toBigNumber, stringToFixed } from '../utils'
 
-	//Props
-	export let pageState;
-	export const resetInputAmounts = resetAmounts;
+	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
+	const { selectedToken, tokenAmount, currencyAmount, tokenLP } = pageStores
 
-	$: quoteCalc = quoteCalculator(pageState?.tokenLP);
-
-	const dispatch = createEventDispatcher();
-	const { determineValues,  } = getContext('pageContext')
-
-	let state = { };
-
-	afterUpdate(() => {
-		state.selectedToken = pageState.selectedToken
-	})
+	$: quoteCalc = quoteCalculator($tokenLP);
 
 	function handleCurrencyChange(e){
-		if (e.detail.toString() === "NaN") state.currencyAmount = null
+		if (e.detail.toString() === "NaN") saveStoreValue(currencyAmount, null)
 		else{
-			state.currencyAmount = e.detail
-			const { tokenLP } = pageState 
-			if (tokenLP){
-				let qc = quoteCalculator(tokenLP)
-				if (determineValues && state.selectedToken) state.tokenAmount = quoteCalc.calcTokenValue(state.currencyAmount)
-			}
-			
+			saveStoreValue(currencyAmount, e.detail)
+			if ($tokenLP && determineValues && $selectedToken) $tokenAmount = quoteCalc.calcTokenValue($currencyAmount)
 		}
-		dispatchEvent(state)
 	}
 
 	function handleTokenChange(e) {
-		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") state.tokenAmount = null
-		else state.tokenAmount = e.detail.tokenAmount
+		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") saveStoreValue(tokenAmount, null)
+		else saveStoreValue(tokenAmount, e.detail.tokenAmount)
 
-		if (e.detail.selectedToken) state.selectedToken = e.detail.selectedToken
-
-		if (determineValues && state.tokenAmount) state.currencyAmount = quoteCalc.calcCurrencyValue(state.tokenAmount) 
-		dispatchEvent(state)
+		if (e.detail.selected) saveStoreValue(selectedToken, e.detail.selected)
+		if ($tokenLP && determineValues && $tokenAmount) {
+			saveStoreValue(currencyAmount, quoteCalc.calcCurrencyValue($tokenAmount))
+		}
 	}
-
-	const switchPositions = async () => {
-		slots = slots.reverse()
-	}
-
-	function resetAmounts() {
-		state = Object.assign({currencyAmount: null, tokenAmount: null})
-		dispatchEvent(state)
-	}
-
-	const dispatchEvent = (value) => dispatch('infoUpdate', value)
 </script>
 
 <style>
@@ -80,17 +50,15 @@
 	<InputCurrency 
 		label={'Base'}
 		on:input={handleCurrencyChange}
-		{...state}
 	/>
 	
 	<div class="plus-sign">
-		<IconPlusSign width={"20px"} height={"50px"} />
+		<IconPlusSign width={"20px"}  />
 	</div>
 
 	<InputToken 
 		label={'Token'}
 		on:input={handleTokenChange} 
-		{...state}
 	/>
 	<slot name="footer"></slot>
 </div>

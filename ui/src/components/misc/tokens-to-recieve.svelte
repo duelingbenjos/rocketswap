@@ -9,13 +9,11 @@
     import { stringToFixed, quoteCalculator, toBigNumber } from '../../utils' 
     import { config } from '../../config'
 
-    //Props
-    export let selectedToken;
+    const { pageStats, pageStores } = getContext('pageContext');
+    const { selectedToken  } = pageStores
 
-    const { pageStats } = getContext('pageContext');
-
-    $: tokenSymbol = selectedToken?.token_symbol || "—";
-    $: logo_svg_base64 = selectedToken?.logo_svg_base64;
+    $: tokenSymbol = $selectedToken?.token_symbol || "—";
+    $: logo_svg_base64 = $selectedToken?.logo_svg_base64;
     $: tokensToReceive = $pageStats?.amounts ? $pageStats.amounts.currency : toBigNumber("0");
     $: currencyToReceive = $pageStats?.amounts ? $pageStats.amounts.token : toBigNumber("0");
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { onMount, setContext } from 'svelte'
-  import { writable } from 'svelte/store'
+	import { onMount, setContext } from 'svelte'
+	import { writable } from 'svelte/store'
 
 	//Router
 	import { params } from 'svelte-hash-router'
@@ -10,121 +10,77 @@
 	const apiService = ApiService.getInstance();
 
 	//Stores
-  import { lwc_info, tokenBalances, walletIsReady } from '../store'
-  
-  //Misc
-  import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
+	import { lwc_info, tokenBalances, walletIsReady, saveStoreValue,  } from '../store'
+	
+	//Misc
+	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
 
-	//Components
-  import SwapPanel from '../components/swap-panel.svelte'
-  import SwapInfoBox from '../components/misc/swap-info-box.svelte'
+		//Components
+	import SwapPanel from '../components/swap-panel.svelte'
+	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
 
-  let pageState = {};
-  let pageStats = writable()
-  let resetInputAmounts
+	let pageStats = writable()
+	let currencyAmount = writable(null)
+	let tokenAmount = writable(null)
+	let selectedToken = writable()
+	let tokenLP = writable()
+	let buy = writable(true)
+
+	let pageStores = {
+		currencyAmount,
+		tokenAmount,
+		selectedToken,
+		buy,
+		tokenLP
+	}
+
+	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: getTokenBalance = refreshTokenBalance($walletIsReady, $tokenBalances)
-	$: pageTitle = pageState.selectedToken ? `RocketSwap TAU/${pageState.selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
-  $: addHref = pageState.selectedToken ? `/#/pool-add/${pageState.selectedToken.contract_name}` : false;
-  
+	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
+	$: addHref = $selectedToken ? `/#/pool-add/${$selectedToken.contract_name}` : false;
+	$: updateStats = updatePageStats($currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
+
+	selectedToken.subscribe(value => {
+		console.log(value)
+		if (value) pageUtilites.refreshTokenInfo(value.contract_name)
+	})
 
 	setContext('pageContext', {
 		getTokenList: async () => await apiService.getMarketList(),
-    determineValues: true,
-    pageStats,
-    resetPage
-  });
+		determineValues: true,
+		pageStats,
+		resetPage: () => pageUtilites.resetPage(contractName, [currencyAmount, tokenAmount]),
+		pageStores,
+		saveStoreValue
+	});
 
-  onMount(() => {
-    if (contractName) refreshTokenInfo()
-  })
-  
-  function resetPage () {
-    resetInputAmounts()
-    setTimeout(refreshTokenInfo, 2000)
-  }
-
-	async function handleInfoUpdate(e) {
-    console.log(e)
-		if (e.detail.selectedToken){
-			let tokenRes = await getTokenInfo(e.detail.selectedToken.contract_name)
-			applyTokenBalance(tokenRes)
-			const { token: selectedToken, lp_info: tokenLP }  = tokenRes
-      pageState = Object.assign(pageState, e.detail, {selectedToken, tokenLP} )
-      updateStatsStore()
-		}else{
-			pageState = Object.assign(pageState, e.detail)
-		}
-		updateWindowHistory()
-  }
-  
-  const updateStatsStore = async () => {
-    const { currencyAmount, tokenAmount, tokenLP, selectedToken, buy } = pageState
-
-    let quoteCalc = quoteCalculator(tokenLP)
-
-    let quote;
-    if (buy) quote = quoteCalc.calcBuyPrice(currencyAmount)      
-    else quote = quoteCalc.calcSellPrice(tokenAmount)
-    
-    pageStats.set({
-      quoteCalc,
-      ...quote
-    })
-  }
-
-  const setLpBalances = async () => {
-    if (!$walletIsReady) return {}
-    let vk = $lwc_info.walletAddress;
-    if (vk){
-        let balancesRes = await apiService.getUserLpBalance(vk)
-        if (balancesRes) return balancesRes.points
-        else return {}
-    }
-  }
-
-	const refreshTokenInfo = async () => {
-		let tokenRes = await getTokenInfo(contractName)
-		applyTokenBalance(tokenRes)
-		const { token: selectedToken, lp_info: tokenLP }  = tokenRes
-    pageState = Object.assign(pageState, {selectedToken, tokenLP} )
-    updateStatsStore();
+	onMount(() => {
+		if (contractName) pageUtilites.refreshTokenInfo(contractName)
+	})
+	
+	
+	const updatePageStats = async () => {
+		console.log($tokenLP)
+		let quoteCalc = quoteCalculator($tokenLP)
+		let quote;
+		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount)      
+		else quote = quoteCalc.calcSellPrice($tokenAmount)
+		
+		pageStats.set({
+			quoteCalc,
+			...quote
+		})
 	}
-
-	const applyTokenBalance = (tokenRes) => {
-		if (!$walletIsReady) tokenRes.token.balance = toBigNumber("0")
-		else tokenRes.token.balance = $tokenBalances[tokenRes.token.contract_name] || toBigNumber("0");
-		return tokenRes
-	}
-
-	const getTokenInfo = async (contractName) => {
-		return apiService.getToken(contractName)
-	}
-
-  const refreshTokenBalance = () => {
-    console.log("refreshing")
-    if (!pageState.selectedToken) return
-    let newBal = $tokenBalances[pageState.selectedToken.contract_name] || 0;
-    if (newBal !== pageState.selectedToken.balance) pageState.selectedToken.balance = newBal
-  }
-
-  const updateWindowHistory = () => {
-    if (pageState.selectedToken){
-      if (!location.pathname.includes(pageState.selectedToken.contract_name))
-        window.history.pushState("", "", `/#/${pageState.selectedToken.contract_name}`);
-    }
-  }
-
 </script>
 
 <style>
-  div.footer{
-    padding-top: 1rem;
-  }
+	div.footer{
+		padding-top: 1rem;
+	}
 </style>
 
 
@@ -133,12 +89,12 @@
 </svelte:head>
 
 <div class="page-container">
-  <SwapPanel on:infoUpdate={handleInfoUpdate} {pageState} bind:resetInputAmounts>
-    <div class="footer" slot="footer">
-      {#if pageState.currencyAmount && pageState.tokenAmount && pageState.tokenLP}
-        <SwapInfoBox {pageState} />
-      {/if}
-      <Buttons buttonFunction="swap" buttonText="Swap" {...pageState} />
-    </div>
-  </SwapPanel>
+	<SwapPanel>
+		<div class="footer" slot="footer">
+		{#if $currencyAmount && $tokenAmount && $tokenLP}
+			<SwapInfoBox />
+		{/if}
+		<Buttons buttonFunction="swap" buttonText="Swap" />
+		</div>
+	</SwapPanel>
 </div>

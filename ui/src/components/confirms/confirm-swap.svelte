@@ -19,20 +19,17 @@
     import { config } from '../../config'
 
     //Props
-    export let selectedToken;
-    export let currencyAmount;
-    export let tokenAmount;
-    export let buy;
     export let closeConfirm;
 
-    const { pageStats, resetPage } = getContext('pageContext')
+    const { pageStats, resetPage, pageStores } = getContext('pageContext')
+    const { selectedToken, currencyAmount, tokenAmount, buy  } = pageStores
 
     let logoSize = "30px"
     let minimumReceived = toBigNumber("0.0")
     
     $: minimumReceivedString = stringToFixed(minimumReceived.toString(), 4)
-    $: slots = createSlots(buy)
-    $: receivedSymbol = buy ? selectedToken.token_symbol : config.currencySymbol
+    $: slots = createSlots($buy)
+    $: receivedSymbol = buy ? $selectedToken.token_symbol : config.currencySymbol
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
     $: slippageWarning = slippage.isGreaterThan(5)
 
@@ -41,15 +38,15 @@
             {
                 logoComponent: LamdenLogo,
                 symbol: config.currencySymbol,
-                amount: stringToFixed(currencyAmount, 4)
+                amount: stringToFixed($currencyAmount, 4)
             },
             {
                 logoComponent: Base64SvgLogo,
-                symbol: selectedToken.token_symbol,
-                amount: stringToFixed(tokenAmount, 4)
+                symbol: $selectedToken.token_symbol,
+                amount: stringToFixed($tokenAmount, 4)
             },
         ]
-        if (!buy) {
+        if (!$buy) {
             minimumReceived = $pageStats.currencyPurchasedLessFee
             slotArray[0].amount = stringToFixed(minimumReceived, 4)
             slotArray.reverse();
@@ -73,21 +70,21 @@
     }
 
     const swapBuy = () => {
-        if (!currencyAmount) return
+        if (!$currencyAmount) return
         loading = true;
         walletService.swapBuy({
-        'contract': selectedToken.contract_name,
-        'currency_amount': {'__fixed__': stringToFixed(currencyAmount.toString(), 30)}
-        }, selectedToken, currencyAmount, minimumReceived, { success, error })
+        'contract': $selectedToken.contract_name,
+        'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)}
+        }, $selectedToken, $currencyAmount, minimumReceived, { success, error })
     }
 
     const swapSell = () => {
-        if (!tokenAmount) return
+        if (!$tokenAmount) return
         loading = true;
         walletService.swapSell({
-        'contract': selectedToken.contract_name,
-        'token_amount': {'__fixed__': stringToFixed(tokenAmount.toString(), 30)}
-        }, selectedToken, minimumReceived, tokenAmount, { success, error })
+        'contract': $selectedToken.contract_name,
+        'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
+        }, $selectedToken, minimumReceived, $tokenAmount, { success, error })
     }
 
 </script>
@@ -118,7 +115,7 @@
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[0].logoComponent} 
-                    string={selectedToken.logo_svg_base64}
+                    string={$selectedToken.logo_svg_base64}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />
@@ -131,7 +128,7 @@
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[1].logoComponent}
-                    string={selectedToken.logo_svg_base64}
+                    string={$selectedToken.logo_svg_base64}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />
@@ -146,15 +143,15 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Price</p>
-            {#if buy}
+            {#if $buy}
                 <div class="flex-row flex-align-center">
                     <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
-                    <span>{`${selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
+                    <span>{`${$selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
                 </div>
             {:else}
                 <div class="flex-row flex-align-center">
                     <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
-                    <span>{`${config.currencySymbol} per ${selectedToken.token_symbol}`}</span>
+                    <span>{`${config.currencySymbol} per ${$selectedToken.token_symbol}`}</span>
                 </div>
             {/if}
         </div>
@@ -179,10 +176,9 @@
                 <span class="number margin-r-3">{stringToFixed($pageStats.fee, 8)}</span>
                 <span>{receivedSymbol}</span>
             </div>
-            
         </div>
         <div class="modal-confirm-buttons flex-col">
-            <Button style="secondary" loading={loading} callback={buy ? swapBuy : swapSell} text="Confirm Swap" />
+            <Button style="secondary" loading={loading} callback={$buy ? swapBuy : swapSell} text="Confirm Swap" />
         </div>
     </div>
 </div>

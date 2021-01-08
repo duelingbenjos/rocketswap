@@ -20,17 +20,15 @@
 
 	//Props
 	export let buttonFunction;
-	export let currencyAmount;
-	export let tokenAmount;
-	export let selectedToken;
 	export let buy;
 	export let buttonText;
 
-	const { pageStats } = getContext('pageContext');
+	const { pageStats, pageStores } = getContext('pageContext');
+	const { selectedToken, currencyAmount, tokenAmount, lpTokenAmount } = pageStores
 
 	let open = false;
 
-	$: disabled = disableButton(currencyAmount, tokenAmount, selectedToken, $pageStats, $lwc_info);
+	$: disabled = disableButton($currencyAmount, $tokenAmount, $selectedToken, $pageStats, $lwc_info, $lpTokenAmount);
 	$: disabledText = undefined;
 
 
@@ -49,23 +47,23 @@
 		}
 
 		if (buttonFunction === "create" || buttonFunction === "add" || buttonFunction === "swap"){
-			if ((!currencyAmount || !tokenAmount || !selectedToken)) return true
-			if (currencyAmount.isEqualTo(0) || tokenAmount.isEqualTo(0)) return true
+			if (!$currencyAmount || !$tokenAmount || !$selectedToken) return true
+			if ($currencyAmount.isEqualTo(0) || $tokenAmount.isEqualTo(0)) return true
 
-			if (currencyAmount.isGreaterThan($walletBalance)){
+			if ($currencyAmount.isGreaterThan($walletBalance)){
 				disabledText = `Insufficent ${config.currencySymbol}`
 				return true
 			}
-			let tokenBalance = $tokenBalances[selectedToken.contract_name]
-			if (tokenAmount.isGreaterThan(tokenBalance)){
-				disabledText = `Insufficent ${selectedToken.token_symbol}`
+			let tokenBalance = $tokenBalances[$selectedToken.contract_name]
+			if ($tokenAmount.isGreaterThan(tokenBalance)){
+				disabledText = `Insufficent ${$selectedToken.token_symbol}`
 				return true
 			}
 		}
 		if (buttonFunction === "remove"){
-			let lpTokenAmount = $pageStats?.lpTokenAmount;
-			if (!lpTokenAmount) return true
-			if (lpTokenAmount.isEqualTo(0)) return true
+			console.log($lpTokenAmount)
+			if (!$lpTokenAmount) return true
+			if ($lpTokenAmount.isEqualTo(0)) return true
 		}
 		return false
 	}
@@ -82,16 +80,16 @@
 		>
 		
 		{#if buttonFunction === 'create'}
-			<ConfirmCreate {currencyAmount} {tokenAmount} {selectedToken} {closeConfirm}/>
+			<ConfirmCreate {$currencyAmount} {$tokenAmount} {$selectedToken} {closeConfirm}/>
 		{/if}
 		{#if buttonFunction === 'add'}
-			<ConfirmAdd {currencyAmount} {tokenAmount} {selectedToken} {closeConfirm}/>
+			<ConfirmAdd {$currencyAmount} {$tokenAmount} {closeConfirm}/>
 		{/if}
 		{#if buttonFunction === 'remove'}
-			<ConfirmRemove {selectedToken} {closeConfirm}/>
+			<ConfirmRemove {$selectedToken} {closeConfirm}/>
 		{/if}
 		{#if buttonFunction === 'swap'}
-			<ConfirmSwap {currencyAmount} {tokenAmount} {selectedToken} {closeConfirm} {buy}/>
+			<ConfirmSwap {$currencyAmount} {$tokenAmount} {$selectedToken} {closeConfirm} {buy}/>
 		{/if}
 	</div>
 {/if}

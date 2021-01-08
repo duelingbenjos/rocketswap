@@ -18,12 +18,10 @@
     import { config } from '../../config'
 
     //Props
-    export let selectedToken;
-    export let currencyAmount;
-    export let tokenAmount;
     export let closeConfirm;
 
-    const { pageStats, resetPage } = getContext('pageContext')
+    const { pageStats, resetPage, pageStores } = getContext('pageContext');
+    const { selectedToken, currencyAmount, tokenAmount } = pageStores
 
     let loading = false;
 
@@ -38,12 +36,12 @@
     }
 
     const addLiquidity = () => {
-        if (!currencyAmount || !tokenAmount || !selectedToken) return
+        if (!currencyAmount || !tokenAmount || !$selectedToken) return
         loading = true;
         walletService.addLiquidity({
-            'contract': selectedToken.contract_name,
+            'contract': $selectedToken.contract_name,
             'currency_amount': {'__fixed__': stringToFixed(currencyAmount.toString(), 30)}
-        }, selectedToken, tokenAmount, currencyAmount, { success, error })
+        }, $selectedToken, tokenAmount, currencyAmount, { success, error })
     }
 
 </script>
@@ -68,23 +66,23 @@
         </button>
     </div>
     <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 4)}</p>
-    <p class="text-large margin-0 text-primary-dim">{`${selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
+    <p class="text-large margin-0 text-primary-dim">{`${$selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
     <p class="text-xsmall sub-text text-primary-dimmer">
         Output is estimated. If the price changes by more than 0.5% your transaction will revert.
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number">{stringToFixed(currencyAmount, 4)}</p>
+            <p class="number">{stringToFixed($currencyAmount, 4)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
-            <p class="text-primary-dim">{`${selectedToken.token_symbol} Deposited`}</p>
-            <p class="number">{stringToFixed(tokenAmount, 4)}</p>
+            <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
+            <p class="number">{stringToFixed($tokenAmount, 4)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}
             tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 4)}
-            {selectedToken}
+            {$selectedToken}
         />
         <ShareChange />
         <div class="modal-confirm-buttons flex-col">

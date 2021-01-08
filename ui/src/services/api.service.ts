@@ -27,8 +27,6 @@ export class ApiService {
   async getMarketList() {
     try {
       let token_list = await axios.get(`${this.base_url}/api/market_list`).then((res) => valuesToBigNumber(res.data))
-      console.log('getting market_list')
-      console.log(token_list)
       token_list_store.set(token_list)
       return token_list
     } catch (err) {
@@ -57,7 +55,6 @@ export class ApiService {
 
   async getUserLpBalance(vk: string) {
     try {
-      console.log(`${this.base_url}/api/user_lp_balance/${vk}`)
       const res = await axios.get(`${this.base_url}/api/user_lp_balance/${vk}`).then((res) => valuesToBigNumber(res.data))
       return res
     } catch (err) {
@@ -67,7 +64,6 @@ export class ApiService {
 
   async getPairs(contracts: string) {
     try {
-      console.log(`${this.base_url}/api/get_pairs/${contracts}`)
       const res = await axios.get(`${this.base_url}/api/get_pairs/${contracts}`).then((res) => valuesToBigNumber(res.data))
       return res
     } catch (err) {

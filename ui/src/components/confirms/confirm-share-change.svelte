@@ -6,8 +6,6 @@
 
     const { pageStats } = getContext('pageContext') 
 
-    pageStats.subscripbe
-
 </script>
 
 <div class="flex-row flex-align-center modal-confirm-item">

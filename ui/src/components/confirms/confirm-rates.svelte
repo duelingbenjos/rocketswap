@@ -1,8 +1,13 @@
 <script>
+    import { getContext } from 'svelte';
+    
     //Props
     export let currencyPrice;
     export let tokenPrice;
-    export let selectedToken;
+
+    const { pageStats, resetPage, pageStores } = getContext('pageContext');
+    const { selectedToken } = pageStores
+
 </script>
 
 <div class="flex-row modal-confirm-item">
@@ -13,11 +18,11 @@
             <span >TAU</span>
             <span class="equals">= </span>
             <span class="number">{currencyPrice}</span>
-            <span >{selectedToken.token_symbol}</span>
+            <span >{$selectedToken.token_symbol}</span>
         </div>
         <div class="rate flex-row flex-align-center">
             <span class="number">1</span>
-            <span class="equals">{selectedToken.token_symbol} = </span>
+            <span class="equals">{$selectedToken.token_symbol} = </span>
             <span class="number">{tokenPrice}</span>
             <span>TAU</span>
         </div>

@@ -23,16 +23,17 @@
     import { stringToFixed  } from '../../utils'
 
     const dispatch = createEventDispatcher();
-    const { getTokenList } = getContext('pageContext');
+    const { getTokenList, pageStores } = getContext('pageContext');
+    const { selectedToken } = pageStores
 
-    export let selectedToken;
+    //export let selectedToken;
 
     let open = false;
     let api_tokens;
 
     $: filter = ""; 
     $: token_list = createTokenList(api_tokens, filter);
-    $: selected_contract = selectedToken?.contract_name;
+    $: selected_contract = $selectedToken?.contract_name;
 
     const openTokenSelect = async () => {
         open = true;
@@ -41,7 +42,6 @@
     const closeTokenSelect = () => open = false;
 
     const selectToken = (token) => {
-        selectedToken = token;
         dispatch('selected', token)
         open = false;
     }
@@ -150,17 +150,17 @@
     }
 
 </style>
-{#if !selectedToken}
+{#if !$selectedToken}
     <button on:click={openTokenSelect} class="select-token flex-row" >
         <span class="input-token-label text-small ">Select Token</span> 
         <DirectionalChevron width="10px" direction="down" />
     </button>
 {:else}
     <button class="select-token flex-row" on:click={openTokenSelect}>
-    	{#if selectedToken}
-			<Base64Svg string={selectedToken.logo_svg_base64} width="21px" margin="0 3px" />
+    	{#if $selectedToken}
+			<Base64Svg string={$selectedToken.logo_svg_base64} width="21px" margin="0 3px" />
 		{/if}
-        <span class="input-token-label text-xlarge">{selectedToken.token_symbol.toUpperCase()}</span> 
+        <span class="input-token-label text-xlarge">{$selectedToken.token_symbol.toUpperCase()}</span> 
         <div class="chevron">
             <DirectionalChevron width="12px" direction="down" margin="0"/>
         </div>
@@ -190,7 +190,7 @@
                             <div class="select-wrapper flex-row">
                                 <button on:click={() => selectToken(token)} class="nostyle button-item">
                                     <div class="token-name-logo flex-row">
-                                        <Base64Svg string={token.logo_svg_base64} width={'27px'} height={'27px'} />
+                                        <Base64Svg string={token.logo_svg_base64} width={'27px'} />
                                         <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
                                         {#if token.contract_name === selected_contract}
                                             <SelectedArrow width="10px" margin="0 8px" direction="left"/>

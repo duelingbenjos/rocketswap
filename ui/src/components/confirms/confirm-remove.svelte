@@ -20,12 +20,10 @@
     import { config } from '../../config'
 
     //Props
-    export let selectedToken;
     export let closeConfirm;
 
-    const { pageStats, resetPage } = getContext('pageContext')
-
-    pageStats.subscribe((value) => console.log(value))
+    const { pageStats, resetPage, pageStores } = getContext('pageContext')
+    const { selectedToken, lpTokenAmount } = pageStores
 
     let loading = false;
 
@@ -44,7 +42,7 @@
         loading = true;
         walletService.removeLiquidity({
         'contract': selectedToken.contract_name,
-        'amount': {'__fixed__': stringToFixed($pageStats.lpTokenAmount.toString(), 30)}
+        'amount': {'__fixed__': stringToFixed($lpTokenAmount.toString(), 30)}
         }, selectedToken, { success, error })
     }
 
@@ -77,11 +75,11 @@
         <div class="flex-row flex-center-spacebetween amount-row">
             <span class="number-reg">{stringToFixed($pageStats.amounts.token, 4)}</span>
             <div class="flex-row flex-center-spacebetween">
-                <span>{selectedToken.token_symbol}</span>
-                <Base64SvgLogo string={selectedToken?.logo_svg_base64} width="30px" margin={"0 0 0 10px"}/>
+                <span>{$selectedToken.token_symbol}</span>
+                <Base64SvgLogo string={$selectedToken?.logo_svg_base64} width="30px" margin={"0 0 0 10px"}/>
             </div>
         </div>
-        <PlusSign width="18px" height="18px" margin="0" color="var(--text-primary-dim)"/>
+        <PlusSign width="18px" margin="0" color="var(--text-primary-dim)"/>
         <div class="flex-row flex-center-spacebetween amount-row">
             <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 4)}</span>
             <div class="flex-row flex-center-spacebetween">
@@ -96,7 +94,7 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row flex-align-center modal-confirm-item">
             <p class="text-primary-dim">{`Pool Tokens Burned`}</p>
-            <p class="number">{stringToFixed($pageStats.lpTokenAmount, 4)}</p>
+            <p class="number">{stringToFixed($lpTokenAmount, 4)}</p>
         </div>
         <ShareChange />
         <div class="modal-confirm-buttons flex-col">

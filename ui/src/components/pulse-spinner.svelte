@@ -4,16 +4,17 @@
   export let size = 60
   export let color = '#FF3E00'
   export let unit = 'px'
+  export let padding = "0";
 </script>
 
-<div class="wrapper" style="--size: {size}{unit}; --color: {color}">
+<div class="spinner" style="--size: {size}{unit}; --color: {color}; padding: {padding};">
   {#each range(3, 0) as version}
     <div class="cube" style="animation-delay: {version * 0.15}s; left: {version * (size / 3 + size / 15) + unit};" />
   {/each}
 </div>
 
 <style>
-  .wrapper {
+  .spinner {
     position: relative;
     display: flex;
     justify-content: center;
@@ -23,7 +24,6 @@
   }
   .cube {
     position: absolute;
-    top: 0px;
     width: calc(var(--size) / 5);
     height: calc(var(--size) / 2.5);
     background-color: var(--color);

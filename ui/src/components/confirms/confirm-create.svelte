@@ -19,12 +19,10 @@
     import { config } from '../../config'
 
     //Props
-    export let selectedToken;
-    export let currencyAmount;
-    export let tokenAmount;
     export let closeConfirm;
 
-    const { pageStats, resetPage } = getContext('pageContext')
+    const { pageStats, pageStores } = getContext('pageContext')
+    const { currencyAmount, tokenAmount, selectedToken } = pageStores
 
     let loading = false;
 
@@ -39,13 +37,13 @@
     }
 
   const createMarket = () => {
-    if (!currencyAmount || !tokenAmount || !selectedToken) return
+    if (!$currencyAmount || !$tokenAmount || !$selectedToken) return
     loading = true;
     walletService.createMarket({
-      'contract': selectedToken.contract_name,
-      'currency_amount': {'__fixed__': stringToFixed(currencyAmount.toString(), 30)},
-      'token_amount': {'__fixed__': stringToFixed(tokenAmount.toString(), 30)}
-    }, selectedToken, tokenAmount, currencyAmount, { success, error })
+      'contract': $selectedToken.contract_name,
+      'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)},
+      'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
+    }, $selectedToken, $tokenAmount, $currencyAmount, { success, error })
   }
 
 </script>
@@ -67,12 +65,6 @@
     .separator{
         margin: 0 11px;
     }
-    .text-bold{
-        text-align: right;
-    }
-    .flex-row.text-bold{
-        justify-content: flex-end;
-    }
 </style>
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
@@ -85,17 +77,17 @@
         <LamdenLogo width="27px"  margin="0 5px 0 0"/>
         <span>{`${config.currencySymbol}`}</span>
         <span class="separator">/</span>
-        <Base64SvgLogo string={selectedToken.logo_svg_base64} width="29px"  margin="0 5px 0 0"/>
-        <span>{`${selectedToken.token_symbol}`}</span>
+        <Base64SvgLogo string={$selectedToken.logo_svg_base64} width="29px"  margin="0 5px 0 0"/>
+        <span>{`${$selectedToken.token_symbol}`}</span>
     </div>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number">{stringToFixed(currencyAmount, 4)}</p>
+            <p class="number">{stringToFixed($currencyAmount, 4)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
-            <p class="text-primary-dim">{`${selectedToken.token_symbol} Deposited`}</p>
-            <p class="number">{stringToFixed(tokenAmount, 4)}</p>
+            <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
+            <p class="number">{stringToFixed($tokenAmount, 4)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}

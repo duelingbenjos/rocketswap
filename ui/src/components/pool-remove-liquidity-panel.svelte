@@ -1,9 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
-
-	//Services
-	import { ApiService } from '../services/api.service'
-	const apiService = ApiService.getInstance();
+	import { getContext } from 'svelte'
 
 	//Components
 	import InputLpTokens from './misc/input-lp-tokens.svelte'
@@ -11,21 +7,10 @@
 	import Ratios from './misc/ratios.svelte'
 	import TokensToReceive from './misc/tokens-to-recieve.svelte'
 
-	//Props
-	export let pageState;
+	const { pageStores, saveStoreValue } = getContext('pageContext')
+	const { lpTokenPercentInput } = pageStores
 
-	const dispatch = createEventDispatcher();
-
-	let state = { };
-
-	afterUpdate(() => {
-		state.selectedToken = pageState.selectedToken
-	})
-
-	const handleLpTokensChange = (e) => {
-		state = Object.assign(state, {lpTokenPercentInput: e.detail})
-		dispatch('infoUpdate', state)
-	}
+	const handleLpTokensChange = (e) => saveStoreValue(lpTokenPercentInput, e.detail)
 </script>
 
 
@@ -35,7 +20,7 @@
 		label={'Amount'} 
 		on:input={handleLpTokensChange}
 	/>
-	<TokensToReceive {...pageState} {...state}/>
-	<Ratios {pageState} showAll={true} />
+	<TokensToReceive />
+	<Ratios  showAll={true} />
 	<slot name="footer"></slot>
 </div>

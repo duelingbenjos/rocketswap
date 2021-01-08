@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
+	import { createEventDispatcher, getContext } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -16,14 +16,16 @@
 
 	//Props
 	export let label
-	export let tokenAmount;
-	export let selectedToken;
 
 	const dispatch = createEventDispatcher();
+	
+	let { pageStores } = getContext('pageContext')
+	const { selectedToken, tokenAmount } = pageStores
+
 	let inputElm;
 
-	$: tokenBalance = selectedToken ? $tokenBalances[selectedToken.contract_name] : toBigNumber("0.0")
-	$: inputValue = tokenAmount;
+	$: tokenBalance = $selectedToken ? $tokenBalances[$selectedToken.contract_name] : toBigNumber("0.0")
+	$: inputValue = $tokenAmount;
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -42,11 +44,10 @@
 	}
 
 	const handleTokenSelect = (e) => {
-		selectedToken = e.detail
-		dispatchEvent(inputValue)
+		dispatchEvent(inputValue, e.detail)
 	}
 
-	const dispatchEvent = (value) => dispatch('input', {tokenAmount: value, selectedToken})
+	const dispatchEvent = (value, selected) => dispatch('input', {tokenAmount: value, selected})
 </script>
 
 <div class="input-container flex-col"
@@ -54,7 +55,7 @@
 	<div class="input-row-1 flex-row">
 		<div class="input-label">{label}</div>
 		<div class="input-balance">
-			{#if selectedToken}
+			{#if $selectedToken}
 				Balance: 
 				<span class="number text-small">{stringToFixed(tokenBalance, 8)}</span>
 			{/if}
@@ -68,13 +69,13 @@
 			bind:this={inputElm} 
 			on:input={handleInputChange}
 			type="text"
-			disabled={!selectedToken} 
+			disabled={!$selectedToken} 
 		/>
 		<div class="input-controls">
-			{#if !inputElm?.value && selectedToken}
-				<button disabled={!selectedToken} on:click={handleMaxInput} class="primary small">MAX</button>
+			{#if !inputElm?.value && $selectedToken}
+				<button disabled={!$selectedToken} on:click={handleMaxInput} class="primary small">MAX</button>
 			{/if}
-			<TokenSelect on:selected={handleTokenSelect} {selectedToken} />
+			<TokenSelect on:selected={handleTokenSelect} />
 		</div>
 	</div>
 </div>

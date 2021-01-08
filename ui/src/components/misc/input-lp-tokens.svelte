@@ -3,6 +3,8 @@
     
 	import { scale } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
+
+    import { walletIsReady } from '../../store'
     
     export let label
 
@@ -94,12 +96,13 @@
 			bind:value={inputVal} 
 			type="range"
 			on:input={handleInputChange}
+            disabled={!$walletIsReady}
         />
 	</div>
     <div class="input-row-3 flex-row">
-        <button on:click={() => handleButtonInput(25)} class="primary medium">25%</button> 
-        <button on:click={() => handleButtonInput(50)} class="primary medium">50%</button>
-        <button on:click={() => handleButtonInput(75)} class="primary medium">75%</button>
-        <button on:click={() => handleButtonInput(100)} class="primary medium">MAX</button>
+        <button disabled={!$walletIsReady} on:click={() => handleButtonInput(25)} class="primary medium">25%</button> 
+        <button disabled={!$walletIsReady} on:click={() => handleButtonInput(50)} class="primary medium">50%</button>
+        <button disabled={!$walletIsReady} on:click={() => handleButtonInput(75)} class="primary medium">75%</button>
+        <button disabled={!$walletIsReady} on:click={() => handleButtonInput(100)} class="primary medium">MAX</button>
     </div>
 </div>

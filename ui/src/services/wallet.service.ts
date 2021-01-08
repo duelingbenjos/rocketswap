@@ -1,9 +1,9 @@
 import WalletController from 'lamden_wallet_controller'
 import { config } from '../config'
-import { lwc_info, walletBalance } from '../store'
+import { lwc_info, walletBalance, lpBalances } from '../store'
 import { get } from 'svelte/store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
-import { refreshTAUBalance, toBigNumber, stringToFixed } from '../utils'
+import { refreshTAUBalance, refreshLpBalances, toBigNumber, stringToFixed } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -11,7 +11,6 @@ import { WsService } from './ws.service'
 
 export class WalletService {
 	private static _instance: WalletService
-	private wallet_state: WalletType
 	private lwc: WalletController
 	private toastService = ToastService.getInstance()
 	private wsService = WsService.getInstance()
@@ -28,9 +27,6 @@ export class WalletService {
 	constructor() {
 		this.lwc = new WalletController()
 
-		//lwc_info.subscribe((update) => console.log(update))
-		//walletBalance.subscribe((update) => console.log(update))
-
 		// events
 		this.lwc.events.on('newInfo', this.handleWalletInfo)
 		this.lwc.events.on('txStatus', (res) => console.log(res))
@@ -43,9 +39,12 @@ export class WalletService {
 	private checkForIntstalledWallet = () => this.lwc.walletIsInstalled().then(this.handleWalletInfo)
 	public connectToWallet = () => this.lwc.sendConnection(this.connectionRequest)
 
-	private handleWalletInfo = () => {
+	private handleWalletInfo = (e) => {
 		//If the wallet wasn't installed schedule another check
 		if (!this.lwc.installed){
+			if (typeof get(lwc_info).installed === 'undefined') {
+				lwc_info.set(Object.assign(get(lwc_info), {installed: this.lwc.installed}))
+			}
 			setTimeout(this.checkForIntstalledWallet, 1000)
 		}else{
 			//If the wallet is installed then update the store if new information is passed
@@ -57,14 +56,14 @@ export class WalletService {
 		}
 	 }
 
-	private updateLwcStore = () => {
+	private updateLwcStore = async () => {
 		if (!this.lwc.installed) return
 
 		lwc_info.update(current => {
 			const { approved, installed, locked, walletAddress } = this.lwc;
 			if (walletAddress.length > 0 && approved){
 				//Get the inital balance 
-				refreshTAUBalance(walletAddress).then(balance => walletBalance.set(balance))
+				this.getIntialBalances()
 				// Join Websocket Feeds for balance updates
 				if (!this._ws_joined) {
 					this.wsService.joinBalanceFeed(walletAddress)
@@ -74,23 +73,25 @@ export class WalletService {
 			return Object.assign(current, { approved, installed, locked, walletAddress })
 		})
 	}
+	private getIntialBalances = async () => {
+		await Promise.all([refreshTAUBalance(), refreshLpBalances()])
+	}
+	private createTxInfo(method: string, args, contractName = undefined) {
+		return {
+			contractName,
+			methodName: method,
+			networkType: config.networkType,
+			stampLimit: 100, //TODO Populate with blockexplorer stamp info endpoint
+			kwargs: args
+		}
+	}
 
-  private createTxInfo(method: string, args, contractName = undefined) {
-    return {
-      contractName,
-      methodName: method,
-      networkType: config.networkType,
-      stampLimit: 100, //TODO Populate with blockexplorer stamp info endpoint
-      kwargs: args
-    }
-  }
-
-  getApprovedAmount = async (vk: string, contract: string) => {
-    return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${config.contractName}`)
-      .then((res) => res.json())
-      .then((json) => json.value)
-      .catch((e) => console.log(e.message))
-  }
+	getApprovedAmount = async (vk: string, contract: string) => {
+		return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${config.contractName}`)
+				.then((res) => res.json())
+				.then((json) => json.value)
+				.catch((e) => console.log(e.message))
+	}
 
 
 	public async createMarket(args, selectedToken, tokenAmount, currencyAmount, callbacks = undefined) {

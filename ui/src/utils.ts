@@ -1,16 +1,39 @@
 import Lamden from 'lamden-js'
 import { config } from './config'
 import BigNumber from 'bignumber.js'
+import { get } from 'svelte/store'
+import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue } from './store'
+import { active } from 'svelte-hash-router'
+
+import { ApiService } from './services/api.service'
 
 let API = new Lamden.Masternode_API({ hosts: [config.masternode] })
 
 export const replaceAll = (string, char, replace) => {
-  return string.split(char).join(replace)
+	return string.split(char).join(replace)
 }
 
-export const refreshTAUBalance = async (account) => {
-  const res = await API.getCurrencyBalance(account)
-  return res
+export const refreshTAUBalance = async (account = undefined) => {
+	if (!account) account = get(lwc_info).walletAddress
+	if (!account) return toBigNumber("0")
+
+	const res = await API.getCurrencyBalance(account)
+	walletBalance.set(res)
+	return res
+}
+
+export const refreshLpBalances = async (account = undefined) => {
+	if (!account) account = get(lwc_info).walletAddress
+	if (!account) return {}
+
+	const apiService = ApiService.getInstance();
+
+	let balances = await apiService.getUserLpBalance(account)
+	if (balances?.points) balances = balances.points
+	else balances = {}
+
+	lpBalances.set(balances)
+	return balances
 }
 
 export const getBaseUrl = (url): string => {
@@ -147,21 +170,21 @@ export function valuesToBigNumber(obj: any) {
 
 export const quoteCalculator = (tokenInfo) => {
 	const currencyReserves = toBigNumber(tokenInfo?.reserves[0] || ["0", "0"])
-  const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
-  
-  const prices = getPrices([currencyReserves, tokenReserves])
+	const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
 
-  const totalLP = tokenInfo?.lp || toBigNumber("0")
-  const k = currencyReserves.multipliedBy(tokenReserves)
+	const prices = getPrices([currencyReserves, tokenReserves])
 
-  function getPrices(reserves) {
-    if (!reserves) return
-    return {
-      reserves,
-      currency: reserves[1].dividedBy(reserves[0]),
-      token: reserves[0].dividedBy(reserves[1])
-    }
-  }
+	const totalLP = tokenInfo?.lp || toBigNumber("0")
+	const k = currencyReserves.multipliedBy(tokenReserves)
+
+	function getPrices(reserves) {
+		if (!reserves) return
+		return {
+			reserves,
+			currency: reserves[1].dividedBy(reserves[0]),
+			token: reserves[0].dividedBy(reserves[1])
+		}
+	}
 
 	const calcCurrencyValue = (value) =>  prices.token.multipliedBy(value)
 	const calcTokenValue = (value) =>  prices.currency.multipliedBy(value)
@@ -169,95 +192,163 @@ export const quoteCalculator = (tokenInfo) => {
 	const calcLpPercent = (lp_balance) => lp_balance.dividedBy(totalLP)
 
 	const calcTokenValueInCurrency = (lp_balance) => {
-        const share = calcLpPercent(lp_balance)
-        return  (currencyReserves.multipliedBy(share)) + (lp_balance.multipliedBy(share).multipliedBy(prices.currency) )
+		const share = calcLpPercent(lp_balance)
+		return  (currencyReserves.multipliedBy(share)) + (lp_balance.multipliedBy(share).multipliedBy(prices.currency) )
 	}
 
-  const calcPointsPerCurrency = () => totalLP.dividedBy(currencyReserves)
-  
-  const calcInitialLpMintAmount = () => toBigNumber(100);
+	const calcPointsPerCurrency = () => totalLP.dividedBy(currencyReserves)
+
+	const calcInitialLpMintAmount = () => toBigNumber(100);
 
 	const calcNewLpMintAmount = (currencyAmount) => calcPointsPerCurrency().multipliedBy(currencyAmount) 
 
 	const calcNewShare = (lp_balance, currencyAmount) => {
+		if (!currencyAmount || !lp_balance) return toBigNumber("0")
+		console.log({lp_balance, currencyAmount})
 		let newLpMinted = calcNewLpMintAmount(currencyAmount)
-    let newShare =  lp_balance.plus(newLpMinted).dividedBy(totalLP.plus(newLpMinted))
-    if (newShare.isNaN) return toBigNumber("0")
-    return newShare
-  }
+		let newShare =  lp_balance.plus(newLpMinted).dividedBy(totalLP.plus(newLpMinted))
+		console.log({
+			lp_balance: lp_balance.toString(), 
+			currencyAmount: currencyAmount.toString(),
+			newLpMinted: newLpMinted.toString(),
+			newShare: newShare.toString()
+		})
+		if (newShare.isNaN()) return toBigNumber("0")
+		return newShare
+	}
 
-  const calcNewShare_removeTokens = (lpCurrentBalance, lpTokensToRemove) => {
-    return lpCurrentBalance.minus(lpTokensToRemove).dividedBy(totalLP.minus(lpTokensToRemove))
-  }
-  
-  const calcAmountsFromLpTokens = (lpTokenAmount) => {
-    if (!lpTokenAmount) return undefined
+	const calcNewShare_removeTokens = (lpCurrentBalance, lpTokensToRemove) => {
+		return lpCurrentBalance.minus(lpTokensToRemove).dividedBy(totalLP.minus(lpTokensToRemove))
+	}
 
-    let lp_percent = calcLpPercent(lpTokenAmount)
-    return {
-      currency: currencyReserves.multipliedBy(lp_percent),
-      token: tokenReserves.multipliedBy(lp_percent)
-    }
-  }
+	const calcAmountsFromLpTokens = (lpTokenAmount) => {
+		if (!lpTokenAmount) return undefined
 
-  const calcBuyPrice = (currencyAmount) => {
-    let newCurrencyReserve = currencyReserves.plus(currencyAmount)
-    let newTokenReserve = k.dividedBy(newCurrencyReserve)
-    let tokensPurchased = tokenReserves.minus(newTokenReserve)
-    let fee = tokensPurchased.multipliedBy(0.03)
-    let tokensPurchasedLessFee = tokensPurchased.minus(fee)
+		let lp_percent = calcLpPercent(lpTokenAmount)
+		return {
+			currency: currencyReserves.multipliedBy(lp_percent),
+			token: tokenReserves.multipliedBy(lp_percent)
+		}
+	}
 
-    return {
-      tokensPurchased,
-      fee,
-      tokensPurchasedLessFee,
-      ...calcSlippage(newTokenReserve, newCurrencyReserve)
-    }
-  }
+	const calcBuyPrice = (currencyAmount) => {
+		let newCurrencyReserve = currencyReserves.plus(currencyAmount)
+		let newTokenReserve = k.dividedBy(newCurrencyReserve)
+		let tokensPurchased = tokenReserves.minus(newTokenReserve)
+		let fee = tokensPurchased.multipliedBy(0.03)
+		let tokensPurchasedLessFee = tokensPurchased.minus(fee)
 
-  const calcSellPrice = (tokenAmount) => {
-    let newTokenReserve = tokenReserves.plus(tokenAmount)
-    let newCurrencyReserve = k.dividedBy(newTokenReserve)
-    let currencyPurchased = currencyReserves.minus(newCurrencyReserve)
-    let fee = currencyPurchased.multipliedBy(0.03)
-    let currencyPurchasedLessFee = currencyPurchased.minus(fee)
+		return {
+			tokensPurchased,
+			fee,
+			tokensPurchasedLessFee,
+			...calcSlippage(newTokenReserve, newCurrencyReserve)
+		}
+	}
 
-    return {
-      currencyPurchased,
-      fee,
-      currencyPurchasedLessFee,
-      ...calcSlippage(newTokenReserve, newCurrencyReserve)
-    }
-  }
+	const calcSellPrice = (tokenAmount) => {
+		let newTokenReserve = tokenReserves.plus(tokenAmount)
+		let newCurrencyReserve = k.dividedBy(newTokenReserve)
+		let currencyPurchased = currencyReserves.minus(newCurrencyReserve)
+		let fee = currencyPurchased.multipliedBy(0.03)
+		let currencyPurchasedLessFee = currencyPurchased.minus(fee)
 
-  const calcSlippage = (newTokenReserve, newCurrencyReserve) => {
-    let newPrices = getPrices([newCurrencyReserve, newTokenReserve])
+		return {
+			currencyPurchased,
+			fee,
+			currencyPurchasedLessFee,
+			...calcSlippage(newTokenReserve, newCurrencyReserve)
+		}
+	}
 
-    if (newPrices.currency.isNaN()) newPrices.currency = toBigNumber("0.0")
-    if (newPrices.token.isNaN()) newPrices.token = toBigNumber("0.0")
+	const calcSlippage = (newTokenReserve, newCurrencyReserve) => {
+		let newPrices = getPrices([newCurrencyReserve, newTokenReserve])
 
-    return {
-      newPrices,
-      tokenSlippage: prices.token.dividedBy(newPrices.token).minus(1).multipliedBy(100).absoluteValue(),
-      currencySlippage: prices.currency.dividedBy(newPrices.currency).minus(1).multipliedBy(100).absoluteValue()
-    }
-  }
-  
+		if (newPrices.currency.isNaN()) newPrices.currency = toBigNumber("0.0")
+		if (newPrices.token.isNaN()) newPrices.token = toBigNumber("0.0")
+
+		return {
+			newPrices,
+			tokenSlippage: prices.token.dividedBy(newPrices.token).minus(1).multipliedBy(100).absoluteValue(),
+			currencySlippage: prices.currency.dividedBy(newPrices.currency).minus(1).multipliedBy(100).absoluteValue()
+		}
+	}
+
 	return {
-    prices,
-    currencyReserves,
-    tokenReserves,
-		toBigNumber,
-		isBigNumber,
-		calcCurrencyValue,
-		calcTokenValue,
-		calcLpPercent,
-		calcTokenValueInCurrency,
-		calcNewShare, calcNewShare_removeTokens,
-		calcPointsPerCurrency,
-    calcNewLpMintAmount, calcInitialLpMintAmount,
-    calcAmountsFromLpTokens,
-    calcBuyPrice, calcSellPrice,
+		prices,
+		currencyReserves,
+		tokenReserves,
+			toBigNumber,
+			isBigNumber,
+			calcCurrencyValue,
+			calcTokenValue,
+			calcLpPercent,
+			calcTokenValueInCurrency,
+			calcNewShare, calcNewShare_removeTokens,
+			calcPointsPerCurrency,
+		calcNewLpMintAmount, calcInitialLpMintAmount,
+		calcAmountsFromLpTokens,
+		calcBuyPrice, calcSellPrice,
 	}
 }
 
+
+/*
+  PAGE UTILS
+*/
+
+export const pageUtils = (pageStores) => {
+	//Stores
+	const {
+		selectedToken,
+		tokenLP,
+	  } = pageStores
+
+	//Services
+	const apiService = ApiService.getInstance();
+
+	const refreshTokenInfo = async (contractName) => {
+		if (!contractName) return
+		let tokenRes = await getTokenInfo(contractName)
+		console.log(tokenRes)
+		applyTokenBalance(tokenRes)
+		const { token, lp_info }  = tokenRes
+		saveStoreValue(selectedToken, token)
+		saveStoreValue(tokenLP, lp_info)
+	}
+
+	const getTokenInfo = async (contractName) => {
+		return apiService.getToken(contractName)
+	}
+
+	const applyTokenBalance = (tokenRes) => {
+		if (!get(walletIsReady)) tokenRes.token.balance = 0
+		else tokenRes.token.balance = get(tokenBalances)[tokenRes.token.contract_name] || 0;
+		return tokenRes
+	}
+
+	const updateWindowHistory = (route) => {
+		if (get(selectedToken)){
+		  if (!location.pathname.includes(get(selectedToken).contract_name))
+			window.history.pushState("", "", `/#/${route}/${get(selectedToken).contract_name}`);
+		}
+	}
+
+	const redirectToAddPool = (contractName) => window.location.assign(`/#/pool-add/${contractName}`)
+	const redirectPoolMain = () => window.location.assign(`/#/pool-main/`)
+
+	  
+	const resetPage = (contractName, stores) => {
+		stores.forEach(store => store.set(null))
+		setTimeout(() => refreshTokenInfo(contractName), 2000)
+	  }
+
+	return {
+		refreshTokenInfo,
+		getTokenInfo,
+		updateWindowHistory,
+		applyTokenBalance,
+		redirectToAddPool, redirectPoolMain,
+		resetPage
+	}
+}

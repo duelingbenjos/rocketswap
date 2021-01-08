@@ -5,9 +5,6 @@
   //Router
   import { params } from 'svelte-hash-router'
 
-  //Stores
-  import { walletIsReady, tokenBalances } from '../store'
-
 	//Services
 	import { ApiService } from '../services/api.service'
 	const apiService = ApiService.getInstance();
@@ -21,64 +18,45 @@
   import IconBackArrow from '../icons/back-arrow.svelte'
 
   //Misc
-  import { quoteCalculator } from '../utils'
+  import { quoteCalculator, pageUtils } from '../utils'
+  import { walletIsReady, tokenBalances, saveStoreValue } from '../store'
 
-  let pageState = {};
   let pageStats = writable({})
-  let resetInputAmounts;
+  let currencyAmount = writable(null)
+  let tokenAmount = writable(null)
+  let selectedToken = writable()
+  let tokenLP = writable()
+  let lpBalance = writable()
+
+  let pageStores = {
+    currencyAmount,
+    tokenAmount,
+    selectedToken,
+    tokenLP,
+    lpBalance
+  }
+
+  let pageUtilites = pageUtils(pageStores)
 
   $: contractName = $params.contract
-  $: getTokenBalance = refreshTokenBalance($walletIsReady)
-  $: pageTitle = pageState.selectedToken ? `RocketSwap Create ${pageState.selectedToken.token_symbol} Pool` : 'RocketSwap Create Pool';
+  $: pageTitle = $selectedToken ? `RocketSwap Create ${$selectedToken.token_symbol} Pool` : 'RocketSwap Create Pool';
+  $: updateStats = updatePageStats($currencyAmount, $tokenAmount)
 
   setContext('pageContext', {
     getTokenList: async () => await apiService.getTokenList(["no-market"]),
     determineValues: false,
     pageStats,
-    resetPage
+    resetPage: () => pageUtilites.resetPage(contractName, [currencyAmount, tokenAmount]),
+    pageStores,
+    saveStoreValue
   });
 
   onMount(() => {
-    if (contractName) refreshTokenInfo(contractName)
+    if (contractName) pageUtilites.refreshTokenInfo(contractName)
   })
 
-  beforeUpdate(() => {
-    if(typeof $pageStats === 'undefined') pageStats = writable({});
-  })
-
-  function resetPage () {
-    resetInputAmounts()
-    setTimeout(() => refreshTokenInfo(pageState.selectedToken.contract_name), 2000)
-  }
-
-  const handleInfoUpdate = (e) => {
-    pageState = Object.assign(pageState, e.detail)
-    if (pageState.selectedToken) refreshTokenInfo(pageState.selectedToken.contract_name)
-  }
-
-  const refreshTokenInfo = async (contractName) => {
-    if (contractName){
-      let tokenRes = await apiService.getToken(contractName)
-
-      if (tokenRes.lp_info) {
-        redirectToAddPool(tokenRes.token.contract_name)
-        return
-      }
-      if (!$walletIsReady) tokenRes.token.balance = 0
-      else tokenRes.token.balance = $tokenBalances[tokenRes.token.contract_name] || 0;
-
-      pageState.selectedToken = tokenRes.token
-      pageState.tokenLP = tokenRes.lp_info
-
-      updateStatsStore()
-      updateWindowHistory()
-    }
-
-  }
-
-  const updateStatsStore = async () => {
-    const { currencyAmount, tokenAmount } = pageState
-    let quoteCalc = quoteCalculator({reserves: [currencyAmount, tokenAmount]})
+  const updatePageStats = async () => {
+    let quoteCalc = quoteCalculator({reserves: [$currencyAmount, $tokenAmount]})
     let initialLPToMint = quoteCalc.calcInitialLpMintAmount()
 
     pageStats.set({
@@ -86,21 +64,6 @@
       initialLPToMint
     })
   }
-
-  const refreshTokenBalance = () => {
-    if (!pageState.selectedToken) return
-    let newBal = $tokenBalances[pageState.selectedToken.contract_name] || 0;
-    if (newBal !== pageState.selectedToken.balance) pageState.selectedToken.balance = newBal
-  }
-
-  const updateWindowHistory = () => {
-    if (pageState.selectedToken){
-      if (!location.pathname.includes(pageState.selectedToken.contract_name))
-        window.history.pushState("", "", `/#/pool-create/${pageState.selectedToken.contract_name}`);
-    }
-  }
-
-  const redirectToAddPool = (contractName) => window.location.assign(`/#/pool-add/${contractName}`)
 
 </script>
 
@@ -124,7 +87,7 @@
 
 
 <div class="page-container">
-  <PoolSwapPanel on:infoUpdate={handleInfoUpdate} {pageState} bind:resetInputAmounts>
+  <PoolSwapPanel>
     <div class="header" slot="header">
       <span class="page-heading">Create Pair</span>
       <div class="page-controls flex-row">
@@ -134,10 +97,10 @@
       </div>
     </div>
     <div class="footer" slot="footer">
-      {#if pageState.selectedToken }
-        <PoolStats {pageState} statList={["ratios"]} title={"Initial prices and pool share"}/>
+      {#if $selectedToken }
+        <PoolStats statList={["ratios"]} title={"Initial prices and pool share"}/>
       {/if}
-      <Buttons buttonFunction="create" buttonText="Create Supply" {...pageState} />
+      <Buttons buttonFunction="create" buttonText="Create Supply" />
     </div>
   </PoolSwapPanel>
 </div>
