@@ -42,6 +42,17 @@
   $: pageTitle = $selectedToken ? `RocketSwap Create ${$selectedToken.token_symbol} Pool` : 'RocketSwap Create Pool';
   $: updateStats = updatePageStats($currencyAmount, $tokenAmount)
 
+	selectedToken.subscribe(value => {
+		if (value) {
+      if (value.has_market){
+         pageUtilites.redirectToAddPool(value.contract_name)
+      }else{
+        pageUtilites.refreshTokenInfo(value.contract_name)
+        pageUtilites.updateWindowHistory("pool-create")
+      }
+		}
+	})
+
   setContext('pageContext', {
     getTokenList: async () => await apiService.getTokenList(["no-market"]),
     determineValues: false,
@@ -55,6 +66,7 @@
     if (contractName) pageUtilites.refreshTokenInfo(contractName)
   })
 
+
   const updatePageStats = async () => {
     let quoteCalc = quoteCalculator({reserves: [$currencyAmount, $tokenAmount]})
     let initialLPToMint = quoteCalc.calcInitialLpMintAmount()
@@ -64,7 +76,6 @@
       initialLPToMint
     })
   }
-
 </script>
 
 <style>

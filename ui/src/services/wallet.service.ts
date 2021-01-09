@@ -40,6 +40,8 @@ export class WalletService {
 	public connectToWallet = () => this.lwc.sendConnection(this.connectionRequest)
 
 	private handleWalletInfo = (e) => {
+		//console.log(JSON.parse(JSON.stringify(this.lwc)))
+		//console.log(JSON.parse(JSON.stringify(get(lwc_info))))
 		//If the wallet wasn't installed schedule another check
 		if (!this.lwc.installed){
 			if (typeof get(lwc_info).installed === 'undefined') {

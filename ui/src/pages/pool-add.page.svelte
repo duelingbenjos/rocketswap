@@ -44,7 +44,14 @@
 	$: updateStats = updatePageStats($walletIsReady, $tokenLP, $lpBalances, $currencyAmount)
 
 	selectedToken.subscribe(value => {
-		if (value) pageUtilites.refreshTokenInfo(value.contract_name)
+		if (value) {
+			if (!value.has_market){
+				pageUtilites.redirectToCreatePool(value.contract_name)
+			}else{
+				pageUtilites.refreshTokenInfo(value.contract_name)
+				pageUtilites.updateWindowHistory("pool-add")
+			}
+		}
 	})
 
 	setContext('pageContext', {

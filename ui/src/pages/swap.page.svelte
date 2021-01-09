@@ -40,12 +40,14 @@
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
-	$: addHref = $selectedToken ? `/#/pool-add/${$selectedToken.contract_name}` : false;
+	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap';
 	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
 
 	selectedToken.subscribe(value => {
-		if (value) pageUtilites.refreshTokenInfo(value.contract_name)
+		if (value) {
+			pageUtilites.refreshTokenInfo(value.contract_name)
+			pageUtilites.updateWindowHistory("pool-swap")
+		}
 	})
 
 	setContext('pageContext', {

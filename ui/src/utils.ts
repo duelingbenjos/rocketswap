@@ -326,6 +326,7 @@ export const pageUtils = (pageStores) => {
 	}
 
 	const redirectToAddPool = (contractName) => window.location.assign(`/#/pool-add/${contractName}`)
+	const redirectToCreatePool = (contractName) => window.location.assign(`/#/pool-create/${contractName}`)
 	const redirectPoolMain = () => window.location.assign(`/#/pool-main/`)
 
 	  
@@ -339,7 +340,7 @@ export const pageUtils = (pageStores) => {
 		getTokenInfo,
 		updateWindowHistory,
 		applyTokenBalance,
-		redirectToAddPool, redirectPoolMain,
+		redirectToAddPool, redirectPoolMain, redirectToCreatePool,
 		resetPage
 	}
 }
