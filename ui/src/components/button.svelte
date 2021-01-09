@@ -13,7 +13,7 @@
     {#if !loading}
       {text}
     {:else}
-        <Spinner size={50} color="#FFFFFF" unit="px" />
+        <Spinner size={40} color="#FFFFFF" unit="px" padding="10px"/>
     {/if}
   </button>
 </div>

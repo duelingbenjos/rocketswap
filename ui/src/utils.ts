@@ -126,7 +126,6 @@ export const stripTrailingZero = (value: string): string => {
   }
   const isDecmailString = (v) => {
     if (typeof v !== 'string') return false
-    // console.log(typeof v)
     if (v.includes('.')) return true
     return false
   }
@@ -204,15 +203,8 @@ export const quoteCalculator = (tokenInfo) => {
 
 	const calcNewShare = (lp_balance, currencyAmount) => {
 		if (!currencyAmount || !lp_balance) return toBigNumber("0")
-		console.log({lp_balance, currencyAmount})
 		let newLpMinted = calcNewLpMintAmount(currencyAmount)
 		let newShare =  lp_balance.plus(newLpMinted).dividedBy(totalLP.plus(newLpMinted))
-		console.log({
-			lp_balance: lp_balance.toString(), 
-			currencyAmount: currencyAmount.toString(),
-			newLpMinted: newLpMinted.toString(),
-			newShare: newShare.toString()
-		})
 		if (newShare.isNaN()) return toBigNumber("0")
 		return newShare
 	}
@@ -310,7 +302,6 @@ export const pageUtils = (pageStores) => {
 	const refreshTokenInfo = async (contractName) => {
 		if (!contractName) return
 		let tokenRes = await getTokenInfo(contractName)
-		console.log(tokenRes)
 		applyTokenBalance(tokenRes)
 		const { token, lp_info }  = tokenRes
 		saveStoreValue(selectedToken, token)

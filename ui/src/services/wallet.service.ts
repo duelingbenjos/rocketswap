@@ -121,7 +121,7 @@ export class WalletService {
 				heading: `Created Supply for ${selectedToken.token_symbol}!`,
 				text: `You have created liquidity for ${selectedToken.token_name} / ${config.currencySymbol}.`, 
 				type: 'info',
-				duration: 10000
+				duration: 7000
 			})
 			callbacks.success()
 		}
@@ -151,7 +151,7 @@ export class WalletService {
 				heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
 				text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
 				type: 'info',
-				duration: 10000
+				duration: 7000
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -167,7 +167,6 @@ export class WalletService {
 			let lpPoints = "0";
 			res.data.txBlockResult.state.forEach(stateChange => {
 				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`){
-					console.log("IN HERE")
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
@@ -176,7 +175,7 @@ export class WalletService {
 				heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
 				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
 				type: 'info',
-				duration: 10000
+				duration: 7000
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -198,7 +197,7 @@ export class WalletService {
 				heading: `Swap Completed!`,
 				text: `You have swapped ${config.currencySymbol} for ${selectedToken.token_symbol}.`, 
 				type: 'info',
-				duration: 10000
+				duration: 7000
 			})
 			if (callbacks) callbacks.success()
 		}

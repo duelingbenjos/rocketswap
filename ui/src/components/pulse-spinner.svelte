@@ -21,6 +21,7 @@
     align-items: center;
     width: var(--size);
     height: calc(var(--size) / 2.5);
+    margin: 0 auto;
   }
   .cube {
     position: absolute;

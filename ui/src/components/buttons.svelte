@@ -61,7 +61,6 @@
 			}
 		}
 		if (buttonFunction === "remove"){
-			console.log($lpTokenAmount)
 			if (!$lpTokenAmount) return true
 			if ($lpTokenAmount.isEqualTo(0)) return true
 		}

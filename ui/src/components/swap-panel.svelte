@@ -26,16 +26,14 @@
 
 	const swapSlots = () => {
 		slots = [...slots.reverse()]
-		buy.set(!buy)
+		buy.set(!$buy)
 	}
 
 	function handleCurrencyChange(e){
-		console.log(e)
 		if (e.detail.toString() === "NaN") saveStoreValue(currencyAmount, null)
 		else{
 			saveStoreValue(currencyAmount, e.detail)
 			if ($selectedToken && $tokenLP) {
-				console.log("in here currency?")
 				let quoteCalc = quoteCalculator($tokenLP)
 				let quote = quoteCalc.calcBuyPrice($currencyAmount)
 				saveStoreValue(tokenAmount, quote.tokensPurchasedLessFee)
@@ -50,7 +48,6 @@
 		if (e.detail.selected) saveStoreValue(selectedToken, e.detail.selected)
 
 		if ($tokenLP && $tokenAmount){
-			console.log("in here token?")
 			let quoteCalc = quoteCalculator($tokenLP)
 			let quote = quoteCalc.calcSellPrice($tokenAmount)
 			saveStoreValue(currencyAmount, quote.currencyPurchasedLessFee)
@@ -78,7 +75,6 @@
 			direction={$buy ? "down" : "up"} width={"20px"} 
 			margin={"1rem 0"} />
 	</div>
-
 	<svelte:component 
 		label={'To'}
 		this={slots[1].component}

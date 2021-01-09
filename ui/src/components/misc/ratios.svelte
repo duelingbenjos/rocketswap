@@ -41,7 +41,7 @@
 
 </style>
 
-<div class="container container-border flex-row text-gray-5">
+<div class="container container-border flex-row">
     <div class="flex-col label">
         <p>{label}</p>
     </div>

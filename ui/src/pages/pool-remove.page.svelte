@@ -123,9 +123,9 @@
 				</a>
 				<a href={addHref} class="text-link underline" >add</a>
 			</div>
-			</div>
+		</div>
 			
-			<div class="footer" slot="footer">
+		<div class="footer" slot="footer">
 			{#if $selectedToken && $tokenLP}
 				<!--<PoolStats statList={["ratios", "poolShare"]} title={"Prices and pool share"}/>-->
 			{/if}

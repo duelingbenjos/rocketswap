@@ -14,7 +14,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, refreshLpBalances } from '../../utils'
+    import { stringToFixed, refreshLpBalances, refreshTAUBalance } from '../../utils'
     import { config } from '../../config'
 
     //Props

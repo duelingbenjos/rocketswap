@@ -45,7 +45,6 @@
 	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
 
 	selectedToken.subscribe(value => {
-		console.log(value)
 		if (value) pageUtilites.refreshTokenInfo(value.contract_name)
 	})
 

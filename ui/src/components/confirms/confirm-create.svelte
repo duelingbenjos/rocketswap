@@ -15,13 +15,13 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, refreshLpBalances } from '../../utils'
+    import { stringToFixed, refreshLpBalances, refreshTAUBalance } from '../../utils'
     import { config } from '../../config'
 
     //Props
     export let closeConfirm;
 
-    const { pageStats, pageStores } = getContext('pageContext')
+    const { pageStats, pageStores, resetPage } = getContext('pageContext')
     const { currencyAmount, tokenAmount, selectedToken } = pageStores
 
     let loading = false;

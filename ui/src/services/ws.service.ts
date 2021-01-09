@@ -53,19 +53,16 @@ export class WsService {
   }
 
   private handleBalanceList(payload) {
-    console.log('balance update received', payload)
     tokenBalances.set(valuesToBigNumber(payload).balances)
     
   }
 
   private handleBalanceUpdate(data) {
     const { payload } = data
-    console.log('balance update received', payload)
     tokenBalances.set(valuesToBigNumber(payload).balances)
   }
 
   public joinPriceFeed(contract_name: string) {
-    // console.log(Date.now(), 'joined room')
     this.connection.emit('join_room', `price_feed:${contract_name}`)
     this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
   }
@@ -76,15 +73,10 @@ export class WsService {
   }
 
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
-    console.log("--- METRICS ---")
-    console.log(metrics_update)
-    // console.log('metrics feed : ', metrics_update)
     let { contract_name } = metrics_update
     const metrics = this.token_metrics
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
-    console.log(metrics)
     token_metrics_store.set(valuesToBigNumber(metrics))
-    // console.log('token_metrics', metrics)
   }
 
   private handlePriceFeedUpdate(update) {

@@ -30,7 +30,7 @@
     margin-right: 20px;
     padding: 5px 12px;
     box-sizing: border-box;
-    /* padding-bottom: 6px */
+    z-index: 10;
   }
 
   a {
@@ -44,7 +44,6 @@
     text-decoration: none;
     cursor: pointer;
   }
-
 
   .header {
     width: 100%;

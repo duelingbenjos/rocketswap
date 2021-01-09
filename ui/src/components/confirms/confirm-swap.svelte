@@ -24,6 +24,7 @@
     const { pageStats, resetPage, pageStores } = getContext('pageContext')
     const { selectedToken, currencyAmount, tokenAmount, buy  } = pageStores
 
+
     let logoSize = "30px"
     let minimumReceived = toBigNumber("0.0")
     
@@ -47,16 +48,13 @@
             },
         ]
         if (!$buy) {
-            console.log($pageStats)
             minimumReceived = $pageStats.currencyPurchasedLessFee
             slotArray[0].amount = stringToFixed(minimumReceived, 4)
-            console.log(slotArray[0].amount)
             slotArray.reverse();
         }else{
             minimumReceived = $pageStats.tokensPurchasedLessFee
             slotArray[1].amount = stringToFixed(minimumReceived, 4)
         }
-        console.log(slotArray)
         return slotArray;
     }
 
@@ -110,6 +108,7 @@
         padding-top: 1rem;
     }
 </style>
+
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
         <span class="text-large">Confirm Swap</span>
@@ -117,6 +116,7 @@
             <CloseIcon />
         </button>
     </div>
+    {$buy}
     <div class="flex-col text-xlarge">
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">

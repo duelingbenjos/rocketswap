@@ -9,6 +9,7 @@
     const { selectedToken, buy } = pageStores
 
     $: tokenSymbol = $selectedToken?.token_symbol || "-";
+    $: slippage = $buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage
 </script>
 
 <style>
@@ -24,7 +25,7 @@
     }
 </style>
 
-<div class="container container-border flex-col text-small weight-400">
+<div class="container container-border flex-col text-xsmall weight-400">
     <div class="flex-row flex-align-center">
         <span class="text-primary-dim">Price</span>
         {#if $buy}
@@ -40,14 +41,19 @@
         {/if}
     </div>
     <div class="flex-row flex-align-center ">
+        <span class="text-primary-dim">Price Impact</span>
+        <span class="number"
+              class:text-warning={slippage.isLessThan(5)}
+              class:text-error={slippage.isGreaterThanOrEqualTo(5)}>
+              {`${stringToFixed(slippage, 2)}%`}
+            </span>
+    </div>
+    <div class="flex-row flex-align-center ">
         <span class="text-primary-dim">Fee</span>
         <div class="flex-row flex-align-center">
             <span class="number margin-r-3">{stringToFixed($pageStats?.fee, 8)}</span>
             <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>
         </div>
     </div>
-    <div class="flex-row flex-align-center ">
-        <span class="text-primary-dim">Slippage</span>
-        <span class="number text-primary">{`${stringToFixed($buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage, 2)}%`}</span>
-    </div>
+
 </div>

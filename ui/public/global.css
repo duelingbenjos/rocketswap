@@ -20,8 +20,8 @@ body {
   overflow: hidden;
 
   --color-primary-light: #41e4b8;
-  --color-primary: #3dd6ad;
-  --color-primary-dark: #138465;
+  --color-primary: #24ffbd;
+  --color-primary-dark: #b8dfff;
 
   --color-secondary: #9100ff;
 
@@ -63,10 +63,10 @@ body {
   --box-border-color: #ffffff26;
   --border-radius: 16px;
 
-  --main-background-solid: #120e4a;
-  --main-background-gradient: linear-gradient(#e92bf74d, rgba(0, 0, 0, 0));
+  --main-background-solid: rgb(81, 0, 128);
+  --main-background-gradient: linear-gradient(533deg, rgb(63, 24, 136) 0%, #130535 80%);
 
-  --panel-background-gradient:  linear-gradient(333deg, #7d0000 0%, #9100ff 80%);
+  --panel-background-gradient: linear-gradient(5deg, rgb(56, 49, 83) 0%, rgb(76, 77, 136) 90%);
 
   --modal-background-primary: #312a43;
   --modal-background-secondary: #e400ff12;
@@ -96,9 +96,9 @@ body.light{
   --pool-main-box-border-color: var(--text-primary-color);
 
   --main-background-solid: #fff;
-  --main-background-gradient: linear-gradient(#ddbeff, rgb(255 0 252 / 3%));
+  --main-background-gradient: linear-gradient(#b2adff, rgb(255 0 252 / 8%));
 
-  --panel-background-gradient: linear-gradient(333deg, #f1eaff 0%, rgba(255,255,255,1) 80%);
+  --panel-background-gradient: linear-gradient(5deg, rgb(248, 245, 255) 10%, #f7f4ff 50%);
   --box-border-color: #0000000f;
 
   --modal-background-primary: #ffffff;
