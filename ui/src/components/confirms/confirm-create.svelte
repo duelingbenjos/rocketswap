@@ -15,7 +15,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed } from '../../utils'
+    import { stringToFixed, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -29,6 +29,10 @@
     const success = () => {
         loading = false;
         resetPage();
+        setTimeout(refreshLpBalances, 2500)
+        setTimeout(refreshLpBalances, 10000)
+        setTimeout(refreshTAUBalance, 2500)
+        setTimeout(refreshTAUBalance, 10000)
         closeConfirm();
     }
 

@@ -28,7 +28,7 @@
 
 	let open = false;
 
-	$: disabled = disableButton($currencyAmount, $tokenAmount, $selectedToken, $pageStats, $lwc_info, $lpTokenAmount);
+	$: disabled = disableButton($currencyAmount, $tokenAmount, $selectedToken, $pageStats, $lwc_info, $lpTokenAmount, $walletBalance);
 	$: disabledText = undefined;
 
 

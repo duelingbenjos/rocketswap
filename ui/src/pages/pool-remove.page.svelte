@@ -50,7 +50,8 @@
 		pageStats,
 		pageStores,
 		resetPage: () => pageUtilites.resetPage(contractName, [lpTokenPercentInput, lpTokenAmount]),
-		saveStoreValue
+		saveStoreValue,
+		pageUtilites
 	});
 
 	onMount(() => {
@@ -59,16 +60,15 @@
 	})
 
 	const updatePageStats = async () => {
-		if (!$selectedToken) return
-		let balance = $lpBalances[$selectedToken.contract_name]
-
 		let quoteCalc = quoteCalculator($tokenLP)
-
+		let balance;
 		let currentLpSharePercent = "0"
 		let newLpSharePercent = "0%"
 		let amounts;
 		let lpTokenPercent = 0;
 		let lpTokensToBurn = toBigNumber("0")
+
+		if ($selectedToken) balance = $lpBalances[$selectedToken.contract_name]
 
 		if (balance) {
 			saveStoreValue(lpBalance, balance)

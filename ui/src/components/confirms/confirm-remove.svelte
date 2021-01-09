@@ -16,13 +16,13 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed } from '../../utils'
+    import { stringToFixed, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
     export let closeConfirm;
 
-    const { pageStats, resetPage, pageStores } = getContext('pageContext')
+    const { pageStats, resetPage, pageStores, pageUtilites } = getContext('pageContext')
     const { selectedToken, lpTokenAmount } = pageStores
 
     let loading = false;
@@ -30,6 +30,10 @@
     const success = () => {
         loading = false;
         closeConfirm()
+        setTimeout(refreshLpBalances, 2500)
+        setTimeout(refreshLpBalances, 10000)
+        setTimeout(refreshTAUBalance, 2500)
+        setTimeout(refreshTAUBalance, 10000)
         resetPage()
     }
 
@@ -38,12 +42,12 @@
     }
 
     const removeLiquidity = () => {
-        if (!$pageStats.lpTokenAmount) return
+        if (!$lpTokenAmount) return
         loading = true;
         walletService.removeLiquidity({
-        'contract': selectedToken.contract_name,
+        'contract': $selectedToken.contract_name,
         'amount': {'__fixed__': stringToFixed($lpTokenAmount.toString(), 30)}
-        }, selectedToken, { success, error })
+        }, $selectedToken, { success, error })
     }
 
 </script>

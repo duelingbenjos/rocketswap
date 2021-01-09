@@ -15,7 +15,7 @@
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
 
-		//Components
+	//Components
 	import SwapPanel from '../components/swap-panel.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
@@ -42,7 +42,7 @@
 	$: contractName = $params.contract
 	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
 	$: addHref = $selectedToken ? `/#/pool-add/${$selectedToken.contract_name}` : false;
-	$: updateStats = updatePageStats($currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
+	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
 
 	selectedToken.subscribe(value => {
 		console.log(value)
@@ -64,7 +64,6 @@
 	
 	
 	const updatePageStats = async () => {
-		console.log($tokenLP)
 		let quoteCalc = quoteCalculator($tokenLP)
 		let quote;
 		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount)      

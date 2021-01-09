@@ -142,7 +142,7 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = '0'
 			res.data.txBlockResult.state.forEach((stateChange) => {
-				if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`) {
+				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`) {
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
@@ -166,7 +166,8 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = "0";
 			res.data.txBlockResult.state.forEach(stateChange => {
-				if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`){
+				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`){
+					console.log("IN HERE")
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})

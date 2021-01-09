@@ -76,6 +76,8 @@ export class WsService {
   }
 
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
+    console.log("--- METRICS ---")
+    console.log(metrics_update)
     // console.log('metrics feed : ', metrics_update)
     let { contract_name } = metrics_update
     const metrics = this.token_metrics

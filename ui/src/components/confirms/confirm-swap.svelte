@@ -15,7 +15,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, toBigNumber } from '../../utils'
+    import { stringToFixed, toBigNumber, refreshTAUBalance, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -28,7 +28,7 @@
     let minimumReceived = toBigNumber("0.0")
     
     $: minimumReceivedString = stringToFixed(minimumReceived.toString(), 4)
-    $: slots = createSlots($buy)
+    $: slots = createSlots($buy, $currencyAmount, $tokenAmount)
     $: receivedSymbol = buy ? $selectedToken.token_symbol : config.currencySymbol
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
     $: slippageWarning = slippage.isGreaterThan(5)
@@ -47,13 +47,16 @@
             },
         ]
         if (!$buy) {
+            console.log($pageStats)
             minimumReceived = $pageStats.currencyPurchasedLessFee
             slotArray[0].amount = stringToFixed(minimumReceived, 4)
+            console.log(slotArray[0].amount)
             slotArray.reverse();
         }else{
             minimumReceived = $pageStats.tokensPurchasedLessFee
             slotArray[1].amount = stringToFixed(minimumReceived, 4)
         }
+        console.log(slotArray)
         return slotArray;
     }
 
@@ -62,6 +65,10 @@
     const success = () => {
         loading = false;
         closeConfirm()
+        setTimeout(refreshLpBalances, 2500)
+        setTimeout(refreshLpBalances, 10000)
+        setTimeout(refreshTAUBalance, 2500)
+        setTimeout(refreshTAUBalance, 10000)
         resetPage()
     }
 

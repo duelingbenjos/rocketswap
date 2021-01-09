@@ -14,7 +14,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed } from '../../utils'
+    import { stringToFixed, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -28,6 +28,10 @@
     const success = () => {
         loading = false;
         resetPage();
+        setTimeout(refreshLpBalances, 2500)
+        setTimeout(refreshLpBalances, 10000)
+        setTimeout(refreshTAUBalance, 2500)
+        setTimeout(refreshTAUBalance, 10000)
         closeConfirm();
     }
 
@@ -36,12 +40,12 @@
     }
 
     const addLiquidity = () => {
-        if (!currencyAmount || !tokenAmount || !$selectedToken) return
+        if (!$currencyAmount || !$tokenAmount || !$selectedToken) return
         loading = true;
         walletService.addLiquidity({
             'contract': $selectedToken.contract_name,
-            'currency_amount': {'__fixed__': stringToFixed(currencyAmount.toString(), 30)}
-        }, $selectedToken, tokenAmount, currencyAmount, { success, error })
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)}
+        }, $selectedToken, $tokenAmount, $currencyAmount, { success, error })
     }
 
 </script>

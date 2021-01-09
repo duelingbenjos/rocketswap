@@ -32,7 +32,7 @@
     let api_tokens;
 
     $: filter = ""; 
-    $: token_list = createTokenList(api_tokens, filter);
+    $: token_list = createTokenList(api_tokens, filter, $walletIsReady, $tokenBalances);
     $: selected_contract = $selectedToken?.contract_name;
 
     const openTokenSelect = async () => {
@@ -62,10 +62,14 @@
                         token.balance = $tokenBalances[token.contract_name] || 0
                         return token
                     })
+
+                    .sort((a, b) => b.balance - a.balance)
+                ]
+            }else{
+                tokenList = [...tokenList
                     .sort((a, b) => {
                         return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
                     })
-                    .sort((a, b) => b.balance - a.balance)
                 ]
             }
             return tokenList

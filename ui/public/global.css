@@ -53,6 +53,8 @@ body {
 
   --button-primary-border-color: var(--color-primary-dark);
   --button-primary: var(--color-primary);
+  --button-primary-disabled-background: #9ae0cd;
+  --button-primary-border-color-disabled: #9ae0cd;
   --button-secondary: var(--color-secondary);
 
   --button-border-radius: 8px;
@@ -366,6 +368,10 @@ button.primary:not(:disabled):hover{
   border: 1px solid var(--button-primary-border-color);
 }
 
+button.primary:disabled{
+  background-color: var(--button-primary-disabled-background);
+  border: 1px solid var(--button-primary-border-color-disabled);
+}
 
 button.secondary{
   border-radius: 99px;

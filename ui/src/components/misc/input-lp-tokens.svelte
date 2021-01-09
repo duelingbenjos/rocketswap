@@ -1,16 +1,19 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte'
+    import { createEventDispatcher, getContext } from 'svelte'
     
 	import { scale } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
 
     import { walletIsReady } from '../../store'
-    
+
+    const { pageStores } = getContext('pageContext')
+    const { lpTokenPercentInput } = pageStores
+
     export let label
 
     const dispatch = createEventDispatcher();
 
-    let inputVal = 0;
+    $: inputVal = $lpTokenPercentInput || 0;
 
     const handleButtonInput = (value) => {
         inputVal = value
