@@ -27,17 +27,21 @@
     let loading = false;
 
     const success = () => {
-        loading = false;
-        resetPage();
+        finish();
         setTimeout(refreshLpBalances, 2500)
         setTimeout(refreshLpBalances, 10000)
-        setTimeout(refreshTAUBalance, 2500)
-        setTimeout(refreshTAUBalance, 10000)
+        resetPage();
         closeConfirm();
     }
 
     const error = () => {
+        finish()
+    }
+
+    const finish = () => {
         loading = false;
+        setTimeout(refreshTAUBalance, 2500)
+        setTimeout(refreshTAUBalance, 10000)
     }
 
   const createMarket = () => {

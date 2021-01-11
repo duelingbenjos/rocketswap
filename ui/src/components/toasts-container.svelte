@@ -6,6 +6,9 @@
   import { ToastService } from '../services/toast.service'
   import type { token_metrics_store } from '../store'
 
+  //Icons
+  import CloseIcon from '../icons/close.svelte'
+
   const toastService = ToastService.getInstance()
 
   let toasts: ToastMetaType[]
@@ -37,13 +40,18 @@
   }
 </script>
 
-<div style="position: absolute; top: 50px; right: 0px; width: 350px; padding: 10px 10px 0px 0px; z-index: 10">
+<div class="toasts-container">
   {#each toasts as t (t.id)}
     <div in:receive={{ key: t.id }} out:send={{ key: t.id }} animate:flip={{ duration: 700 }} class={`toast-container ${t.type}`}>
+
       <div class={`text-container`}>
-        <div class="heading">{t.heading}</div>
+        <div class="heading flex-row flex-align-center">{t.heading}
+          <div class="close" on:click={handleRemove(t.id)}> 
+            <CloseIcon width="8px" />
+          </div>
+        </div>
         {#if t.text}
-          <div class="subtext">{t.text}</div>
+          <div class="subtext text-small">{t.text}</div>
         {/if}
       </div>
     </div>
@@ -51,24 +59,54 @@
 </div>
 
 <style>
+  .toasts-container{
+    position: absolute; 
+    box-sizing: border-box;
+    top: 50px; 
+    right: 0px; 
+    width: 280px; 
+    padding: 10px 10px 0px 0px; 
+    z-index: 105 
+  }
+
+  .text-container{
+    width: 100%;
+  }
+
   .heading {
     font-weight: 600;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .close{
+    position: relative;
+    top: -8px;
+    right: 0;
+  }
+
+  .subtext{
+    line-height: 1.2;
+    word-break: break-word;
   }
 
   .toast-container {
     justify-content: space-between;
     display: flex;
     flex-direction: row;
-    background-color: rgba(255, 255, 255, 0.9);
+
     margin-top: 15px;
-    border: 1px solid var(--box-border-color);
+    padding: 10px 10px 5px 10px;
+    z-index: 110;
+
+    border-radius: 8px 16px 8px 8px;
+    background-color: var(--toast-background);
+
     min-height: 70px;
-    width: 320px;
-    background-color: #2a334a;
-    border-radius: 8px;
-    border: 3px solid var(--info-color);
-    color: #fff;
-    padding: 10px;
+  }
+
+  .success {
+    border: 3px solid var(--success-color);
   }
 
   .warning {
@@ -77,6 +115,7 @@
 
   .error {
     border: 3px solid var(--error-color);
+    background: var(--toast-background-error);
   }
 
   .info {

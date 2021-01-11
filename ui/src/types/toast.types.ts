@@ -8,4 +8,4 @@ export type ToastMetaType = {
   done?: boolean
 }
 
-export type ToastType = 'info' | 'warning' | 'error'
+export type ToastType = 'info' | 'warning' | 'error' | 'success'

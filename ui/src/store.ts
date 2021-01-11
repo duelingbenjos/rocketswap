@@ -13,7 +13,7 @@ export const saveStoreValue = (store, value) => {
 export const toast_store: Writable<ToastMetaType[]> = writable([])
 
 export const lwc_info = writable({
-  installed: undefined,
+  installed: null,
   locked: null,
   walletAddress: "",
   approved: false

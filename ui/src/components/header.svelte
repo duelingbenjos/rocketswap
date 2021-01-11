@@ -4,6 +4,7 @@
 
   //Icons
   import RocketSwap from '../icons/rocketswap.svelte'
+  import LightDark from '../icons/light-dark.svelte'
 
   const { themeToggle, currentThemeName } = getContext('app')
 
@@ -22,8 +23,6 @@
   }
 
   .links {
-    display: flex;
-    flex-direction: row;
     align-items: center;
     font-size: var(--text-size-xlarge);
     font-weight: 600;
@@ -48,7 +47,6 @@
   .header {
     width: 100%;
     height: 95px;
-    display: flex;
     align-items: center;
     justify-content: space-between;
   }
@@ -63,19 +61,22 @@
 </style>
 
 
-<div class="header">
+<div class="header flex-row">
   <div class="logo-container">
     <RocketSwap />
   </div>
-  <div class="links">
-    {#each links as e}
-      {#if e.$$name === "Pools" || e.$$name === "Swap"}
-        <a class:active={e === $active} href={e.$$href}> 
-          {e.$$name} 
-        </a> 
-      {/if}
-    {/each}
-    <button on:click={themeToggle} class="primary outline small">{$currentThemeName === 'dark' ? 'light' : 'dark'}</button>
+  <div class="flex-row">
+    <div class="links flex-row">
+      {#each links as e}
+        {#if e.$$name === "Pools" || e.$$name === "Swap"}
+          <a class:active={e === $active} href={e.$$href}> 
+            {e.$$name} 
+          </a> 
+        {/if}
+      {/each}
+      
+      <button on:click={themeToggle} class="primary outline small">{$currentThemeName === 'dark' ? 'light' : 'dark'}</button>
+    </div>
+    <!--<LightDark />-->
   </div>
-
 </div>

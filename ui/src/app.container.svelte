@@ -10,7 +10,13 @@
   import { ApiService } from './services/api.service'
   import { WsService } from './services/ws.service'
   import { show_token_select_store, show_swap_confirm } from './store'
+
+  
   import type { TokenSelectType } from './types/api.types'
+
+  //TO DO REMOVE THIS!!
+  import { ToastService } from './services/toast.service'
+  const toastService = ToastService.getInstance()
 
   let show_token_select: TokenSelectType
   let currentThemeName = writable()
@@ -30,6 +36,34 @@
     show_token_select_store.subscribe((update) => {
       show_token_select = update
     })
+    // TO DO REMOVE THIS!! 
+    /*
+    toastService.addToast({ 
+				heading: `TESTING TOAST!`,
+				text: `You have a new toast You have a new toast You have a new toast You have a new toasttttttttttttttttttttttttttttttttttttt`, 
+				type: 'info',
+				duration: 7000000
+    })
+
+    toastService.addToast({ 
+				heading: `TESTING TOAST!`,
+				text: `You have a new toast`, 
+				type: 'error',
+				duration: 7000000
+    })
+    toastService.addToast({ 
+				heading: `TESTING TOAST!`,
+				text: `You have a new toast`, 
+				type: 'warning',
+				duration: 7000000
+    })
+    toastService.addToast({ 
+				heading: `TESTING TOAST!`,
+				text: `You have a new toast`, 
+				type: 'success',
+				duration: 7000000
+    })
+    */
   })
 
   function themeToggle() {

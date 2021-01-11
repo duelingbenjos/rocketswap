@@ -61,17 +61,21 @@
     let loading = false;
 
     const success = () => {
-        loading = false;
-        closeConfirm()
+        finish();
         setTimeout(refreshLpBalances, 2500)
         setTimeout(refreshLpBalances, 10000)
-        setTimeout(refreshTAUBalance, 2500)
-        setTimeout(refreshTAUBalance, 10000)
-        resetPage()
+        resetPage();
+        closeConfirm();
     }
 
     const error = () => {
+        finish()
+    }
+
+    const finish = () => {
         loading = false;
+        setTimeout(refreshTAUBalance, 2500)
+        setTimeout(refreshTAUBalance, 10000)
     }
 
     const swapBuy = () => {
@@ -80,7 +84,7 @@
         walletService.swapBuy({
         'contract': $selectedToken.contract_name,
         'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)}
-        }, $selectedToken, $currencyAmount, minimumReceived, { success, error })
+        }, $selectedToken, $currencyAmount, { success, error })
     }
 
     const swapSell = () => {
@@ -89,7 +93,7 @@
         walletService.swapSell({
         'contract': $selectedToken.contract_name,
         'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
-        }, $selectedToken, minimumReceived, $tokenAmount, { success, error })
+        }, $selectedToken, $tokenAmount, { success, error })
     }
 
 </script>

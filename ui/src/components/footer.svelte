@@ -25,10 +25,10 @@
 
 <div class="container">
 	<div class="wallet-info">
-		{#if typeof $lwc_info.installed === 'undefined'} 
+		{#if $lwc_info.installed === null} 
 			<Spinner size={29} color="#FFFFFF" unit="px" padding="10px"/>
 		{:else}
-			{#if !$lwc_info.installed}
+			{#if $lwc_info.installed === false}
 				<button class="wallet-message" on:click={refreshPage}>Wallet not Installed</button>
 			{:else}
 				{#if $lwc_info.locked }
@@ -63,7 +63,7 @@
 		font-size: var(--text-size-large);
 		padding-left: 12px;
 		display: flex;
-		justify-content: center;
+		justify-content: space-between;
 		align-items: center;
 		min-width: 230px;
 	}
@@ -75,10 +75,13 @@
 	}
 	.balance {
 		padding-left: 8px;
+		width: 100%;
+    	text-align: center;
 	}
 
 	.wallet-message {
 		padding-right: 16px;
+		margin: 0 auto;
 	}
 	.address {
 		margin: 3px 3px 0px 32px;

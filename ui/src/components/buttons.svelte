@@ -20,11 +20,10 @@
 
 	//Props
 	export let buttonFunction;
-	export let buy;
 	export let buttonText;
 
 	const { pageStats, pageStores } = getContext('pageContext');
-	const { selectedToken, currencyAmount, tokenAmount, lpTokenAmount } = pageStores
+	const { selectedToken, currencyAmount, tokenAmount, lpTokenAmount, buy } = pageStores
 
 	let open = false;
 
@@ -50,12 +49,12 @@
 			if (!$currencyAmount || !$tokenAmount || !$selectedToken) return true
 			if ($currencyAmount.isEqualTo(0) || $tokenAmount.isEqualTo(0)) return true
 
-			if ($currencyAmount.isGreaterThan($walletBalance)){
+			if ($currencyAmount.isGreaterThan($walletBalance) && buy === true){
 				disabledText = `Insufficent ${config.currencySymbol}`
 				return true
 			}
 			let tokenBalance = $tokenBalances[$selectedToken.contract_name]
-			if ($tokenAmount.isGreaterThan(tokenBalance)){
+			if ($tokenAmount.isGreaterThan(tokenBalance) && buy === false){
 				disabledText = `Insufficent ${$selectedToken.token_symbol}`
 				return true
 			}

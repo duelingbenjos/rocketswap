@@ -3,7 +3,7 @@ import type { ToastMetaType } from '../types/toast.types'
 
 export class ToastService {
   private static _instance: ToastService
-  public static getInstance(interval: number = 3000): ToastService {
+  public static getInstance(interval: number = 300000): ToastService {
     if (!ToastService._instance) {
       ToastService._instance = new ToastService(interval)
     }

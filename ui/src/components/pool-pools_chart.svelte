@@ -43,6 +43,8 @@
         let value =  (currency_amount * share) + (token_amount * share * price )
         return value.toPrecision(4)
     }
+
+    const adjustLiquidityRedirect = (contract) => window.location.assign(`/#/${contract}`)
 </script>
 
 <style>
@@ -141,7 +143,9 @@
                         {stringToFixed(quoteCalculator(pair).calcTokenValueInCurrency(toBigNumber(balances[pair.contract_name])), 4)}
                          TAU
                     </td>
-                    <td><a href="{`/#/pool-add/${pair.contract_name}`}" class="text-link">Adjust ></a></td>
+                    <td>
+                        <button class="primary outline small" on:click={() => adjustLiquidityRedirect(pair.contract_name)}>adjust</button>
+                    </td>
                 </tr>
             {/each}
         </table>

@@ -16,6 +16,7 @@ export class WalletService {
 	private wsService = WsService.getInstance()
 	private _ws_joined: boolean = false
 	private connectionRequest = config;
+	private installChecker = null;
 
 	public static getInstance() {
 		if (!WalletService._instance) {
@@ -29,26 +30,29 @@ export class WalletService {
 
 		// events
 		this.lwc.events.on('newInfo', this.handleWalletInfo)
-		this.lwc.events.on('txStatus', (res) => console.log(res))
-		this.lwc.events.on('installed', (res) => console.log(res))
+		//this.lwc.events.on('txStatus', (res) => console.log(res))
+		this.lwc.events.on('installed', this.handleWalletInstalled)
 
 		//Do first check if wallet is installed, folloups will be done by 
-		this.checkForIntstalledWallet()
+		this.installChecker = setInterval(this.checkForIntstalledWallet, 1500)
 	}
 
-	private checkForIntstalledWallet = () => this.lwc.walletIsInstalled().then(this.handleWalletInfo)
-	public connectToWallet = () => this.lwc.sendConnection(this.connectionRequest)
+	private checkForIntstalledWallet = async () => {
+		this.lwc.walletIsInstalled().then(res => {
+			clearInterval(this.installChecker)
+			this.handleWalletInstalled(res)
+		})
+	}
+	public connectToWallet = async () => this.lwc.sendConnection(this.connectionRequest)
+
+	private handleWalletInstalled = (e) => {
+		lwc_info.set(Object.assign(get(lwc_info), {installed: e}))
+	}
 
 	private handleWalletInfo = (e) => {
-		//console.log(JSON.parse(JSON.stringify(this.lwc)))
-		//console.log(JSON.parse(JSON.stringify(get(lwc_info))))
-		//If the wallet wasn't installed schedule another check
-		if (!this.lwc.installed){
-			if (typeof get(lwc_info).installed === 'undefined') {
-				lwc_info.set(Object.assign(get(lwc_info), {installed: this.lwc.installed}))
-			}
-			setTimeout(this.checkForIntstalledWallet, 1000)
-		}else{
+		if (this.lwc.installed){
+			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0) this.connectToWallet();
+
 			//If the wallet is installed then update the store if new information is passed
 			let lwc_info_store = get(lwc_info)
 			let results = Object.keys(lwc_info_store).map(key => lwc_info_store[key] === this.lwc[key])
@@ -63,9 +67,11 @@ export class WalletService {
 
 		lwc_info.update(current => {
 			const { approved, installed, locked, walletAddress } = this.lwc;
+			console.log('get initial balances?')
+			console.log(walletAddress.length > 0 && approved)
 			if (walletAddress.length > 0 && approved){
 				//Get the inital balance 
-				this.getIntialBalances()
+				this.getIntialBalances(walletAddress)
 				// Join Websocket Feeds for balance updates
 				if (!this._ws_joined) {
 					this.wsService.joinBalanceFeed(walletAddress)
@@ -75,8 +81,8 @@ export class WalletService {
 			return Object.assign(current, { approved, installed, locked, walletAddress })
 		})
 	}
-	private getIntialBalances = async () => {
-		await Promise.all([refreshTAUBalance(), refreshLpBalances()])
+	private getIntialBalances = async (walletAddress) => {
+		await Promise.all([refreshTAUBalance(walletAddress), refreshLpBalances(walletAddress)])
 	}
 	private createTxInfo(method: string, args, contractName = undefined) {
 		return {
@@ -122,7 +128,7 @@ export class WalletService {
 			this.toastService.addToast({ 
 				heading: `Created Supply for ${selectedToken.token_symbol}!`,
 				text: `You have created liquidity for ${selectedToken.token_name} / ${config.currencySymbol}.`, 
-				type: 'info',
+				type: 'success',
 				duration: 7000
 			})
 			callbacks.success()
@@ -152,7 +158,7 @@ export class WalletService {
 			this.toastService.addToast({
 				heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
 				text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
-				type: 'info',
+				type: 'success',
 				duration: 7000
 			})
 			if (callbacks) callbacks.success()
@@ -164,7 +170,7 @@ export class WalletService {
 	}
 
 	private handleRemoveLiquidity = (res, selectedToken, callbacks = undefined) => {
-		let status = this.txResult(res.data)
+		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			let lpPoints = "0";
 			res.data.txBlockResult.state.forEach(stateChange => {
@@ -176,14 +182,14 @@ export class WalletService {
 			this.toastService.addToast({ 
 				heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
 				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
-				type: 'info',
+				type: 'success',
 				duration: 7000
 			})
 			if (callbacks) callbacks.success()
 		}
 	}
 
-	public async swapBuy(args, selectedToken, currencyAmount, tokenAmount, callbacks = undefined) {
+	public async swapBuy(args, selectedToken, currencyAmount, callbacks = undefined) {
 		let results = await this.callApprove('currency', currencyAmount)
 		if (results){
 			this.lwc.sendTransaction(this.createTxInfo('buy', args), (res) => this.handleSwapBuy(res, selectedToken, callbacks))
@@ -193,19 +199,19 @@ export class WalletService {
 	}
 
 	private handleSwapBuy = (res, selectedToken, callbacks = undefined) => {
-		let status = this.txResult(res.data)
+		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
 				heading: `Swap Completed!`,
 				text: `You have swapped ${config.currencySymbol} for ${selectedToken.token_symbol}.`, 
-				type: 'info',
+				type: 'success',
 				duration: 7000
 			})
 			if (callbacks) callbacks.success()
 		}
 	}
 
-	public async swapSell(args, selectedToken, currencyAmount, tokenAmount, callbacks = undefined) {
+	public async swapSell(args, selectedToken, tokenAmount, callbacks = undefined) {
 		let results = await this.callApprove(args.contract, tokenAmount)
 		if (results){
 			this.lwc.sendTransaction(this.createTxInfo('sell', args), (res) => this.handleSwapSell(res, selectedToken, callbacks))
@@ -215,24 +221,35 @@ export class WalletService {
 	}
 
 	private handleSwapSell = (res, selectedToken, callbacks = undefined) => {
-		let status = this.txResult(res.data)
+		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
 				heading: `Swap Completed!`,
 				text: `You have swapped ${selectedToken.token_symbol} for ${config.currencySymbol}.`, 
-				type: 'info',
+				type: 'success',
 				duration: 10000
 			})
 			if (callbacks) callbacks.success()
 		}
 	}
 
-	private handleTxErrors(errors, callback = undefined){
+	private handleTxErrors(errors, callbacks = undefined){
 		errors.forEach(error => {
 			let toastType = 'info'
-			if (error.includes('AssertionError')) {
-				error = error.split("'")[1]
-				toastType = 'error'
+			console.log(JSON.stringify(error))
+			if (error.includes("AssertionError('")) {
+				let match = error.match(/AssertionError\('(.*)',\)/)
+				if (match){
+					error = match[1]
+					toastType = 'error'
+				}else return
+			}
+			if (error.includes('AssertionError("')) {
+				let match = error.match(/AssertionError\("(.*)",\)/)
+				if (match){
+					error = match[1]
+					toastType = 'error'
+				}else return
 			}
 			this.toastService.addToast({
 				heading: 'Transaction Error.',
@@ -240,19 +257,23 @@ export class WalletService {
 				text: error
 			})
 		})
-		if (callback) callback.error()
+		if (callbacks) {
+			console.log("calling error callback! ")
+			console.log(callbacks)
+			callbacks.error()
+		}
 	}
 
-	private txResult(txResults, callback = undefined) {
+	private txResult(txResults, callbacks = undefined) {
 		console.log(txResults)
 		if (txResults.errors) {
-			this.handleTxErrors(txResults.errors, callback)
+			this.handleTxErrors(txResults.errors, callbacks)
 			return txResults.errors
 		}
-			if (typeof txResults.txBlockResult.status !== 'undefined') {
+		if (typeof txResults.txBlockResult.status !== 'undefined') {
 			if (txResults.txBlockResult.status === 0) return 'success'
 			if (txResults.txBlockResult.status === 1) {
-				this.handleTxErrors(txResults.txBlockResult.errors, callback)
+				this.handleTxErrors(txResults.txBlockResult.errors, callbacks)
 				return txResults.txBlockResult.errors
 			}
 		}
