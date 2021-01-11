@@ -17,6 +17,17 @@
 
 
 <style>
+  .header {
+    width: 100%;
+    align-items: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+  }
+
+  .right-content{
+    justify-content: flex-end;
+  }
+
   .active {
     border-bottom: 3px solid var(--color-primary);
     box-sizing: border-box;
@@ -26,8 +37,6 @@
     align-items: center;
     font-size: var(--text-size-xlarge);
     font-weight: 600;
-    margin-right: 20px;
-    padding: 5px 12px;
     box-sizing: border-box;
     z-index: 10;
   }
@@ -44,17 +53,6 @@
     cursor: pointer;
   }
 
-  .header {
-    width: 100%;
-    height: 95px;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .logo-container {
-    padding: 60px;
-  }
-
   button.primary.small{
     color: var(--text-primary-color-inverted-color);
   }
@@ -65,7 +63,7 @@
   <div class="logo-container">
     <RocketSwap />
   </div>
-  <div class="flex-row">
+  <div class="right-content flex-row flex-align-center flex-grow">
     <div class="links flex-row">
       {#each links as e}
         {#if e.$$name === "Pools" || e.$$name === "Swap"}
@@ -74,9 +72,7 @@
           </a> 
         {/if}
       {/each}
-      
-      <button on:click={themeToggle} class="primary outline small">{$currentThemeName === 'dark' ? 'light' : 'dark'}</button>
     </div>
-    <!--<LightDark />-->
+    <LightDark />
   </div>
 </div>
