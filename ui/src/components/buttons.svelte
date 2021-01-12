@@ -48,15 +48,28 @@
 		if (buttonFunction === "create" || buttonFunction === "add" || buttonFunction === "swap"){
 			if (!$currencyAmount || !$tokenAmount || !$selectedToken) return true
 			if ($currencyAmount.isEqualTo(0) || $tokenAmount.isEqualTo(0)) return true
-
-			if ($currencyAmount.isGreaterThan($walletBalance) && buy === true){
-				disabledText = `Insufficent ${config.currencySymbol}`
-				return true
-			}
 			let tokenBalance = $tokenBalances[$selectedToken.contract_name]
-			if ($tokenAmount.isGreaterThan(tokenBalance) && buy === false){
-				disabledText = `Insufficent ${$selectedToken.token_symbol}`
-				return true
+
+			if (typeof $buy === 'undefined'){
+				if ($currencyAmount.isGreaterThan($walletBalance)){
+					disabledText = `Insufficent ${config.currencySymbol}`
+					return true
+				}
+				
+				if ($tokenAmount.isGreaterThan(tokenBalance)){
+					disabledText = `Insufficent ${$selectedToken.token_symbol}`
+					return true
+				}
+			}else{
+				if ($currencyAmount.isGreaterThan($walletBalance) && buy === true){
+					disabledText = `Insufficent ${config.currencySymbol}`
+					return true
+				}
+				
+				if ($tokenAmount.isGreaterThan(tokenBalance) && buy === false){
+					disabledText = `Insufficent ${$selectedToken.token_symbol}`
+					return true
+				}
 			}
 		}
 		if (buttonFunction === "remove"){
