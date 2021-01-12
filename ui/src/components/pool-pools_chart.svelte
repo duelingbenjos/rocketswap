@@ -43,7 +43,6 @@
         let value =  (currency_amount * share) + (token_amount * share * price )
         return value.toPrecision(4)
     }
-
     const adjustLiquidityRedirect = (contract) => window.location.assign(`/#/pool-add/${contract}`)
 </script>
 
