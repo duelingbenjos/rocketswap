@@ -44,7 +44,7 @@
         return value.toPrecision(4)
     }
 
-    const adjustLiquidityRedirect = (contract) => window.location.assign(`/#/${contract}`)
+    const adjustLiquidityRedirect = (contract) => window.location.assign(`/#/pool-add/${contract}`)
 </script>
 
 <style>
