@@ -1,3 +1,4 @@
+import { Client } from "socket.io";
 import { PriceEntity } from "src/entities/price.entity";
 import { BlockDTO } from "./misc.types";
 
@@ -11,7 +12,8 @@ export interface IBlockParser {
 export type ClientUpdateType =
 	| PriceUpdateType
 	| MetricsUpdateType
-	| BalanceUpdateType;
+	| BalanceUpdateType
+	| TradeUpdateType;
 
 export interface PriceUpdateType extends UpdateType {
 	action: "price_update";
@@ -44,8 +46,16 @@ export type UpdateType = {
 		| "metrics_update"
 		| "price_update"
 		| "user_lp_update"
-		| "balance_update";
+		| "balance_update"
+		| "trade_update";
 };
+
+export interface TradeUpdateType extends UpdateType {
+	action: "trade_update";
+	type: "buy" | "sell";
+	amount: string;
+	token: string;
+}
 
 export function isMetricsUpdate(
 	client_update: ClientUpdateType
@@ -63,4 +73,10 @@ export function isPriceUpdate(
 	client_update: ClientUpdateType
 ): client_update is PriceUpdateType {
 	return (client_update as PriceUpdateType).action === "price_update";
+}
+
+export function isTradeUpdate(
+	client_update: ClientUpdateType
+): client_update is TradeUpdateType {
+	return (client_update as TradeUpdateType).action === "trade_update";
 }

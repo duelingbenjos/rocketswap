@@ -8,6 +8,7 @@ import { BalanceEntity } from "./entities/balance.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { PriceEntity } from "./entities/price.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
+import { TradeHistoryEntity } from "./entities/trade-history.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -18,7 +19,8 @@ const db_options: TypeOrmModuleOptions = {
 		BalanceEntity,
 		PairEntity,
 		PriceEntity,
-		LpPointsEntity
+		LpPointsEntity,
+		TradeHistoryEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true

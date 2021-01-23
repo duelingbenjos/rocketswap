@@ -19,6 +19,7 @@ import {
 	isBalanceUpdate,
 	isMetricsUpdate,
 	isPriceUpdate,
+	isTradeUpdate,
 	MetricsUpdateType,
 	UserLpUpdateType
 } from "./types/websocket.types";
@@ -58,16 +59,29 @@ export class AppGateway
 		let contract_name;
 		switch (update.action) {
 			case "metrics_update":
-				if (isMetricsUpdate(update))
+				if (isMetricsUpdate(update)) {
+					console.log(update);
 					contract_name = update.contract_name;
-				this.wss.emit(`price_feed:${contract_name}`, update);
-				this.logger.log("price update sent");
+					this.wss.emit(`price_feed:${contract_name}`, update);
+					this.logger.log("price update sent");
+				}
 				break;
 			case "balance_update":
 				if (isBalanceUpdate(update)) {
-					this.wss.emit(`balance_update:${update.payload.vk}`, update);
-					this.logger.log(`balance update sent to : ${update.payload.vk}`);
+					this.wss.emit(
+						`balance_update:${update.payload.vk}`,
+						update
+					);
+					this.logger.log(
+						`balance update sent to : ${update.payload.vk}`
+					);
 				}
+				break;
+			case "trade_update":
+				if (isTradeUpdate(update)) {
+					this.wss.emit(`trade_update:${update.token}`, update);
+				}
+				break;
 		}
 	};
 

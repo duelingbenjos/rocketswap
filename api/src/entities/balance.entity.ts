@@ -1,5 +1,4 @@
 import { IKvp } from "../types/misc.types";
-import BigNumber from "bignumber.js";
 import { getVal } from "../utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 import { handleClientUpdate } from "../types/websocket.types";
@@ -50,10 +49,10 @@ export async function saveTransfer(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "balances"
 	);
 	//console.log(balances_kvp);
-	const transfers = balances_kvp.filter(
+	const balance_updates = balances_kvp.filter(
 		(kvp) => kvp.key.split(":").length === 2
 	);
-	for (let kvp of transfers) {
+	for (let kvp of balance_updates) {
 		const { key, value } = kvp;
 		const parts = key.split(".");
 		const is_balance = parts[1].split(":")[0] === "balances" ? true : false;

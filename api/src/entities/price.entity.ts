@@ -57,7 +57,7 @@ export async function savePrice(
 		reserves
 	});
 
-	await Promise.all([price_entity.save(), pair_entity.save()]);
+	return await Promise.all([price_entity.save(), pair_entity.save()]);
 }
 
 export async function getTokenMetrics(contract_name: string) {

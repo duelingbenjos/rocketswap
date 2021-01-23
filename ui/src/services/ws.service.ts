@@ -54,7 +54,6 @@ export class WsService {
 
   private handleBalanceList(payload) {
     tokenBalances.set(valuesToBigNumber(payload).balances)
-    
   }
 
   private handleBalanceUpdate(data) {
@@ -63,11 +62,13 @@ export class WsService {
   }
 
   public joinPriceFeed(contract_name: string) {
+    console.log('join price feed')
     this.connection.emit('join_room', `price_feed:${contract_name}`)
     this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
   }
 
   public leavePriceFeed(contract_name: string) {
+    console.log('leave price feed')
     this.connection.emit('leave_room', `price_feed:${contract_name}`)
     this.connection.off(`price_feed:${contract_name}`)
   }
@@ -75,6 +76,7 @@ export class WsService {
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
     let { contract_name } = metrics_update
     const metrics = this.token_metrics
+    console.log(metrics_update)
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     token_metrics_store.set(valuesToBigNumber(metrics))
   }
