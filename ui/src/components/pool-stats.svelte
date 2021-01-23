@@ -69,6 +69,7 @@
     }
     .stat{
         min-width: max-content;
+        min-width: -webkit-max-content;
         text-align: center;
         color: var(--color-gray-5);
     }

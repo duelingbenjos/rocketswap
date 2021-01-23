@@ -39,21 +39,21 @@
             {
                 logoComponent: LamdenLogo,
                 symbol: config.currencySymbol,
-                amount: stringToFixed($currencyAmount, 4)
+                amount: stringToFixed($currencyAmount, 12)
             },
             {
                 logoComponent: Base64SvgLogo,
                 symbol: $selectedToken.token_symbol,
-                amount: stringToFixed($tokenAmount, 4)
+                amount: stringToFixed($tokenAmount, 12)
             },
         ]
         if (!$buy) {
             minimumReceived = $pageStats.currencyPurchasedLessFee
-            slotArray[0].amount = stringToFixed(minimumReceived, 4)
+            slotArray[0].amount = stringToFixed(minimumReceived, 12)
             slotArray.reverse();
         }else{
             minimumReceived = $pageStats.tokensPurchasedLessFee
-            slotArray[1].amount = stringToFixed(minimumReceived, 4)
+            slotArray[1].amount = stringToFixed(minimumReceived, 12)
         }
         return slotArray;
     }

@@ -396,6 +396,7 @@ button.secondary{
   background: var(--button-secondary);
   padding: 6px 16px;
   height: fit-content;
+  height: -webkit-fit-content;
   font-size: 0.8em; 
   position: relative;
   color: var(--text-inverted)
@@ -427,6 +428,8 @@ button.select-token{
   border-radius: var(--button-border-radius);
   padding: 0 3px;
   line-height: 1.1;
+  min-width: max-content;
+  min-width: -webkit-max-content;
 }
 
 button.select-token:hover{
@@ -490,6 +493,7 @@ button.close{
 .input-label{
   flex-grow: 1;
   min-width: fit-content;
+  min-width: -webkit-fit-content;
   margin-right: 20px;
 }
 
@@ -529,6 +533,7 @@ input.input-amount-value::placeholder {
   font-weight: 400;
   letter-spacing: 0.02em;
   min-width: max-content;
+  min-width: -webkit-max-content;
 }
 
 .text-link {

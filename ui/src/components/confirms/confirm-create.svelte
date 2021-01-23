@@ -91,11 +91,11 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number">{stringToFixed($currencyAmount, 4)}</p>
+            <p class="number">{stringToFixed($currencyAmount, 12)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
-            <p class="number">{stringToFixed($tokenAmount, 4)}</p>
+            <p class="number">{stringToFixed($tokenAmount, 12)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}

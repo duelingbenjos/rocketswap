@@ -81,7 +81,7 @@
     </div>
     <div class="flex-col text-xlarge to-receive">
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span class="number-reg">{stringToFixed($pageStats.amounts.token, 4)}</span>
+            <span class="number-reg">{stringToFixed($pageStats.amounts.token, 12)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span>{$selectedToken.token_symbol}</span>
                 <Base64SvgLogo string={$selectedToken?.logo_svg_base64} width="30px" margin={"0 0 0 10px"}/>
@@ -89,7 +89,7 @@
         </div>
         <PlusSign width="18px" margin="0" color="var(--text-primary-dim)"/>
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 4)}</span>
+            <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 12)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span >{config.currencySymbol}</span>
                 <LamdenLogo width={'30px'} height={'30px'} margin={"0 0 0 10px"}/>
