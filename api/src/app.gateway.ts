@@ -79,6 +79,7 @@ export class AppGateway
 				break;
 			case "trade_update":
 				if (isTradeUpdate(update)) {
+					this.wss.emit(`trade_update`, update);
 					this.wss.emit(`trade_update:${update.token}`, update);
 				}
 				break;

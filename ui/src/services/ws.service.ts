@@ -16,7 +16,7 @@ export class WsService {
   private token_metrics: TokenMetricsType = {}
   private base_url: string
   private port: number
-  connection
+  connection: SocketIOClient.Socket
 
   constructor() {
     console.log('WS Service STARTED')
@@ -31,6 +31,9 @@ export class WsService {
     // console.log('setup events')
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
+      this.connection.on('trade_update', (msg) => {
+        console.log(msg)
+      })
       this.connection.on('joined_room', (msg) => {
         // console.log('joined room : ', msg)
       })

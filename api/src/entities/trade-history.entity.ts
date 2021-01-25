@@ -13,6 +13,9 @@ export class TradeHistoryEntity extends BaseEntity {
 	contract_name: string;
 
 	@Column()
+	token_symbol: string;
+
+	@Column()
 	price: string;
 
 	@Column()
@@ -25,11 +28,12 @@ export class TradeHistoryEntity extends BaseEntity {
 	vk: string;
 
 	@Column()
-	type: 'buy' | 'sell' // buying or selling the token
+	type: "buy" | "sell"; // buying or selling the token
 }
 
 export async function saveTradeUpdate(args: {
 	contract_name: string;
+	token_symbol: string;
 	price: string;
 	amount: string;
 	vk: string;

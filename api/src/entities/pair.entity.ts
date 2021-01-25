@@ -27,6 +27,9 @@ export class PairEntity extends BaseEntity {
 	@Column({ nullable: true })
 	price: string;
 
+	@Column({ nullable: true })
+	token_symbol: string;
+
 	@Column({ nullable: true, type: "simple-json" })
 	reserves: [string, string];
 }
@@ -85,12 +88,14 @@ export async function saveReserves(
 				console.log(amount_exchanged);
 				updateTradeFeed(
 					contract_name,
+					entity.token_symbol,
 					fn,
 					amount_exchanged,
 					handleClientUpdate
 				);
 				saveTradeUpdate({
 					contract_name,
+					token_symbol: entity.token_symbol,
 					type: fn,
 					vk,
 					amount: amount_exchanged,
@@ -103,12 +108,14 @@ export async function saveReserves(
 				console.log(amount_exchanged);
 				updateTradeFeed(
 					contract_name,
+					entity.token_symbol,
 					fn,
 					amount_exchanged,
 					handleClientUpdate
 				);
 				saveTradeUpdate({
 					contract_name,
+					token_symbol: entity.token_symbol,
 					type: fn,
 					vk,
 					amount: amount_exchanged,
@@ -137,6 +144,7 @@ export async function saveReserves(
 
 function updateTradeFeed(
 	token: string,
+	token_symbol: string,
 	type: "buy" | "sell",
 	amount: string,
 	handleClientUpdate: handleClientUpdate
@@ -145,7 +153,8 @@ function updateTradeFeed(
 		action: "trade_update",
 		type,
 		amount,
-		token
+		token,
+		token_symbol
 	};
 	handleClientUpdate(payload);
 }
@@ -164,10 +173,9 @@ export async function savePair(state: IKvp[]) {
 	if (token_entity) {
 		token_entity.has_market = true;
 		await token_entity.save();
+		pair_entity.token_symbol = token_entity.token_symbol;
 	}
 	pair_entity.contract_name = contract_name;
-	if (contract_name === "con_token_bs") console.log(pair_entity);
-
 	await pair_entity.save();
 }
 

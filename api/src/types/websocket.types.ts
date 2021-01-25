@@ -55,6 +55,7 @@ export interface TradeUpdateType extends UpdateType {
 	type: "buy" | "sell";
 	amount: string;
 	token: string;
+	token_symbol: string;
 }
 
 export function isMetricsUpdate(
