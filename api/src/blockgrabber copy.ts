@@ -1,4 +1,5 @@
 import mongoose_models from "./mongoose.models";
+import { isLamdenKey } from "./utils";
 
 const https = require("https");
 const http = require("http");
@@ -17,7 +18,7 @@ if (DBUSER) {
 	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}/block-explorer?authSource=admin`;
 }
 
-var wipeOnStartup = false;
+var wipeOnStartup = true;
 if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
 }
@@ -31,7 +32,7 @@ const databaseLoader = (models, handleNewBlock) => {
 	const route_getLastestBlock = "/latest_block";
 	let lastestBlockNum = 0;
 	let currBatchMax = 0;
-	let batchAmount = 20;
+	let batchAmount = 25;
 	let timerId;
 
 	const wipeDB = async () => {
@@ -67,33 +68,36 @@ const databaseLoader = (models, handleNewBlock) => {
 		timerId = setTimeout(checkForBlocks, 1000);
 	};
 
-	const sendBlockRequest =  (url) => {
-		return new Promise((resolve)=>{
-			let protocol = http;
-			if (url.includes("https://")) protocol = https;
-			protocol
-				.get(url, (resp) => {
-					let data = "";
-					resp.on("data", (chunk) => {
-						data += chunk;
-					});
-					resp.on("end", () => {
-						try {
-							resolve(JSON.parse(data))
-						} catch (err) {
-							console.log("Error: " + err.message);
-							resolve(({error: err.message}))
-						}
-					});
-				})
-				.on("error", (err) => {
-					console.log("Error: " + err.message);
-					resolve({error: err.message})
+	const send = (url, callback) => {
+		let protocal = http;
+		if (url.includes("https://")) protocal = https;
+
+		protocal
+			.get(url, (resp) => {
+				let data = "";
+
+				// A chunk of data has been recieved.
+				resp.on("data", (chunk) => {
+					data += chunk;
 				});
-		})
+
+				// The whole response has been received. Print out the result.
+				resp.on("end", () => {
+					try {
+						callback(JSON.parse(data));
+					} catch (err) {
+						console.log("Error: " + err.message);
+						callback({ error: err.message });
+					}
+				});
+			})
+			.on("error", (err) => {
+				console.log("Error: " + err.message);
+				callback({ error: err.message });
+			});
 	};
 
-	const processBlock = async (blockInfo) => {
+	const storeBlock = async (blockInfo) => {
 		if (
 			typeof blockInfo.error === "undefined" &&
 			typeof blockInfo.number !== "undefined"
@@ -137,20 +141,121 @@ const databaseLoader = (models, handleNewBlock) => {
 							signer: sig.signer
 						}).save();
 					});
-					// console.log(sb.transactions);
-					(async function loop() {for (let tx of sb.transactions) {
+
+					sb.transactions.forEach(async (tx) => {
 						sb.numOfTransactions = sb.numOfTransactions + 1;
 						block.numOfTransactions = block.numOfTransactions + 1;
 						blockTxList.push(tx.hash);
 						subblockTxList.push(tx.hash);
 
-					await	handleNewBlock({
+						let transaction = new models.Transactions({
+							hash: tx.hash,
+							result: tx.result,
+							stampsUsed: tx.stamps_used,
+							status: tx.status,
+							transaction:
+								JSON.stringify(tx.transaction) || undefined,
+							state: JSON.stringify(tx.state) || undefined,
+							blockNum: blockInfo.number,
+							subBlockNum: sb.subblock,
+							contractName: tx.transaction.payload.contract,
+							functionName: tx.transaction.payload.function,
+							nonce: tx.transaction.payload.nonce,
+							processor: tx.transaction.payload.processor,
+							sender: tx.transaction.payload.sender,
+							stampsSupplied:
+								tx.transaction.payload.stamps_supplied,
+							kwargs: JSON.stringify(
+								tx.transaction.payload.kwargs
+							),
+							timestamp: new Date(
+								tx.transaction.metadata.timestamp * 1000
+							),
+							signature: tx.transaction.metadata.signature,
+							numOfStateChanges: 0
+						});
+
+						handleNewBlock({
 							state: tx.state,
 							fn: tx.transaction.payload.function,
 							contract: tx.transaction.payload.contract
 						});
 
-					}})()
+						if (Array.isArray(tx.state)) {
+							tx.state.forEach((s) => {
+								transaction.numOfStateChanges =
+									transaction.numOfStateChanges + 1;
+								let state = new models.State({
+									hash: tx.hash,
+									txNonce: tx.transaction.payload.nonce,
+									blockNum: blockInfo.number,
+									subBlockNum: sb.subblock,
+									rawKey: s.key,
+									contractName: s.key
+										.split(":")[0]
+										.split(".")[0],
+									variableName: s.key
+										.split(":")[0]
+										.split(".")[1],
+									key: s.key.split(/:(.+)/)[1],
+									value: s.value
+								});
+
+								state.keyIsAddress = isLamdenKey(state.key);
+								state.keyContainsAddress = false;
+								let stateKeys = [];
+								if (state.key) {
+									state.key.split(":").forEach((k) => {
+										stateKeys.push(k);
+										if (isLamdenKey(k))
+											state.keyContainsAddress = true;
+									});
+								}
+								state.keys = JSON.stringify(stateKeys);
+								state.save();
+							});
+						}
+
+						let stampInfo = await models.Stamps.findOne({
+							contractName: transaction.contractName,
+							functionName: transaction.functionName
+						});
+						if (!stampInfo) {
+							new models.Stamps({
+								contractName: transaction.contractName,
+								functionName: transaction.functionName,
+								avg: transaction.stampsUsed,
+								max: transaction.stampsUsed,
+								min: transaction.stampsUsed,
+								numOfTxs: 1
+							}).save();
+						} else {
+							await models.Stamps.updateOne(
+								{
+									contractName: transaction.contractName,
+									functionName: transaction.functionName
+								},
+								{
+									min:
+										transaction.stampsUsed < stampInfo.min
+											? transaction.stampsUsed
+											: stampInfo.min,
+									max:
+										transaction.stampsUsed > stampInfo.max
+											? transaction.stampsUsed
+											: stampInfo.max,
+									avg: Math.ceil(
+										(stampInfo.avg +
+											transaction.stampsUsed) /
+											2
+									),
+									numOfTxs: stampInfo.numOfTxs + 1
+								}
+							);
+						}
+
+						transaction.save();
+					});
 					subblock.transactions = JSON.stringify(subblockTxList);
 					subblock.save();
 				});
@@ -160,6 +265,7 @@ const databaseLoader = (models, handleNewBlock) => {
 				if (err) console.log(err);
 				console.log("saved " + blockInfo.number);
 			});
+
 			if (blockInfo.number === currBatchMax) {
 				currBlockNum = currBatchMax;
 				timerId = setTimeout(checkForBlocks, 0);
@@ -167,19 +273,16 @@ const databaseLoader = (models, handleNewBlock) => {
 		}
 	};
 
-	const getBlock_MN = async (blockNum) => {
-		const block_res = await sendBlockRequest(`${MASTERNODE_URL}${route_getBlockNum}${blockNum}`);
-		return block_res
-};
+	const getBlock_MN = (blockNum) => {
+		send(`${MASTERNODE_URL}${route_getBlockNum}${blockNum}`, storeBlock);
+	};
 
 	const getLatestBlock_MN = () => {
 		return new Promise((resolve, reject) => {
 			const returnRes = async (res) => {
 				resolve(res);
 			};
-			 
-			const res = sendBlockRequest(`${MASTERNODE_URL}${route_getLastestBlock}`);
-			returnRes(res)
+			send(`${MASTERNODE_URL}${route_getLastestBlock}`, returnRes);
 		});
 	};
 
@@ -206,26 +309,18 @@ const databaseLoader = (models, handleNewBlock) => {
 					if (currBatchMax > lastestBlockNum)
 						currBatchMax = lastestBlockNum;
 					if (currBatchMax > batchAmount) currBatchMax + batchAmount;
-					// let to_process = []
-					let to_fetch = []
 					for (let i = currBlockNum + 1; i <= currBatchMax; i++) {
-						// let timedelay = (i - currBlockNum) * 100;
-						// console.log(
-						// 	"getting block: " +
-						// 		i +
-						// 		" with delay of " +
-						// 		timedelay +
-						// 		"ms"
-						// );
-						let block = getBlock_MN(i)
-						to_fetch.push(block)
-						// }, 200 + timedelay);
-					}
-					let to_process = await Promise.all(to_fetch)
-					// console.log(to_process)
-					to_process.sort((a,b) => a.number - b.number)
-					for(let block of to_process) {
-						await processBlock(block)
+						let timedelay = (i - currBlockNum) * 100;
+						/*
+						console.log(
+							"getting block: " +
+								i +
+								" with delay of " +
+								timedelay +
+								"ms"
+						);
+						*/
+						setTimeout(() => getBlock_MN(i), 200 + timedelay);
 					}
 				}
 

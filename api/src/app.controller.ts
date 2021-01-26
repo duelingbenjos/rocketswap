@@ -11,7 +11,6 @@ export class AppController {
 
 	@Get("trade_history")
 	public async getTradeHistory(@Param() params) {
-		console.log(params);
 		const { vk, contract_name, index } = params;
 		const find_options = {};
 		try {

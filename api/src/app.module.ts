@@ -9,6 +9,7 @@ import { PairEntity } from "./entities/pair.entity";
 import { PriceEntity } from "./entities/price.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
+import { SocketService } from "./socket.service";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -29,6 +30,6 @@ const db_options: TypeOrmModuleOptions = {
 @Module({
 	imports: [TypeOrmModule.forRoot(db_options)],
 	controllers: [AppController],
-	providers: [AppGateway, ParserProvider]
+	providers: [AppGateway, ParserProvider, SocketService]
 })
 export class AppModule {}

@@ -115,7 +115,7 @@ export async function updateLogo(state: IKvp[], contract_name: string){
 
 	if(tokenEntity.logo_svg_base64 !== logo_change.value){
 		tokenEntity.logo_svg_base64 = logo_change.value
-		tokenEntity.save()
+		await tokenEntity.save()
 	}
 }
 

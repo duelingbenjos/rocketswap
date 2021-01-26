@@ -39,7 +39,7 @@ export async function saveReserves(
 	state: IKvp[],
 	handleClientUpdate: handleClientUpdate
 ) {
-	console.log(state);
+	// console.log(state);
 	const reserve_kvp = state.find(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "reserves"
 	);
@@ -53,7 +53,7 @@ export async function saveReserves(
 	if (reserve_kvp) {
 		let contract_name = reserve_kvp.key.split(":")[1];
 		let vk_kvp = state.find((kvp) => {
-			console.log(`${contract_name}.balances`);
+			// console.log(`${contract_name}.balances`);
 			return (
 				kvp.key.includes(`${contract_name}.balances`) &&
 				isLamdenKey(kvp.key.split(":")[1])
@@ -80,12 +80,12 @@ export async function saveReserves(
 				old_currency_reserve = entity.reserves[0];
 				old_token_reserve = entity.reserves[1];
 			}
-			console.log(entity);
+			// console.log(entity);
 			if (fn === "buy") {
 				let amount_exchanged = (
 					parseFloat(old_token_reserve) - parseFloat(reserves[1])
 				).toString();
-				console.log(amount_exchanged);
+				// console.log(amount_exchanged);
 				updateTradeFeed(
 					contract_name,
 					entity.token_symbol,
@@ -105,7 +105,7 @@ export async function saveReserves(
 				let amount_exchanged = (
 					parseFloat(reserves[1]) - parseFloat(old_token_reserve)
 				).toString();
-				console.log(amount_exchanged);
+				// console.log(amount_exchanged);
 				updateTradeFeed(
 					contract_name,
 					entity.token_symbol,
@@ -160,6 +160,7 @@ function updateTradeFeed(
 }
 
 export async function savePair(state: IKvp[]) {
+	// console.log(state)
 	// { key: "con_amm2.pairs:con_token_test7", value: true },
 	const pair_kvp = state.find(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "pairs"
