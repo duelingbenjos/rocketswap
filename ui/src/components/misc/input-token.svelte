@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { createEventDispatcher, getContext } from 'svelte'
+	import { createEventDispatcher, getContext, onDestroy } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
+	import {WsService} from '../../services/ws.service'
 
 	//Components
 	import TokenSelect from './token-select-toggle.svelte'
@@ -18,6 +19,7 @@
 	export let label
 
 	const dispatch = createEventDispatcher();
+	const ws = WsService.getInstance()
 	
 	let { pageStores } = getContext('pageContext')
 	const { selectedToken, tokenAmount } = pageStores
@@ -26,6 +28,8 @@
 
 	$: tokenBalance = $selectedToken ? $tokenBalances[$selectedToken.contract_name] : toBigNumber("0.0")
 	$: inputValue = $tokenAmount;
+
+	onDestroy(()=>ws.leaveTradeFeed())
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -45,6 +49,9 @@
 
 	const handleTokenSelect = (e) => {
 		dispatchEvent(inputValue, e.detail)
+		// Subscribe the LP feed / Trade Feed
+		console.log(e.detail)
+		ws.joinTradeFeed(e.detail.contract_name)
 	}
 
 	const dispatchEvent = (value, selected) => dispatch('input', {tokenAmount: value, selected})

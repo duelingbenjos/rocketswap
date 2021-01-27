@@ -16,6 +16,8 @@ export class WsService {
   private token_metrics: TokenMetricsType = {}
   private base_url: string
   private port: number
+  private current_trade_feed: string
+
   connection: SocketIOClient.Socket
 
   constructor() {
@@ -32,7 +34,7 @@ export class WsService {
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
       this.connection.on('trade_update', (msg) => {
-        console.log(msg)
+        // console.log(msg)
       })
       this.connection.on('joined_room', (msg) => {
         // console.log('joined room : ', msg)
@@ -49,6 +51,24 @@ export class WsService {
     })
   }
 
+  public joinTradeFeed(contract_name: string) {
+    this.leaveTradeFeed()
+    this.connection.on(`trade_update:${contract_name}`, this.handleTradeUpdate)
+    this.current_trade_feed = contract_name
+    console.log('joined trade feed : ', contract_name)
+  }
+
+  public leaveTradeFeed() {
+    const contract_name = this.current_trade_feed
+    this.connection.off(`trade_update:${contract_name}`)
+    this.current_trade_feed = ''
+    console.log('left trade feed : ', contract_name)
+  }
+
+  private handleTradeUpdate(event) {
+    console.log(event)
+  }
+
   public joinBalanceFeed(vk: string) {
     this.connection.emit('join_room', `balance_feed:${vk}`)
     this.connection.on(`balance_list:${vk}`, this.handleBalanceList)
@@ -56,6 +76,7 @@ export class WsService {
   }
 
   private handleBalanceList(payload) {
+    console.log(payload)
     tokenBalances.set(valuesToBigNumber(payload).balances)
   }
 
