@@ -15,7 +15,8 @@ export class BalanceEntity extends BaseEntity implements IBalance {
 }
 
 export async function updateBalance(balance_dto: BalanceType) {
-	const { contract_name, amount, vk } = balance_dto;
+	let { contract_name, amount, vk } = balance_dto;
+	if (typeof amount === 'number') amount = (amount as number).toString()
 	let entity = await BalanceEntity.findOne(vk);
 	if (!entity) {
 		entity = new BalanceEntity();

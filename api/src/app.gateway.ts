@@ -13,6 +13,7 @@ import blockgrabber from "./blockgrabber";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics } from "./entities/price.entity";
+import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
 import {
@@ -110,6 +111,28 @@ export class AppGateway
 			case "balance_feed":
 				this.handleJoinBalanceFeed(subject, client);
 				break;
+			case "trade_feed" && subject:
+				this.handleJoinTradeFeed(subject, client)
+		}
+	}
+
+	private async handleJoinTradeFeed(subject: string, client: Socket) {
+		try {
+			const trade_update = await TradeHistoryEntity.find({
+				select: [
+					"contract_name",
+					"token_symbol",
+					"price",
+					"type",
+					"time"
+				],
+				order:{time: "DESC"},
+				where: {contract_name: subject},
+				take: 50
+			});
+			client.emit(`trade_update:${subject}`, trade_update);
+		} catch (err) {
+			this.logger.error(err)
 		}
 	}
 

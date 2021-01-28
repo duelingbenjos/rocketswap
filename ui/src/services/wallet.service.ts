@@ -73,9 +73,11 @@ export class WalletService {
 				//Get the inital balance 
 				this.getIntialBalances(walletAddress)
 				// Join Websocket Feeds for balance updates
+				console.log('ws_joined', this._ws_joined)
 				if (!this._ws_joined) {
 					this.wsService.joinBalanceFeed(walletAddress)
 					this._ws_joined = true
+					console.log('ws_joined', this._ws_joined)
 				}
 			}
 			return Object.assign(current, { approved, installed, locked, walletAddress })

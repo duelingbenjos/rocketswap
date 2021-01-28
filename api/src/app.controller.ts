@@ -1,27 +1,17 @@
-import { Controller, Get, HttpException, Param, Query } from "@nestjs/common";
+import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
+import { decideLogo } from "./utils";
 
 @Controller("api")
 export class AppController {
 	constructor() {}
 
-	@Get("trade_history")
-	public async getTradeHistory(@Param() params) {
-		const { vk, contract_name, index } = params;
-		const find_options = {};
-		try {
-			return await TradeHistoryEntity.find();
-		} catch (err) {
-			throw new HttpException(err, 500);
-		}
-	}
-
 	@Get("get_trade_history")
-	public async test(@Query() params) {
+	public async getTradeHistory(@Query() params) {
 		let { vk, contract_name, skip, take } = params;
 		let select = ["contract_name", "token_symbol"];
 		const find_options = { where: {} };
@@ -44,6 +34,7 @@ export class AppController {
 					"type",
 					"time"
 				],
+				order:{time: "DESC"},
 				...find_options
 			});
 		} catch (err) {
@@ -54,7 +45,19 @@ export class AppController {
 	@Get("token_list")
 	public async getTokenList() {
 		try {
-			return await TokenEntity.find();
+			const res = await TokenEntity.find({select:['contract_name','has_market','token_base64_png','token_base64_svg','token_logo_url','token_name','token_symbol']});
+			return res.map((token) => {
+				return {
+					contract_name: token.contract_name,
+					has_market: token.has_market,
+					token_base64_png: token.token_base64_png, 
+					token_base64_svg: token.token_base64_svg,
+					logo: decideLogo(token),
+					token_logo_url: token.token_logo_url,
+					token_name: token.token_name,
+					token_symbol: token.token_symbol
+				}
+			})
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
@@ -64,9 +67,9 @@ export class AppController {
 	public async getToken(@Param() params) {
 		const { contract_name } = params;
 		try {
-			let tokenRes = await TokenEntity.find({ contract_name });
-			let token = tokenRes[tokenRes.length - 1];
-			let lp_info = await PairEntity.findOne(contract_name);
+			let token = await TokenEntity.findOne({ where: {contract_name}});
+			// let token = tokenRes[tokenRes.length - 1];
+			let lp_info = await PairEntity.findOne({where: {contract_name}});
 			return { token, lp_info };
 		} catch (err) {
 			throw new HttpException(err, 500);

@@ -24,7 +24,7 @@ const db_options: TypeOrmModuleOptions = {
 		TradeHistoryEntity
 	],
 	synchronize: true,
-	autoLoadEntities: true
+	autoLoadEntities: true,
 };
 
 @Module({
