@@ -24,6 +24,7 @@ export class AppController {
 	@Get("get_trade_history")
 	public async test(@Query() params) {
 		let { vk, contract_name, skip, take } = params;
+		if (!take) take = 50;
 		let select = ["contract_name", "token_symbol"];
 		const find_options = { where: {} };
 
