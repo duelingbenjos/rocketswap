@@ -12,8 +12,10 @@ import { Server, Socket } from "socket.io";
 import blockgrabber from "./blockgrabber";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
-import { getTokenMetrics, PriceEntity } from "./entities/price.entity";
+import { getTokenMetrics } from "./entities/price.entity";
+import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { ParserProvider } from "./parser.provider";
+import { SocketService } from "./socket.service";
 import {
 	ClientUpdateType,
 	isBalanceUpdate,
@@ -35,12 +37,13 @@ export class AppGateway
 
 	@WebSocketServer() wss: Server;
 
-	constructor(private readonly parser: ParserProvider) {
+	constructor(private readonly parser: ParserProvider, private readonly socketService: SocketService) {
 		blockgrabber(this.handleNewBlock);
 	}
 
 	afterInit(server: Server) {
-		this.logger.log(`Websocket Initialised`);
+		this.logger.log(`Websocket Initialised`);    
+		this.socketService.handleClientUpdate = this.handleClientUpdate;
 	}
 
 	handleNewBlock = async (block: any) => {
@@ -50,8 +53,7 @@ export class AppGateway
 				state,
 				fn,
 				contract
-			},
-			handleClientUpdate: this.handleClientUpdate
+			}
 		});
 	};
 
@@ -60,7 +62,6 @@ export class AppGateway
 		switch (update.action) {
 			case "metrics_update":
 				if (isMetricsUpdate(update)) {
-					console.log(update);
 					contract_name = update.contract_name;
 					this.wss.emit(`price_feed:${contract_name}`, update);
 					this.logger.log("price update sent");
@@ -94,7 +95,7 @@ export class AppGateway
 
 	@SubscribeMessage("join_room")
 	async handleJoinRoom(client: Socket, room: string) {
-		this.logger.log(room);
+		// this.logger.log(room);
 		// join user to room
 		client.join(room);
 		client.emit("joined_room", room);
@@ -110,6 +111,28 @@ export class AppGateway
 			case "balance_feed":
 				this.handleJoinBalanceFeed(subject, client);
 				break;
+			case "trade_feed" && subject:
+				this.handleJoinTradeFeed(subject, client)
+		}
+	}
+
+	private async handleJoinTradeFeed(subject: string, client: Socket) {
+		try {
+			const trade_update = await TradeHistoryEntity.find({
+				select: [
+					"contract_name",
+					"token_symbol",
+					"price",
+					"type",
+					"time"
+				],
+				order:{time: "DESC"},
+				where: {contract_name: subject},
+				take: 50
+			});
+			client.emit(`trade_update:${subject}`, trade_update);
+		} catch (err) {
+			this.logger.error(err)
 		}
 	}
 
@@ -149,7 +172,7 @@ export class AppGateway
 				action: "metrics_update",
 				...metrics
 			};
-			this.logger.log(metrics_action);
+			// this.logger.log(metrics_action);
 			client.emit(`price_feed:${contract_name}`, metrics_action);
 		} catch (err) {
 			this.logger.error(err);

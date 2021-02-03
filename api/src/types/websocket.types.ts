@@ -6,7 +6,6 @@ export type handleClientUpdate = (update: ClientUpdateType) => {};
 
 export interface IBlockParser {
 	block: BlockDTO;
-	handleClientUpdate: handleClientUpdate;
 }
 
 export type ClientUpdateType =

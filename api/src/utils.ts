@@ -1,5 +1,6 @@
 import { IKvp } from "./types/misc.types";
 import BigNumber from "bignumber.js";
+import { TokenEntity } from "./entities/token.entity";
 
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;
@@ -78,4 +79,29 @@ export function getContractEntry(state: IKvp[]) {
 export function getContractCode(state: IKvp[]) {
 	let entry = getContractEntry(state);
 	return entry ? entry.value : "";
+}
+
+export function decideLogo(token: TokenEntity): {type:string, data:string} {
+	/**
+	 * Returns an image in this order of preference
+	 * 1. SVG
+	 * 2. PNG
+	 * 3. URL
+	 */
+	let obj = {
+		type: '',
+		data: ''
+	}
+	if (token.token_base64_svg) {
+		obj.type = 'svg',
+		obj.data = token.token_base64_svg
+	} else if (token.token_base64_png) {
+		obj.type = 'png',
+		obj.data = token.token_base64_png
+	} else {
+		obj.type = 'url'
+		obj.data = token.token_logo_url
+	}
+	
+	return obj
 }
