@@ -9,6 +9,7 @@ import { saveUserLp } from "./entities/lp-points.entity"
 import { savePrice } from "./entities/price.entity"
 import { IBlockParser } from "./types/websocket.types"
 import { SocketService } from "./socket.service"
+import { setName } from "./entities/name.entity"
 
 @Injectable()
 export class ParserProvider {
@@ -105,7 +106,19 @@ export class ParserProvider {
     if (isUpdateFn(fn)) {
      await saveTokenUpdate(state)
     }
-   } else {
+   } else if (contract_name === config.identityContract) {
+     console.log(fn)
+     console.log(state)
+     switch(fn) {
+       case 'setName':
+         await setName(state)
+        break
+        case 'auth':
+          // call auth function here.
+        break
+     }
+   }
+    else {
     // console.log(`ignoring block for contract: ${contract_name}`);
     // console.log(state);
     // console.log(state[state.length - 1].value);
