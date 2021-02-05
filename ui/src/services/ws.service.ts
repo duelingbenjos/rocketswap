@@ -27,7 +27,7 @@ export class WsService {
     this.connection = socket(`${this.base_url}:${this.port}`)
     this.setupEvents()
     this.setupSubs()
-    this.joinTrollboxAuth()
+    this.joinTrollBox()
   }
 
   setupEvents = () => {
@@ -79,7 +79,7 @@ export class WsService {
     this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
   }
 
-  public joinTrollboxAuth() {
+  public joinTrollBox() {
     this.connection.emit('join_room', `trollbox`)
     this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
   }
