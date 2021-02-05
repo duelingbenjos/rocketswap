@@ -8,8 +8,6 @@ import {
 	PrimaryColumn
 } from "typeorm";
 
-/** An instance of this entity is created after each action on the AMM that changes the price variable. */
-
 @Entity()
 export class NameEntity extends BaseEntity {
 	@PrimaryColumn()

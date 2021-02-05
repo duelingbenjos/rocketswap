@@ -32,7 +32,7 @@ def setName(name: str):
 
 @export 
 def auth(secret: str):
-    auth_codes[secret] = True
+    auth_codes[secret] = ctx.signer
 
 @export
 def withdraw(amount: float):

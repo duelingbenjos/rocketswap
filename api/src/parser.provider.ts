@@ -10,10 +10,11 @@ import { savePrice } from "./entities/price.entity"
 import { IBlockParser } from "./types/websocket.types"
 import { SocketService } from "./socket.service"
 import { setName } from "./entities/name.entity"
+import { AuthService } from "./authentication/auth.service"
 
 @Injectable()
 export class ParserProvider {
- constructor(private readonly socketService: SocketService) {}
+ constructor(private readonly socketService: SocketService, private readonly authService: AuthService) {}
  private token_contract_list: string[]
  private action_que: { action: any; args: any }[] = []
  private action_que_processing: boolean
@@ -107,14 +108,12 @@ export class ParserProvider {
      await saveTokenUpdate(state)
     }
    } else if (contract_name === config.identityContract) {
-     console.log(fn)
-     console.log(state)
      switch(fn) {
        case 'setName':
          await setName(state)
         break
         case 'auth':
-          // call auth function here.
+          this.authService.authenticate(state)
         break
      }
    }

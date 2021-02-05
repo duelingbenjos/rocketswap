@@ -5,10 +5,10 @@ import {
 	OnGatewayInit,
 	SubscribeMessage,
 	WebSocketGateway,
-	WebSocketServer,
-	WsResponse
+	WebSocketServer
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { AuthenticationPayload } from "./authentication/auth.controller";
 import blockgrabber from "./blockgrabber";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -37,13 +37,17 @@ export class AppGateway
 
 	@WebSocketServer() wss: Server;
 
-	constructor(private readonly parser: ParserProvider, private readonly socketService: SocketService) {
+	constructor(
+		private readonly parser: ParserProvider,
+		private readonly socketService: SocketService
+	) {
 		blockgrabber(this.handleNewBlock);
 	}
 
 	afterInit(server: Server) {
-		this.logger.log(`Websocket Initialised`);    
+		this.logger.log(`Websocket Initialised`);
 		this.socketService.handleClientUpdate = this.handleClientUpdate;
+		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse
 	}
 
 	handleNewBlock = async (block: any) => {
@@ -112,7 +116,26 @@ export class AppGateway
 				this.handleJoinBalanceFeed(subject, client);
 				break;
 			case "trade_feed" && subject:
-				this.handleJoinTradeFeed(subject, client)
+				this.handleJoinTradeFeed(subject, client);
+			case "trollbox":
+				this.handleJoinTrollBox(client);
+		}
+	}
+
+	private async handleJoinTrollBox(client: Socket) {
+		client.emit("trollbox_authcode", client.id);
+	}
+
+	public handleAuthenticateResponse = (auth_response: {
+		socket_id: string;
+		payload: AuthenticationPayload;
+	}) => {
+		try {
+			const { socket_id, payload } = auth_response;
+			// this.wss.sockets[socket_id].emit("auth_response", payload);
+			this.wss.to(socket_id).emit("auth_response", payload);
+		} catch(err) {
+			console.log(err)
 		}
 	}
 
@@ -126,13 +149,13 @@ export class AppGateway
 					"type",
 					"time"
 				],
-				order:{time: "DESC"},
-				where: {contract_name: subject},
+				order: { time: "DESC" },
+				where: { contract_name: subject },
 				take: 50
 			});
 			client.emit(`trade_update:${subject}`, trade_update);
 		} catch (err) {
-			this.logger.error(err)
+			this.logger.error(err);
 		}
 	}
 

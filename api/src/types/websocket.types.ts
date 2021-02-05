@@ -1,8 +1,14 @@
 import { Client } from "socket.io";
+import { AuthenticationPayload } from "src/authentication/auth.controller";
 import { PriceEntity } from "src/entities/price.entity";
 import { BlockDTO } from "./misc.types";
 
 export type handleClientUpdate = (update: ClientUpdateType) => {};
+
+export type handleAuthenticateResponse = (auth_response: {
+	socket_id: string;
+	payload: AuthenticationPayload;
+}) => void;
 
 export interface IBlockParser {
 	block: BlockDTO;

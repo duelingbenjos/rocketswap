@@ -1,5 +1,5 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances } from '../store'
+import { token_metrics_store, tokenBalances, ws_id } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber } from '../utils'
 
@@ -27,6 +27,7 @@ export class WsService {
     this.connection = socket(`${this.base_url}:${this.port}`)
     this.setupEvents()
     this.setupSubs()
+    this.joinTrollboxAuth()
   }
 
   setupEvents = () => {
@@ -41,6 +42,9 @@ export class WsService {
       })
       this.connection.on('left_room', (msg) => {
         // console.log('left room : ', msg)
+      })
+      this.connection.on('auth_response', (msg) => {
+        console.log(msg)
       })
     })
   }
@@ -73,6 +77,16 @@ export class WsService {
     this.connection.emit('join_room', `balance_feed:${vk}`)
     this.connection.on(`balance_list:${vk}`, this.handleBalanceList)
     this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
+  }
+
+  public joinTrollboxAuth() {
+    this.connection.emit('join_room', `trollbox`)
+    this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
+  }
+
+  private handleTrollboxAuthCode(payload) {
+    console.log(payload)
+    ws_id.set(payload)
   }
 
   private handleBalanceList(payload) {
