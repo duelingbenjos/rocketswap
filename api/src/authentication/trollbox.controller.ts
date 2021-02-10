@@ -31,7 +31,7 @@ export interface AuthenticationPayload {
 	};
 }
 
-@Controller("/api/auth")
+@Controller("/api/trollbox")
 export class TrollboxController {
 	public constructor(
 		private readonly tokens: TokensService,
