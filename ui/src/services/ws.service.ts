@@ -27,7 +27,6 @@ export class WsService {
     this.connection = socket(`${this.base_url}:${this.port}`)
     this.setupEvents()
     this.setupSubs()
-    this.joinTrollBox()
   }
 
   setupEvents = () => {
@@ -49,6 +48,7 @@ export class WsService {
       this.connection.on('auth_response', (msg) => {
         console.log(msg)
       })
+      this.joinTrollBox()
     })
   }
 
