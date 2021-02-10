@@ -11,12 +11,12 @@ import { LpPointsEntity } from "./entities/lp-points.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { SocketService } from "./socket.service";
 import { NameEntity } from "./entities/name.entity";
-import { AuthenticationController } from "./authentication/auth.controller";
+import { TrollboxController } from "./authentication/trollbox.controller";
 import { RefreshTokensRepository } from "./authentication/refresh-token.repository";
 import { TokensService } from "./authentication/tokens.service";
 import { JwtModule, JwtService } from "@nestjs/jwt";
 import { JWTGuard } from "./authentication/jwt.guard";
-import { AuthService } from "./authentication/auth.service";
+import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
 
@@ -44,11 +44,11 @@ const db_options: TypeOrmModuleOptions = {
 		JwtModule.register({
 			secret: "<SECRET KEY>",
 			signOptions: {
-				expiresIn: "5m"
+				expiresIn: "60m"
 			}
 		})
 	],
-	controllers: [AppController, AuthenticationController],
+	controllers: [AppController, TrollboxController],
 	providers: [
 		AppGateway,
 		ParserProvider,

@@ -9,7 +9,7 @@ import { RefreshTokenEntity } from "../entities/refresh-token.entity";
 import { IKvp } from "../types/misc.types";
 import { config } from "../config";
 import { TokensService } from "./tokens.service";
-import { AuthenticationPayload } from "./auth.controller";
+import { AuthenticationPayload } from "./trollbox.controller";
 import { SocketService } from "../socket.service";
 
 @Injectable()

@@ -10,7 +10,7 @@ export interface AccessTokenPayload {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-	private logger: Logger = new Logger("AppGateway");
+	private logger: Logger = new Logger("JwtStrategy");
 
 	public constructor(logger: Logger) {
 		super({
@@ -25,7 +25,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
 	async validate(payload: AccessTokenPayload): Promise<NameEntity> {
 		const { sub: vk } = payload;
-		this.logger.log(payload);
 		const user = await NameEntity.findOne(vk);
 
 		if (!user) {

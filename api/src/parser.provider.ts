@@ -10,7 +10,7 @@ import { savePrice } from "./entities/price.entity"
 import { IBlockParser } from "./types/websocket.types"
 import { SocketService } from "./socket.service"
 import { setName } from "./entities/name.entity"
-import { AuthService } from "./authentication/auth.service"
+import { AuthService } from "./authentication/trollbox.service"
 
 @Injectable()
 export class ParserProvider {
@@ -23,50 +23,10 @@ export class ParserProvider {
   this.updateTokenList()
  }
 
- /** The action que is added to attempt to solve a bug where transactions coming in from the blockgrabber fail to be processed
-  * by the parser. Assuming that it's a race condition causing it, this approach should be effective.
-  */
-
-  private executeActionQue =  async (action_que: { action: any; args: any }[]) => {
-  try {
-   if (action_que.length) {
-    console.log(`ACTION QUE PROCESSING ${action_que.length} `)
-    const { action, args } = this.action_que[0]
-		// console.log(args)
-		if (args) {
-			await action(args)
-		} else {
-			action()
-		}
-    this.action_que.splice(0, 1)
-    this.executeActionQue(action_que)
-   } else {
-    this.action_que_processing = false
-   }
-  } catch (err) {
-   console.error(err)
-   setTimeout(async () => this.executeActionQue(action_que), 1000)
-  }
- }
-
- private addToActionQue = (action: any, args?) => {
-  this.action_que.push({ action, args })
-  console.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
-  if (!this.action_que_processing) {
-   this.action_que_processing = true
-   this.executeActionQue(this.action_que)
-  }
- }
-
- private updateTokenList = async (): Promise<void> => {
-  const token_list_update = await getTokenList()
-  this.token_contract_list = token_list_update
-  //console.log(`Token list updated : ${this.token_contract_list}`);
- }
-
  /** This method is passed to the blockgrabber as a callback and checks
   * if we're interested in the contents of the block.
   */
+ 
  public parseBlock = async (update: IBlockParser) => {
   const { block } = update
 	const { state, fn, contract: contract_name } = block
@@ -140,6 +100,47 @@ export class ParserProvider {
   } catch (err) {
    console.error(err)
   }
+ }
+
+  /** The action que is added to attempt to solve a bug where transactions coming in from the blockgrabber fail to be processed
+  * by the parser. Assuming that it's a race condition causing it, this approach should be effective.
+  */
+
+ private executeActionQue =  async (action_que: { action: any; args: any }[]) => {
+  try {
+   if (action_que.length) {
+    console.log(`ACTION QUE PROCESSING ${action_que.length} `)
+    const { action, args } = this.action_que[0]
+		// console.log(args)
+		if (args) {
+			await action(args)
+		} else {
+			action()
+		}
+    this.action_que.splice(0, 1)
+    this.executeActionQue(action_que)
+   } else {
+    this.action_que_processing = false
+   }
+  } catch (err) {
+   console.error(err)
+   setTimeout(async () => this.executeActionQue(action_que), 1000)
+  }
+ }
+
+ private addToActionQue = (action: any, args?) => {
+  this.action_que.push({ action, args })
+  console.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
+  if (!this.action_que_processing) {
+   this.action_que_processing = true
+   this.executeActionQue(this.action_que)
+  }
+ }
+
+ private updateTokenList = async (): Promise<void> => {
+  const token_list_update = await getTokenList()
+  this.token_contract_list = token_list_update
+  //console.log(`Token list updated : ${this.token_contract_list}`);
  }
 }
 

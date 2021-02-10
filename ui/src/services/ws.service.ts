@@ -37,6 +37,9 @@ export class WsService {
       this.connection.on('trade_update', (msg) => {
         // console.log(msg)
       })
+      this.connection.on('trollbox_message', (msg) => {
+        console.log(msg)
+      })
       this.connection.on('joined_room', (msg) => {
         // console.log('joined room : ', msg)
       })

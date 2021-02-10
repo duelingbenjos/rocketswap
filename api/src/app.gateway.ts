@@ -8,8 +8,8 @@ import {
 	WebSocketServer
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { AuthenticationPayload } from "./authentication/auth.controller";
-import blockgrabber from "./blockgrabber";
+import { AuthenticationPayload } from "./authentication/trollbox.controller";
+import startBlockgrabber from "./blockgrabber";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics } from "./entities/price.entity";
@@ -41,23 +41,20 @@ export class AppGateway
 		private readonly parser: ParserProvider,
 		private readonly socketService: SocketService
 	) {
-		blockgrabber(this.handleNewBlock);
+		startBlockgrabber(this.handleNewBlock);
 	}
 
 	afterInit(server: Server) {
 		this.logger.log(`Websocket Initialised`);
 		this.socketService.handleClientUpdate = this.handleClientUpdate;
-		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse
+		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
+		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 	}
 
 	handleNewBlock = async (block: any) => {
-		const { state, fn, contract } = block;
+		// const { state, fn, contract, timestamp } = block;
 		await this.parser.parseBlock({
-			block: {
-				state,
-				fn,
-				contract
-			}
+			block
 		});
 	};
 
@@ -126,18 +123,25 @@ export class AppGateway
 		client.emit("trollbox_authcode", client.id);
 	}
 
+	public handleTrollboxMsg = (message: {
+		sender: string;
+		message: string;
+		timestamp: number;
+	}) => {
+		this.wss.emit("trollbox_message", message);
+	};
+
 	public handleAuthenticateResponse = (auth_response: {
 		socket_id: string;
 		payload: AuthenticationPayload;
 	}) => {
 		try {
 			const { socket_id, payload } = auth_response;
-			// this.wss.sockets[socket_id].emit("auth_response", payload);
 			this.wss.to(socket_id).emit("auth_response", payload);
-		} catch(err) {
-			console.log(err)
+		} catch (err) {
+			console.log(err);
 		}
-	}
+	};
 
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
 		try {

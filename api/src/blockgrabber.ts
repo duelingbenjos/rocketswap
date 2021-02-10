@@ -147,7 +147,8 @@ const databaseLoader = (models, handleNewBlock) => {
 					await	handleNewBlock({
 							state: tx.state,
 							fn: tx.transaction.payload.function,
-							contract: tx.transaction.payload.contract
+							contract: tx.transaction.payload.contract,
+							timestamp: new Date(tx.transaction.metadata.timestamp * 1000)
 						});
 
 					}})()
