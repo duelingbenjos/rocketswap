@@ -16,6 +16,7 @@ import { getTokenMetrics } from "./entities/price.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
+import { BlockDTO } from "./types/misc.types";
 import {
 	ClientUpdateType,
 	isBalanceUpdate,
@@ -51,7 +52,7 @@ export class AppGateway
 		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 	}
 
-	handleNewBlock = async (block: any) => {
+	handleNewBlock = async (block: BlockDTO) => {
 		// const { state, fn, contract, timestamp } = block;
 		await this.parser.parseBlock({
 			block
@@ -82,7 +83,7 @@ export class AppGateway
 			case "trade_update":
 				if (isTradeUpdate(update)) {
 					this.wss.emit(`trade_update`, update);
-					this.wss.emit(`trade_update:${update.token}`, update);
+					this.wss.emit(`trade_update:${update.contract_name}`, update);
 				}
 				break;
 		}
@@ -96,12 +97,10 @@ export class AppGateway
 
 	@SubscribeMessage("join_room")
 	async handleJoinRoom(client: Socket, room: string) {
-		// this.logger.log(room);
-		// join user to room
 		client.join(room);
 		client.emit("joined_room", room);
-
 		const [prefix, subject] = room.split(":");
+		console.log(prefix, subject)
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
@@ -112,7 +111,8 @@ export class AppGateway
 			case "balance_feed":
 				this.handleJoinBalanceFeed(subject, client);
 				break;
-			case "trade_feed" && subject:
+			case "trade_feed":
+				if (!subject) return
 				this.handleJoinTradeFeed(subject, client);
 			case "trollbox":
 				this.handleJoinTrollBox(client);
@@ -144,6 +144,7 @@ export class AppGateway
 	};
 
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
+		this.logger.log(`joined trade feed: ${subject}`)
 		try {
 			const trade_update = await TradeHistoryEntity.find({
 				select: [
@@ -151,7 +152,8 @@ export class AppGateway
 					"token_symbol",
 					"price",
 					"type",
-					"time"
+					"time",
+					"amount"
 				],
 				order: { time: "DESC" },
 				where: { contract_name: subject },

@@ -29,7 +29,7 @@ export class ParserProvider {
  
  public parseBlock = async (update: IBlockParser) => {
   const { block } = update
-	const { state, fn, contract: contract_name } = block
+	const { state, fn, contract: contract_name, timestamp } = block
   try {
    if (contract_name === "submission" && fn === "submit_contract") {
     // Check if the submitted contract is a token, if it's a token, add it to the DB
@@ -58,6 +58,7 @@ export class ParserProvider {
     this.addToActionQue(this.processAmmBlock, {
      state,
      fn,
+     timestamp
     })
     return
    } else if (this.token_contract_list.includes(contract_name)) {
@@ -88,14 +89,14 @@ export class ParserProvider {
   }
  }
 
- processAmmBlock = async (args: { fn: string; state: IKvp[] }) => {
-  const { fn, state } = args
+ processAmmBlock = async (args: { fn: string; state: IKvp[],timestamp: number }) => {
+  const { fn, state, timestamp } = args
   try {
    await savePair(state)
    await saveTransfer(state, this.socketService.handleClientUpdate)
    await savePairLp(state)
    await saveUserLp(state)
-   await saveReserves(fn, state, this.socketService.handleClientUpdate)
+   await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp)
    await savePrice(state, this.socketService.handleClientUpdate)
   } catch (err) {
    console.error(err)

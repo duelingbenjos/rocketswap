@@ -48,7 +48,8 @@ export class WsService {
       this.connection.on('auth_response', (msg) => {
         console.log(msg)
       })
-      this.joinTrollBox()
+      this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
+      this.connection.emit('join_room', `trollbox`)
     })
   }
 
@@ -61,6 +62,7 @@ export class WsService {
   public joinTradeFeed(contract_name: string) {
     this.leaveTradeFeed()
     this.connection.on(`trade_update:${contract_name}`, this.handleTradeUpdate)
+    this.connection.emit('join_room', `trade_feed:${contract_name}`)
     this.current_trade_feed = contract_name
     console.log('joined trade feed : ', contract_name)
   }
@@ -80,11 +82,6 @@ export class WsService {
     this.connection.emit('join_room', `balance_feed:${vk}`)
     this.connection.on(`balance_list:${vk}`, this.handleBalanceList)
     this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
-  }
-
-  public joinTrollBox() {
-    this.connection.emit('join_room', `trollbox`)
-    this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
   }
 
   private handleTrollboxAuthCode(payload) {
@@ -122,7 +119,4 @@ export class WsService {
     token_metrics_store.set(valuesToBigNumber(metrics))
   }
 
-  private handlePriceFeedUpdate(update) {
-    console.log(update)
-  }
 }
