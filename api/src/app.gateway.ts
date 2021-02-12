@@ -82,8 +82,11 @@ export class AppGateway
 				break;
 			case "trade_update":
 				if (isTradeUpdate(update)) {
-					this.wss.emit(`trade_update`, update);
-					this.wss.emit(`trade_update:${update.contract_name}`, update);
+					this.wss.emit(`trade_update`, {update});
+					this.wss.emit(
+						`trade_update:${update.contract_name}`,
+						update
+					);
 				}
 				break;
 		}
@@ -100,7 +103,7 @@ export class AppGateway
 		client.join(room);
 		client.emit("joined_room", room);
 		const [prefix, subject] = room.split(":");
-		console.log(prefix, subject)
+		this.logger.log(prefix, subject);
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
@@ -112,7 +115,7 @@ export class AppGateway
 				this.handleJoinBalanceFeed(subject, client);
 				break;
 			case "trade_feed":
-				if (!subject) return
+				if (!subject) return;
 				this.handleJoinTradeFeed(subject, client);
 			case "trollbox":
 				this.handleJoinTrollBox(client);
@@ -144,7 +147,7 @@ export class AppGateway
 	};
 
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
-		this.logger.log(`joined trade feed: ${subject}`)
+		this.logger.log(`joined trade feed: ${subject}`);
 		try {
 			const trade_update = await TradeHistoryEntity.find({
 				select: [
@@ -159,7 +162,7 @@ export class AppGateway
 				where: { contract_name: subject },
 				take: 50
 			});
-			client.emit(`trade_update:${subject}`, trade_update);
+			client.emit(`trade_update:${subject}`, { history: trade_update });
 		} catch (err) {
 			this.logger.error(err);
 		}

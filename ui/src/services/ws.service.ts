@@ -33,9 +33,6 @@ export class WsService {
     // console.log('setup events')
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
-      this.connection.on('trade_update', (msg) => {
-        // console.log(msg)
-      })
       this.connection.on('trollbox_message', (msg) => {
         trollboxMessages.update(val => {
           val.push({sender: msg.sender.name, message: msg.message})
@@ -81,6 +78,7 @@ export class WsService {
   }
 
   private handleTradeUpdate(event) {
+    console.log(event)
     tradeFeed.set(valuesToBigNumber(event))
   }
 
