@@ -1,7 +1,7 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, bearerToken } from '../store'
+import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeFeed, lwc_info } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
-import { getBaseUrl, valuesToBigNumber } from '../utils'
+import { getBaseUrl, valuesToBigNumber, setBearerToken } from '../utils'
 
 /** Singleton socket.io service */
 export class WsService {
@@ -51,6 +51,7 @@ export class WsService {
       })
       this.connection.on('auth_response', (msg) => {
         localStorage.setItem('auth_token', JSON.stringify(msg))
+        setBearerToken()
       })
       this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
       this.connection.emit('join_room', `trollbox`)
@@ -64,6 +65,7 @@ export class WsService {
   }
 
   public joinTradeFeed(contract_name: string) {
+    if (this.current_trade_feed === contract_name) return
     this.leaveTradeFeed()
     this.connection.on(`trade_update:${contract_name}`, this.handleTradeUpdate)
     this.connection.emit('join_room', `trade_feed:${contract_name}`)
@@ -79,7 +81,7 @@ export class WsService {
   }
 
   private handleTradeUpdate(event) {
-    console.log(event)
+    tradeFeed.set(valuesToBigNumber(event))
   }
 
   public joinBalanceFeed(vk: string) {

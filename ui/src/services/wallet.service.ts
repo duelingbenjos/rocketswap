@@ -1,10 +1,10 @@
 import WalletController from 'lamden_wallet_controller'
 import axios from 'axios'
 import { config } from '../config'
-import { lwc_info, accountName, ws_id } from '../store'
+import { lwc_info, accountName, ws_id, bearerToken } from '../store'
 import { get } from 'svelte/store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
-import { refreshTAUBalance, refreshLpBalances, toBigNumber, stringToFixed } from '../utils'
+import { refreshTAUBalance, refreshLpBalances, setBearerToken, toBigNumber, stringToFixed } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -89,7 +89,8 @@ export class WalletService {
 		await Promise.all([
 			refreshTAUBalance(walletAddress), 
 			refreshLpBalances(walletAddress),
-			this.getAccountName(walletAddress)
+			this.getAccountName(walletAddress),
+			setBearerToken(walletAddress)
 		])
 	}
 

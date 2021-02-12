@@ -8,6 +8,8 @@
 	//Services
 	import { ApiService } from '../services/api.service'
 	const apiService = ApiService.getInstance();
+	import { WsService } from '../services/ws.service'
+	const ws = WsService.getInstance()
 
 	//Stores
 	import { lwc_info, tokenBalances, walletIsReady, saveStoreValue,  } from '../store'
@@ -45,8 +47,7 @@
 
 	selectedToken.subscribe(value => {
 		if (value) {
-			pageUtilites.refreshTokenInfo(value.contract_name)
-			pageUtilites.updateWindowHistory("pool-swap")
+			joinTradeFeed_UpdateWindow(value.contract_name)
 		}
 	})
 
@@ -60,8 +61,20 @@
 	});
 
 	onMount(() => {
-		if (contractName) pageUtilites.refreshTokenInfo(contractName)
+		if (contractName) joinTradeFeed_UpdateWindow(contractName)
+		return () => ws.leaveTradeFeed()
 	})
+
+	const joinTradeFeed_UpdateWindow = (contract_name) => {
+		pageUtilites.refreshTokenInfo(contract_name).then(res => {
+			if (res){
+				pageUtilites.updateWindowHistory("pool-swap")
+				ws.joinTradeFeed(contract_name)
+			}else{
+				pageUtilites.updateWindowHistory("pool-swap", false)
+			}
+		})
+	}
 	
 	
 	const updatePageStats = async () => {
