@@ -152,7 +152,7 @@ export class WalletService {
 						heading: `Hello ${get(accountName)}!`,
 						text: `You have created a Rocket ID on the blockchain. You can now log into the Troll Box!`, 
 						type: 'success',
-						duration: 7000
+						duration: 5000
 					})
 				}
 			}
@@ -174,7 +174,7 @@ export class WalletService {
 				heading: `Rocket ID Authenticated!`,
 				text: `You can now use the Troll Box. Don't be too much of a Degen.`, 
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 		}
 	}
@@ -213,7 +213,7 @@ export class WalletService {
 				heading: `Created Supply for ${selectedToken.token_symbol}!`,
 				text: `You have created liquidity for ${selectedToken.token_name} / ${config.currencySymbol}.`, 
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			callbacks.success()
 		}
@@ -243,7 +243,7 @@ export class WalletService {
 				heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
 				text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -267,7 +267,7 @@ export class WalletService {
 				heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
 				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -289,7 +289,7 @@ export class WalletService {
 				heading: `Swap Completed!`,
 				text: `You have swapped ${config.currencySymbol} for ${selectedToken.token_symbol}.`, 
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			if (callbacks) callbacks.success()
 		}
