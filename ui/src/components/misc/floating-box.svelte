@@ -40,16 +40,6 @@
         }
     })
 
-    const addMessage = () => {
-        messages = [
-            ...messages,
-            {
-                sender: "person1",
-                message: "Hey Hey Hye Hey Hey HyeHey Hey HyeHey Hey HyeHey Hey HyeHey Hey HyeHey Hey HyeHey Hey Hye"
-            }
-        ]
-    }
-
     const createUserColors = (list) => {
         list.map(message => {
             if (!userColors[message.sender]) userColors[message.sender] = Math.floor(Math.random()*16777215).toString(16)
@@ -101,6 +91,7 @@
     }
 
     const handleSendMessage = async () => {
+        if (!message) return
         let res = await apiService.sendMessage(message)
         message = ""
         if (!res) handleLogin()
