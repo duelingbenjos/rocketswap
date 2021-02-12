@@ -61,9 +61,9 @@
 </style>
 
 <div class="trade flex-row">
-    <div class="icon">
+    <div class="icon flex flex-center-center">
         <Rocket 
-            width="30px" 
+            width="20px" 
             color={trade.type === "buy" ? "var(--success-color)" : "var(--error-color)"} 
             direction={trade.type === "buy" ? "up-right" : "down-left"}
         />
