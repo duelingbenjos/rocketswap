@@ -93,6 +93,7 @@
     const handleSendMessage = async () => {
         if (!message) return
         let res = await apiService.sendMessage(message)
+        console.log(res)
         message = ""
         if (!res) handleLogin()
     }

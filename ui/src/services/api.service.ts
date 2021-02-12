@@ -72,19 +72,21 @@ export class ApiService {
     }
   }
 
-  async sendMessage(message: string){
-    if (!get(bearerToken)) return false
-    try {
-      const res = await axios.post(`${this.base_url}/api/trollbox/message`, JSON.stringify({message}), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${get(bearerToken)}`,
-      }
-      })
-      return res
-    } catch (err) {
-      localStorage.removeItem('auth_token')
-      return false
-    }
-  }
+	async sendMessage(message: string){
+		if (!get(bearerToken)) return false
+		try {
+			const res = await axios.post(`${this.base_url}/api/trollbox/message`, JSON.stringify({message}), {
+				headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${get(bearerToken)}`,
+			}
+		})
+			console.log(res)
+			return res
+		} catch (err) {
+			console.log(err)
+			localStorage.removeItem('auth_token')
+			return false
+		}
+	}
 }

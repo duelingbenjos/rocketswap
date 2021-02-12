@@ -27,18 +27,8 @@ export const tokenBalances = writable({})
 export const lpBalances = writable({})
 export const accountName = writable(null);
 export const trollboxMessages = writable([]);
-
-export const bearerToken = derived([walletIsReady, lwc_info], ([$walletIsReady, $lwc_info]) => {
-  if (localStorage && $walletIsReady){
-    let tokenInfo = localStorage.getItem('auth_token')
-    if (tokenInfo) {
-      tokenInfo = JSON.parse(tokenInfo)
-      if (tokenInfo?.user?.vk === $lwc_info.walletAddress) return tokenInfo?.payload?.token
-    }
-    return null
-  }
-  return null
-})
+export const tradeFeed = writable([]);
+export const bearerToken = writable(null)
 
 export const token_list_store: Writable<TokenListType[]> = writable([])
 export const show_token_select_store: Writable<TokenSelectType> = writable({ open: false })
