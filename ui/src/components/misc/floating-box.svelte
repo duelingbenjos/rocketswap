@@ -106,7 +106,7 @@
 
 <style>
     .box-wrapper{
-        z-index: 1;
+        z-index: 102;
         position: fixed;
         bottom: 0;
         right: 48px;
