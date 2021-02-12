@@ -8,12 +8,7 @@ import {
 	UseGuards
 } from "@nestjs/common";
 
-import {
-	LoginRequest,
-	MessageRequest,
-	RefreshRequest,
-	RegisterRequest
-} from "../requests";
+import { RefreshRequest } from "../requests";
 
 import { NameEntity } from "../entities/name.entity";
 
@@ -63,10 +58,15 @@ export class TrollboxController {
 			user,
 			body: { message }
 		} = request;
-		console.log(user, message);
-		console.log(typeof message)
 		if (typeof message !== "string") {
 			throw new HttpException("Message must be a string ! :(", 500);
+		} else if (!message) {
+			return;
+		} else if (message.length > 200) {
+			throw new HttpException(
+				"Message is too long (must be under 200 characters)",
+				500
+			);
 		}
 		const ws_payload = {
 			sender: user,
@@ -74,6 +74,7 @@ export class TrollboxController {
 			timestamp: Date.now()
 		};
 		this.socketService.handleTrollboxMsg(ws_payload);
+		
 	}
 
 	@Get("/me")
