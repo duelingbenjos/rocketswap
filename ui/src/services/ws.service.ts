@@ -33,26 +33,26 @@ export class WsService {
     // console.log('setup events')
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
-      this.connection.on('trollbox_message', (msg) => {
-        trollboxMessages.update(val => {
-          val.push({sender: msg.sender.name, message: msg.message})
-          return val
-      })
-        console.log(msg)
-      })
-      this.connection.on('joined_room', (msg) => {
-        // console.log('joined room : ', msg)
-      })
-      this.connection.on('left_room', (msg) => {
-        // console.log('left room : ', msg)
-      })
-      this.connection.on('auth_response', (msg) => {
-        localStorage.setItem('auth_token', JSON.stringify(msg))
-        setBearerToken()
-      })
-      this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
       this.connection.emit('join_room', `trollbox`)
     })
+    this.connection.on('trollbox_message', (msg) => {
+      trollboxMessages.update(val => {
+        val.push({sender: msg.sender.name, message: msg.message})
+        return val
+    })
+      console.log(msg)
+    })
+    this.connection.on('joined_room', (msg) => {
+      // console.log('joined room : ', msg)
+    })
+    this.connection.on('left_room', (msg) => {
+      // console.log('left room : ', msg)
+    })
+    this.connection.on('auth_response', (msg) => {
+      localStorage.setItem('auth_token', JSON.stringify(msg))
+      setBearerToken()
+    })
+    this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
   }
 
   setupSubs = () => {
