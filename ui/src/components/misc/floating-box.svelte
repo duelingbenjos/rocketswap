@@ -25,6 +25,12 @@
     let userColors = {}
 
     $: colorCreator = createUserColors($trollboxMessages)
+    $: loggedIn = $bearerToken
+
+    trollboxMessages.subscribe(async () => {
+        await tick();
+        msgBox.scroll({ top: msgBox.scrollHeight, behavior: 'smooth' });
+    })
 
     onMount(async () => {
         boxOpen = getBoxState();
@@ -87,6 +93,7 @@
 
     const success = (res) => {
         sending = false
+        loggedIn = true
     }
 
     const error = (errors) => {
@@ -191,7 +198,7 @@
             {/each}
         </div>
         <div class="box-controls flex-row flex-align-center">
-            {#if $walletIsReady && $accountName && !$bearerToken}
+            {#if $walletIsReady && $accountName && !loggedIn}
                 <button class="primary" disabled={!$walletIsReady} on:click={handleLogin}>login as {$accountName}</button>
             {/if}
             {#if $walletIsReady && !$accountName}
@@ -210,7 +217,7 @@
                 <span>Connect wallet to login</span>
             {/if}
 
-            {#if $bearerToken}
+            {#if loggedIn}
                 <input 
                     type="text" 
                     bind:value={message} 

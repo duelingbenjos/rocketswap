@@ -1,5 +1,5 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances, ws_id, trollboxMessages } from '../store'
+import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, bearerToken } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber } from '../utils'
 
