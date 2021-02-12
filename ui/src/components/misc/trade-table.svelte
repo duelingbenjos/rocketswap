@@ -66,6 +66,12 @@
         background: #ffffff;
         border: 2px solid #ffffff;
     }
+
+    @media screen and (max-width: 800px) {
+        .trade-table {
+            display: none;
+        }
+    }
 </style>
 
 
