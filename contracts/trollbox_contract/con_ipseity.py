@@ -13,7 +13,7 @@ def seed():
 @export
 def setName(name: str):
     # TO DO make fee dynamic
-    currency.transfer_from(amount=5, to=ctx.this, main_account=ctx.signer)
+    # currency.transfer_from(amount=5, to=ctx.this, main_account=ctx.signer)
 
     assert len(name) > 0 and len(name) < 20, 'Chosen name length must be more than 1 and less than 20 characters long.'
     key = ctx.signer
