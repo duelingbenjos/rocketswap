@@ -62,7 +62,7 @@
   .toasts-container{
     position: absolute; 
     box-sizing: border-box;
-    top: 50px; 
+    top: 10px; 
     right: 0px; 
     width: 280px; 
     padding: 10px 10px 0px 0px; 
@@ -102,7 +102,7 @@
     border-radius: 8px 16px 8px 8px;
     background-color: var(--toast-background);
 
-    min-height: 70px;
+    min-height: 50px;
   }
 
   .success {

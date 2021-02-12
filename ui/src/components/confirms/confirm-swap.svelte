@@ -1,5 +1,5 @@
 <script>
-    import { getContext } from 'svelte';
+    import { onMount, getContext } from 'svelte';
 
     //Components
     import Button from '../button.svelte';
@@ -15,6 +15,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
+    import { rocketState } from '../../store'
     import { stringToFixed, toBigNumber, refreshTAUBalance, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
@@ -33,6 +34,10 @@
     $: receivedSymbol = buy ? $selectedToken.token_symbol : config.currencySymbol
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
     $: slippageWarning = slippage.isGreaterThan(5)
+
+    onMount(() => {
+        rocketState.set(1)
+    })
 
     const createSlots = () => {
         let slotArray = [
@@ -64,6 +69,7 @@
         finish();
         setTimeout(refreshLpBalances, 2500)
         setTimeout(refreshLpBalances, 10000)
+        setTimeout(() => rocketState.set(2), 500)
         resetPage();
         closeConfirm();
     }
@@ -95,7 +101,6 @@
         'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
         }, $selectedToken, $tokenAmount, { success, error })
     }
-
 </script>
 
 
@@ -189,7 +194,7 @@
             </div>
         </div>
         <div class="modal-confirm-buttons flex-col">
-            <Button style="secondary" loading={loading} callback={$buy ? swapBuy : swapSell} text="Confirm Swap" />
+            <Button style="secondary" loading={loading} callback={$buy ? swapBuy : swapSell} text="LAUNCH" />
         </div>
     </div>
 </div>

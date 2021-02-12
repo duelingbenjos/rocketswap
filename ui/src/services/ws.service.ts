@@ -1,5 +1,5 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeFeed, lwc_info } from '../store'
+import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeUpdates, tradeHistory } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber, setBearerToken } from '../utils'
 
@@ -44,6 +44,7 @@ export class WsService {
         // console.log('joined room : ', msg)
       })
       this.connection.on('left_room', (msg) => {
+
         // console.log('left room : ', msg)
       })
       this.connection.on('auth_response', (msg) => {
@@ -75,11 +76,22 @@ export class WsService {
     this.connection.off(`trade_update:${contract_name}`)
     this.current_trade_feed = ''
     console.log('left trade feed : ', contract_name)
+    tradeHistory.set([])
+    tradeUpdates.set([])
   }
 
   private handleTradeUpdate(event) {
     console.log(event)
-    tradeFeed.set(valuesToBigNumber(event))
+    if (event.history) tradeHistory.set( valuesToBigNumber(event.history))
+    else{
+      if (event.action === "trade_update"){
+        tradeUpdates.update(trades => {
+          trades.push(valuesToBigNumber(event))
+          console.log(trades)
+          return trades
+        })
+      }
+    }
   }
 
   public joinBalanceFeed(vk: string) {

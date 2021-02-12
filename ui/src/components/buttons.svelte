@@ -12,7 +12,7 @@
 
 	//Misc
 	import { config } from '../config'
-	import { walletBalance, lwc_info, walletIsReady, tokenBalances } from '../store'
+	import { walletBalance, lwc_info, walletIsReady, tokenBalances, rocketState } from '../store'
 
 	//Services
 	import { WalletService } from '../services/wallet.service'
@@ -32,7 +32,10 @@
 
 
 	const openConfirm = () => open = true;
-	const closeConfirm = (e) => open = false;
+	const closeConfirm = (e) => {
+		if ($rocketState == 1) rocketState.set(0)
+		open = false;
+	}
 
 	const clickOff = (e) => {
 		if (e.target.classList.contains('modal')) closeConfirm()
