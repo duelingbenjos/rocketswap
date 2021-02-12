@@ -27,8 +27,11 @@ export const tokenBalances = writable({})
 export const lpBalances = writable({})
 export const accountName = writable(null);
 export const trollboxMessages = writable([]);
-export const tradeFeed = writable([]);
+export const tradeHistory = writable([]);
+export const tradeUpdates = writable([]);
 export const bearerToken = writable(null)
+
+export const rocketState = writable(0);
 
 export const token_list_store: Writable<TokenListType[]> = writable([])
 export const show_token_select_store: Writable<TokenSelectType> = writable({ open: false })

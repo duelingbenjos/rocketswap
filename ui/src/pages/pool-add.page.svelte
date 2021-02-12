@@ -49,7 +49,7 @@
 				pageUtilites.redirectToCreatePool(value.contract_name)
 			}else{
 				pageUtilites.refreshTokenInfo(value.contract_name)
-				pageUtilites.updateWindowHistory("pool-add")
+				pageUtilites.updateWindowHistory("pool-add/")
 			}
 		}
 	})

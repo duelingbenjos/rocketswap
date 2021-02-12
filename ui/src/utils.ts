@@ -335,7 +335,7 @@ export const pageUtils = (pageStores) => {
 		if (contractExists){
 			if (get(selectedToken)){
 				if (!location.pathname.includes(get(selectedToken).contract_name))
-				  window.history.pushState("", "", `/#/${route}/${get(selectedToken).contract_name}`);
+				  window.history.pushState("", "", `/#/${route}${get(selectedToken).contract_name}`);
 			  }
 		}else{
 			window.history.pushState("", "", `/#/${route}`);

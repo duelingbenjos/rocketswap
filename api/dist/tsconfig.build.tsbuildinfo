@@ -3642,7 +3642,7 @@
         "affectsGlobalScope": false
       },
       "../src/app.gateway.ts": {
-        "version": "e5643e387f015eb3f36fabf3b231199353c3a5323a75957031bfe23d016cda37",
+        "version": "6f84ad2d76679459a441ced3c25544d4bdb8267d49feb6742dd8ef83697acceb",
         "signature": "7adf95af791fcd30db6a0283895f5c381cc7625aaf2171f2a6bd753b570bede9",
         "affectsGlobalScope": false
       },
