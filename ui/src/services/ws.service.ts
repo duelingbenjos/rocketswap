@@ -86,7 +86,7 @@ export class WsService {
     else{
       if (event.action === "trade_update"){
         tradeUpdates.update(trades => {
-          trades.unshift(valuesToBigNumber(event))
+          trades.push(valuesToBigNumber(event))
           console.log(trades)
           return trades
         })

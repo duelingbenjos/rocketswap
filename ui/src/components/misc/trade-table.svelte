@@ -70,11 +70,14 @@
 
 
 <div class="trade-table flex-col">
-    {#each $tradeUpdates as trade}
-        <div in:fade={{duration: 500}}>
-            <Trade {trade} />
-        </div>
-    {/each} 
+    <div class="flex-col-reverse">
+        {#each $tradeUpdates as trade}
+            <div in:fade={{duration: 500}}>
+                <Trade {trade} />
+            </div>
+        {/each} 
+    </div>
+
     {#each $tradeHistory as trade}
         <div in:fade={{duration: 500}}>
             <Trade {trade} />

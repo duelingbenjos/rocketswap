@@ -247,6 +247,11 @@ body.light{
   flex-direction: column;
 }
 
+.flex-col-reverse{
+  display: flex;
+  flex-direction: column-reverse;
+}
+
 .flex-center-spacebetween{
   align-items: center;
   justify-content: space-between;
