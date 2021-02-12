@@ -27,7 +27,9 @@ BalanceEntity = __decorate([
 ], BalanceEntity);
 exports.BalanceEntity = BalanceEntity;
 async function updateBalance(balance_dto) {
-    const { contract_name, amount, vk } = balance_dto;
+    let { contract_name, amount, vk } = balance_dto;
+    if (typeof amount === 'number')
+        amount = amount.toString();
     let entity = await BalanceEntity.findOne(vk);
     if (!entity) {
         entity = new BalanceEntity();
@@ -40,8 +42,8 @@ async function updateBalance(balance_dto) {
 exports.updateBalance = updateBalance;
 async function saveTransfer(state, handleClientUpdate) {
     const balances_kvp = state.filter((kvp) => kvp.key.split(".")[1].split(":")[0] === "balances");
-    const transfers = balances_kvp.filter((kvp) => kvp.key.split(":").length === 2);
-    for (let kvp of transfers) {
+    const balance_updates = balances_kvp.filter((kvp) => kvp.key.split(":").length === 2);
+    for (let kvp of balance_updates) {
         const { key, value } = kvp;
         const parts = key.split(".");
         const is_balance = parts[1].split(":")[0] === "balances" ? true : false;

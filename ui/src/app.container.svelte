@@ -3,13 +3,14 @@
   import Header from './components/header.svelte'
   import Footer from './components/footer.svelte'
   import Dimmer from './components/dimmer.svelte'
+  import TrollBox from './components/misc/floating-box.svelte'
   import ToastsContainer from './components/toasts-container.svelte'
   import { onMount, setContext } from 'svelte'
   import { writable } from 'svelte/store'
   import { WalletService } from './services/wallet.service'
   import { ApiService } from './services/api.service'
   import { WsService } from './services/ws.service'
-  import { show_token_select_store, show_swap_confirm } from './store'
+  import { show_token_select_store, show_swap_confirm, bearerToken } from './store'
 
   
   import type { TokenSelectType } from './types/api.types'
@@ -94,6 +95,7 @@
   }
 </script>
 
+
 <main>
   <div class="bg-solid">
     <div class="bg-gradient flex">
@@ -110,6 +112,7 @@
   </div>
 </main>
 <Footer />
+<TrollBox />
 
 <style>
   .bg-gradient {

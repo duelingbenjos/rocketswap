@@ -2,7 +2,7 @@
     import { onMount, tick } from 'svelte'
 
     //Misc
-    import { walletIsReady, accountName, bearerToken } from '../../store'
+    import { walletIsReady, accountName, bearerToken, trollboxMessages } from '../../store'
     import { config } from '../../config'
 
     //Icons
@@ -23,50 +23,8 @@
     let sending = false;
     let nameTaken = false;
     let userColors = {}
-    let messages = [
-        {
-            sender: "person1",
-            message: "Hey Hey Hye Hey Hey HyeHey Hey HyeHey Hey HyeHey Hey HyeHey Hey HyeHey Hey HyeHey Hey Hye"
-        },
-        {
-            sender: "person2",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person3",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person4",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person5",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person6",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person7",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person7",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person10",
-            message: "Hey Hey Hye"
-        },
-        {
-            sender: "person10",
-            message: "Hey Hey Hye"
-        },
-    ].reverse();
 
-    $: messageList = createUserColors(messages)
+    $: colorCreator = createUserColors($trollboxMessages)
 
     onMount(async () => {
         boxOpen = getBoxState();
@@ -136,7 +94,13 @@
     }
 
     const handleSendMessage = async () => {
-        apiService.sendMessage(message)
+        let res = await apiService.sendMessage(message)
+        message = ""
+        if (!res) handleLogin()
+    }
+
+    const handleEnterKey = (e) => {
+        if (e.which === 13)  handleSendMessage()
     }
 
 </script>
@@ -191,15 +155,15 @@
     }
     .box-controls > span {
         min-width: fit-content;
-        margin-left: 10px;
     }
     .box-controls > input {
         width: 100%;
+        margin-right: 10px;
     }
     .box-messages{
         box-sizing: border-box;
         margin: 0 20px;
-        padding: 0 10px;
+        padding: 2px 10px;
         border: 1px solid var(--text-primary-color-dim);
         overflow-y: scroll;
     }
@@ -219,8 +183,8 @@
             Troll Box
         </div>
         <div bind:this={msgBox} class="box-messages flex-grow">
-            {#each messages as message}
-                <div class="message" style={`color: #${userColors[message.sender]}c9`}>
+            {#each $trollboxMessages as message}
+                <div class="message" style={`color: #${userColors[message.sender]}`}>
                     <strong style={`color: #${userColors[message.sender]}`}>{`${message.sender}: `}</strong>
                     {`${message.message}`}
                 </div>
@@ -250,6 +214,7 @@
                 <input 
                     type="text" 
                     bind:value={message} 
+                    on:keydown={handleEnterKey}
                     class="input-message" 
                     maxlength="256" 
                     placeholder="Enter Message"

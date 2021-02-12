@@ -3,7 +3,6 @@ import { config } from './config'
 import BigNumber from 'bignumber.js'
 import { get } from 'svelte/store'
 import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue } from './store'
-import { active } from 'svelte-hash-router'
 
 import { ApiService } from './services/api.service'
 
@@ -333,7 +332,7 @@ export const pageUtils = (pageStores) => {
 	const resetPage = (contractName, stores) => {
 		stores.forEach(store => store.set(null))
 		setTimeout(() => refreshTokenInfo(contractName), 2000)
-	  }
+	}
 
 	return {
 		refreshTokenInfo,

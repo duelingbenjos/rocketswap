@@ -82,7 +82,7 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TrollboxController.prototype, "getUser", null);
 TrollboxController = __decorate([
-    common_1.Controller("/api/auth"),
+    common_1.Controller("/api/trollbox"),
     __metadata("design:paramtypes", [tokens_service_1.TokensService,
         trollbox_service_1.AuthService,
         socket_service_1.SocketService])

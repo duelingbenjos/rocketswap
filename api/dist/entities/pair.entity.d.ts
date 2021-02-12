@@ -6,8 +6,9 @@ export declare class PairEntity extends BaseEntity {
     lp: string;
     time: string;
     price: string;
+    token_symbol: string;
     reserves: [string, string];
 }
-export declare function saveReserves(state: IKvp[], handleClientUpdate: handleClientUpdate): Promise<void>;
+export declare function saveReserves(fn: string, state: IKvp[], handleClientUpdate: handleClientUpdate, timestamp: number): Promise<void>;
 export declare function savePair(state: IKvp[]): Promise<void>;
 export declare function savePairLp(state: IKvp[]): Promise<void>;

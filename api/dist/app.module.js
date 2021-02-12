@@ -17,6 +17,17 @@ const balance_entity_1 = require("./entities/balance.entity");
 const pair_entity_1 = require("./entities/pair.entity");
 const price_entity_1 = require("./entities/price.entity");
 const lp_points_entity_1 = require("./entities/lp-points.entity");
+const trade_history_entity_1 = require("./entities/trade-history.entity");
+const socket_service_1 = require("./socket.service");
+const name_entity_1 = require("./entities/name.entity");
+const trollbox_controller_1 = require("./authentication/trollbox.controller");
+const refresh_token_repository_1 = require("./authentication/refresh-token.repository");
+const tokens_service_1 = require("./authentication/tokens.service");
+const jwt_1 = require("@nestjs/jwt");
+const jwt_guard_1 = require("./authentication/jwt.guard");
+const trollbox_service_1 = require("./authentication/trollbox.service");
+const refresh_token_entity_1 = require("./entities/refresh-token.entity");
+const jwt_strategy_1 = require("./authentication/jwt.strategy");
 const db_options = {
     name: "default",
     type: "sqlite",
@@ -26,7 +37,10 @@ const db_options = {
         balance_entity_1.BalanceEntity,
         pair_entity_1.PairEntity,
         price_entity_1.PriceEntity,
-        lp_points_entity_1.LpPointsEntity
+        lp_points_entity_1.LpPointsEntity,
+        trade_history_entity_1.TradeHistoryEntity,
+        name_entity_1.NameEntity,
+        refresh_token_entity_1.RefreshTokenEntity
     ],
     synchronize: true,
     autoLoadEntities: true
@@ -35,9 +49,27 @@ let AppModule = class AppModule {
 };
 AppModule = __decorate([
     common_1.Module({
-        imports: [typeorm_1.TypeOrmModule.forRoot(db_options)],
-        controllers: [app_controller_1.AppController],
-        providers: [app_gateway_1.AppGateway, parser_provider_1.ParserProvider]
+        imports: [
+            typeorm_1.TypeOrmModule.forRoot(db_options),
+            jwt_1.JwtModule.register({
+                secret: "<SECRET KEY>",
+                signOptions: {
+                    expiresIn: "60m"
+                }
+            })
+        ],
+        controllers: [app_controller_1.AppController, trollbox_controller_1.TrollboxController],
+        providers: [
+            app_gateway_1.AppGateway,
+            parser_provider_1.ParserProvider,
+            socket_service_1.SocketService,
+            tokens_service_1.TokensService,
+            refresh_token_repository_1.RefreshTokensRepository,
+            jwt_guard_1.JWTGuard,
+            jwt_strategy_1.JwtStrategy,
+            trollbox_service_1.AuthService,
+            common_1.Logger
+        ]
     })
 ], AppModule);
 exports.AppModule = AppModule;

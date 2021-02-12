@@ -16,53 +16,73 @@ const blockgrabber_1 = require("./blockgrabber");
 const balance_entity_1 = require("./entities/balance.entity");
 const lp_points_entity_1 = require("./entities/lp-points.entity");
 const price_entity_1 = require("./entities/price.entity");
+const trade_history_entity_1 = require("./entities/trade-history.entity");
 const parser_provider_1 = require("./parser.provider");
+const socket_service_1 = require("./socket.service");
 const websocket_types_1 = require("./types/websocket.types");
 let AppGateway = class AppGateway {
-    constructor(parser) {
+    constructor(parser, socketService) {
         this.parser = parser;
+        this.socketService = socketService;
         this.logger = new common_1.Logger("AppGateway");
         this.handleNewBlock = async (block) => {
-            const { state, fn, contract } = block;
             await this.parser.parseBlock({
-                block: {
-                    state,
-                    fn,
-                    contract
-                },
-                handleClientUpdate: this.handleClientUpdate
+                block
             });
         };
         this.handleClientUpdate = async (update) => {
             let contract_name;
             switch (update.action) {
                 case "metrics_update":
-                    if (websocket_types_1.isMetricsUpdate(update))
+                    if (websocket_types_1.isMetricsUpdate(update)) {
                         contract_name = update.contract_name;
-                    this.wss.emit(`price_feed:${contract_name}`, update);
-                    this.logger.log("price update sent");
+                        this.wss.emit(`price_feed:${contract_name}`, update);
+                        this.logger.log("price update sent");
+                    }
                     break;
                 case "balance_update":
                     if (websocket_types_1.isBalanceUpdate(update)) {
                         this.wss.emit(`balance_update:${update.payload.vk}`, update);
                         this.logger.log(`balance update sent to : ${update.payload.vk}`);
                     }
+                    break;
+                case "trade_update":
+                    if (websocket_types_1.isTradeUpdate(update)) {
+                        this.wss.emit(`trade_update`, update);
+                        this.wss.emit(`trade_update:${update.contract_name}`, update);
+                    }
+                    break;
+            }
+        };
+        this.handleTrollboxMsg = (message) => {
+            this.wss.emit("trollbox_message", message);
+        };
+        this.handleAuthenticateResponse = (auth_response) => {
+            try {
+                const { socket_id, payload } = auth_response;
+                this.wss.to(socket_id).emit("auth_response", payload);
+            }
+            catch (err) {
+                console.log(err);
             }
         };
         blockgrabber_1.default(this.handleNewBlock);
     }
     afterInit(server) {
         this.logger.log(`Websocket Initialised`);
+        this.socketService.handleClientUpdate = this.handleClientUpdate;
+        this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
+        this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
     }
     handleLeaveRoom(client, room) {
         client.leave(room);
         client.emit("left_room", room);
     }
     async handleJoinRoom(client, room) {
-        this.logger.log(room);
         client.join(room);
         client.emit("joined_room", room);
         const [prefix, subject] = room.split(":");
+        console.log(prefix, subject);
         switch (prefix) {
             case "price_feed":
                 this.handleJoinPriceFeed(subject, client);
@@ -73,6 +93,37 @@ let AppGateway = class AppGateway {
             case "balance_feed":
                 this.handleJoinBalanceFeed(subject, client);
                 break;
+            case "trade_feed":
+                if (!subject)
+                    return;
+                this.handleJoinTradeFeed(subject, client);
+            case "trollbox":
+                this.handleJoinTrollBox(client);
+        }
+    }
+    async handleJoinTrollBox(client) {
+        client.emit("trollbox_authcode", client.id);
+    }
+    async handleJoinTradeFeed(subject, client) {
+        this.logger.log(`joined trade feed: ${subject}`);
+        try {
+            const trade_update = await trade_history_entity_1.TradeHistoryEntity.find({
+                select: [
+                    "contract_name",
+                    "token_symbol",
+                    "price",
+                    "type",
+                    "time",
+                    "amount"
+                ],
+                order: { time: "DESC" },
+                where: { contract_name: subject },
+                take: 50
+            });
+            client.emit(`trade_update:${subject}`, trade_update);
+        }
+        catch (err) {
+            this.logger.error(err);
         }
     }
     async handleJoinBalanceFeed(vk, client) {
@@ -108,7 +159,6 @@ let AppGateway = class AppGateway {
         try {
             const metrics = await price_entity_1.getTokenMetrics(contract_name);
             const metrics_action = Object.assign({ action: "metrics_update" }, metrics);
-            this.logger.log(metrics_action);
             client.emit(`price_feed:${contract_name}`, metrics_action);
         }
         catch (err) {
@@ -140,7 +190,8 @@ __decorate([
 ], AppGateway.prototype, "handleJoinRoom", null);
 AppGateway = __decorate([
     websockets_1.WebSocketGateway(),
-    __metadata("design:paramtypes", [parser_provider_1.ParserProvider])
+    __metadata("design:paramtypes", [parser_provider_1.ParserProvider,
+        socket_service_1.SocketService])
 ], AppGateway);
 exports.AppGateway = AppGateway;
 //# sourceMappingURL=app.gateway.js.map

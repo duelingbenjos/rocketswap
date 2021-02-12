@@ -4,7 +4,7 @@ export declare class TradeHistoryEntity extends BaseEntity {
     contract_name: string;
     token_symbol: string;
     price: string;
-    time: string;
+    time: number;
     amount: string;
     vk: string;
     type: "buy" | "sell";
@@ -16,4 +16,5 @@ export declare function saveTradeUpdate(args: {
     amount: string;
     vk: string;
     type: "buy" | "sell";
+    time: number;
 }): Promise<void>;

@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTokenList = exports.updateLogo = exports.prepareAddToken = exports.saveToken = exports.AddTokenDto = exports.TokenEntity = void 0;
+exports.getTokenList = exports.saveTokenUpdate = exports.prepareAddToken = exports.saveToken = exports.AddTokenDto = exports.TokenEntity = void 0;
 const utils_1 = require("../utils");
 const typeorm_1 = require("typeorm");
 let TokenEntity = class TokenEntity extends typeorm_1.BaseEntity {
@@ -19,11 +19,11 @@ __decorate([
     __metadata("design:type", Number)
 ], TokenEntity.prototype, "id", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column({ nullable: true }),
     __metadata("design:type", String)
 ], TokenEntity.prototype, "token_symbol", void 0);
 __decorate([
-    typeorm_1.Column(),
+    typeorm_1.Column({ nullable: true }),
     __metadata("design:type", String)
 ], TokenEntity.prototype, "token_name", void 0);
 __decorate([
@@ -40,12 +40,24 @@ __decorate([
 ], TokenEntity.prototype, "developer", void 0);
 __decorate([
     typeorm_1.Column({ nullable: true }),
+    __metadata("design:type", String)
+], TokenEntity.prototype, "owner", void 0);
+__decorate([
+    typeorm_1.Column({ nullable: true }),
     __metadata("design:type", Boolean)
 ], TokenEntity.prototype, "has_market", void 0);
 __decorate([
     typeorm_1.Column({ nullable: true }),
     __metadata("design:type", String)
-], TokenEntity.prototype, "logo_svg_base64", void 0);
+], TokenEntity.prototype, "token_base64_svg", void 0);
+__decorate([
+    typeorm_1.Column({ nullable: true }),
+    __metadata("design:type", String)
+], TokenEntity.prototype, "token_base64_png", void 0);
+__decorate([
+    typeorm_1.Column({ nullable: true }),
+    __metadata("design:type", String)
+], TokenEntity.prototype, "token_logo_url", void 0);
 TokenEntity = __decorate([
     typeorm_1.Entity()
 ], TokenEntity);
@@ -54,8 +66,8 @@ class AddTokenDto {
 }
 exports.AddTokenDto = AddTokenDto;
 exports.saveToken = async (add_token_dto) => {
-    const { token_symbol, token_name, base_supply, contract_name, developer, logo_svg_base64 } = add_token_dto;
-    if (!token_symbol || !token_name || !base_supply || !contract_name)
+    const { token_symbol, token_name, base_supply, contract_name, developer, token_base64_svg, token_base64_png, token_logo_url, owner } = add_token_dto;
+    if (!base_supply || !contract_name)
         throw new Error("Field missing.");
     const exists = await TokenEntity.findOne(contract_name);
     if (exists)
@@ -66,16 +78,23 @@ exports.saveToken = async (add_token_dto) => {
     entity.token_name = token_name;
     entity.contract_name = contract_name;
     entity.developer = developer;
-    entity.logo_svg_base64 = logo_svg_base64;
+    entity.owner = owner;
+    entity.token_base64_svg = token_base64_svg;
+    entity.token_base64_png = token_base64_png;
+    entity.token_logo_url = token_logo_url;
     return await entity.save();
 };
 function prepareAddToken(state) {
+    var _a, _b, _c, _d, _e, _f;
     const contract_name = utils_1.getContractName(state);
-    const token_symbol = state.find((kvp) => kvp.key === `${contract_name}.token_symbol`).value;
-    const token_name = state.find((kvp) => kvp.key === `${contract_name}.token_name`).value;
+    const token_symbol = ((_a = state.find((kvp) => kvp.key === `${contract_name}.token_symbol`)) === null || _a === void 0 ? void 0 : _a.value) || '';
+    const token_name = ((_b = state.find((kvp) => kvp.key === `${contract_name}.token_name`)) === null || _b === void 0 ? void 0 : _b.value) || '';
     const developer = state.find((kvp) => kvp.key === `${contract_name}.__developer__`).value;
+    const owner = ((_c = state.find((kvp) => kvp.key === `${contract_name}.__owner__`)) === null || _c === void 0 ? void 0 : _c.value) || "";
     const supply_kvp = state.find((kvp) => kvp.key.includes(`${contract_name}.balances`));
-    const logo_svg_base64 = state.find((kvp) => kvp.key === `${contract_name}.token_base64_svg`);
+    const token_base64_svg = ((_d = state.find((kvp) => kvp.key === `${contract_name}.token_base64_svg`)) === null || _d === void 0 ? void 0 : _d.value) || '';
+    const token_base64_png = ((_e = state.find((kvp) => kvp.key === `${contract_name}.token_base64_png`)) === null || _e === void 0 ? void 0 : _e.value) || '';
+    const token_logo_url = ((_f = state.find((kvp) => kvp.key === `${contract_name}.token_logo_url`)) === null || _f === void 0 ? void 0 : _f.value) || '';
     const base_supply = supply_kvp.value;
     const token_seed_holder = supply_kvp.key.split(":")[1];
     return {
@@ -85,23 +104,38 @@ function prepareAddToken(state) {
         base_supply,
         token_seed_holder,
         developer,
-        logo_svg_base64: (logo_svg_base64 === null || logo_svg_base64 === void 0 ? void 0 : logo_svg_base64.value) || null
+        token_base64_svg,
+        token_base64_png,
+        token_logo_url,
+        owner
     };
 }
 exports.prepareAddToken = prepareAddToken;
-async function updateLogo(state, contract_name) {
-    const logo_change = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "token_base64_svg");
-    if (!logo_change)
-        return;
-    const tokenEntity = await TokenEntity.findOne({ contract_name });
-    if (!tokenEntity)
-        return;
-    if (tokenEntity.logo_svg_base64 !== logo_change.value) {
-        tokenEntity.logo_svg_base64 = logo_change.value;
-        tokenEntity.save();
+async function saveTokenUpdate(state) {
+    var _a, _b, _c, _d, _e;
+    const contract_name = utils_1.getContractName(state);
+    const token_base64_svg = ((_a = state.find((kvp) => kvp.key === `${contract_name}.token_base64_svg`)) === null || _a === void 0 ? void 0 : _a.value) || '';
+    const token_base64_png = ((_b = state.find((kvp) => kvp.key === `${contract_name}.token_base64_png`)) === null || _b === void 0 ? void 0 : _b.value) || '';
+    const token_logo_url = ((_c = state.find((kvp) => kvp.key === `${contract_name}.token_logo_url`)) === null || _c === void 0 ? void 0 : _c.value) || '';
+    const token_symbol = ((_d = state.find((kvp) => kvp.key === `${contract_name}.token_symbol`)) === null || _d === void 0 ? void 0 : _d.value) || '';
+    const token_name = ((_e = state.find((kvp) => kvp.key === `${contract_name}.token_name`)) === null || _e === void 0 ? void 0 : _e.value) || '';
+    const update_obj = { token_base64_png, token_base64_svg, token_logo_url, token_symbol, token_name };
+    try {
+        const entity = await TokenEntity.findOne(contract_name);
+        if (!entity)
+            return;
+        for (let key in update_obj) {
+            if (update_obj[key]) {
+                entity[key] = update_obj[key];
+            }
+        }
+        await entity.save();
+    }
+    catch (err) {
+        console.error(err);
     }
 }
-exports.updateLogo = updateLogo;
+exports.saveTokenUpdate = saveTokenUpdate;
 async function getTokenList() {
     const tokens = await TokenEntity.find();
     return tokens.map((token) => token.contract_name);

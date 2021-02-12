@@ -13,10 +13,6 @@ exports.saveTradeUpdate = exports.TradeHistoryEntity = void 0;
 const misc_types_1 = require("../types/misc.types");
 const typeorm_1 = require("typeorm");
 let TradeHistoryEntity = class TradeHistoryEntity extends typeorm_1.BaseEntity {
-    constructor() {
-        super(...arguments);
-        this.time = Date.now().toString();
-    }
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
@@ -36,7 +32,7 @@ __decorate([
 ], TradeHistoryEntity.prototype, "price", void 0);
 __decorate([
     typeorm_1.Column(),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], TradeHistoryEntity.prototype, "time", void 0);
 __decorate([
     typeorm_1.Column(),
@@ -59,6 +55,7 @@ async function saveTradeUpdate(args) {
     for (let arg in args) {
         entity[arg] = args[arg];
     }
+    entity.time = args.time;
     await entity.save();
 }
 exports.saveTradeUpdate = saveTradeUpdate;

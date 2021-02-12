@@ -1,5 +1,5 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances, ws_id } from '../store'
+import { token_metrics_store, tokenBalances, ws_id, trollboxMessages } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber } from '../utils'
 
@@ -37,6 +37,10 @@ export class WsService {
         // console.log(msg)
       })
       this.connection.on('trollbox_message', (msg) => {
+        trollboxMessages.update(val => {
+          val.push({sender: msg.sender.name, message: msg.message})
+          return val
+      })
         console.log(msg)
       })
       this.connection.on('joined_room', (msg) => {
@@ -46,7 +50,7 @@ export class WsService {
         // console.log('left room : ', msg)
       })
       this.connection.on('auth_response', (msg) => {
-        console.log(msg)
+        localStorage.setItem('auth_token', JSON.stringify(msg))
       })
       this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
       this.connection.emit('join_room', `trollbox`)

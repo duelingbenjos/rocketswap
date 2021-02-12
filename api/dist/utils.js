@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContractCode = exports.getContractEntry = exports.getContractName = exports.getVal = exports.getKey = exports.validateTokenContract = exports.getNewJoiner = exports.isLamdenKey = void 0;
+exports.decideLogo = exports.getContractCode = exports.getContractEntry = exports.getContractName = exports.getVal = exports.getKey = exports.validateTokenContract = exports.getNewJoiner = exports.isLamdenKey = void 0;
 const bignumber_js_1 = require("bignumber.js");
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;
@@ -74,4 +74,24 @@ function getContractCode(state) {
     return entry ? entry.value : "";
 }
 exports.getContractCode = getContractCode;
+function decideLogo(token) {
+    let obj = {
+        type: '',
+        data: ''
+    };
+    if (token.token_base64_svg) {
+        obj.type = 'svg',
+            obj.data = token.token_base64_svg;
+    }
+    else if (token.token_base64_png) {
+        obj.type = 'png',
+            obj.data = token.token_base64_png;
+    }
+    else {
+        obj.type = 'url';
+        obj.data = token.token_logo_url;
+    }
+    return obj;
+}
+exports.decideLogo = decideLogo;
 //# sourceMappingURL=utils.js.map
