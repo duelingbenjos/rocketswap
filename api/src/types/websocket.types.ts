@@ -10,11 +10,13 @@ export type handleAuthenticateResponse = (auth_response: {
 	payload: AuthenticationPayload;
 }) => void;
 
-export type handleTrollboxMsg = (payload: {
+export type handleTrollboxMsg = (payload: ITrollBoxMessage) => void;
+
+export interface ITrollBoxMessage {
 	sender: string;
 	message: string;
 	timestamp: number;
-}) => void;
+}
 
 export interface IBlockParser {
 	block: BlockDTO;
@@ -67,8 +69,8 @@ export interface TradeUpdateType extends UpdateType {
 	amount: string;
 	contract_name: string;
 	token_symbol: string;
-	price: string,
-	time: number
+	price: string;
+	time: number;
 }
 
 export function isMetricsUpdate(
