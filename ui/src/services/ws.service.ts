@@ -36,11 +36,24 @@ export class WsService {
       this.connection.emit('join_room', `trollbox`)
     })
     this.connection.on('trollbox_message', (msg) => {
-      trollboxMessages.update(val => {
-        val.push({sender: msg.sender.name, message: msg.message})
+      trollboxMessages.update((val) => {
+        val.push({ sender: msg.sender.name, message: msg.message })
         return val
-    })
+      })
       console.log(msg)
+    })
+    this.connection.on(`trollbox_history`, (history) => {
+      trollboxMessages.update((val) => {
+        val.push(
+          ...history.map((item) => {
+            return {
+              sender: item.sender.name,
+              message: item.message
+            }
+          })
+        )
+        return val
+      })
     })
     this.connection.on('joined_room', (msg) => {
       // console.log('joined room : ', msg)
@@ -93,6 +106,8 @@ export class WsService {
     ws_id.set(payload)
   }
 
+  private handleTrollboxHistory(payload: any[]) {}
+
   private handleBalanceList(payload) {
     console.log(payload)
     tokenBalances.set(valuesToBigNumber(payload).balances)
@@ -122,5 +137,4 @@ export class WsService {
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     token_metrics_store.set(valuesToBigNumber(metrics))
   }
-
 }

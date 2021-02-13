@@ -11,6 +11,7 @@ import { Server, Socket } from "socket.io";
 import { AuthenticationPayload } from "./authentication/trollbox.controller";
 import startBlockgrabber from "./blockgrabber";
 import { BalanceEntity } from "./entities/balance.entity";
+import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics } from "./entities/price.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
@@ -21,7 +22,6 @@ import {
 	ClientUpdateType,
 	isBalanceUpdate,
 	isMetricsUpdate,
-	isPriceUpdate,
 	isTradeUpdate,
 	MetricsUpdateType,
 	UserLpUpdateType
@@ -82,7 +82,7 @@ export class AppGateway
 				break;
 			case "trade_update":
 				if (isTradeUpdate(update)) {
-					this.wss.emit(`trade_update`, {update});
+					this.wss.emit(`trade_update`, { update });
 					this.wss.emit(
 						`trade_update:${update.contract_name}`,
 						update
@@ -124,6 +124,16 @@ export class AppGateway
 
 	private async handleJoinTrollBox(client: Socket) {
 		client.emit("trollbox_authcode", client.id);
+		try {
+			let history = await ChatHistoryEntity.find({
+				select: ["message", "timestamp", "sender"],
+				take: 50,
+				order: { timestamp: "DESC" }
+			});
+			client.emit("trollbox_history", history);
+		} catch (err) {
+			this.logger.error(err);
+		}
 	}
 
 	public handleTrollboxMsg = (message: {

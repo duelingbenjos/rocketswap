@@ -3,6 +3,7 @@ import {
 	Controller,
 	Get,
 	HttpException,
+	Logger,
 	Post,
 	Req,
 	UseGuards
@@ -16,6 +17,10 @@ import { TokensService } from "./tokens.service";
 import { JWTGuard } from "./jwt.guard";
 import { AuthService } from "./trollbox.service";
 import { SocketService } from "../socket.service";
+import { ITrollBoxMessage } from "src/types/websocket.types";
+import {
+	saveTrollChat
+} from "../entities/chat-history.entity";
 
 export interface AuthenticationPayload {
 	user: NameEntity;
@@ -28,6 +33,8 @@ export interface AuthenticationPayload {
 
 @Controller("/api/trollbox")
 export class TrollboxController {
+	private logger: Logger = new Logger("TrollboxController");
+
 	public constructor(
 		private readonly tokens: TokensService,
 		private readonly authService: AuthService,
@@ -68,13 +75,17 @@ export class TrollboxController {
 				500
 			);
 		}
-		const ws_payload = {
+		const ws_payload: ITrollBoxMessage = {
 			sender: user,
 			message,
 			timestamp: Date.now()
 		};
 		this.socketService.handleTrollboxMsg(ws_payload);
-		
+		try {
+			await saveTrollChat(ws_payload);
+		} catch (err) {
+			this.logger.error(err)
+		}
 	}
 
 	@Get("/me")

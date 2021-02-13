@@ -19,6 +19,7 @@ import { JWTGuard } from "./authentication/jwt.guard";
 import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
+import { ChatHistoryEntity } from "./entities/chat-history.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -32,7 +33,8 @@ const db_options: TypeOrmModuleOptions = {
 		LpPointsEntity,
 		TradeHistoryEntity,
 		NameEntity,
-		RefreshTokenEntity
+		RefreshTokenEntity,
+		ChatHistoryEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true
