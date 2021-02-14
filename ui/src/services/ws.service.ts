@@ -17,6 +17,7 @@ export class WsService {
   private base_url: string
   private port: number
   private current_trade_feed: string
+  private previously_connected = false
 
   connection: SocketIOClient.Socket
 
@@ -33,7 +34,10 @@ export class WsService {
     // console.log('setup events')
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
-      this.connection.emit('join_room', `trollbox`)
+      if (!this.previously_connected) {
+        this.connection.emit('join_room', `trollbox`)
+        this.previously_connected = true
+      }
     })
     this.connection.on('trollbox_message', (msg) => {
       trollboxMessages.update((val) => {
