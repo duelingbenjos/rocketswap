@@ -58,12 +58,7 @@ export class WsService {
         )
         return val
       })
-    })
-    this.connection.on('joined_room', (msg) => {
-      // console.log('joined room : ', msg)
-    })
-    this.connection.on('left_room', (msg) => {
-      // console.log('left room : ', msg)
+      this.connection.off(`trollbox_history`)
     })
     this.connection.on('auth_response', (msg) => {
       localStorage.setItem('auth_token', JSON.stringify(msg))
