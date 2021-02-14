@@ -44,10 +44,6 @@ export class ParserProvider {
       contract_name,
       vk,
      })
-    //  this.socketService.handleClientUpdate({
-    //   action: "balance_update",
-    //   payload: res,
-    //  })
 		this.addToActionQue(saveToken, add_token_dto)
 		this.addToActionQue(this.updateTokenList)
     await this.updateTokenList()
@@ -62,8 +58,6 @@ export class ParserProvider {
     })
     return
    } else if (this.token_contract_list.includes(contract_name)) {
-    // console.log(`Found block for token ${contract_name}`);
-    // console.log(`function : ${fn}`);
     await saveTransfer(state, this.socketService.handleClientUpdate)
     if (isUpdateFn(fn)) {
      await saveTokenUpdate(state)
@@ -77,12 +71,6 @@ export class ParserProvider {
           this.authService.authenticate(state)
         break
      }
-   }
-    else {
-    // console.log(`ignoring block for contract: ${contract_name}`);
-    // console.log(state);
-    // console.log(state[state.length - 1].value);
-    // console.log(fn);
    }
   } catch (err) {
    console.error(err)
@@ -112,7 +100,6 @@ export class ParserProvider {
    if (action_que.length) {
     console.log(`ACTION QUE PROCESSING ${action_que.length} `)
     const { action, args } = this.action_que[0]
-		// console.log(args)
 		if (args) {
 			await action(args)
 		} else {
@@ -141,7 +128,6 @@ export class ParserProvider {
  private updateTokenList = async (): Promise<void> => {
   const token_list_update = await getTokenList()
   this.token_contract_list = token_list_update
-  //console.log(`Token list updated : ${this.token_contract_list}`);
  }
 }
 
