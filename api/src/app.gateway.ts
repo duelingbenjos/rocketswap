@@ -130,6 +130,9 @@ export class AppGateway
 				take: 50,
 				order: { timestamp: "DESC" }
 			});
+			history.sort((a, b) => {
+				return a.timestamp - b.timestamp;
+			});
 			client.emit("trollbox_history", history);
 		} catch (err) {
 			this.logger.error(err);
