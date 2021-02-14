@@ -10,7 +10,7 @@ token_owner = Variable() # Optional
 token_name = Variable() # Optional
 token_symbol = Variable() # Optional
 
-## Token Logo (base64 svg/png image or url). Use 1 of the variables below.
+## Token Logo (base64 svg/png image or url).
 # ** A base64 value that is too long will cause the smart contract to fail on submission.
 # ** It is recommended that you submit your contract with an owner and then after the contract is submitted 
 # ** use the "set_logo" method to set the base64 value of either token_base64_svg or token_base64_png.
