@@ -1,9 +1,10 @@
 import WalletController from 'lamden_wallet_controller'
+import axios from 'axios'
 import { config } from '../config'
-import { lwc_info, walletBalance, lpBalances } from '../store'
+import { lwc_info, accountName, ws_id, bearerToken } from '../store'
 import { get } from 'svelte/store'
 import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
-import { refreshTAUBalance, refreshLpBalances, toBigNumber, stringToFixed } from '../utils'
+import { refreshTAUBalance, refreshLpBalances, setBearerToken, toBigNumber, stringToFixed } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -83,9 +84,16 @@ export class WalletService {
 			return Object.assign(current, { approved, installed, locked, walletAddress })
 		})
 	}
+
 	private getIntialBalances = async (walletAddress) => {
-		await Promise.all([refreshTAUBalance(walletAddress), refreshLpBalances(walletAddress)])
+		await Promise.all([
+			refreshTAUBalance(walletAddress), 
+			refreshLpBalances(walletAddress),
+			this.getAccountName(walletAddress),
+			setBearerToken(walletAddress)
+		])
 	}
+
 	private createTxInfo(method: string, args, contractName = undefined) {
 		return {
 			contractName,
@@ -96,13 +104,87 @@ export class WalletService {
 		}
 	}
 
+	private getAccountName = async (account = undefined) => {
+		if (!account) return null
+		let body = [{
+			"contractName": config.namesContract,
+			"variableName": "key_to_name",
+			"key": account
+		  }]
+		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`,body)
+		  console.log(res)
+		if (res?.data[0]?.value) {
+			accountName.set(res.data[0].value)
+			this.toastService.addToast({ 
+				heading: `Hello ${get(accountName)}!`,
+				text: `Welcome back to RocketSwap!`, 
+				type: 'info',
+				duration: 3000
+			})
+		}
+	}
+
+ 	public nameIsTaken = async (name = undefined) => {
+		if (!name) return true
+		let body = [{
+			"contractName": config.namesContract,
+			"variableName": "name_to_key",
+			"key": name
+		  }]
+		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`, body)
+	
+		return res?.data[0]?.value !== null
+	}
+
+	public createAccountName = async (name, callbacks = undefined) => {
+		this.lwc.sendTransaction(this.createTxInfo("setName", {name}, config.namesContract), (res) => this.handleCreateAccountName(res, callbacks))
+	}
+
+	private handleCreateAccountName = (res, callbacks) => {
+		let status = this.txResult(res.data, callbacks)
+		if (status === 'success') {
+			const checkForName = async () => {
+				await this.getAccountName(this.lwc.walletAddress);
+				if (!get(accountName)){
+					setTimeout(checkForName, 1000)
+				}else{
+					this.toastService.addToast({ 
+						heading: `Hello ${get(accountName)}!`,
+						text: `You have created a Rocket ID on the blockchain. You can now log into the Troll Box!`, 
+						type: 'success',
+						duration: 5000
+					})
+				}
+			}
+			setTimeout(checkForName, 1000)
+			callbacks.success(res)
+		}
+	}
+
+	public sendAuth = (callbacks) => {
+		this.lwc.sendTransaction(this.createTxInfo("auth", {secret: get(ws_id)}, config.namesContract), (res) => this.handleAuth(res, callbacks))
+
+	}
+
+	private handleAuth = (res, callbacks) => {
+		let status = this.txResult(res.data, callbacks)
+		if (status === 'success') {
+			callbacks.success()
+			this.toastService.addToast({ 
+				heading: `Rocket ID Authenticated!`,
+				text: `You can now use the Troll Box. Don't be too much of a Degen.`, 
+				type: 'success',
+				duration: 5000
+			})
+		}
+	}
+
 	getApprovedAmount = async (vk: string, contract: string) => {
 		return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${config.contractName}`)
 				.then((res) => res.json())
 				.then((json) => json.value)
 				.catch((e) => console.log(e.message))
 	}
-
 
 	public async createMarket(args, selectedToken, tokenAmount, currencyAmount, callbacks = undefined) {
 		let results = await Promise.all([
@@ -131,7 +213,7 @@ export class WalletService {
 				heading: `Created Supply for ${selectedToken.token_symbol}!`,
 				text: `You have created liquidity for ${selectedToken.token_name} / ${config.currencySymbol}.`, 
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			callbacks.success()
 		}
@@ -161,7 +243,7 @@ export class WalletService {
 				heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
 				text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -185,7 +267,7 @@ export class WalletService {
 				heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
 				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -207,7 +289,7 @@ export class WalletService {
 				heading: `Swap Completed!`,
 				text: `You have swapped ${config.currencySymbol} for ${selectedToken.token_symbol}.`, 
 				type: 'success',
-				duration: 7000
+				duration: 5000
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -262,7 +344,7 @@ export class WalletService {
 		if (callbacks) {
 			console.log("calling error callback! ")
 			console.log(callbacks)
-			callbacks.error()
+			callbacks.error(errors)
 		}
 	}
 

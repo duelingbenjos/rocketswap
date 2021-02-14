@@ -229,6 +229,10 @@ body.light{
   height: 100%;
 }
 
+.flex{
+  display: flex;
+}
+
 .flex-grow{
   flex-grow: 1;
 }
@@ -241,6 +245,11 @@ body.light{
 .flex-col{
   display: flex;
   flex-direction: column;
+}
+
+.flex-col-reverse{
+  display: flex;
+  flex-direction: column-reverse;
 }
 
 .flex-center-spacebetween{
@@ -663,7 +672,6 @@ input.input-amount-value::placeholder {
     width: 100%;
     border-radius: 0px;
   }
-
 }
 
 .page-heading{

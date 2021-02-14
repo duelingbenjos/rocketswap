@@ -61,7 +61,7 @@ async function savePrice(state, handleClientUpdate) {
         lp,
         reserves
     });
-    await Promise.all([price_entity.save(), pair_entity.save()]);
+    return await Promise.all([price_entity.save(), pair_entity.save()]);
 }
 exports.savePrice = savePrice;
 async function getTokenMetrics(contract_name) {

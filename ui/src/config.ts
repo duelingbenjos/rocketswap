@@ -14,6 +14,7 @@ const connectionRequest = {
   version: '1.0.1',
   logo: 'images/logo.png',
   contractName: 'con_amm2',
+  namesContract: 'con_ipseity_5',
   currencySymbol: 'DTAU',
   // domainName: "https://demoapp.lamden.io",
   blockExplorer: 'https://testnet.lamden.io',

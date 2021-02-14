@@ -1,7 +1,8 @@
 import axios from 'axios'
-import { token_list_store } from '../store'
+import { token_list_store, bearerToken } from '../store'
 import { getBaseUrl, valuesToBigNumber } from '../utils'
 import { config } from '../config'
+import { get } from 'svelte/store'
 
 /** Singleton Api Service */
 export class ApiService {
@@ -70,4 +71,22 @@ export class ApiService {
       return false
     }
   }
+
+	async sendMessage(message: string){
+		if (!get(bearerToken)) return false
+		try {
+			const res = await axios.post(`${this.base_url}/api/trollbox/message`, JSON.stringify({message}), {
+				headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${get(bearerToken)}`,
+			}
+		})
+			console.log(res)
+			return res
+		} catch (err) {
+			console.log(err)
+			localStorage.removeItem('auth_token')
+			return false
+		}
+	}
 }

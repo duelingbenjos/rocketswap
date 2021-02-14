@@ -8,6 +8,8 @@
 	//Services
 	import { ApiService } from '../services/api.service'
 	const apiService = ApiService.getInstance();
+	import { WsService } from '../services/ws.service'
+	const ws = WsService.getInstance()
 
 	//Stores
 	import { lwc_info, tokenBalances, walletIsReady, saveStoreValue,  } from '../store'
@@ -17,6 +19,7 @@
 
 	//Components
 	import SwapPanel from '../components/swap-panel.svelte'
+	import TradeTable from '../components/misc/trade-table.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
@@ -39,14 +42,15 @@
 
 	let pageUtilites = pageUtils(pageStores)
 
+	params.subscribe(params => console.log({params}))
+
 	$: contractName = $params.contract
 	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap';
 	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
 
 	selectedToken.subscribe(value => {
 		if (value) {
-			pageUtilites.refreshTokenInfo(value.contract_name)
-			pageUtilites.updateWindowHistory("pool-swap")
+			joinTradeFeed_UpdateWindow(value.contract_name)
 		}
 	})
 
@@ -60,8 +64,22 @@
 	});
 
 	onMount(() => {
-		if (contractName) pageUtilites.refreshTokenInfo(contractName)
+		console.log({contractName})
+		if (contractName) joinTradeFeed_UpdateWindow(contractName)
+		return () => ws.leaveTradeFeed()
 	})
+
+	const joinTradeFeed_UpdateWindow = (contract_name) => {
+		console.log({contract_name})
+		pageUtilites.refreshTokenInfo(contract_name).then(res => {
+			if (res){
+				pageUtilites.updateWindowHistory("")
+				ws.joinTradeFeed(contract_name)
+			}else{
+				pageUtilites.updateWindowHistory("", false)
+			}
+		})
+	}
 	
 	
 	const updatePageStats = async () => {
@@ -97,4 +115,5 @@
 		<Buttons buttonFunction="swap" buttonText="Swap" />
 		</div>
 	</SwapPanel>
+	<TradeTable />
 </div>

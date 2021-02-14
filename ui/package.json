@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "dev": "PORT=3003 npm run start:dev",
+    "start:dev": "rollup -c -w",
     "start": "sirv public --host",
     "validate": "svelte-check"
   },

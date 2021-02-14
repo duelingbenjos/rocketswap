@@ -1,8 +1,22 @@
 import { Client } from "socket.io";
+import { AuthenticationPayload } from "src/authentication/trollbox.controller";
 import { PriceEntity } from "src/entities/price.entity";
 import { BlockDTO } from "./misc.types";
 
 export type handleClientUpdate = (update: ClientUpdateType) => {};
+
+export type handleAuthenticateResponse = (auth_response: {
+	socket_id: string;
+	payload: AuthenticationPayload;
+}) => void;
+
+export type handleTrollboxMsg = (payload: ITrollBoxMessage) => void;
+
+export interface ITrollBoxMessage {
+	sender: string;
+	message: string;
+	timestamp: number;
+}
 
 export interface IBlockParser {
 	block: BlockDTO;
@@ -53,8 +67,10 @@ export interface TradeUpdateType extends UpdateType {
 	action: "trade_update";
 	type: "buy" | "sell";
 	amount: string;
-	token: string;
+	contract_name: string;
 	token_symbol: string;
+	price: string;
+	time: number;
 }
 
 export function isMetricsUpdate(

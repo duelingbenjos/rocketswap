@@ -1,4 +1,5 @@
 import mongoose_models from "./mongoose.models";
+import {handleNewBlock} from './types/misc.types'
 
 const https = require("https");
 const http = require("http");
@@ -22,7 +23,7 @@ if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
 }
 
-const databaseLoader = (models, handleNewBlock) => {
+const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 	let currBlockNum = 1;
 	let checkNextIn = 0;
 	let maxCheckCount = 10;
@@ -143,11 +144,12 @@ const databaseLoader = (models, handleNewBlock) => {
 						block.numOfTransactions = block.numOfTransactions + 1;
 						blockTxList.push(tx.hash);
 						subblockTxList.push(tx.hash);
-
-					await	handleNewBlock({
+						console.log('METADATA', tx.transaction.metadata)
+					await handleNewBlock({
 							state: tx.state,
 							fn: tx.transaction.payload.function,
-							contract: tx.transaction.payload.contract
+							contract: tx.transaction.payload.contract,
+							timestamp: tx.transaction.metadata.timestamp
 						});
 
 					}})()
@@ -192,8 +194,8 @@ const databaseLoader = (models, handleNewBlock) => {
 				await wipeDB();
 				wipeOnStartup = false;
 			} else {
-				//console.log("lastestBlockNum: " + lastestBlockNum);
-				//console.log("currBlockNum: " + currBlockNum);
+				// console.log("lastestBlockNum: " + lastestBlockNum);
+				// console.log("currBlockNum: " + currBlockNum);
 				if (lastestBlockNum === currBlockNum) {
 					if (alreadyCheckedCount < maxCheckCount)
 						alreadyCheckedCount = alreadyCheckedCount + 1;
@@ -252,7 +254,7 @@ const databaseLoader = (models, handleNewBlock) => {
 		});
 };
 
-export default (handleNewBlock: Function) => {
+export default (handleNewBlock: handleNewBlock) => {
 	db.connect(
 		connectionString,
 		{ useNewUrlParser: true, useUnifiedTopology: true },

@@ -7,8 +7,11 @@ export declare class TokenEntity extends BaseEntity {
     base_supply: string;
     contract_name: string;
     developer: string;
+    owner: string;
     has_market: boolean;
-    logo_svg_base64: string;
+    token_base64_svg: string;
+    token_base64_png: string;
+    token_logo_url: string;
 }
 export declare class AddTokenDto {
     token_symbol: string;
@@ -17,10 +20,12 @@ export declare class AddTokenDto {
     contract_name: string;
     token_seed_holder: string;
     developer: string;
-    lp_info?: object;
-    logo_svg_base64: string;
+    token_base64_svg?: string;
+    token_base64_png?: string;
+    token_logo_url?: string;
+    owner?: string;
 }
 export declare const saveToken: (add_token_dto: AddTokenDto) => Promise<TokenEntity>;
 export declare function prepareAddToken(state: IKvp[]): AddTokenDto;
-export declare function updateLogo(state: IKvp[], contract_name: string): Promise<void>;
+export declare function saveTokenUpdate(state: IKvp[]): Promise<void>;
 export declare function getTokenList(): Promise<string[]>;

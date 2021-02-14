@@ -19,7 +19,7 @@ export class TradeHistoryEntity extends BaseEntity {
 	price: string;
 
 	@Column()
-	time: string = Date.now().toString();
+	time: number;
 
 	@Column()
 	amount: string;
@@ -38,10 +38,12 @@ export async function saveTradeUpdate(args: {
 	amount: string;
 	vk: string;
 	type: "buy" | "sell";
+	time: number;
 }) {
 	const entity = new TradeHistoryEntity();
 	for (let arg in args) {
 		entity[arg] = args[arg];
 	}
+	entity.time = args.time
 	await entity.save();
 }

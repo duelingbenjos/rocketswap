@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { Logger, Module } from "@nestjs/common";
 import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { AppGateway } from "./app.gateway";
 import { TokenEntity } from "./entities/token.entity";
@@ -11,6 +11,15 @@ import { LpPointsEntity } from "./entities/lp-points.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { SocketService } from "./socket.service";
 import { NameEntity } from "./entities/name.entity";
+import { TrollboxController } from "./authentication/trollbox.controller";
+import { RefreshTokensRepository } from "./authentication/refresh-token.repository";
+import { TokensService } from "./authentication/tokens.service";
+import { JwtModule, JwtService } from "@nestjs/jwt";
+import { JWTGuard } from "./authentication/jwt.guard";
+import { AuthService } from "./authentication/trollbox.service";
+import { RefreshTokenEntity } from "./entities/refresh-token.entity";
+import { JwtStrategy } from "./authentication/jwt.strategy";
+import { ChatHistoryEntity } from "./entities/chat-history.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -23,15 +32,35 @@ const db_options: TypeOrmModuleOptions = {
 		PriceEntity,
 		LpPointsEntity,
 		TradeHistoryEntity,
-		NameEntity
+		NameEntity,
+		RefreshTokenEntity,
+		ChatHistoryEntity
 	],
 	synchronize: true,
-	autoLoadEntities: true,
+	autoLoadEntities: true
 };
 
 @Module({
-	imports: [TypeOrmModule.forRoot(db_options)],
-	controllers: [AppController],
-	providers: [AppGateway, ParserProvider, SocketService]
+	imports: [
+		TypeOrmModule.forRoot(db_options),
+		JwtModule.register({
+			secret: "<SECRET KEY>",
+			signOptions: {
+				expiresIn: "60m"
+			}
+		})
+	],
+	controllers: [AppController, TrollboxController],
+	providers: [
+		AppGateway,
+		ParserProvider,
+		SocketService,
+		TokensService,
+		RefreshTokensRepository,
+		JWTGuard,
+		JwtStrategy,
+		AuthService,
+		Logger
+	]
 })
 export class AppModule {}

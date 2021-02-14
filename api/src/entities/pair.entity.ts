@@ -37,7 +37,8 @@ export class PairEntity extends BaseEntity {
 export async function saveReserves(
 	fn: string,
 	state: IKvp[],
-	handleClientUpdate: handleClientUpdate
+	handleClientUpdate: handleClientUpdate,
+	timestamp: number
 ) {
 	// console.log(state);
 	const reserve_kvp = state.find(
@@ -81,45 +82,26 @@ export async function saveReserves(
 				old_token_reserve = entity.reserves[1];
 			}
 			// console.log(entity);
-			if (fn === "buy") {
-				let amount_exchanged = (
-					parseFloat(old_token_reserve) - parseFloat(reserves[1])
-				).toString();
-				// console.log(amount_exchanged);
-				updateTradeFeed(
-					contract_name,
-					entity.token_symbol,
-					fn,
-					amount_exchanged,
-					handleClientUpdate
-				);
-				saveTradeUpdate({
+			if (fn === "buy" || fn === "sell") {
+				let amount_exchanged = getAmountExchanged(fn, old_token_reserve, reserves);
+
+				updateTradeFeed({
 					contract_name,
 					token_symbol: entity.token_symbol,
 					type: fn,
-					vk,
 					amount: amount_exchanged,
-					price
+					price,
+					handleClientUpdate,
+					time: timestamp
 				});
-			} else if (fn === "sell") {
-				let amount_exchanged = (
-					parseFloat(reserves[1]) - parseFloat(old_token_reserve)
-				).toString();
-				// console.log(amount_exchanged);
-				updateTradeFeed(
-					contract_name,
-					entity.token_symbol,
-					fn,
-					amount_exchanged,
-					handleClientUpdate
-				);
 				saveTradeUpdate({
 					contract_name,
 					token_symbol: entity.token_symbol,
 					type: fn,
 					vk,
 					amount: amount_exchanged,
-					price
+					price,
+					time: timestamp
 				});
 			}
 		}
@@ -142,19 +124,43 @@ export async function saveReserves(
 	}
 }
 
-function updateTradeFeed(
-	token: string,
-	token_symbol: string,
-	type: "buy" | "sell",
-	amount: string,
-	handleClientUpdate: handleClientUpdate
-) {
+const getAmountExchanged = (
+	fn: string,
+	old_token_reserve: any,
+	reserves: any[]
+) => {
+	return fn === "buy"
+		? (parseFloat(old_token_reserve) - parseFloat(reserves[1])).toString()
+		: (parseFloat(reserves[1]) - parseFloat(old_token_reserve)).toString();
+};
+
+function updateTradeFeed(args: {
+	contract_name: string;
+	token_symbol: string;
+	type: "buy" | "sell";
+	amount: string;
+	price: string;
+	handleClientUpdate: handleClientUpdate;
+	time: number;
+}) {
+	const {
+		type,
+		amount,
+		contract_name,
+		token_symbol,
+		price,
+		handleClientUpdate,
+		time
+	} = args;
+
 	const payload: TradeUpdateType = {
 		action: "trade_update",
 		type,
 		amount,
-		token,
-		token_symbol
+		contract_name,
+		token_symbol,
+		price,
+		time
 	};
 	handleClientUpdate(payload);
 }

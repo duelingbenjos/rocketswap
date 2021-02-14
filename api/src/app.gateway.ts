@@ -5,22 +5,23 @@ import {
 	OnGatewayInit,
 	SubscribeMessage,
 	WebSocketGateway,
-	WebSocketServer,
-	WsResponse
+	WebSocketServer
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import blockgrabber from "./blockgrabber";
+import { AuthenticationPayload } from "./authentication/trollbox.controller";
+import startBlockgrabber from "./blockgrabber";
 import { BalanceEntity } from "./entities/balance.entity";
+import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics } from "./entities/price.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
+import { BlockDTO } from "./types/misc.types";
 import {
 	ClientUpdateType,
 	isBalanceUpdate,
 	isMetricsUpdate,
-	isPriceUpdate,
 	isTradeUpdate,
 	MetricsUpdateType,
 	UserLpUpdateType
@@ -37,23 +38,24 @@ export class AppGateway
 
 	@WebSocketServer() wss: Server;
 
-	constructor(private readonly parser: ParserProvider, private readonly socketService: SocketService) {
-		blockgrabber(this.handleNewBlock);
+	constructor(
+		private readonly parser: ParserProvider,
+		private readonly socketService: SocketService
+	) {
+		startBlockgrabber(this.handleNewBlock);
 	}
 
 	afterInit(server: Server) {
-		this.logger.log(`Websocket Initialised`);    
+		this.logger.log(`Websocket Initialised`);
 		this.socketService.handleClientUpdate = this.handleClientUpdate;
+		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
+		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 	}
 
-	handleNewBlock = async (block: any) => {
-		const { state, fn, contract } = block;
+	handleNewBlock = async (block: BlockDTO) => {
+		// const { state, fn, contract, timestamp } = block;
 		await this.parser.parseBlock({
-			block: {
-				state,
-				fn,
-				contract
-			}
+			block
 		});
 	};
 
@@ -80,8 +82,11 @@ export class AppGateway
 				break;
 			case "trade_update":
 				if (isTradeUpdate(update)) {
-					this.wss.emit(`trade_update`, update);
-					this.wss.emit(`trade_update:${update.token}`, update);
+					this.wss.emit(`trade_update`, { update });
+					this.wss.emit(
+						`trade_update:${update.contract_name}`,
+						update
+					);
 				}
 				break;
 		}
@@ -95,12 +100,10 @@ export class AppGateway
 
 	@SubscribeMessage("join_room")
 	async handleJoinRoom(client: Socket, room: string) {
-		// this.logger.log(room);
-		// join user to room
 		client.join(room);
 		client.emit("joined_room", room);
-
 		const [prefix, subject] = room.split(":");
+		this.logger.log(prefix, subject);
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
@@ -111,12 +114,53 @@ export class AppGateway
 			case "balance_feed":
 				this.handleJoinBalanceFeed(subject, client);
 				break;
-			case "trade_feed" && subject:
-				this.handleJoinTradeFeed(subject, client)
+			case "trade_feed":
+				if (!subject) return;
+				this.handleJoinTradeFeed(subject, client);
+			case "trollbox":
+				this.handleJoinTrollBox(client);
 		}
 	}
 
+	private async handleJoinTrollBox(client: Socket) {
+		client.emit("trollbox_authcode", client.id);
+		try {
+			let history = await ChatHistoryEntity.find({
+				select: ["message", "timestamp", "sender"],
+				take: 50,
+				order: { timestamp: "DESC" }
+			});
+			history.sort((a, b) => {
+				return a.timestamp - b.timestamp;
+			});
+			client.emit("trollbox_history", history);
+		} catch (err) {
+			this.logger.error(err);
+		}
+	}
+
+	public handleTrollboxMsg = (message: {
+		sender: string;
+		message: string;
+		timestamp: number;
+	}) => {
+		this.wss.emit("trollbox_message", message);
+	};
+
+	public handleAuthenticateResponse = (auth_response: {
+		socket_id: string;
+		payload: AuthenticationPayload;
+	}) => {
+		try {
+			const { socket_id, payload } = auth_response;
+			this.wss.to(socket_id).emit("auth_response", payload);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
+		this.logger.log(`joined trade feed: ${subject}`);
 		try {
 			const trade_update = await TradeHistoryEntity.find({
 				select: [
@@ -124,15 +168,16 @@ export class AppGateway
 					"token_symbol",
 					"price",
 					"type",
-					"time"
+					"time",
+					"amount"
 				],
-				order:{time: "DESC"},
-				where: {contract_name: subject},
+				order: { time: "DESC" },
+				where: { contract_name: subject },
 				take: 50
 			});
-			client.emit(`trade_update:${subject}`, trade_update);
+			client.emit(`trade_update:${subject}`, { history: trade_update });
 		} catch (err) {
-			this.logger.error(err)
+			this.logger.error(err);
 		}
 	}
 

@@ -2,8 +2,7 @@ import Lamden from 'lamden-js'
 import { config } from './config'
 import BigNumber from 'bignumber.js'
 import { get } from 'svelte/store'
-import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue } from './store'
-import { active } from 'svelte-hash-router'
+import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue, bearerToken } from './store'
 
 import { ApiService } from './services/api.service'
 
@@ -34,6 +33,17 @@ export const refreshLpBalances = async (account = undefined) => {
 
 	lpBalances.set(balances)
 	return balances
+}
+
+export const setBearerToken = (account = undefined) => {
+	if (!account) account = get(lwc_info).walletAddress
+	if (!account) return
+	let tokenInfo = localStorage.getItem('auth_token')
+	if (tokenInfo) {
+		tokenInfo = JSON.parse(tokenInfo)
+		if (tokenInfo?.user?.vk === account) bearerToken.set(tokenInfo?.payload?.token || null)
+		else localStorage.removeItem('auth_token')
+	}
 }
 
 export const getBaseUrl = (url): string => {
@@ -302,10 +312,13 @@ export const pageUtils = (pageStores) => {
 	const refreshTokenInfo = async (contractName) => {
 		if (!contractName) return
 		let tokenRes = await getTokenInfo(contractName)
+		if (!tokenRes || Object.keys(tokenRes).length === 0) return false;
+		console.log(tokenRes)
 		applyTokenBalance(tokenRes)
 		const { token, lp_info }  = tokenRes
 		saveStoreValue(selectedToken, token)
 		saveStoreValue(tokenLP, lp_info)
+		return true
 	}
 
 	const getTokenInfo = async (contractName) => {
@@ -318,11 +331,16 @@ export const pageUtils = (pageStores) => {
 		return tokenRes
 	}
 
-	const updateWindowHistory = (route) => {
-		if (get(selectedToken)){
-		  if (!location.pathname.includes(get(selectedToken).contract_name))
-			window.history.pushState("", "", `/#/${route}/${get(selectedToken).contract_name}`);
-		}
+	const updateWindowHistory = (route, contractExists = true) => {
+		if (contractExists){
+			if (get(selectedToken)){
+				if (!location.pathname.includes(get(selectedToken).contract_name))
+				  window.history.pushState("", "", `/#/${route}${get(selectedToken).contract_name}`);
+			  }
+		}else{
+			window.history.pushState("", "", `/#/${route}`);
+		}	
+
 	}
 
 	const redirectToAddPool = (contractName) => window.location.assign(`/#/pool-add/${contractName}`)
@@ -333,7 +351,7 @@ export const pageUtils = (pageStores) => {
 	const resetPage = (contractName, stores) => {
 		stores.forEach(store => store.set(null))
 		setTimeout(() => refreshTokenInfo(contractName), 2000)
-	  }
+	}
 
 	return {
 		refreshTokenInfo,
