@@ -100,7 +100,7 @@ def revoke_always_approve(to: str):
 @export
 def transfer_from(amount: float, to: str, main_account: str):
     assert amount > 0, 'Cannot send negative balances!'
-    assert balances[main_account] > amount, 'Cannot send amount greater than balance!'
+    assert balances[main_account] >= amount, 'Cannot send amount greater than balance!'
 
     if custodial[main_account, ctx.caller] == True:
     	balances[main_account] -= amount
