@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const websockets_1 = require("@nestjs/websockets");
 const blockgrabber_1 = require("./blockgrabber");
 const balance_entity_1 = require("./entities/balance.entity");
+const chat_history_entity_1 = require("./entities/chat-history.entity");
 const lp_points_entity_1 = require("./entities/lp-points.entity");
 const price_entity_1 = require("./entities/price.entity");
 const trade_history_entity_1 = require("./entities/trade-history.entity");
@@ -103,6 +104,20 @@ let AppGateway = class AppGateway {
     }
     async handleJoinTrollBox(client) {
         client.emit("trollbox_authcode", client.id);
+        try {
+            let history = await chat_history_entity_1.ChatHistoryEntity.find({
+                select: ["message", "timestamp", "sender"],
+                take: 50,
+                order: { timestamp: "DESC" }
+            });
+            history.sort((a, b) => {
+                return a.timestamp - b.timestamp;
+            });
+            client.emit("trollbox_history", history);
+        }
+        catch (err) {
+            this.logger.error(err);
+        }
     }
     async handleJoinTradeFeed(subject, client) {
         this.logger.log(`joined trade feed: ${subject}`);

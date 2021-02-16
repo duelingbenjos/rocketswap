@@ -5,11 +5,12 @@ export declare type handleAuthenticateResponse = (auth_response: {
     socket_id: string;
     payload: AuthenticationPayload;
 }) => void;
-export declare type handleTrollboxMsg = (payload: {
+export declare type handleTrollboxMsg = (payload: ITrollBoxMessage) => void;
+export interface ITrollBoxMessage {
     sender: string;
     message: string;
     timestamp: number;
-}) => void;
+}
 export interface IBlockParser {
     block: BlockDTO;
 }

@@ -20,11 +20,14 @@ const tokens_service_1 = require("./tokens.service");
 const jwt_guard_1 = require("./jwt.guard");
 const trollbox_service_1 = require("./trollbox.service");
 const socket_service_1 = require("../socket.service");
+const websocket_types_1 = require("../types/websocket.types");
+const chat_history_entity_1 = require("../entities/chat-history.entity");
 let TrollboxController = class TrollboxController {
     constructor(tokens, authService, socketService) {
         this.tokens = tokens;
         this.authService = authService;
         this.socketService = socketService;
+        this.logger = new common_1.Logger("TrollboxController");
     }
     async refresh(body) {
         const { user, token } = await this.tokens.createAccessTokenFromRefreshToken(body.refresh_token);
@@ -36,10 +39,14 @@ let TrollboxController = class TrollboxController {
     }
     async send_message(request) {
         const { user, body: { message } } = request;
-        console.log(user, message);
-        console.log(typeof message);
         if (typeof message !== "string") {
             throw new common_1.HttpException("Message must be a string ! :(", 500);
+        }
+        else if (!message) {
+            return;
+        }
+        else if (message.length > 200) {
+            throw new common_1.HttpException("Message is too long (must be under 200 characters)", 500);
         }
         const ws_payload = {
             sender: user,
@@ -47,6 +54,12 @@ let TrollboxController = class TrollboxController {
             timestamp: Date.now()
         };
         this.socketService.handleTrollboxMsg(ws_payload);
+        try {
+            await chat_history_entity_1.saveTrollChat(ws_payload);
+        }
+        catch (err) {
+            this.logger.error(err);
+        }
     }
     async getUser(request) {
         const vk = request.user.vk;

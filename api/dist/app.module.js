@@ -28,6 +28,7 @@ const jwt_guard_1 = require("./authentication/jwt.guard");
 const trollbox_service_1 = require("./authentication/trollbox.service");
 const refresh_token_entity_1 = require("./entities/refresh-token.entity");
 const jwt_strategy_1 = require("./authentication/jwt.strategy");
+const chat_history_entity_1 = require("./entities/chat-history.entity");
 const db_options = {
     name: "default",
     type: "sqlite",
@@ -40,7 +41,8 @@ const db_options = {
         lp_points_entity_1.LpPointsEntity,
         trade_history_entity_1.TradeHistoryEntity,
         name_entity_1.NameEntity,
-        refresh_token_entity_1.RefreshTokenEntity
+        refresh_token_entity_1.RefreshTokenEntity,
+        chat_history_entity_1.ChatHistoryEntity
     ],
     synchronize: true,
     autoLoadEntities: true

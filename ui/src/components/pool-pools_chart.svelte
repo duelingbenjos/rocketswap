@@ -128,7 +128,7 @@
             {#each pairs as pair}
                 <tr>
                     <td class="flex-row symbol max-width">
-                            <Base64SvgLogo string={pair.logo_svg_base64} width={'27px'} height={'27px'} margin={"0 10px 0 0"}/>
+                            <Base64SvgLogo string={pair.token_base64_svg} width={'27px'} height={'27px'} margin={"0 10px 0 0"}/>
                             <span class="symbol">{pair.token_symbol || "none"}</span>
                     </td>
                     <td class="max-width">{pair.contract_name}</td>

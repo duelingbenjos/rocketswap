@@ -9,19 +9,24 @@
 	//Stores
 	import { walletBalance } from '../../store'
 
+	//Services
+	import { WalletService } from '../../services/wallet.service'
+	const walletService = WalletService.getInstance();
+
 	//Misc
 	import { config } from '../../config'
-	import { stringToFixed, toBigNumber } from '../../utils.js'
+	import { stringToFixed, toBigNumber, determinePrecision, stampsToTAU } from '../../utils.js'
 
 	//Props
 	export let label
 
 	const dispatch = createEventDispatcher();
 
-	const { pageStores } = getContext('pageContext')
-	const { currencyAmount } = pageStores
+	const { pageStores, getStampCost } = getContext('pageContext')
+	const { currencyAmount, buy, selectedToken } = pageStores
 
 	let inputElm;
+	let pressedMaxValue = false;
 
 	$: inputValue = $currencyAmount;
 
@@ -31,13 +36,24 @@
 			inputElm.value = validateValue
 		}else{
 			let value = toBigNumber(e.target.value)
+			if (determinePrecision(value) > 8){
+				value = toBigNumber(stringToFixed(value.toString(), 8))
+				inputElm.value = value.toString()
+			}
+			pressedMaxValue = false;
 			dispatchEvent(value)
 		}
 	}
 
-	const handleMaxInput = () => {
-		inputValue = $walletBalance
-		inputElm.value = inputValue.toString()
+	const handleMaxInput = async () => {
+		let adjustedValue = 0;
+		let txTAUCost = stampsToTAU(await getStampCost())
+		if ($walletBalance.isGreaterThan(txTAUCost)){
+			adjustedValue = $walletBalance.minus(toBigNumber(txTAUCost))
+		}
+		inputValue = toBigNumber(stringToFixed(adjustedValue, 8))
+		inputElm.value = stringToFixed(inputValue.toString(), 8)
+		pressedMaxValue = true;
 		dispatchEvent(inputValue)
 	}
 	
@@ -48,6 +64,9 @@
 	button.primary.small{
 		margin-right: 6px;
 	}
+	.input-container {
+  		position: relative;
+  	}
 </style>
 
 <div class="input-container flex-col"
@@ -71,11 +90,14 @@
         />
 
 		<div class="input-controls">
-			{#if !inputElm?.value}
+			{#if ($buy === true || typeof $buy === 'undefined') && !pressedMaxValue && $selectedToken}
 				<button on:click={handleMaxInput} class="primary small">MAX</button> 
 			{/if}
 			<LamdenLogo width="23px" margin="0 3px 0 0" color="white"/>
 			<span class="input-token-label text-xlarge"> {config.currencySymbol} </span>
 		</div>
 	</div>
+	{#if pressedMaxValue}
+		<p class="tx-fee-label text-xsmall text-primary-dim">** adjusted for tx fees</p>
+	{/if}
 </div>

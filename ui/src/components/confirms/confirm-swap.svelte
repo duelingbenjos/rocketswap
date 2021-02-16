@@ -125,30 +125,29 @@
             <CloseIcon />
         </button>
     </div>
-    {$buy}
     <div class="flex-col text-xlarge">
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[0].logoComponent} 
-                    string={$selectedToken.logo_svg_base64}
+                    string={$selectedToken.token_base64_svg}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />
-                <span>{slots[0].amount}</span>
+                <span>{stringToFixed(slots[0].amount, 8)}</span>
             </div>
             <span>{slots[0].symbol}</span>
         </div>
-        <DirectionalArrow direction="down" width="20px" margin="0 0 0 5px" color="var(--text-primary-color-dimmer)"/>
+        <DirectionalArrow direction="down" width="20px" margin="0.5rem 0 0 5px" color="var(--text-primary-color-dimmer)"/>
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[1].logoComponent}
-                    string={$selectedToken.logo_svg_base64}
+                    string={$selectedToken.token_base64_svg}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />
-                <span>{slots[1].amount}</span>
+                <span>{stringToFixed(slots[1].amount, 8)}</span>
             </div>
             <span>{slots[1].symbol}</span>
         </div>
