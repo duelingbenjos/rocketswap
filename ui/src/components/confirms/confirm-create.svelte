@@ -85,21 +85,21 @@
         <LamdenLogo width="27px"  margin="0 5px 0 0"/>
         <span>{`${config.currencySymbol}`}</span>
         <span class="separator">/</span>
-        <Base64SvgLogo string={$selectedToken.logo_svg_base64} width="29px"  margin="0 5px 0 0"/>
+        <Base64SvgLogo string={$selectedToken.token_base64_svg} width="29px"  margin="0 5px 0 0"/>
         <span>{`${$selectedToken.token_symbol}`}</span>
     </div>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number">{stringToFixed($currencyAmount, 12)}</p>
+            <p class="number">{stringToFixed($currencyAmount, 8)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
-            <p class="number">{stringToFixed($tokenAmount, 12)}</p>
+            <p class="number">{stringToFixed($tokenAmount, 8)}</p>
         </div>
         <ConfirmRates 
-            currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}
-            tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 4)}
+            currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 8)}
+            tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 8)}
             {selectedToken}
         />
         <div class="flex-row modal-confirm-item">

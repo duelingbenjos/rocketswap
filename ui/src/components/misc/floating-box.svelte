@@ -87,6 +87,7 @@
     }
 
     const error = (errors) => {
+        console.log(errors)
         sending = false
     }
 

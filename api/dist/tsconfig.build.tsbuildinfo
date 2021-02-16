@@ -3461,9 +3461,14 @@
         "signature": "67d6f769ed944698ae085cf749157b6170af6cb1f2f2c51366e2055c8af81b6a",
         "affectsGlobalScope": false
       },
+      "../src/entities/chat-history.entity.ts": {
+        "version": "707f89eb313f745bab486381a582cd1e00602c131ab6d7b562ca2e92af26df3f",
+        "signature": "84a55bfe07c8c54f7e5b4ad10b05418e50465371b0cd584ac71c900c3fbb8c27",
+        "affectsGlobalScope": false
+      },
       "../src/authentication/trollbox.controller.ts": {
-        "version": "dc100262d257434598d9565ff51f001d3245a7ea9b0fec02f54dbea27dd77662",
-        "signature": "50b595f45c7781b331d6fd79c515d24a97e272232a18aa82c0fc725a189b586c",
+        "version": "10dcbf475c543c384d3315fe1ddd2f68dc6ffe26b7c17ebd47980c3fad9a2c92",
+        "signature": "7f683dbd31cf1d5d26ecf56fbbe82631eaa417132c6d9bc45187782067f00965",
         "affectsGlobalScope": false
       },
       "../src/entities/trade-history.entity.ts": {
@@ -3482,12 +3487,12 @@
         "affectsGlobalScope": false
       },
       "../src/types/websocket.types.ts": {
-        "version": "fdb6f209cc9015e06ddc124f527cc23a940e5c294f837459cc7f9ff0ee7784c4",
-        "signature": "03d72e7c623f966c3bbf6fb60e5ecddeed2ea6e75ded3da25199e7ada3dde124",
+        "version": "e304c06b6fedff9264512e56aa18c746c94b73e53a7834266cd30fc4c05278ee",
+        "signature": "c228a92701aeb752c4b883771a073de9a42270248fde46b6a629f3dfff3c2f63",
         "affectsGlobalScope": false
       },
       "../src/entities/balance.entity.ts": {
-        "version": "84f2face588c0845baaee17cdd6fec02012ff1c6b6cc7bc6612a7ec592c7b143",
+        "version": "b2b9aaee68970f26cf51e016d094c1d24e4e1ec0ce8c2f5266002c2ccd95e8af",
         "signature": "851d87bbc976be829481ba196a9b94e4ff5cb0deae7a27b661f58687aedbe715",
         "affectsGlobalScope": false
       },
@@ -3637,12 +3642,12 @@
         "affectsGlobalScope": false
       },
       "../src/parser.provider.ts": {
-        "version": "e3fd83de231196031be4abe75b6f08a946c0d1c1710aebc56e5651232de94565",
+        "version": "52503ae2efcbc666fd9cf82e42255fe1a6fa62da9c456b4c032439948a80833f",
         "signature": "09c8f7b316c7517d310a2484114ca7ada579088087b103b67ddef70de4e6f9cb",
         "affectsGlobalScope": false
       },
       "../src/app.gateway.ts": {
-        "version": "6f84ad2d76679459a441ced3c25544d4bdb8267d49feb6742dd8ef83697acceb",
+        "version": "ab1ee5a1a009b1e8ac67de2dafe84f6d3eaf49b9a9cab10031a52a62eadbbf68",
         "signature": "7adf95af791fcd30db6a0283895f5c381cc7625aaf2171f2a6bd753b570bede9",
         "affectsGlobalScope": false
       },
@@ -3697,7 +3702,7 @@
         "affectsGlobalScope": false
       },
       "../src/app.module.ts": {
-        "version": "fa3fe2c739886132f13b34002643c1863e36421cb62e6ce1fbd83362cfbe7c94",
+        "version": "c4d1aa3ebf599000ac1b969979c2ee689e1004183c42b2a2e84c2f34d8f42c15",
         "signature": "b82491e2990291580288c5602d4c017238977749d52b17391f0e45d9a29be644",
         "affectsGlobalScope": false
       },
@@ -7205,6 +7210,7 @@
         "../src/authentication/trollbox.controller.ts",
         "../src/blockgrabber.ts",
         "../src/entities/balance.entity.ts",
+        "../src/entities/chat-history.entity.ts",
         "../src/entities/lp-points.entity.ts",
         "../src/entities/price.entity.ts",
         "../src/entities/trade-history.entity.ts",
@@ -7226,6 +7232,7 @@
         "../src/authentication/trollbox.controller.ts",
         "../src/authentication/trollbox.service.ts",
         "../src/entities/balance.entity.ts",
+        "../src/entities/chat-history.entity.ts",
         "../src/entities/lp-points.entity.ts",
         "../src/entities/name.entity.ts",
         "../src/entities/pair.entity.ts",
@@ -7263,9 +7270,11 @@
         "../src/authentication/jwt.guard.ts",
         "../src/authentication/tokens.service.ts",
         "../src/authentication/trollbox.service.ts",
+        "../src/entities/chat-history.entity.ts",
         "../src/entities/name.entity.ts",
         "../src/requests.ts",
-        "../src/socket.service.ts"
+        "../src/socket.service.ts",
+        "../src/types/websocket.types.ts"
       ],
       "../src/authentication/trollbox.service.ts": [
         "../node_modules/@nestjs/common/index.d.ts",
@@ -7290,6 +7299,13 @@
       ],
       "../src/entities/balance.entity.ts": [
         "../node_modules/typeorm/index.d.ts",
+        "../src/types/misc.types.ts",
+        "../src/types/websocket.types.ts",
+        "../src/utils.ts"
+      ],
+      "../src/entities/chat-history.entity.ts": [
+        "../node_modules/typeorm/index.d.ts",
+        "../src/config.ts",
         "../src/types/misc.types.ts",
         "../src/types/websocket.types.ts",
         "../src/utils.ts"
@@ -10410,6 +10426,10 @@
         "../src/types/misc.types.ts",
         "../src/types/websocket.types.ts"
       ],
+      "../src/entities/chat-history.entity.ts": [
+        "../node_modules/typeorm/index.d.ts",
+        "../src/types/websocket.types.ts"
+      ],
       "../src/entities/lp-points.entity.ts": [
         "../node_modules/typeorm/index.d.ts",
         "../src/types/misc.types.ts"
@@ -11281,6 +11301,7 @@
       "../src/blockgrabber.ts",
       "../src/config.ts",
       "../src/entities/balance.entity.ts",
+      "../src/entities/chat-history.entity.ts",
       "../src/entities/lp-points.entity.ts",
       "../src/entities/name.entity.ts",
       "../src/entities/pair.entity.ts",

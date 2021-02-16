@@ -15,6 +15,7 @@ export declare class TrollboxController {
     private readonly tokens;
     private readonly authService;
     private readonly socketService;
+    private logger;
     constructor(tokens: TokensService, authService: AuthService, socketService: SocketService);
     refresh(body: RefreshRequest): Promise<{
         status: string;

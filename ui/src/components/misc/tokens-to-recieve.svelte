@@ -13,7 +13,7 @@
     const { selectedToken  } = pageStores
 
     $: tokenSymbol = $selectedToken?.token_symbol || "—";
-    $: logo_svg_base64 = $selectedToken?.logo_svg_base64;
+    $: token_base64_svg = $selectedToken?.token_base64_svg;
     $: tokensToReceive = $pageStats?.amounts ? $pageStats.amounts.currency : toBigNumber("0");
     $: currencyToReceive = $pageStats?.amounts ? $pageStats.amounts.token : toBigNumber("0");
 
@@ -48,7 +48,7 @@
         <p class="number flex-grow text-large">{currencyToReceive.isNaN() ? "0" : stringToFixed(currencyToReceive, 8)}</p>
         <div class="flex-row">
             <p class="input-token-label text-large">{tokenSymbol}</p>
-            <Base64SvgLogo string={logo_svg_base64} width={'25px'}  margin={"0 10px"}/>
+            <Base64SvgLogo string={token_base64_svg} width={'25px'}  margin={"0 10px"}/>
         </div>
     </div>
     <div class="flex-row">

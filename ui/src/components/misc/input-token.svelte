@@ -12,7 +12,7 @@
 
 	//Misc
 	import { config } from '../../config'
-	import { stringToFixed, toBigNumber } from '../../utils.js'
+	import { stringToFixed, toBigNumber, determinePrecision } from '../../utils.js'
 	import { tokenBalances } from '../../store'
 
 	//Props
@@ -21,9 +21,10 @@
 	const dispatch = createEventDispatcher();
 	
 	let { pageStores } = getContext('pageContext')
-	const { selectedToken, tokenAmount } = pageStores
+	const { selectedToken, tokenAmount, buy } = pageStores
 
 	let inputElm;
+	let pressedMaxValue = false;
 
 	$: tokenBalance = $selectedToken ? $tokenBalances[$selectedToken.contract_name] : toBigNumber("0.0")
 	$: inputValue = $tokenAmount;
@@ -34,6 +35,11 @@
 			inputElm.value = validateValue
 		}else{
 			let value = toBigNumber(e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1'))
+			if (determinePrecision(value) > 8){
+				value = toBigNumber(stringToFixed(value.toString(), 8))
+				inputElm.value = value.toString()
+			}
+			pressedMaxValue = false
 			dispatchEvent(value)
 		}
 	}
@@ -41,10 +47,12 @@
 	const handleMaxInput = () => {
 		inputValue = tokenBalance
 		inputElm.value = inputValue.toString()
+		pressedMaxValue = true
 		dispatchEvent(inputValue)
 	}
 
 	const handleTokenSelect = (e) => {
+		pressedMaxValue = false
 		dispatchEvent(inputValue, e.detail)
 	}
 
@@ -73,7 +81,7 @@
 			disabled={!$selectedToken} 
 		/>
 		<div class="input-controls">
-			{#if !inputElm?.value && $selectedToken}
+			{#if $buy === false && $selectedToken && !pressedMaxValue}
 				<button disabled={!$selectedToken} on:click={handleMaxInput} class="primary small">MAX</button>
 			{/if}
 			<TokenSelect on:selected={handleTokenSelect} />
