@@ -37,7 +37,6 @@ export class ParserProvider {
     const token_is_valid = validateTokenContract(contract_str)
     if (token_is_valid) {
      const add_token_dto = prepareAddToken(state)
-     this.addToActionQue(saveToken, add_token_dto)
 		 const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto
      this.addToActionQue(updateBalance, {
       amount,
@@ -65,7 +64,7 @@ export class ParserProvider {
    } else if (contract_name === config.identityContract) {
      switch(fn) {
        case 'setName':
-         await setName(state)
+        this.addToActionQue(setName,state)
         break
         case 'auth':
           this.authService.authenticate(state)
