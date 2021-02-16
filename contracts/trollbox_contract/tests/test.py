@@ -65,7 +65,7 @@ class MyTestCase(unittest.TestCase):
         self.setupBalances()
         secret = "abc123"
         self.contract.auth(secret=secret)
-        self.assertEqual(self.contract.auth_codes[secret], 1)
+        self.assertEqual(self.contract.auth_codes[secret], 'sys')
 
 
     # def get_stamp_cost(self):
