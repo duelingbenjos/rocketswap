@@ -58,9 +58,9 @@ export class ParserProvider {
     })
     return
    } else if (this.token_contract_list.includes(contract_name)) {
-    await saveTransfer(state, this.socketService.handleClientUpdate)
+    this.addToActionQue(saveTransfer, {state, handleClientUpdate:this.socketService.handleClientUpdate})
     if (isUpdateFn(fn)) {
-     await saveTokenUpdate(state)
+    this.addToActionQue(saveTokenUpdate, state)
     }
    } else if (contract_name === config.identityContract) {
      switch(fn) {
@@ -81,7 +81,7 @@ export class ParserProvider {
   const { fn, state, timestamp } = args
   try {
    await savePair(state)
-   await saveTransfer(state, this.socketService.handleClientUpdate)
+   await saveTransfer({state,handleClientUpdate: this.socketService.handleClientUpdate})
    await savePairLp(state)
    await saveUserLp(state)
    await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp)
@@ -98,12 +98,12 @@ export class ParserProvider {
  private executeActionQue = async (action_que: { action: any; args: any }[]) => {
   try {
    if (action_que.length) {
-    this.logger.log(`ACTION QUE PROCESSING ${action_que.length} `)
+    // this.logger.log(`ACTION QUE PROCESSING ${action_que.length} `)
     const { action, args } = this.action_que[0]
 		if (args) {
 			await action(args)
 		} else {
-			action()
+			await action()
 		}
     this.action_que.splice(0, 1)
     this.executeActionQue(action_que)
@@ -118,7 +118,7 @@ export class ParserProvider {
 
  private addToActionQue = (action: any, args?) => {
   this.action_que.push({ action, args })
-  this.logger.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
+  // this.logger.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
   if (!this.action_que_processing) {
    this.action_que_processing = true
    this.executeActionQue(this.action_que)
