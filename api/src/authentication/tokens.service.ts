@@ -1,4 +1,8 @@
-import { Injectable, UnprocessableEntityException } from "@nestjs/common";
+import {
+	Injectable,
+	Logger,
+	UnprocessableEntityException
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { SignOptions, TokenExpiredError } from "jsonwebtoken";
 
@@ -21,6 +25,7 @@ export interface RefreshTokenPayload {
 export class TokensService {
 	private readonly tokens: RefreshTokensRepository;
 	private readonly jwt: JwtService;
+	private logger: Logger = new Logger("TokensService");
 
 	public constructor(tokens: RefreshTokensRepository, jwt: JwtService) {
 		this.tokens = tokens;
@@ -28,61 +33,83 @@ export class TokensService {
 	}
 
 	public async generateAccessToken(user: NameEntity): Promise<string> {
-		const opts: SignOptions = {
-			...BASE_OPTIONS,
-			subject: String(user.vk)
-		};
+		try {
+			const opts: SignOptions = {
+				...BASE_OPTIONS,
+				subject: String(user.vk)
+			};
 
-		return this.jwt.signAsync({}, opts);
+			return this.jwt.signAsync({}, opts);
+		} catch (err) {
+			this.logger.error(err);
+		}
 	}
 
 	public async generateRefreshToken(
 		user: NameEntity,
 		expiresIn: number
 	): Promise<string> {
-		const token = await this.tokens.createRefreshToken(user, expiresIn);
+		try {
+			const token = await this.tokens.createRefreshToken(user, expiresIn);
 
-		const opts: SignOptions = {
-			...BASE_OPTIONS,
-			expiresIn,
-			subject: String(user.vk),
-			jwtid: String(token.id)
-		};
+			const opts: SignOptions = {
+				...BASE_OPTIONS,
+				expiresIn,
+				subject: String(user.vk),
+				jwtid: String(token.id)
+			};
 
-		return this.jwt.signAsync({}, opts);
+			return this.jwt.signAsync({}, opts);
+		} catch (err) {
+			this.logger.error(err);
+		}
 	}
 
-	public async resolveRefreshToken(
+	public resolveRefreshToken = async (
 		encoded: string
-	): Promise<{ user: NameEntity; token: RefreshTokenEntity }> {
-		const payload = await this.decodeRefreshToken(encoded);
-		const token = await this.getStoredTokenFromRefreshTokenPayload(payload);
+	): Promise<{ user: NameEntity; token: RefreshTokenEntity }> => {
+		try {
+			const payload = await this.decodeRefreshToken(encoded);
+			const token = await this.getStoredTokenFromRefreshTokenPayload(
+				payload
+			);
 
-		if (!token) {
-			throw new UnprocessableEntityException("Refresh token not found");
+			if (!token) {
+				throw new UnprocessableEntityException(
+					"Refresh token not found"
+				);
+			}
+
+			if (token.is_revoked) {
+				throw new UnprocessableEntityException("Refresh token revoked");
+			}
+
+			const user = await this.getUserFromRefreshTokenPayload(payload);
+
+			if (!user) {
+				throw new UnprocessableEntityException(
+					"Refresh token malformed"
+				);
+			}
+
+			return { user, token };
+		} catch (err) {
+			this.logger.error(err);
 		}
-
-		if (token.is_revoked) {
-			throw new UnprocessableEntityException("Refresh token revoked");
-		}
-
-		const user = await this.getUserFromRefreshTokenPayload(payload);
-
-		if (!user) {
-			throw new UnprocessableEntityException("Refresh token malformed");
-		}
-
-		return { user, token };
-	}
+	};
 
 	public async createAccessTokenFromRefreshToken(
 		refresh: string
 	): Promise<{ token: string; user: NameEntity }> {
-		const { user } = await this.resolveRefreshToken(refresh);
+		try {
+			const { user } = await this.resolveRefreshToken(refresh);
 
-		const token = await this.generateAccessToken(user);
+			const token = await this.generateAccessToken(user);
 
-		return { user, token };
+			return { user, token };
+		} catch (err) {
+			this.logger.error(err);
+		}
 	}
 
 	private async decodeRefreshToken(
@@ -104,24 +131,34 @@ export class TokensService {
 	private async getUserFromRefreshTokenPayload(
 		payload: RefreshTokenPayload
 	): Promise<NameEntity> {
-		const subId = payload.sub;
+		try {
+			const subId = payload.sub;
 
-		if (!subId) {
-			throw new UnprocessableEntityException("Refresh token malformed");
+			if (!subId) {
+				throw new UnprocessableEntityException(
+					"Refresh token malformed"
+				);
+			}
+			return NameEntity.findOne(subId);
+		} catch (err) {
+			this.logger.error(err);
 		}
-
-		return NameEntity.findOne(subId);
 	}
 
 	private async getStoredTokenFromRefreshTokenPayload(
 		payload: RefreshTokenPayload
 	): Promise<RefreshTokenEntity | null> {
-		const tokenId = payload.jti;
-        console.log(payload)
-		if (!tokenId) {
-			throw new UnprocessableEntityException("Refresh token malformed");
+		try {
+			const tokenId = payload.jti;
+			this.logger.log(payload);
+			if (!tokenId) {
+				throw new UnprocessableEntityException(
+					"Refresh token malformed"
+				);
+			}
+			return this.tokens.findTokenById(tokenId);
+		} catch (err) {
+			this.logger.error(err);
 		}
-
-		return this.tokens.findTokenById(tokenId);
 	}
 }

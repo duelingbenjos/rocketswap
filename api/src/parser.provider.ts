@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, Logger } from "@nestjs/common"
 import { IKvp } from "./types/misc.types"
 import { config } from "./config"
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity"
@@ -18,6 +18,7 @@ export class ParserProvider {
  private token_contract_list: string[]
  private action_que: { action: any; args: any }[] = []
  private action_que_processing: boolean
+ private logger: Logger = new Logger("ParserProvider");
 
  onModuleInit() {
   this.updateTokenList()
@@ -72,7 +73,7 @@ export class ParserProvider {
      }
    }
   } catch (err) {
-   console.error(err)
+   this.logger.error(err)
   }
  }
 
@@ -86,7 +87,7 @@ export class ParserProvider {
    await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp)
    await savePrice(state, this.socketService.handleClientUpdate)
   } catch (err) {
-   console.error(err)
+   this.logger.error(err)
   }
  }
 
@@ -94,10 +95,10 @@ export class ParserProvider {
   * by the parser. Assuming that it's a race condition causing it, this approach should be effective.
   */
 
- private executeActionQue =  async (action_que: { action: any; args: any }[]) => {
+ private executeActionQue = async (action_que: { action: any; args: any }[]) => {
   try {
    if (action_que.length) {
-    console.log(`ACTION QUE PROCESSING ${action_que.length} `)
+    this.logger.log(`ACTION QUE PROCESSING ${action_que.length} `)
     const { action, args } = this.action_que[0]
 		if (args) {
 			await action(args)
@@ -110,14 +111,14 @@ export class ParserProvider {
     this.action_que_processing = false
    }
   } catch (err) {
-   console.error(err)
+   this.logger.error(err)
    setTimeout(async () => this.executeActionQue(action_que), 1000)
   }
  }
 
  private addToActionQue = (action: any, args?) => {
   this.action_que.push({ action, args })
-  console.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
+  this.logger.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
   if (!this.action_que_processing) {
    this.action_que_processing = true
    this.executeActionQue(this.action_que)
