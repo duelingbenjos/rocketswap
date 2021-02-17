@@ -1,5 +1,5 @@
 import Lamden from 'lamden-js'
-import { config } from './config'
+import { config, connectionRequest, stamps } from './config'
 import BigNumber from 'bignumber.js'
 import { get } from 'svelte/store'
 import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue, bearerToken } from './store'
@@ -46,13 +46,15 @@ export const setBearerToken = (account = undefined) => {
 	}
 }
 
+export const stampsToTAU = (stampCost) => stampCost / stamps.currentRatio
+
 export const getBaseUrl = (url): string => {
   const parts = url.split(':')
   return `${parts[0]}:${parts[1]}`
 }
 
 export const checkForApproval = (account: string) => {
-  return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${config.contractName}`)
+  return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${connectionRequest.contractName}`)
     .then((res) => res.json())
     .then((json) => {
       return json.value as number
@@ -116,6 +118,16 @@ export const stringToFixed = (value: string, precision: number) => {
       return `${values[0]}.${values[1].substring(0, precision)}`
     }
   }
+}
+
+export const determinePrecision = (value) => {
+	if (isBigNumber(value)) value = value.toString()
+	let valueStripped = stripTrailingZero(value)
+	if (!valueStripped.includes(".")) return 0
+	else {
+		return valueStripped.split(".")[1].length
+	}
+
 }
 
 export const range = (size, startAt = 0) => [...Array(size).keys()].map((i) => i + startAt)
@@ -234,6 +246,7 @@ export const quoteCalculator = (tokenInfo) => {
 	}
 
 	const calcBuyPrice = (currencyAmount) => {
+		if (!currencyAmount) currencyAmount = toBigNumber("0")
 		let newCurrencyReserve = currencyReserves.plus(currencyAmount)
 		let newTokenReserve = k.dividedBy(newCurrencyReserve)
 		let tokensPurchased = tokenReserves.minus(newTokenReserve)
@@ -249,6 +262,7 @@ export const quoteCalculator = (tokenInfo) => {
 	}
 
 	const calcSellPrice = (tokenAmount) => {
+		if (!tokenAmount) tokenAmount = toBigNumber("0")
 		let newTokenReserve = tokenReserves.plus(tokenAmount)
 		let newCurrencyReserve = k.dividedBy(newTokenReserve)
 		let currencyPurchased = currencyReserves.minus(newCurrencyReserve)

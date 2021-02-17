@@ -35,7 +35,6 @@ let ParserProvider = class ParserProvider {
                     const token_is_valid = utils_1.validateTokenContract(contract_str);
                     if (token_is_valid) {
                         const add_token_dto = token_entity_1.prepareAddToken(state);
-                        this.addToActionQue(token_entity_1.saveToken, add_token_dto);
                         const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto;
                         this.addToActionQue(balance_entity_1.updateBalance, {
                             amount,
@@ -65,14 +64,12 @@ let ParserProvider = class ParserProvider {
                 else if (contract_name === config_1.config.identityContract) {
                     switch (fn) {
                         case 'setName':
-                            await name_entity_1.setName(state);
+                            this.addToActionQue(name_entity_1.setName, state);
                             break;
                         case 'auth':
                             this.authService.authenticate(state);
                             break;
                     }
-                }
-                else {
                 }
             }
             catch (err) {
