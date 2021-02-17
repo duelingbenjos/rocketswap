@@ -47,7 +47,7 @@
 	}
 
 	function handleTokenChange(e) {
-		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") saveStoreValue(tokenAmount, null)
+		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN" || e.detail.tokenAmount.isEqualTo(0)) saveStoreValue(tokenAmount, null)
 		else saveStoreValue(tokenAmount, e.detail.tokenAmount)
 
 		if (e.detail.selected) saveStoreValue(selectedToken, e.detail.selected)

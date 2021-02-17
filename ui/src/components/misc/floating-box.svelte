@@ -42,7 +42,7 @@
 
     const createUserColors = (list) => {
         list.map(message => {
-            if (!userColors[message.sender]) userColors[message.sender] = Math.floor(Math.random()*16777215).toString(16)
+            if (!userColors[message.sender]) userColors[message.sender] = Math.floor(Math.random()*15777215).toString(16)
         })
     }
 
@@ -116,6 +116,7 @@
         height: 31px;
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         border: 1px solid var(--text-primary-color-dim);
+        border-bottom: 0px;
         transition: 1s height ease-in-out;
     }
     .half-opacity{
@@ -167,6 +168,7 @@
         padding: 2px 10px;
         border: 1px solid var(--text-primary-color-dim);
         overflow-y: scroll;
+        background: var(--trollbox-message-bg);
     }
     .message{
         line-height: 1.3;
