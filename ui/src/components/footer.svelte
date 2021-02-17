@@ -5,12 +5,13 @@
 	//Misc
 	import { lwc_info, walletBalance, rocketState } from '../store'
 	import { config } from '../config'
-	import { formatAccountAddress, stringToFixed } from '../utils'
+	import { formatAccountAddress, stringToFixed, openNewTab } from '../utils'
 
 	//Components
 	import Spinner from './pulse-spinner.svelte'
 	import Rocket from '../icons/rocket.svelte'
-    import Smoke from '../icons/smoke.svelte'
+	import Smoke from '../icons/smoke.svelte'
+
 
 	//Services
 	import { WalletService } from '../services/wallet.service'
@@ -64,7 +65,7 @@
 
 	const connnectToWallet = () => walletService.connectToWallet();
 
-	const openWalletUrl = () => window.open(`${config.blockExplorer}/addresses/${$lwc_info.walletAddress}`);
+	const openWalletUrl = () => openNewTab(`${config.blockExplorer}/addresses/${$lwc_info.walletAddress}`);
 </script>
 
 <style>

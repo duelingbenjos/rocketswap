@@ -92,6 +92,9 @@ body {
 
   --wallet-info-text: var(--text-primary-color-dim);
 
+  --lamden-logo-color: #FFF;
+  --lamden-logo-border-color: #000;
+
   color: var(--text-primary-color);
 }
 
@@ -128,6 +131,9 @@ body.light{
   --toast-close-icon: var(--error-color-light);
 
   --wallet-info-text: var(--text-primary-color-inverted-dim);
+
+  --lamden-logo-color: #000;
+  --lamden-logo-border-color: #FFF;
 
   color: var(--text-primary-color);
 }
