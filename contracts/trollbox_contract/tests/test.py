@@ -9,7 +9,7 @@ class MyTestCase(unittest.TestCase):
         self.c = ContractingClient()
         self.c.flush()
 
-        with open('currency.s.py') as f:
+        with open('../currency.s.py') as f:
             code = f.read()
             self.c.submit(code, name='currency', constructor_args={'vk':'sys'})
 
@@ -66,10 +66,6 @@ class MyTestCase(unittest.TestCase):
         secret = "abc123"
         self.contract.auth(secret=secret)
         self.assertEqual(self.contract.auth_codes[secret], 'sys')
-
-
-    # def get_stamp_cost(self):
-    #     res = stamp_cost.current_value()
 
 
 if __name__ == '__main__':

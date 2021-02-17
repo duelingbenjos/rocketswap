@@ -1,11 +1,15 @@
+import currency
+
 ## State
 
 Owner = Variable()
+DevRewardWallet = Variable()
 Deposits = Hash(default_value = False)
 Withdrawals = Hash(default_value = False)
 CurrentEpochIndex = Variable()
 Epochs = Hash(default_value = False)
-Stash = Variable() # The total amount of token in the vault.
+Tally = Variable() # The total amount of farming token in the vault.
+Treasury = Variable() # The total amount of yield token left in the vault
 
 ## Constants
 
@@ -13,16 +17,17 @@ EPOCH_LENGTH = 60 # Length of Epoch in minutes
 EMISSION_RATE_HOURLY = 3000 # Per Hour
 EMISSION_RATE_PER_MIN = EMISSION_RATE_HOURLY / 60 # Per Minute
 EMISSION_RATE_PER_SEC = EMISSION_RATE_PER_MIN / 60 # Per Second
-
+DEV_REWARD = 0.1 # 10%
 
 @construct
 def seed():
-    Owner.set(ctx.signer)
+    Owner.set(ctx.caller)
+    DevRewardWallet.set(ctx.caller)
     CurrentEpochIndex.set(0)
-    Stash.set(0)
+    Tally.set(0)
     Epochs[0] = {
         "time": now,
-        "stash": 0
+        "tally": 0
     }
 
 @export
@@ -47,13 +52,15 @@ def incrementEpoch():
 
 def addTokensToEpochTally(amount: float):
     epoch_index = getCurrentEpochIndex()
-    Epochs[epoch_index]['stash'] += amount
+    Epochs[epoch_index]['tally'] += amount
 
 @export
-def addTokens(amount: float):
+def addFarmingTokens(amount: float):
     user = ctx.caller
+    currency.transfer_from(amount=amount,to=ctx.this,main_account=user)
+
     # Get time delta between now and last epoch
-    # If delta is greater then the minutes constant, begin the next epoch
+    # If delta is greater then the EPOCH_LENGTH, begin the next epoch
 
     current_epoch = getCurrentEpochDetails()
     time_delta = now - current_epoch['time']
@@ -75,10 +82,10 @@ def addTokens(amount: float):
 
     addTokensToEpochTally(amount=amount)
 
-    # Update the
+    # Update the tally amount.
 
-    stash = Stash.get()
-    Stash.set(stash + amount)
+    tally = Tally.get()
+    Tally.set(tally + amount)
 
 @export
 def withdrawTokensAndYield():
@@ -91,15 +98,15 @@ def withdrawTokensAndYield():
     for d in deposits:
         yield_to_harvest += calculateYield(starting_epoch_index=d.epoch, start_time=d.time, amount=d.amount)
         tokens_to_return += amount
-    # Send Tokens to user
+    # Send Farming Tokens to user
     
-    # Take % of Yield, send it to dev fund
+    # Take % of Yield Tokens, send it to dev fund
        
-    # Send Yield to user
+    # Send remanding Yield Tokens to user
 
     # Reset User's Deposits
 
-    # Remove token amount from Stash
+    # Remove token amount from Tally
 
 def calculateYield(starting_epoch_index:int, start_time, amount:float):
     current_epoch_index = getCurrentEpochIndex()
@@ -115,36 +122,8 @@ def calculateYield(starting_epoch_index:int, start_time, amount:float):
             delta = now - this_epoch['time']
         else:
             delta = next_epoch['time'] - this_epoch['time']
-        pct_share_of_stash = amount / Stash.get()
+        pct_share_of_tally = amount / Tally.get()
         global_yield_this_epoch = delta.seconds * EMISSION_RATE_PER_SEC
-        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stash
+        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_tally
         y += deposit_yield_this_epoch
     return y       
-
-@export
-def harvestYield():
-    ## stub
-    stub = True
-
-
-@export
-def testTime():
-    d1 = datetime.datetime(year = 2019, month = 10, day = 11, hour = 12, minute = 10, second = 10)
-    delta = now - d1
-
-    return delta.seconds
-
-@export
-def testWhile():
-    integer = 10
-    while integer > 0 :
-        integer -= 1
-
-
-
-# @export 
-# def get_delta_in_seconds(year:int, month: int, day: int, hour: int, minute: int, second: int):
-#     start_date
-
-# @export
-# def get_rate_last_hour
