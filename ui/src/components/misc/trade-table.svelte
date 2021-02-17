@@ -29,10 +29,10 @@
     .trade-table{
         overflow-y: auto;
         height: 100%;
-        max-height: 30vh;
-        max-width: 500px;
+        max-height: 16vh;
+        max-width: 430px;
         margin: 1rem auto 0;
-        opacity: 0.7;
+        opacity: 0.8;
         -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
         mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
     }
@@ -42,29 +42,7 @@
     }
 
     .trade-table::-webkit-scrollbar {
-        width: 10px;
-    }
-    /* Track */
-
-    .trade-table::-webkit-scrollbar-track {
-        -webkit-box-shadow: none;
-    }
-    /* Handle */
-
-    .trade-table::-webkit-scrollbar-thumb {
-        -webkit-box-shadow: none;
-        border-radius: 99px;
-        background: transparent;
-        border: 2px solid #ffffffaf;
-    }
-
-    .trade-table::-webkit-scrollbar-thumb:window-inactive {
-        background: transparent;
-        border: 2px solid #ffffffaf;
-    }
-        .trade-table::-webkit-scrollbar-thumb:hover {
-        background: #ffffff;
-        border: 2px solid #ffffff;
+        display: none;
     }
 
     @media screen and (max-width: 800px) {

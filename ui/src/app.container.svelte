@@ -38,30 +38,54 @@
       show_token_select = update
     })
     // TO DO REMOVE THIS!! 
-    /*
+/*
     toastService.addToast({ 
+        icon: "buyToken",
 				heading: `TESTING TOAST!`,
-				text: `You have a new toast You have a new toast You have a new toast You have a new toasttttttttttttttttttttttttttttttttttttt`, 
-				type: 'info',
+				text: `You have a new info toast You have a new info toast You have a new info toast You have a new info toast You have a new info toast`, 
+        type: 'info',
+        link: {
+          text: "explorer",
+          href: "https://www.google.ca",
+          icon: "popout"
+        },
 				duration: 7000000
     })
 
     toastService.addToast({ 
+        icon: "sellToken",
 				heading: `TESTING TOAST!`,
-				text: `You have a new toast`, 
-				type: 'error',
+				text: `You have a new ERROR toast`, 
+        type: 'error',
+        link: {
+          text: "explorer",
+          href: "https://www.google.ca",
+          icon: "popout"
+        },
 				duration: 7000000
     })
     toastService.addToast({ 
+      icon: "gaugePlus",
 				heading: `TESTING TOAST!`,
-				text: `You have a new toast`, 
-				type: 'warning',
+				text: `You have a new WARNING toast`, 
+        type: 'warning',
+        link: {
+          text: "explorer",
+          href: "https://www.google.ca",
+          icon: "popout"
+        },
 				duration: 7000000
     })
     toastService.addToast({ 
+        icon: "userAuth",
 				heading: `TESTING TOAST!`,
-				text: `You have a new toast`, 
-				type: 'success',
+				text: `You have a SUCCESS new toast`, 
+        type: 'success',
+        link: {
+          text: "explorer",
+          href: "https://www.google.ca",
+          icon: "popout"
+        },
 				duration: 7000000
     })
     */

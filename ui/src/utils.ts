@@ -53,6 +53,10 @@ export const getBaseUrl = (url): string => {
   return `${parts[0]}:${parts[1]}`
 }
 
+export const openNewTab = (url) => window.open(url);
+
+export const createBlockExplorerLink = (route, id) => `${config.blockExplorer}/${route}/${id}`
+
 export const checkForApproval = (account: string) => {
   return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${connectionRequest.contractName}`)
     .then((res) => res.json())
