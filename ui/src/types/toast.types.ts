@@ -1,4 +1,6 @@
 export type ToastMetaType = {
+  icon?: string,
+  link?: any,
   heading: string
   type: ToastType
   text?: string

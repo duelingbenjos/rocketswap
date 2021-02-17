@@ -3,8 +3,14 @@ import axios from 'axios'
 import { config, stamps, connectionRequest } from '../config'
 import { lwc_info, accountName, ws_id, walletBalance } from '../store'
 import { get } from 'svelte/store'
-import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
-import { refreshTAUBalance, refreshLpBalances, setBearerToken, toBigNumber, stringToFixed, stampsToTAU } from '../utils'
+import { 
+	refreshTAUBalance, 
+	refreshLpBalances, 
+	setBearerToken, 
+	toBigNumber, 
+	stringToFixed, 
+	stampsToTAU, 
+	createBlockExplorerLink } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -146,10 +152,11 @@ export class WalletService {
 		if (res?.data[0]?.value) {
 			accountName.set(res.data[0].value)
 			this.toastService.addToast({ 
+				icon: "rocketswapLogo",
 				heading: `Hello ${get(accountName)}!`,
 				text: `Welcome back to RocketSwap!`, 
 				type: 'info',
-				duration: 3000
+				duration: 300000
 			})
 		}
 	}
@@ -185,10 +192,16 @@ export class WalletService {
 					setTimeout(checkForName, 1000)
 				}else{
 					this.toastService.addToast({ 
+						icon: "rocketswapLogo",
 						heading: `Hello ${get(accountName)}!`,
 						text: `You have created a Rocket ID on the blockchain. You can now log into the Troll Box!`, 
 						type: 'success',
-						duration: 5000
+						duration: 5000,
+						link:{
+							href: createBlockExplorerLink("transactions", res.data.txHash),
+							icon: "popout",
+							text: "explorer"
+						}
 					})
 				}
 			}
@@ -210,12 +223,19 @@ export class WalletService {
 	private handleAuth = (res, callbacks) => {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
+			console.log(res.data)
 			callbacks.success()
 			this.toastService.addToast({ 
+				icon: "userAuth",
 				heading: `Rocket ID Authenticated!`,
 				text: `You can now use the Troll Box. Don't be too much of a Degen.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 		}
 	}
@@ -261,10 +281,16 @@ export class WalletService {
 			})
 			lpPoints = toBigNumber(lpPoints)
 			this.toastService.addToast({ 
+				icon: "gaugePlus",
 				heading: `Created Supply for ${selectedToken.token_symbol}!`,
 				text: `You have created liquidity for ${selectedToken.token_name} / ${config.currencySymbol}.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			callbacks.success()
 		}
@@ -312,10 +338,16 @@ export class WalletService {
 			})
 			lpPoints = toBigNumber(lpPoints)
 			this.toastService.addToast({
+				icon: "gaugePlus",
 				heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
 				text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -342,10 +374,16 @@ export class WalletService {
 			})
 			lpPoints = toBigNumber(lpPoints)
 			this.toastService.addToast({ 
+				icon: "gaugeMinus",
 				heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
 				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -378,10 +416,16 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
+				icon: "buyToken",
 				heading: `Swap Completed!`,
 				text: `You have swapped ${config.currencySymbol} for ${selectedToken.token_symbol}.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -411,10 +455,16 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
+				icon: "sellToken",
 				heading: `Swap Completed!`,
 				text: `You have swapped ${selectedToken.token_symbol} for ${config.currencySymbol}.`, 
 				type: 'success',
-				duration: 10000
+				duration: 10000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
 		}

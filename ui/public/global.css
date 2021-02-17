@@ -19,7 +19,7 @@ body {
   font-family: 'Mukta';
   overflow: hidden;
 
-  --color-primary-light: #41e4b8;
+  --color-primary-light: #e4fff8;
   --color-primary: #24ffbd;
   --color-primary-dark: #b8dfff;
 
@@ -31,10 +31,21 @@ body {
   --color-gray-4: #888888;
   --color-gray-5: #5e5e5e;
 
+
+  --success-color-light: #f2fffc;
   --success-color: var(--color-primary);
+  --success-color-dark: #00986b;
+
   --info-color: var(--color-gray-3); 
+  --info-color-dark: var(--text-primary-color-dim);
+
+  --warning-color-light: #f9f9f9;
   --warning-color: #ffcf3b;
+  --warning-color-dark: #ac8400;
+
+  --error-color-light: #fff8f8;
   --error-color: #ea4c1c;
+  --error-color-dark: #861f00;
 
   --text-primary-color: #fff;
   --text-primary-color-dim: #ffffffb8;
@@ -43,8 +54,6 @@ body {
   --text-primary-color-inverted: #120e4a;
   --text-primary-color-inverted-dim: #120e4a;
   --text-primary-color-inverted-dimmer: #120e4a;
-
-
 
   --text-size-xsmall: 0.7em; 
   --text-size-small: 0.9em;
@@ -76,7 +85,10 @@ body {
   --msg-box-background: #2b284b;
 
   --toast-background: var(--modal-background-primary);
-  --toast-background-error: #ff0000;
+  --toast-background-success: var(--success-color-dark);
+  --toast-background-warning: var(--warning-color-dark);
+  --toast-background-error: var(--error-color-dark);
+  --toast-icon-color: var(--text-primary-color-dim);
 
   --wallet-info-text: var(--text-primary-color-dim);
 
@@ -110,7 +122,10 @@ body.light{
   --modal-background-secondary: #673ab712;
   --msg-box-background: #f0f0f0;
 
-  --toast-background-error: #fff1f1;
+  --toast-background-success: var(--success-color-light);
+  --toast-background-warning: var(--warning-color-light);
+  --toast-background-error: var(--error-color-light);
+  --toast-close-icon: var(--error-color-light);
 
   --wallet-info-text: var(--text-primary-color-inverted-dim);
 
@@ -255,6 +270,11 @@ body.light{
 .flex-center-spacebetween{
   align-items: center;
   justify-content: space-between;
+}
+
+.flex-center-end{
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .flex-align-center{
