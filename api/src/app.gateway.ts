@@ -151,7 +151,7 @@ export class AppGateway
 			const { socket_id, payload } = auth_response;
 			this.wss.to(socket_id).emit("auth_response", payload);
 		} catch (err) {
-			console.log(err);
+			this.logger.error(err);
 		}
 	};
 
@@ -177,7 +177,7 @@ export class AppGateway
 	}
 
 	private async handleJoinBalanceFeed(vk: string, client: Socket) {
-		console.log(`${vk} joined balance feed`);
+		// console.log(`${vk} joined balance feed`);
 		try {
 			let balances: any = await BalanceEntity.findOne(vk);
 			if (!balances)
