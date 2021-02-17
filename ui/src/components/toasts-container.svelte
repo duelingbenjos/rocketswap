@@ -103,6 +103,10 @@
 		background-color: var(--toast-background);
 
 		min-height: 50px;
+
+		box-shadow: -8px 7px 12px -6px rgba(0, 0, 0, 0.3);  
+		-webkit-box-shadow: -8px 7px 12px -6px rgba(0, 0, 0, 0.3);
+		-moz-box-shadow: -8px 7px 12px -6px rgba(0, 0, 0, 0.3);
 	}
 	.toast-icon{
 		padding: 5px 10px 0 0;

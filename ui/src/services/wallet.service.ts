@@ -156,7 +156,7 @@ export class WalletService {
 				heading: `Hello ${get(accountName)}!`,
 				text: `Welcome back to RocketSwap!`, 
 				type: 'info',
-				duration: 300000
+				duration: 3000
 			})
 		}
 	}
