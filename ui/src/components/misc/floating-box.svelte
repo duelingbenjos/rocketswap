@@ -113,7 +113,7 @@
         right: 48px;
         background: var(--modal-background-primary);
         width: 450px;
-        height: 30px;
+        height: 31px;
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         border: 1px solid var(--text-primary-color-dim);
         transition: 1s height ease-in-out;

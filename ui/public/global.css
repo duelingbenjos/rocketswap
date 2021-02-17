@@ -692,7 +692,8 @@ input.input-amount-value::placeholder {
   margin-top: 15px;
   padding: 30px;
   background: var(--panel-background-gradient);
-  width: 380px;
+  width: 100%;
+  max-width: 430px;
   border-radius: 32px;
 
   box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
