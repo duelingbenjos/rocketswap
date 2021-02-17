@@ -5,7 +5,8 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { NameEntity } from "../entities/name.entity";
 
 export interface AccessTokenPayload {
-	sub: number;
+	sub: string;
+	exp: number;
 }
 
 @Injectable()
@@ -15,19 +16,19 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	public constructor(logger: Logger) {
 		super({
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			ignoreExpiration: false,
+			ignoreExpiration: true,
 			secretOrKey: "<SECRET KEY>",
 			signOptions: {
-				expiresIn: "5m"
+				expiresIn: "1m"
 			}
 		});
 	}
 
 	async validate(payload: AccessTokenPayload): Promise<NameEntity> {
-		const { sub: vk } = payload;
+		const { sub: vk, exp } = payload;
 		const user = await NameEntity.findOne(vk);
 
-		if (!user) {
+		if (!user || Date.now() > exp) {
 			throw new UnauthorizedException();
 		}
 		return user;
