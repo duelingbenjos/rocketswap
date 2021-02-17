@@ -397,7 +397,6 @@ export class WalletService {
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
 			let results = await this.callApprove('currency', currencyAmount)
-			if (walletBalance)
 			if (results){
 				this.sendTransaction(
 					connectionRequest.contractName, 
@@ -428,6 +427,8 @@ export class WalletService {
 				}
 			})
 			if (callbacks) callbacks.success()
+		}else{
+			if (callbacks) callbacks.error()
 		}
 	}
 
@@ -447,6 +448,8 @@ export class WalletService {
 					callbacks, 
 					(res) => this.handleSwapSell(res, selectedToken, callbacks)
 				)
+			}else{
+				if (callbacks) callbacks.error()
 			}
 		}
 	}
@@ -564,6 +567,11 @@ export class WalletService {
 				if (err || !res) resolve(false)
 				if (res === true) resolve(true)
 				else {
+					console.log(res.status)
+					if (res.status === "Transaction Cancelled") {
+						this.handleTxErrors(res.data.errors)
+						resolve(false)
+					}
 					if (res?.data?.txBlockResult?.status === 0) resolve(true)
 					else resolve(false)
 				}
