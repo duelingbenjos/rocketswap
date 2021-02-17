@@ -2,7 +2,7 @@
     export let trade;
 
     //Icons
-    import Rocket from '../../icons/rocket.svelte'
+    import RocketswapLogo from '../../icons/rocketswap-logo.svelte'
 
     //Misc
     import { stringToFixed } from '../../utils'
@@ -62,7 +62,7 @@
 
 <div class="trade flex-row">
     <div class="icon flex flex-center-center">
-        <Rocket 
+        <RocketswapLogo 
             width="20px" 
             color={trade.type === "buy" ? "var(--success-color)" : "var(--error-color)"} 
             direction={trade.type === "buy" ? "up-right" : "down-left"}
