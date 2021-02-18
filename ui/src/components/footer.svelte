@@ -11,7 +11,7 @@
 	import Spinner from './pulse-spinner.svelte'
 	import Rocket from '../icons/rocket.svelte'
 	import Smoke from '../icons/smoke.svelte'
-
+	import TrollBoxButton from './misc/troll-box-button.svelte'
 
 	//Services
 	import { WalletService } from '../services/wallet.service'
@@ -70,27 +70,30 @@
 
 <style>
 	.footer {
+		position: fixed;
+		bottom: 20px;
+
+		display: flex;
+		align-items: center;
+		
 		background-color: transparent;
 		z-index: 101;
 		width: 100%;
-		display: flex;
-		align-items: center;
-		position: fixed;
-		bottom: 15px;
+		padding: 0 20px;
+
 		color: var(--wallet-info-text);
 	}
 	.wallet-info {
 		position: relative;
 		min-height: 35px;
 		background-color: var(--color-secondary);
-		margin-left: 48px;
 		border-radius: var(--border-radius);
 		font-size: var(--text-size-large);
 		padding-left: 12px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		min-width: 230px;
+		
 	}
 	.balance {
 		padding-left: 8px;
@@ -120,6 +123,23 @@
 		display: none;
 		top: -59px;
 	}
+
+
+	/* When page width is greater than 650px (tablets) */
+    @media screen and (min-width: 430px) {
+        .wallet-info{
+			min-width: 230px;
+        }
+    }
+	/* When page width is greater than 650px (tablets) */
+    @media screen and (min-width: 650px) {
+		.footer{
+			bottom: 35px;
+		}
+        .wallet-info{
+            margin-left: 48px;
+        }
+    }
 </style>
 
 

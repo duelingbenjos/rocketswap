@@ -4,18 +4,24 @@
         background-color: var(--msg-box-background);
         color: var(--text-primary-color);
         font-size: var(--text-size-small);
-        border-radius: var(--border-radius);
-        padding: 30px;
+        border-radius: 0;
+        padding: 10px 20px;
         box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
         -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
         -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
         padding-top: 15px;
         width: 100%;
     }
-    @media screen and (max-width: 800px) {
-        div {
-            border-radius: 0px;
+
+    @media screen and (min-width: 430px) {
+        div{
+            padding: 30px;
+            border-radius: var(--border-radius);
         }
+    }
+
+    @media screen and (min-width: 650px) {
+
     }
 </style>
 

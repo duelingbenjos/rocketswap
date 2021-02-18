@@ -27,6 +27,7 @@
 
 <style>
     .trade-table{
+        display: none;
         overflow-y: auto;
         height: 100%;
         max-height: 16vh;
@@ -45,9 +46,9 @@
         display: none;
     }
 
-    @media screen and (max-width: 800px) {
+    @media screen and (min-width: 650px) {
         .trade-table {
-            display: none;
+            display: flex;
         }
     }
 </style>

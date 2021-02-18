@@ -22,6 +22,9 @@ export const walletIsReady = derived(lwc_info, ($lwc_info) => {
   return $lwc_info.installed === true && $lwc_info.locked === false && $lwc_info.approved === true && $lwc_info.walletAddress.length > 0
 })
 
+export const mainMenuOpen = writable(false);
+export const trollBoxOpen = writable(null);
+
 export const walletBalance = writable(toBigNumber('0'))
 export const tokenBalances = writable({})
 export const lpBalances = writable({})
