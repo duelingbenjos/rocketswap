@@ -27,8 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	async validate(payload: AccessTokenPayload): Promise<NameEntity> {
 		const { sub: vk, exp } = payload;
 		const user = await NameEntity.findOne(vk);
-
-		if (!user || Date.now() > exp) {
+		if (!user || Date.now() > exp*1000) {
 			throw new UnauthorizedException();
 		}
 		return user;
