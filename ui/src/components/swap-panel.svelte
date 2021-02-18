@@ -61,12 +61,13 @@
 </script>
 
 <style>
-.plus-sign{
-	display: flex;
-	justify-content: center;
-	text-align: center;
-	padding: 1rem 0;
-}
+	.plus-sign{
+		display: flex;
+		justify-content: center;
+		text-align: center;
+		padding: 5px 0;
+	}
+
 </style>
 
 <div class="panel-container">

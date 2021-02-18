@@ -24,7 +24,7 @@
 	.header {
 		width: 100%;
 		align-items: center;
-		padding: 40px 20px;
+		padding: 20px;
 		box-sizing: border-box;
 		justify-content: space-between;
 	}
@@ -77,6 +77,9 @@
         .wallet-info{
 			min-width: 230px;
         }
+		.header{
+			padding: 40px 20px;
+		}
     }
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {

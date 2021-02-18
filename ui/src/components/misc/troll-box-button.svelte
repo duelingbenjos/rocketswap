@@ -16,7 +16,7 @@
         bottom: 20px;
         right: 20px;
         z-index: 103;
-        padding: 10px 14px;
+        padding: 8px 12px;
         border-radius: 99px;
         background: var(--color-secondary);
 
@@ -31,15 +31,37 @@
 	    -webkit-box-shadow: -1px 8px 23px 0px rgba(0, 0, 0, 0.5);
 	    -moz-box-shadow: -1px 8px 23px 0px rgba(0, 0, 0, 0.5);
     }
+    .large{
+        display: none;
+    }
+    @media screen and (min-width: 430px) {
+        button{
+            display: none;
+            padding: 10px 14px;
+        }
+        .small{
+            display: none;
+        }
+        .large{
+            display: block;
+        }
+    }
 
     /* When page width is greater than 900px (tablets) */
     @media screen and (min-width: 900px) {
         button{
             display: none;
         }
+
     }
 </style>
 
 <button on:click={handelClick}>
-    <TrollIcon width="40px" color="var(--color-white)" />
+    <div class="small">
+        <TrollIcon width="25px" color="var(--color-white)" />
+    </div>
+    <div class="large">
+        <TrollIcon width="40px" color="var(--color-white)" />
+    </div>
+    
 </button>

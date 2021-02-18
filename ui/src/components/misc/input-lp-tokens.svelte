@@ -36,10 +36,10 @@
         outline: none;
 
         width: 100%; 
-        height: 3px; 
+        height: 2px; 
         background: #ffffffbd; 
-        margin: 2rem 0;
-        padding: 3px;
+        margin: 1.5rem 0 1rem;
+        padding: 2px;
     }
 
     input[type="range"]:hover{
@@ -50,8 +50,8 @@
         -webkit-appearance: none;
         appearance: none;
         border-radius: 99px;
-        width: 25px;
-        height: 25px;
+        width: 20px;
+        height: 20px;
         background: var(--text-primary-color);
         cursor: pointer;
     }
@@ -61,8 +61,8 @@
     }
 
     input[type="range"]:active::-webkit-slider-thumb {
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
         filter: brightness(120%);
     }
 
@@ -71,13 +71,34 @@
     }
 
     .big-number{
-        font-size: var(--text-size-massive);
+        font-size: var(--text-size-xlarge);
         margin: 0;
         line-height: 1;
     }
 
     .input-row-3{
         justify-content: space-between;
+    }
+
+    @media screen and (min-width: 430px) {
+        .big-number{
+            font-size: var(--text-size-massive);
+        }
+        input[type="range"]{
+            height: 3px; 
+            margin: 2rem 0;
+            padding: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            width: 25px;
+            height: 25px;
+        }
+
+        input[type="range"]:active::-webkit-slider-thumb {
+            width: 22px;
+            height: 22px;
+        }
     }
 
 </style>
