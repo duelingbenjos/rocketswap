@@ -36,7 +36,6 @@
     }
     @media screen and (min-width: 430px) {
         button{
-            display: none;
             padding: 10px 14px;
         }
         .small{
