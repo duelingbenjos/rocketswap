@@ -11,8 +11,8 @@ Deposits = Hash(default_value = False)
 Withdrawals = Hash(default_value = False)
 CurrentEpochIndex = Variable()
 Epochs = Hash(default_value = False)
-Staked = Variable() # The total amount of farming token in the vault.
-Yield = Variable() # The total amount of yield token left in the vault
+StakedBalance = Variable() # The total amount of farming token in the vault.
+YieldReserves = Variable() # The total amount of yield token left in the vault
 
 ## Constants
 
@@ -26,8 +26,8 @@ def seed():
     Owner.set(ctx.caller)
     DevRewardWallet.set(ctx.caller)
     CurrentEpochIndex.set(0)
-    Staked.set(0)
-    Yield.set(0)
+    StakedBalance.set(0)
+    YieldReserves.set(0)
     Epochs[0] = {
         "time": now,
         "staked": 0
@@ -43,9 +43,9 @@ def addFarmingTokens(amount: float):
     currency.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     # Update the Staked amount
-    staked = Staked.get()
+    staked = StakedBalance.get()
     new_staked_amount = staked + amount
-    Staked.set(new_staked_amount)
+    StakedBalance.set(new_staked_amount)
 
     # Update the Epoch
     new_epoch_idx = incrementEpoch(new_staked_amount=new_staked_amount)
@@ -92,12 +92,12 @@ def withdrawTokensAndYield():
     Deposits[user] = False
 
     # Remove token amount from Staked
-    new_staked_amount = Staked.get() - stake_to_return
-    Staked.set(new_staked_amount)
+    new_staked_amount = StakedBalance.get() - stake_to_return
+    StakedBalance.set(new_staked_amount)
 
     # Remove withdrawn yield from Yield
-    new_yield_amount = Yield.get() - yield_to_harvest
-    Yield.set(new_yield_amount)
+    new_yield_amount = YieldReserves.get() - yield_to_harvest
+    YieldReserves.set(new_yield_amount)
 
     # Increment Epoch
     incrementEpoch(new_staked_amount = new_yield_amount)
