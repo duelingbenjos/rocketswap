@@ -1,10 +1,16 @@
 import WalletController from 'lamden_wallet_controller'
 import axios from 'axios'
-import { config } from '../config'
-import { lwc_info, accountName, ws_id, bearerToken } from '../store'
+import { config, stamps, connectionRequest } from '../config'
+import { lwc_info, accountName, ws_id, walletBalance } from '../store'
 import { get } from 'svelte/store'
-import type { WalletType, WalletErrorType, WalletInitType, WalletConnectedType } from '../types/wallet.types'
-import { refreshTAUBalance, refreshLpBalances, setBearerToken, toBigNumber, stringToFixed } from '../utils'
+import { 
+	refreshTAUBalance, 
+	refreshLpBalances, 
+	setBearerToken, 
+	toBigNumber, 
+	stringToFixed, 
+	stampsToTAU, 
+	createBlockExplorerLink } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -16,8 +22,9 @@ export class WalletService {
 	private toastService = ToastService.getInstance()
 	private wsService = WsService.getInstance()
 	private _ws_joined: boolean = false
-	private connectionRequest = config;
+	private connectionRequest = connectionRequest;
 	private installChecker = null;
+
 
 	public static getInstance() {
 		if (!WalletService._instance) {
@@ -94,13 +101,43 @@ export class WalletService {
 		])
 	}
 
-	private createTxInfo(method: string, args, contractName = undefined) {
+	private getStampCost = async (contractName, method) => {
+		let stampsInfo = await axios.get(`${config.blockExplorer}/api/stamps/${contractName}/${method}`)
+		let maxStamps = stampsInfo?.data?.max
+		if (!maxStamps) maxStamps = stamps.defaultValue
+		else maxStamps + stamps.buffer
+		return maxStamps
+	}
+
+	public estimateTxCosts = async (txInfo) => {
+		let results = await Promise.all(txInfo.map(info => this.getStampCost(info.contract, info.method)))
+		return results.reduce((a: number, b: number) => a + b, 0)
+	}
+
+	private userHasSufficientStamps = (stampCost, callbacks = undefined) => {
+		console.log({stampCost})
+		if (stampsToTAU(stampCost) < get(walletBalance)) return true
+		if (callbacks) callbacks.error(["Insufficient Stamps"])
+		this.insufficientCurrencyForTransactionToast(stampCost)
+		return false;
+	}
+
+	private createTxInfo = (method, args, stamps, contractName = undefined) => {
+		contractName = contractName ? contractName : connectionRequest.contractName
 		return {
 			contractName,
 			methodName: method,
-			networkType: config.networkType,
-			stampLimit: 100, //TODO Populate with blockexplorer stamp info endpoint
+			networkType: connectionRequest.networkType,
+			stampLimit: stamps,
 			kwargs: args
+		}
+	}
+
+	private sendTransaction = async (contractName, method, args, callbacks, callback) => {
+		let stampCost = await this.getStampCost(contractName, method)
+		console.log(stampCost)
+		if (this.userHasSufficientStamps(stampCost, callbacks)){
+			this.lwc.sendTransaction(this.createTxInfo(method, args, stampCost, contractName), callback)
 		}
 	}
 
@@ -112,10 +149,10 @@ export class WalletService {
 			"key": account
 		  }]
 		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`,body)
-		  console.log(res)
 		if (res?.data[0]?.value) {
 			accountName.set(res.data[0].value)
 			this.toastService.addToast({ 
+				icon: "rocketswapLogo",
 				heading: `Hello ${get(accountName)}!`,
 				text: `Welcome back to RocketSwap!`, 
 				type: 'info',
@@ -137,7 +174,13 @@ export class WalletService {
 	}
 
 	public createAccountName = async (name, callbacks = undefined) => {
-		this.lwc.sendTransaction(this.createTxInfo("setName", {name}, config.namesContract), (res) => this.handleCreateAccountName(res, callbacks))
+		this.sendTransaction(
+			config.namesContract, 
+			"setName", 
+			{name}, 
+			callbacks, 
+			(res) => this.handleCreateAccountName(res, callbacks)
+		)
 	}
 
 	private handleCreateAccountName = (res, callbacks) => {
@@ -149,10 +192,16 @@ export class WalletService {
 					setTimeout(checkForName, 1000)
 				}else{
 					this.toastService.addToast({ 
+						icon: "rocketswapLogo",
 						heading: `Hello ${get(accountName)}!`,
 						text: `You have created a Rocket ID on the blockchain. You can now log into the Troll Box!`, 
 						type: 'success',
-						duration: 5000
+						duration: 5000,
+						link:{
+							href: createBlockExplorerLink("transactions", res.data.txHash),
+							icon: "popout",
+							text: "explorer"
+						}
 					})
 				}
 			}
@@ -161,42 +210,64 @@ export class WalletService {
 		}
 	}
 
-	public sendAuth = (callbacks) => {
-		this.lwc.sendTransaction(this.createTxInfo("auth", {secret: get(ws_id)}, config.namesContract), (res) => this.handleAuth(res, callbacks))
-
+	public sendAuth = async (callbacks) => {
+		this.sendTransaction(
+			config.namesContract, 
+			"auth", 
+			{secret: get(ws_id)}, 
+			callbacks, 
+			(res) => this.handleAuth(res, callbacks) 
+		)
 	}
 
 	private handleAuth = (res, callbacks) => {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
+			console.log(res.data)
 			callbacks.success()
 			this.toastService.addToast({ 
+				icon: "userAuth",
 				heading: `Rocket ID Authenticated!`,
 				text: `You can now use the Troll Box. Don't be too much of a Degen.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 		}
 	}
 
-	getApprovedAmount = async (vk: string, contract: string) => {
-		return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${config.contractName}`)
-				.then((res) => res.json())
-				.then((json) => json.value)
-				.catch((e) => console.log(e.message))
-	}
-
 	public async createMarket(args, selectedToken, tokenAmount, currencyAmount, callbacks = undefined) {
-		let results = await Promise.all([
-			this.callApprove(args.contract, tokenAmount),
-			this.callApprove('currency', currencyAmount)
-		])
-
-		if (results.every(v => v === true)){
-			this.lwc.sendTransaction(this.createTxInfo('create_market', args), (res) => this.handleCreateMarket(res, selectedToken, callbacks))
-		}else{
-			if (callbacks) callbacks.error()
+		let txList = [{contract: connectionRequest.contractName, method: "create_market"}]
+		if (await this.needsApproval('currency', currencyAmount)){
+			txList.push({contract: 'currency', method: "approve"})
 		}
+		if (await this.needsApproval(args.contract, tokenAmount)){
+			txList.push({contract: args.contract, method: "approve"})
+		}
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			let results = await Promise.all([
+				this.callApprove(args.contract, tokenAmount),
+				this.callApprove('currency', currencyAmount)
+			])
+	
+			if (results.every(v => v === true)){
+				this.sendTransaction(
+					connectionRequest.contractName, 
+					"create_market", 
+					args, 
+					callbacks, 
+					(res) => this.handleCreateMarket(res, selectedToken, callbacks)
+				)
+			}else{
+				if (callbacks) callbacks.error()
+			}
+		}
+
 	}
 
 	private handleCreateMarket = (res, selectedToken, callbacks=undefined) => {
@@ -204,28 +275,55 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = "0";
 			res.data.txBlockResult.state.forEach(stateChange => {
-				if (stateChange.key === `${config.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`){
+				if (stateChange.key === `${connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`){
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
 			lpPoints = toBigNumber(lpPoints)
 			this.toastService.addToast({ 
+				icon: "gaugePlus",
 				heading: `Created Supply for ${selectedToken.token_symbol}!`,
 				text: `You have created liquidity for ${selectedToken.token_name} / ${config.currencySymbol}.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			callbacks.success()
 		}
 	}
 
 	public async addLiquidity(args, selectedToken, tokenAmount, currencyAmount, callbacks = undefined) {
-		let results = await Promise.all([this.callApprove(args.contract, tokenAmount), this.callApprove('currency', currencyAmount)])
-
-		if (results.every(v => v === true)){
-			this.lwc.sendTransaction(this.createTxInfo('add_liquidity', args), (res) => this.handleAddLiquidity(res, selectedToken, callbacks))
-		}else{
-			if (callbacks) callbacks.error();
+		let txList = [{contract: connectionRequest.contractName, method: "add_liquidity"}]
+		if (await this.needsApproval('currency', currencyAmount)){
+			txList.push({contract: 'currency', method: "approve"})
+		}
+		if (await this.needsApproval(args.contract, tokenAmount)){
+			txList.push({contract: args.contract, method: "approve"})
+		}
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			let results = await Promise.all(
+				[
+					this.callApprove(args.contract, tokenAmount), 
+					this.callApprove('currency', currencyAmount)
+				]
+			)
+	
+			if (results.every(v => v === true)){
+				this.sendTransaction(
+					connectionRequest.contractName, 
+					"add_liquidity", 
+					args, 
+					callbacks, 
+					(res) => this.handleAddLiquidity(res, selectedToken, callbacks)
+				)
+			}else{
+				if (callbacks) callbacks.error();
+			}
 		}
 	}
 
@@ -240,17 +338,29 @@ export class WalletService {
 			})
 			lpPoints = toBigNumber(lpPoints)
 			this.toastService.addToast({
+				icon: "gaugePlus",
 				heading: `Added Liquidity to ${selectedToken.token_symbol}!`,
 				text: `You have added liquidity to ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
 		}
 	}
 
 	public async removeLiquidity(args, selectedToken, callbacks) {
-		this.lwc.sendTransaction(this.createTxInfo('remove_liquidity', args), (res) => this.handleRemoveLiquidity(res, selectedToken, callbacks))
+		this.sendTransaction(
+			connectionRequest.contractName, 
+			"remove_liquidity", 
+			args, 
+			callbacks, 
+			(res) => this.handleRemoveLiquidity(res, selectedToken, callbacks)
+		)
 	}
 
 	private handleRemoveLiquidity = (res, selectedToken, callbacks = undefined) => {
@@ -264,21 +374,40 @@ export class WalletService {
 			})
 			lpPoints = toBigNumber(lpPoints)
 			this.toastService.addToast({ 
+				icon: "gaugeMinus",
 				heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
 				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
 		}
 	}
 
 	public async swapBuy(args, selectedToken, currencyAmount, callbacks = undefined) {
-		let results = await this.callApprove('currency', currencyAmount)
-		if (results){
-			this.lwc.sendTransaction(this.createTxInfo('buy', args), (res) => this.handleSwapBuy(res, selectedToken, callbacks))
-		}else{
-			if (callbacks) callbacks.error();
+		let txList = [{contract: connectionRequest.contractName, method: "buy"}]
+		if (await this.needsApproval('currency', currencyAmount)){
+			txList.push({contract: 'currency', method: "approve"})
+		}
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			let results = await this.callApprove('currency', currencyAmount)
+			if (results){
+				this.sendTransaction(
+					connectionRequest.contractName, 
+					"buy", 
+					args, 
+					callbacks, 
+					(res) => this.handleSwapBuy(res, selectedToken, callbacks)
+				)
+			}else{
+				if (callbacks) callbacks.error();
+			}
 		}
 	}
 
@@ -286,21 +415,42 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
+				icon: "buyToken",
 				heading: `Swap Completed!`,
 				text: `You have swapped ${config.currencySymbol} for ${selectedToken.token_symbol}.`, 
 				type: 'success',
-				duration: 5000
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
+		}else{
+			if (callbacks) callbacks.error()
 		}
 	}
 
 	public async swapSell(args, selectedToken, tokenAmount, callbacks = undefined) {
-		let results = await this.callApprove(args.contract, tokenAmount)
-		if (results){
-			this.lwc.sendTransaction(this.createTxInfo('sell', args), (res) => this.handleSwapSell(res, selectedToken, callbacks))
-		}else{
-			if (callbacks) callbacks.error();
+		let txList = [{contract: connectionRequest.contractName, method: "sell"}]
+		if (await this.needsApproval(args.contract, tokenAmount)){
+			txList.push({contract: args.contract, method: "approve"})
+		}
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			let results = await this.callApprove(args.contract, tokenAmount)
+			if (results){
+				this.sendTransaction(
+					connectionRequest.contractName, 
+					"sell", 
+					args, 
+					callbacks, 
+					(res) => this.handleSwapSell(res, selectedToken, callbacks)
+				)
+			}else{
+				if (callbacks) callbacks.error()
+			}
 		}
 	}
 
@@ -308,10 +458,16 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
+				icon: "sellToken",
 				heading: `Swap Completed!`,
 				text: `You have swapped ${selectedToken.token_symbol} for ${config.currencySymbol}.`, 
 				type: 'success',
-				duration: 10000
+				duration: 10000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
 			})
 			if (callbacks) callbacks.success()
 		}
@@ -355,7 +511,11 @@ export class WalletService {
 			return txResults.errors
 		}
 		if (typeof txResults.txBlockResult.status !== 'undefined') {
-			if (txResults.txBlockResult.status === 0) return 'success'
+			if (txResults.txBlockResult.status === 0) {
+				setInterval(refreshTAUBalance, 2000)
+				setInterval(refreshLpBalances, 2000)
+				return 'success'
+			}
 			if (txResults.txBlockResult.status === 1) {
 				this.handleTxErrors(txResults.txBlockResult.errors, callbacks)
 				return txResults.txBlockResult.errors
@@ -363,18 +523,39 @@ export class WalletService {
 		}
 	}
 
+	public getApprovedAmount = async (vk, contract) => {
+		return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${connectionRequest.contractName}`)
+				.then((res) => res.json())
+				.then((json) => {
+					let approval
+					if (typeof json?.value?.__fixed__ !== 'undefined') approval = toBigNumber(json.value.__fixed__)
+					else approval = toBigNumber(json?.value)
+					if (approval.isNaN()) approval = toBigNumber('0')
+					return approval
+				})
+				.catch((e) => console.log(e.message))
+	}
+
+	public needsApproval = async (contract, amount) => {
+		console.log({contract, amount})
+		let approvedAmount = await this.getApprovedAmount(this.lwc.walletAddress, contract)
+		console.log({approvedAmount, approvedAmountStr: approvedAmount.toString(), needs: approvedAmount.isLessThan(amount)})
+		return approvedAmount.isLessThan(amount)
+	}
+
 	public async approveBN(contractName, approveAmount, callback = undefined) {
-		let currentApproval = await this.getApprovedAmount(this.lwc.walletAddress, contractName)
-		if (typeof currentApproval?.__fixed__ !== 'undefined') currentApproval = toBigNumber(currentApproval.__fixed__)
-		else currentApproval = toBigNumber(currentApproval)
-		if (currentApproval.isNaN()) currentApproval = toBigNumber('0')
-			let adjustedApprovalAmount = approveAmount.minus(currentApproval)
-			if (adjustedApprovalAmount.isGreaterThan(toBigNumber("0"))){
-				let args = {
-					amount: { __fixed__: stringToFixed(adjustedApprovalAmount.toString(), 30) },
-					to: config.contractName
-				}
-			this.lwc.sendTransaction(this.createTxInfo('approve', args, contractName), callback)
+		if (await this.needsApproval(contractName, approveAmount)){
+			let args = {
+				amount: { __fixed__: "9999999999999" },
+				to: connectionRequest.contractName
+			}
+			this.sendTransaction(
+				contractName, 
+				"approve", 
+				args, 
+				null, 
+				callback
+			)
 		} else {
 			if (callback) callback(true)
 		}
@@ -386,22 +567,26 @@ export class WalletService {
 				if (err || !res) resolve(false)
 				if (res === true) resolve(true)
 				else {
+					console.log(res.status)
+					if (res.status === "Transaction Cancelled") {
+						this.handleTxErrors(res.data.errors)
+						resolve(false)
+					}
 					if (res?.data?.txBlockResult?.status === 0) resolve(true)
 					else resolve(false)
 				}
 			})
 		})
 	}
-}
 
-export function isWalletError(wallet_info: WalletType): wallet_info is WalletErrorType {
-  return (wallet_info as WalletErrorType).errors !== undefined
-}
-
-export function isWalletInit(wallet_info: WalletType): wallet_info is WalletInitType {
-  return (wallet_info as WalletInitType).init !== undefined
-}
-
-export function isWalletConnected(wallet_info: WalletType): wallet_info is WalletConnectedType {
-  return (wallet_info as WalletConnectedType)?.wallets !== undefined
+	private insufficientCurrencyForTransactionToast = (stampCost) => {
+		console.log({stampCost, toTAU: stampsToTAU(stampCost)})
+		let currencyAmount = stringToFixed(get(walletBalance), 8)
+		this.toastService.addToast({
+			heading: `Insufficient ${config.currencySymbol}`,
+			text: `It costs ${stampsToTAU(stampCost)} ${config.currencySymbol} to send this transaction and you only have ${currencyAmount} ${config.currencySymbol} in your wallet.`,
+			type: 'info',
+			duration: 5000
+		})
+	}
 }

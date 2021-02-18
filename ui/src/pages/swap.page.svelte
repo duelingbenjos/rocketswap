@@ -8,6 +8,8 @@
 	//Services
 	import { ApiService } from '../services/api.service'
 	const apiService = ApiService.getInstance();
+	import { WalletService } from '../services/wallet.service'
+	const walletService = WalletService.getInstance();
 	import { WsService } from '../services/ws.service'
 	const ws = WsService.getInstance()
 
@@ -16,6 +18,7 @@
 	
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
+	import { connectionRequest } from '../config'
 
 	//Components
 	import SwapPanel from '../components/swap-panel.svelte'
@@ -42,8 +45,6 @@
 
 	let pageUtilites = pageUtils(pageStores)
 
-	params.subscribe(params => console.log({params}))
-
 	$: contractName = $params.contract
 	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap';
 	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
@@ -60,17 +61,16 @@
 		pageStats,
 		resetPage: () => pageUtilites.resetPage(contractName, [currencyAmount, tokenAmount]),
 		pageStores,
-		saveStoreValue
+		saveStoreValue,
+		getStampCost
 	});
 
 	onMount(() => {
-		console.log({contractName})
 		if (contractName) joinTradeFeed_UpdateWindow(contractName)
 		return () => ws.leaveTradeFeed()
 	})
 
 	const joinTradeFeed_UpdateWindow = (contract_name) => {
-		console.log({contract_name})
 		pageUtilites.refreshTokenInfo(contract_name).then(res => {
 			if (res){
 				pageUtilites.updateWindowHistory("")
@@ -80,7 +80,6 @@
 			}
 		})
 	}
-	
 	
 	const updatePageStats = async () => {
 		let quoteCalc = quoteCalculator($tokenLP)
@@ -92,6 +91,25 @@
 			quoteCalc,
 			...quote
 		})
+	}
+
+	async function getStampCost(){
+		let txList = [
+			{contract: connectionRequest.contractName, method: $buy ? "buy" : "sell"}
+		]
+		let inputAmount = toBigNumber("0");
+		if ($buy) {
+			if ($currencyAmount) inputAmount = $currencyAmount
+			if (await walletService.needsApproval($lwc_info.walletAddress, "currency", inputAmount)){
+				txList.push({contract: "currency", method: "approve"})
+			}
+		}else{
+			if ($tokenAmount) inputAmount = $tokenAmount
+			if (await walletService.needsApproval($lwc_info.walletAddress, contractName, inputAmount)){
+				txList.push({contract: contractName, method: "approve"})
+			}			
+		}
+		return await walletService.estimateTxCosts(txList)
 	}
 </script>
 
@@ -109,9 +127,7 @@
 <div class="page-container">
 	<SwapPanel>
 		<div class="footer" slot="footer">
-		{#if $currencyAmount && $tokenAmount && $tokenLP}
 			<SwapInfoBox />
-		{/if}
 		<Buttons buttonFunction="swap" buttonText="Swap" />
 		</div>
 	</SwapPanel>

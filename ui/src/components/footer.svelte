@@ -5,12 +5,13 @@
 	//Misc
 	import { lwc_info, walletBalance, rocketState } from '../store'
 	import { config } from '../config'
-	import { formatAccountAddress, stringToFixed } from '../utils'
+	import { formatAccountAddress, stringToFixed, openNewTab } from '../utils'
 
 	//Components
 	import Spinner from './pulse-spinner.svelte'
 	import Rocket from '../icons/rocket.svelte'
-    import Smoke from '../icons/smoke.svelte'
+	import Smoke from '../icons/smoke.svelte'
+
 
 	//Services
 	import { WalletService } from '../services/wallet.service'
@@ -35,7 +36,6 @@
 				const element = new Smoke({
 					target: rocketElm,
 					props: {
-						opacity: $rocketState == 1 ? Math.random() * (0.6 - 0.4) + 0.4 : 0.5,
 						scale: $rocketState == 1 ? Math.random() * (1 - 0.5) + 0.5 : 1,
 						smokeTrail: $rocketState == 2,
 						width: 30
@@ -65,7 +65,7 @@
 
 	const connnectToWallet = () => walletService.connectToWallet();
 
-	const openWalletUrl = () => window.open(`${config.blockExplorer}/addresses/${$lwc_info.walletAddress}`);
+	const openWalletUrl = () => openNewTab(`${config.blockExplorer}/addresses/${$lwc_info.walletAddress}`);
 </script>
 
 <style>
@@ -81,6 +81,7 @@
 	}
 	.wallet-info {
 		position: relative;
+		min-height: 35px;
 		background-color: var(--color-secondary);
 		margin-left: 48px;
 		border-radius: var(--border-radius);
@@ -125,7 +126,7 @@
 <div class="footer">
 	<div class="wallet-info">
 		{#if $lwc_info.installed === null} 
-			<Spinner size={29} color="#FFFFFF" unit="px" padding="10px"/>
+			<Spinner size={29} color="#FFFFFF" unit="px" margin="0 auto" padding="0 41px 0 0"/>
 		{:else}
 			{#if $lwc_info.installed === false}
 				<button class="wallet-message" on:click={refreshPage}>Wallet not Installed</button>
@@ -145,7 +146,6 @@
 								direction="up" 
 								shake={$rocketState == 1} 
 								fire={$rocketState == 2}
-								smokeTrail={$rocketState == 2}
 								blastOff={$rocketState == 2}
 							/>
 						</div>

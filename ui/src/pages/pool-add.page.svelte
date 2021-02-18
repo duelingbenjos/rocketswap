@@ -8,12 +8,13 @@
 	//Services
 	import { ApiService } from '../services/api.service'
 	const apiService = ApiService.getInstance();
-
-	//Stores
-	import { walletIsReady, lwc_info, tokenBalances, lpBalances, saveStoreValue } from '../store'
+	import { WalletService } from '../services/wallet.service'
+	const walletService = WalletService.getInstance();
 	
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils, refreshLpBalances } from '../utils'
+	import { walletIsReady, lwc_info, tokenBalances, lpBalances, saveStoreValue } from '../store'
+	import { connectionRequest } from '../config'
 
 	//Components
 	import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
@@ -60,7 +61,8 @@
 		pageStats,
 		resetPage: () => pageUtilites.resetPage(contractName, [currencyAmount, tokenAmount]),
 		pageStores,
-		saveStoreValue
+		saveStoreValue,
+		getStampCost
 	});
 
 	onMount(() => {
@@ -91,6 +93,21 @@
 			newLpSharePercent,
 			lpToMint
 		})
+	}
+	
+	async function getStampCost(){
+		let txList = [{contract: connectionRequest.contractName, method: "add_liquidity"}]
+		let inputCurrencyAmount = toBigNumber("0");
+		let inputTokenAmount = toBigNumber("0");
+		if ($currencyAmount) inputAmount = $currencyAmount
+		if ($tokenAmount) inputAmount = $tokenAmount
+		if (await walletService.needsApproval('currency', inputCurrencyAmount)){
+			txList.push({contract: 'currency', method: "approve"})
+		}
+		if (await walletService.needsApproval(contractName, inputTokenAmount)){
+			txList.push({contract: contractName, method: "approve"})
+		}
+		return await walletService.estimateTxCosts(txList)
 	}
 </script>
 

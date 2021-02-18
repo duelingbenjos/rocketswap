@@ -92,7 +92,6 @@ export class TrollboxController {
 	@UseGuards(JWTGuard)
 	public async getUser(@Req() request) {
 		const vk = request.user.vk;
-		console.log(request.user);
 
 		const user = await NameEntity.findOne(vk);
 

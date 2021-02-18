@@ -18,7 +18,6 @@ export class NameEntity extends BaseEntity {
 }
 
 export const setName = async (state: IKvp[]) => {
-	console.log('SAVE NAME ACTIVATED')
 	const key_to_name = state.find(
 		(kvp) =>
 			kvp.key.split(":")[0] === `${config.identityContract}.key_to_name`
@@ -28,7 +27,6 @@ export const setName = async (state: IKvp[]) => {
 			kvp.key.split(":")[0] ===
 				`${config.identityContract}.name_to_key` && kvp.value
 	);
-	console.log(name_to_key, key_to_name)
 	if (key_to_name && name_to_key) {
 		const vk = name_to_key.value;
 		const name = key_to_name.value;

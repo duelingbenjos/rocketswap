@@ -82,13 +82,13 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 						try {
 							resolve(JSON.parse(data))
 						} catch (err) {
-							console.log("Error: " + err.message);
+							console.error("Error: " + err.message);
 							resolve(({error: err.message}))
 						}
 					});
 				})
 				.on("error", (err) => {
-					console.log("Error: " + err.message);
+					console.error("Error: " + err.message);
 					resolve({error: err.message})
 				});
 		})
@@ -144,7 +144,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 						block.numOfTransactions = block.numOfTransactions + 1;
 						blockTxList.push(tx.hash);
 						subblockTxList.push(tx.hash);
-						console.log('METADATA', tx.transaction.metadata)
+						// console.log('METADATA', tx.transaction.metadata)
 					await handleNewBlock({
 							state: tx.state,
 							fn: tx.transaction.payload.function,

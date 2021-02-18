@@ -5,17 +5,14 @@
   export let color = '#FF3E00'
   export let unit = 'px'
   export let padding = "0";
+  export let margin = "0";
 </script>
 
-<div class="spinner" style="--size: {size}{unit}; --color: {color}; padding: {padding};">
-  {#each range(3, 0) as version}
-    <div class="cube" style="animation-delay: {version * 0.15}s; left: {version * (size / 3 + size / 15) + unit};" />
-  {/each}
-</div>
 
 <style>
   .spinner {
     position: relative;
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -42,3 +39,9 @@
     }
   }
 </style>
+
+<div class="spinner" style="--size: {size}{unit}; --color: {color}; padding: {padding}; margin: {margin};">
+  {#each range(3, 0) as version}
+    <div class="cube" style="animation-delay: {version * 0.15}s; left: {version * (size / 3 + size / 15) + unit};" />
+  {/each}
+</div>

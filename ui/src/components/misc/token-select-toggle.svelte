@@ -47,6 +47,7 @@
     }
 
     function createTokenList (tokenList, filter) {
+        console.log({tokenList})
         if (tokenList){
             if (filter !== "") {
                 if (filter.startsWith("con_")){
@@ -162,7 +163,7 @@
 {:else}
     <button class="select-token flex-row" on:click={openTokenSelect}>
     	{#if $selectedToken}
-			<Base64Svg string={$selectedToken.logo_svg_base64} width="21px" margin="0 3px" />
+			<Base64Svg string={$selectedToken.token_base64_svg} width="21px" margin="0 3px" />
 		{/if}
         <span class="input-token-label text-xlarge">{$selectedToken.token_symbol.toUpperCase()}</span> 
         <div class="chevron">
@@ -172,46 +173,46 @@
     </button>
 {/if}
 
-{#if open}
-<div class="modal">
-    <div class="modal-style flex-col text-large"
-        in:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
-        out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
-        <div class="heading">
-            <span> Select a token </span> 
-            <button class="nostyle" on:click={closeTokenSelect}> 
-                <CloseIcon width="18px" />
-            </button>
-        </div>
+    {#if open}
+    <div class="modal">
+        <div class="modal-style flex-col text-large"
+            in:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
+            out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
+            <div class="heading">
+                <span> Select a token </span> 
+                <button class="nostyle" on:click={closeTokenSelect}> 
+                    <CloseIcon width="18px" />
+                </button>
+            </div>
 
-        <TokenSearch on:search={handleSearch}/>
-        <hr />
-        <div class="token-scroll">
-            <div class="token-list">
-                {#if token_list}
-                    {#if token_list.length > 0}
-                        {#each token_list as token}
-                            <div class="select-wrapper flex-row">
-                                <button on:click={() => selectToken(token)} class="nostyle button-item">
-                                    <div class="token-name-logo flex-row">
-                                        <Base64Svg string={token.logo_svg_base64} width={'27px'} />
-                                        <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
-                                        {#if token.contract_name === selected_contract}
-                                            <SelectedArrow width="10px" margin="0 8px" direction="left"/>
-                                        {/if}
-                                    </div>
-                                    <span class="token-amount number"> {stringToFixed(token.balance || 0, 8)} </span>
-                                </button>
-                            </div>
-                        {/each}
+            <TokenSearch on:search={handleSearch}/>
+            <hr />
+            <div class="token-scroll">
+                <div class="token-list">
+                    {#if token_list}
+                        {#if token_list.length > 0}
+                            {#each token_list as token}
+                                <div class="select-wrapper flex-row">
+                                    <button on:click={() => selectToken(token)} class="nostyle button-item">
+                                        <div class="token-name-logo flex-row">
+                                            <Base64Svg string={token.token_base64_svg} width={'27px'} />
+                                            <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
+                                            {#if token.contract_name === selected_contract}
+                                                <SelectedArrow width="10px" margin="0 8px" direction="left"/>
+                                            {/if}
+                                        </div>
+                                        <span class="token-amount number"> {stringToFixed(token.balance || 0, 8)} </span>
+                                    </button>
+                                </div>
+                            {/each}
+                        {:else}
+                            No Tokens Found
+                        {/if}
                     {:else}
-                        No Tokens Found
+                        Loading Tokens
                     {/if}
-                {:else}
-                    Loading Tokens
-                {/if}
+                </div>
             </div>
         </div>
     </div>
-</div>
 {/if}

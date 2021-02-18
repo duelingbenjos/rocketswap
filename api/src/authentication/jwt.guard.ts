@@ -7,7 +7,6 @@ export class JWTGuard extends AuthGuard("jwt") {
 		if (err || info || !user) {
 			throw err || info || new UnauthorizedException();
         }
-        
 		return user;
 	}
 }

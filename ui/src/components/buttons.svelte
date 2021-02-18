@@ -64,12 +64,13 @@
 					return true
 				}
 			}else{
-				if ($currencyAmount.isGreaterThan($walletBalance) && buy === true){
+
+				if ($currencyAmount.isGreaterThan($walletBalance) && $buy === true){
 					disabledText = `Insufficent ${config.currencySymbol}`
 					return true
 				}
 				
-				if ($tokenAmount.isGreaterThan(tokenBalance) && buy === false){
+				if ($tokenAmount.isGreaterThan(tokenBalance) && $buy === false){
 					disabledText = `Insufficent ${$selectedToken.token_symbol}`
 					return true
 				}

@@ -1,8 +1,9 @@
 <script>
     export let trade;
+    console.log(trade)
 
     //Icons
-    import Rocket from '../../icons/rocket.svelte'
+    import RocketswapLogo from '../../icons/rocketswap-logo.svelte'
 
     //Misc
     import { stringToFixed } from '../../utils'
@@ -39,7 +40,7 @@
 
 <style>
     .trade{
-        height: 30px;
+        height: 22px;
     }
     .trade > p {
         margin: 0;
@@ -56,19 +57,21 @@
         margin: 0 20px;
     }
     .trade > .icon{
+        margin-left: 20px;
         margin-right: 20px;
     }
 </style>
 
-<div class="trade flex-row">
+<div class="trade flex-row text-xsmall weight-400">
     <div class="icon flex flex-center-center">
-        <Rocket 
+        <RocketswapLogo 
             width="20px" 
             color={trade.type === "buy" ? "var(--success-color)" : "var(--error-color)"} 
-            direction={trade.type === "buy" ? "up-right" : "down-left"}
+            reverse={trade.type === "sell" ? true : false}
+
         />
     </div>
-    <p >{`${stringToFixed(trade.amount, 4)} ${trade.type === "buy" ? trade.token_symbol : config.currencySymbol }`}</p>
+    <p >{`${stringToFixed(trade.amount, 4)} ${trade.token_symbol}`}</p>
     <p class="price flex-grow">{`${stringToFixed(trade.price, 4)} ${config.currencySymbol}`}</p>
     <p class="timedelta ">{timeDelta(trade.time)}</p>
 </div>

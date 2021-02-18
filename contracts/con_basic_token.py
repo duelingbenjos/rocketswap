@@ -22,10 +22,10 @@ token_logo_url = Variable()  # Optional
 @construct
 def seed():
     # Create a token with the information from fixtures/tokenInfo
-    token_name.set("")
-    token_symbol.set("")
+    token_name.set("TOKEN")
+    token_symbol.set("TKN")
 
-    balances[ctx.caller] = 1000000
+    balances[ctx.caller] = 10000000
     token_owner.set(ctx.caller)
 
 # set_logo, set_name, set_symbol and assert_owner are only needed if you set an owner. Otherwise they can be removed
