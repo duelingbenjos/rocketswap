@@ -145,8 +145,8 @@
         border-top: 0.5px solid #d9d9d90a;
     }
     .modal-style{
-        width: 400px;
-        height: 70%;
+        box-sizing: border-box;
+        height: 80%;
     }
     .chevron{
         position: relative;
@@ -154,7 +154,14 @@
         margin: 0 3px;
     }
 
+    /* When page width is greater than 430px and less than 650px (phones) */
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            width: 400px;
+        }
+    }
 </style>
+
 {#if !$selectedToken}
     <button on:click={openTokenSelect} class="select-token flex-row" >
         <span class="input-token-label text-small ">Select Token</span> 

@@ -2,7 +2,7 @@
     import { onMount, tick } from 'svelte'
 
     //Misc
-    import { walletIsReady, accountName, bearerToken, trollboxMessages } from '../../store'
+    import { walletIsReady, accountName, bearerToken, trollboxMessages, trollBoxOpen } from '../../store'
     import { config } from '../../config'
 
     //Icons
@@ -19,7 +19,6 @@
     let name;
     let message;
 
-    let boxOpen = false;
     let sending = false;
     let nameTaken = false;
     let userColors = {}
@@ -33,9 +32,9 @@
     })
 
     onMount(async () => {
-        boxOpen = getBoxState();
+        trollBoxOpen.set(getBoxState())
         await tick()
-        if (boxOpen){
+        if ($trollBoxOpen){
             msgBox.scroll({ top: msgBox.scrollHeight + 10000, behavior: 'smooth' });
         }
     })
@@ -47,7 +46,7 @@
     }
 
     const saveBoxState = () => {
-        localStorage.setItem("trollbox-state", boxOpen)
+        localStorage.setItem("trollbox-state", $trollBoxOpen)
     }
 
     const getBoxState = () => {
@@ -58,8 +57,8 @@
     }
 
     const handleBoxToggle = () => {
-        if (boxOpen) boxOpen = false
-        else boxOpen = true
+        if ($trollBoxOpen) trollBoxOpen.set(false)
+        else trollBoxOpen.set(true)
         saveBoxState()
 
     }
@@ -106,30 +105,33 @@
 </script>
 
 <style>
-    .box-wrapper{
-        z-index: 102;
+    .troll-box{
         position: fixed;
-        bottom: 0;
-        right: 48px;
+        bottom: -350px;
+        left: 50%;
+        z-index: 102;
+        transform: translate(-50%, 0%);
+
+        height: 300px;
+        visibility: hidden;
+        width: 100%;
+        max-width: 450px;
+
         background: var(--modal-background-primary);
-        width: 450px;
-        height: 31px;
+        opacity: 0.1;
+
         border-radius: var(--border-radius) var(--border-radius) 0 0;
         border: 1px solid var(--text-primary-color-dim);
         border-bottom: 0px;
-        transition: 1s height ease-in-out;
-    }
-    .half-opacity{
-        opacity: 0.75;
-    }
-    .box-wrapper:hover{
-        opacity: 1;
+
+        transition: 1s visibility ease-in-out, 1s bottom ease-in-out, 1s opacity ease-in-out;
     }
     .box{
         position: relative;
         width: 100%;
         height: 100%;
     }
+    
     button.open-close{
         position: absolute;
         background: transparent;
@@ -150,7 +152,9 @@
         text-align: center;    
     }
     .box-is-open{
-        height: 300px;
+        visibility: visible;
+        opacity: 1;
+        bottom: 0;
     }
     .box-controls{
         padding: 20px;
@@ -175,9 +179,34 @@
         margin-bottom: 6px;
     }
 
+    /* When page width is greater than 900px (tablets) */
+    @media screen and (min-width: 900px) {
+        .troll-box{
+            display: block;
+            height: 31px;
+            transform: translate(0%, 0%);
+            left: unset;
+            right: 48px;
+            bottom: 0px;
+            visibility: visible;
+
+            transition: 1s height ease-in-out;
+        }
+        .troll-box:hover{
+            opacity: 1;
+        }
+        .half-opacity{
+            opacity: 0.75;
+        }
+        .box-is-open{
+            height: 300px;
+            opacity: 1;
+        }
+    }
+
 </style>
 
-<div class="box-wrapper" class:box-is-open={boxOpen} class:half-opacity={!boxOpen}>
+<div class="troll-box" class:box-is-open={$trollBoxOpen} class:half-opacity={!$trollBoxOpen}>
     <div class="box flex-col">
         <button class="open-close" on:click={handleBoxToggle}>
             <TrollIcon width="45px" />

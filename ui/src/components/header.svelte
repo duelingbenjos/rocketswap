@@ -2,15 +2,21 @@
 	import { getContext, onMount } from 'svelte';
 	import { routes, active } from 'svelte-hash-router'
 
-	//Icons
+	// Icons
 	import RocketSwap from '../icons/rocketswap.svelte'
 	import LightDark from '../icons/light-dark.svelte'
 	import PoweredByLamden from './misc/powered-by-lamden.svelte'
+	import MainMenu from './main-menu.svelte'
+
+	// Misc
+	import { mainMenuOpen } from '../store'
 
 	const { themeToggle, currentThemeName } = getContext('app')
 
 	let links: any[]
 	$: links = Object.values($routes)
+
+	const handleLinkClick = () => mainMenuOpen.set(false)
 </script>
 
 
@@ -20,15 +26,21 @@
 		align-items: center;
 		padding: 40px 20px;
 		box-sizing: border-box;
+		justify-content: space-between;
 	}
 
 	.right-content{
+		display: none;
 		justify-content: flex-end;
 	}
 
-	.active {
+	.links > .active {
 		border-bottom: 3px solid var(--color-primary);
 		box-sizing: border-box;
+	}
+
+	.mobile-links > .active {
+		color: var(--color-primary);
 	}
 
 	.links {
@@ -39,7 +51,7 @@
 		z-index: 10;
 	}
 
-	a {
+	.links > a {
 		color: var(--header-primary-color);
 		margin-right: 40px;
 		padding: 0 5px;
@@ -51,9 +63,27 @@
 		cursor: pointer;
 	}
 
+	.mobile-links > a {
+		margin: 0.5rem auto;
+
+	}
+
 	button.primary.small{
 		color: var(--text-primary-color-inverted-color);
 	}
+
+	/* When page width is greater than 650px (tablets) */
+    @media screen and (min-width: 430px) {
+        .wallet-info{
+			min-width: 230px;
+        }
+    }
+	/* When page width is greater than 650px (tablets) */
+    @media screen and (min-width: 650px) {
+        .right-content{
+			display: flex;
+		}
+    }
 </style>
 
 
@@ -64,14 +94,27 @@
 	</div>
 	<div class="right-content flex-row flex-align-center flex-grow">
 		<div class="links flex-row">
-		{#each links as e}
-			{#if e.$$name === "Pools" || e.$$name === "Swap"}
-				<a class:active={e === $active} href={e.$$href}> 
-					{e.$$name} 
-				</a> 
-			{/if}
-		{/each}
+			{#each links as e}
+				{#if e.$$name === "Pools" || e.$$name === "Swap"}
+					<a class:active={e === $active} href={e.$$href}> 
+						{e.$$name} 
+					</a> 
+				{/if}
+			{/each}
 		</div>
 		<LightDark />
 	</div>
+	<MainMenu>
+		<div class="mobile-links flex-col" slot="links">
+			{#each links as e}
+				{#if e.$$name === "Pools" || e.$$name === "Swap"}
+					<a  class="text-xxlarge text-color-white weight-600"
+						class:active={e === $active} 
+						href={e.$$href} on:click={handleLinkClick}> 
+						{e.$$name} 
+					</a> 
+				{/if}
+			{/each}
+		</div>
+	</MainMenu>
 </div>

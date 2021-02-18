@@ -1,170 +1,170 @@
 <script lang="ts">
-  import Router from 'svelte-hash-router'
-  import Header from './components/header.svelte'
-  import Footer from './components/footer.svelte'
-  import Dimmer from './components/dimmer.svelte'
-  import TrollBox from './components/misc/floating-box.svelte'
-  import ToastsContainer from './components/toasts-container.svelte'
-  import { onMount, setContext } from 'svelte'
-  import { writable } from 'svelte/store'
-  import { WalletService } from './services/wallet.service'
-  import { ApiService } from './services/api.service'
-  import { WsService } from './services/ws.service'
-  import { show_token_select_store, show_swap_confirm, bearerToken } from './store'
+	import { onMount, setContext } from 'svelte'
+	import { writable } from 'svelte/store'
+	import Router from 'svelte-hash-router'
 
-  
-  import type { TokenSelectType } from './types/api.types'
+	//Components
+	import Header from './components/header.svelte'
+	import Footer from './components/footer.svelte'
+	import Dimmer from './components/dimmer.svelte'
+	import TrollBox from './components/misc/troll-box.svelte'
+	import TrollBoxButton from './components/misc/troll-box-button.svelte'
+	import ToastsContainer from './components/toasts-container.svelte'
 
-  //TO DO REMOVE THIS!!
-  import { ToastService } from './services/toast.service'
-  const toastService = ToastService.getInstance()
+	//Services
+	import { WalletService } from './services/wallet.service'
+	import { ApiService } from './services/api.service'
+	import { WsService } from './services/ws.service'
 
-  let show_token_select: TokenSelectType
-  let currentThemeName = writable()
+	//Misc
+	import { show_token_select_store, show_swap_confirm, bearerToken } from './store'
 
-  setContext("app", {
-    themeToggle,
-    currentThemeName
-  })
-  
 
-  onMount(() => {
-    themeSet();
-    /** Initialise Singleton Instances */
-    WsService.getInstance()
-    WalletService.getInstance()
-    ApiService.getInstance()
-    show_token_select_store.subscribe((update) => {
-      show_token_select = update
-    })
-    // TO DO REMOVE THIS!! 
-/*
-    toastService.addToast({ 
-        icon: "buyToken",
-				heading: `TESTING TOAST!`,
-				text: `You have a new info toast You have a new info toast You have a new info toast You have a new info toast You have a new info toast`, 
-        type: 'info',
-        link: {
-          text: "explorer",
-          href: "https://www.google.ca",
-          icon: "popout"
-        },
-				duration: 7000000
-    })
+	//TO DO REMOVE THIS!!
+	import { ToastService } from './services/toast.service'
+	const toastService = ToastService.getInstance()
 
-    toastService.addToast({ 
-        icon: "sellToken",
-				heading: `TESTING TOAST!`,
-				text: `You have a new ERROR toast`, 
-        type: 'error',
-        link: {
-          text: "explorer",
-          href: "https://www.google.ca",
-          icon: "popout"
-        },
-				duration: 7000000
-    })
-    toastService.addToast({ 
-      icon: "gaugePlus",
-				heading: `TESTING TOAST!`,
-				text: `You have a new WARNING toast`, 
-        type: 'warning',
-        link: {
-          text: "explorer",
-          href: "https://www.google.ca",
-          icon: "popout"
-        },
-				duration: 7000000
-    })
-    toastService.addToast({ 
-        icon: "userAuth",
-				heading: `TESTING TOAST!`,
-				text: `You have a SUCCESS new toast`, 
-        type: 'success',
-        link: {
-          text: "explorer",
-          href: "https://www.google.ca",
-          icon: "popout"
-        },
-				duration: 7000000
-    })
-    */
-  })
+	let currentThemeName = writable()
 
-  function themeToggle() {
-    let body = document.getElementById("theme-toggle")
-    let lighttheme = getThemeSetting()
-    if (!lighttheme) {
-      body.classList.add("light");
-      currentThemeName.set('light')  
-    }
-    else {
-      body.classList.remove("light");
-      currentThemeName.set('dark')
-    }
-    localStorage.setItem("lighttheme", !lighttheme)
-  }
+	setContext("app", {
+		themeToggle,
+		currentThemeName
+	})
+	
 
-  function themeSet() {
-    let body = document.getElementById("theme-toggle")
-    let lighttheme = getThemeSetting()
-    if (lighttheme) {
-      body.classList.add("light");
-      currentThemeName.set('light')
-    }else currentThemeName.set('dark')
-  }
+	onMount(() => {
+		themeSet();
+		/** Initialise Singleton Instances */
+		WsService.getInstance()
+		WalletService.getInstance()
+		ApiService.getInstance()
 
-  function getThemeSetting() {
-    return JSON.parse(localStorage.getItem("lighttheme"))
-  }
+		// TO DO REMOVE THIS!! 
+		/*
+		toastService.addToast({ 
+			icon: "buyToken",
+					heading: `TESTING TOAST!`,
+					text: `You have a new info toast You have a new info toast You have a new info toast You have a new info toast You have a new info toast`, 
+			type: 'info',
+			link: {
+			text: "explorer",
+			href: "https://www.google.ca",
+			icon: "popout"
+			},
+					duration: 7000000
+		})
+
+		toastService.addToast({ 
+			icon: "sellToken",
+					heading: `TESTING TOAST!`,
+					text: `You have a new ERROR toast`, 
+			type: 'error',
+			link: {
+			text: "explorer",
+			href: "https://www.google.ca",
+			icon: "popout"
+			},
+					duration: 7000000
+		})
+		toastService.addToast({ 
+		icon: "gaugePlus",
+					heading: `TESTING TOAST!`,
+					text: `You have a new WARNING toast`, 
+			type: 'warning',
+			link: {
+			text: "explorer",
+			href: "https://www.google.ca",
+			icon: "popout"
+			},
+					duration: 7000000
+		})
+		toastService.addToast({ 
+			icon: "userAuth",
+					heading: `TESTING TOAST!`,
+					text: `You have a SUCCESS new toast`, 
+			type: 'success',
+			link: {
+			text: "explorer",
+			href: "https://www.google.ca",
+			icon: "popout"
+			},
+					duration: 7000000
+		})
+		*/
+	})
+
+	function themeToggle() {
+		let body = document.getElementById("theme-toggle")
+		let lighttheme = getThemeSetting()
+		if (!lighttheme) {
+			body.classList.add("light");
+			currentThemeName.set('light')  
+		}else {
+			body.classList.remove("light");
+			currentThemeName.set('dark')
+		}
+		localStorage.setItem("lighttheme", !lighttheme)
+	}
+
+	function themeSet() {
+		let body = document.getElementById("theme-toggle")
+		let lighttheme = getThemeSetting()
+		if (lighttheme) {
+			body.classList.add("light");
+			currentThemeName.set('light')
+		}else currentThemeName.set('dark')
+	}
+
+	function getThemeSetting() {
+		return JSON.parse(localStorage.getItem("lighttheme"))
+	}
 </script>
 
+<style>
+	.bg-gradient {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		background-image: var(--main-background-gradient);
+
+		overflow-y: scroll;
+	}
+
+	.bg-solid {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		background-color: var(--main-background-solid);
+	}
+
+	.flex {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	main {
+		height: 100%;
+		width: 100%;
+	}
+
+	@media screen and (min-width: 650px) {
+
+	}
+
+</style>
 
 <main>
-  <div class="bg-solid">
-    <div class="bg-gradient flex">
-      {#if show_token_select?.open}
-        <Dimmer>
-          <TokenSelect content={show_token_select.content}/>
-        </Dimmer>
-      {/if}
-      <Header />
-      <Router />
-      <ToastsContainer />
-
-    </div>
-  </div>
+	<div class="bg-solid">
+		<div class="bg-gradient flex">
+			<Header />
+			<Router />
+			<ToastsContainer />
+		</div>
+	</div>
 </main>
 <Footer />
+<TrollBoxButton />
 <TrollBox />
 
-<style>
-  .bg-gradient {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background-image: var(--main-background-gradient);
 
-    overflow-y: scroll;
-  }
-
-  .bg-solid {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    background-color: var(--main-background-solid);
-  }
-
-  .flex {
-    display: flex;
-    flex-direction: column;
-    /* justify-items: space-between; */
-    /* justify-content: space-between; */
-    align-items: center;
-  }
-
-  main {
-    height: 100%;
-    width: 100%;
-  }
-</style>
