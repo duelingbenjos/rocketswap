@@ -1,5 +1,3 @@
-import currency
-
 ## State
 
 Owner = Variable()
@@ -11,7 +9,7 @@ Stash = Variable() # The total amount of token in the vault.
 
 ## Constants
 
-# EPOCH_LENGTH = 60 # Length of Epoch in minutes
+EPOCH_LENGTH = 60 # Length of Epoch in minutes
 EMISSION_RATE_HOURLY = 3000 # Per Hour
 EMISSION_RATE_PER_MIN = EMISSION_RATE_HOURLY / 60 # Per Minute
 EMISSION_RATE_PER_SEC = EMISSION_RATE_PER_MIN / 60 # Per Second
@@ -32,6 +30,11 @@ def getCurrentEpochIndex():
     current_epoch_index = CurrentEpochIndex.get()
     return current_epoch_index
 
+@export
+def getEpochDetails(index: int):
+    epoch_info = Epochs[index]
+    return epoch_info
+
 @export 
 def getCurrentEpochDetails():
     index = getCurrentEpochIndex()
@@ -40,38 +43,46 @@ def getCurrentEpochDetails():
 
 def incrementEpoch():
     current_epoch = CurrentEpochIndex.get()
-    next_epoch_idx = current_epoch + 1
-    CurrentEpochIndex.set(next_epoch_idx)
-    Epochs[next_epoch_idx] = {
-        "time" : now,
-        "stash" : Stash.get()
-    }
-    return next_epoch_idx
+    CurrentEpochIndex.set(current_epoch + 1)
+
+def addTokensToEpochTally(amount: float):
+    epoch_index = getCurrentEpochIndex()
+    Epochs[epoch_index]['stash'] += amount
+
+def addTokensToNextEpochTally(amount: float):
+    epoch_index = getCurrentEpochIndex()
+    Epochs[epoch_index+1]['stash'] += amount
 
 @export
 def addTokens(amount: float):
     user = ctx.caller
-    currency.transfer_from(amount=amount, from_address=user, to_address=ctx.this)
+    # Get time delta between now and last epoch
+    # If delta is greater then the minutes constant, begin the next epoch
 
-    # Update the Stash
+    current_epoch = getCurrentEpochDetails()
+    time_delta = now - current_epoch['time']
 
-    stash = Stash.get()
-    Stash.set(stash + amount)
-
-    # Update the Epoch
-    new_epoch_idx = incrementEpoch()
+    if time_delta.minutes >= EPOCH_LENGTH:
+        incrementEpoch()
 
     if Deposits[user] is False:
         Deposits[user] = []
 
     # Create a record of the user's deposit
-
     Deposits[user].append({
-        'starting_epoch': new_epoch_idx,
+        'starting_epoch': current_epoch,
         'time': now,
         'amount': amount
     })
 
+    # Update the current epoch with the token amount
+
+    addTokensToNextEpochTally(amount=amount)
+
+    # Update the Stash
+
+    stash = Stash.get()
+    Stash.set(stash + amount)
 
 @export
 def withdrawTokensAndYield():
@@ -132,3 +143,12 @@ def testWhile():
     integer = 10
     while integer > 0 :
         integer -= 1
+
+
+
+# @export 
+# def get_delta_in_seconds(year:int, month: int, day: int, hour: int, minute: int, second: int):
+#     start_date
+
+# @export
+# def get_rate_last_hour
