@@ -61,8 +61,7 @@ So how do we bookend the changes in rate so that they :
 
 Epochs. *an event or a time marked by an event that begins a new period or development. b : a memorable event or date.*
 
-For arguments sake, let's say that an Epoch is an hour.
-Each time someone leaves or enters the farm, we check if more then an hour has passed since the `Current_Epoch` started the `Epoch[<idx>]` (idx being current epoch + 1) is adjusted to the following :
+Each time someone leaves or enters the farmm the Epoch is incremented, and an new Epoch object is created. :
 
 ```
 {

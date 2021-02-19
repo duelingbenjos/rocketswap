@@ -1,25 +1,24 @@
-# Imports
+## Imports
 
 import currency
 import con_basic_token
 
-## State
+## State Variables
 
 Owner = Variable()
 DevRewardWallet = Variable()
+EmissionRatePerHour = Variable()
+DevRewardPct = Variable()
+
+## State
+
 Deposits = Hash(default_value = False)
-Withdrawals = Hash(default_value = False)
+Withdrawals = Hash(default_value = 0)
 CurrentEpochIndex = Variable()
 Epochs = Hash(default_value = False)
 StakedBalance = Variable() # The total amount of farming token in the vault.
 YieldReserves = Variable() # The total amount of yield token left in the vault
-
-## Constants
-
-EMISSION_RATE_HOURLY = 3000 # Per Hour
-EMISSION_RATE_PER_MIN = EMISSION_RATE_HOURLY / 60 # Per Minute
-EMISSION_RATE_PER_SEC = EMISSION_RATE_PER_MIN / 60 # Per Second
-DEV_REWARD = 0.1 # 10%
+Active = Variable() # 
 
 @construct
 def seed():
@@ -33,8 +32,11 @@ def seed():
         "staked": 0
     }
 
+    EmissionRatePerHour.set(3000)
+    DevRewardPct.set(0.1)
+
 @export
-def addFarmingTokens(amount: float):
+def addStakingTokens(amount: float):
     assert amount > 0, 'You cannot stake a negative balance.'
 
     user = ctx.caller
@@ -61,6 +63,40 @@ def addFarmingTokens(amount: float):
         'amount': amount
     })
 
+
+@export
+def withdrawYield(amount: float):
+    assert amount > 0, 'You cannot harvest a negative balance'
+
+    user = ctx.caller
+    deposits = Deposits[user]
+
+    assert deposits is not False, "You have no deposit to withdraw yield from."
+
+    # Calculate how much yield is due per deposit account
+    withdrawn_yield = Withdrawals[user]
+    harvestable_yield = 0
+
+    for d in deposits:
+        harvestable_yield += calculateYield(starting_epoch_index=d['starting_epoch'], start_time=d['time'], amount=d['amount'])
+
+    # Determine maximum amount of yield user can withdraw
+    harvestable_yield -= withdrawn_yield
+
+    yield_to_harvest = amount if amount < harvestable_yield else harvestable_yield
+
+    assert yield_to_harvest > 0, 'There is no yield to harvest right now :('
+
+    # Take % of Yield Tokens, send it to dev fund
+    dev_share = yield_to_harvest * DevRewardPct.get()
+    con_basic_token.transfer(to = DevRewardWallet.get(), amount = dev_share)
+
+    # Send remanding Yield Tokens to user
+    user_share = yield_to_harvest-dev_share
+    con_basic_token.transfer(to=user, amount = user_share)
+
+    Withdrawals[user] = withdrawn_yield + yield_to_harvest
+
 @export
 def withdrawTokensAndYield():
     user = ctx.caller
@@ -69,6 +105,7 @@ def withdrawTokensAndYield():
     assert deposits is not False, "You have no deposit to withdraw"
 
     # Calculate how much yield is due per deposit account
+    withdrawn_yield = Withdrawals[user]
     stake_to_return = 0
     yield_to_harvest = 0
 
@@ -78,19 +115,27 @@ def withdrawTokensAndYield():
 
     # assert Yield.get() > yield_to_harvest, 'The contract does not have sufficient supplies to fufill your claim.'
 
-    # Send Farming Tokens to user
+    # Send Staking Tokens to user
     currency.transfer(to=user, amount=stake_to_return)
     
-    # Take % of Yield Tokens, send it to dev fund
-    dev_share = yield_to_harvest * DEV_REWARD
-    con_basic_token.transfer(to="dev_wallet", amount=dev_share)
+    # check that the user has yield left to harvest (this should never be negative, but let's check here just in case)
+    yield_to_harvest -= withdrawn_yield
+    if yield_to_harvest > 0:
 
-    # Send remanding Yield Tokens to user
-    user_share = yield_to_harvest-dev_share
-    con_basic_token.transfer(to=user, amount = user_share)
+        # Take % of Yield Tokens, send it to dev fund
+        dev_share = yield_to_harvest * DevRewardPct.get()
+        if dev_share > 0:
+            con_basic_token.transfer(to = DevRewardWallet.get(), amount = dev_share)
+
+        # Send remanding Yield Tokens to user
+        user_share = yield_to_harvest-dev_share
+        con_basic_token.transfer(to=user, amount = user_share)
 
     # Reset User's Deposits
     Deposits[user] = False
+
+    # Reset User's Withdrawal
+    Withdrawals[user] = 0
 
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
@@ -101,7 +146,7 @@ def withdrawTokensAndYield():
     YieldReserves.set(new_yield_amount)
 
     # Increment Epoch
-    incrementEpoch(new_staked_amount = new_yield_amount)
+    incrementEpoch(new_staked_amount = new_staked_amount)
 
 
 def calculateYield(starting_epoch_index:int, start_time, amount:float):
@@ -124,8 +169,9 @@ def calculateYield(starting_epoch_index:int, start_time, amount:float):
             delta = next_epoch['time'] - this_epoch['time']
 
         pct_share_of_stake = amount / this_epoch['staked']
-        global_yield_this_epoch = delta.seconds * EMISSION_RATE_PER_SEC
-        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake
+        ## These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
+        global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond()
+        deposit_yield_this_epoch = decimal(global_yield_this_epoch) * pct_share_of_stake
         y += deposit_yield_this_epoch
 
         this_epoch_index += 1
@@ -146,3 +192,34 @@ def incrementEpoch(new_staked_amount: float):
         "staked" : new_staked_amount
     }
     return new_epoch_idx
+
+@export
+def getEmissionRatePerSecond():
+    emission_rate_per_hour = EmissionRatePerHour.get()
+    emission_rate_per_minute = emission_rate_per_hour / 60
+    emission_rate_per_second = emission_rate_per_minute / 60
+    return emission_rate_per_second
+
+@export
+def setOwner(vk:str):
+    assertOwner()
+    Owner.set(vk)
+
+@export
+def setDevWallet(vk: str):
+    assertOwner()
+    DevRewardWallet.set(vk)
+
+@export
+def setDevRewardPct(amount: float):
+    assertOwner()
+    assert amount <= 1 and amount >= 0, 'Amount must be a value between 0 and 1'
+    DevRewardPct.set(amount)
+
+@export
+def setEmissionRatePerHour(amount: float):
+    assertOwner()
+    EmissionRatePerHour.set(amount)
+
+def assertOwner():
+    assert Owner.get() == ctx.caller, 'You must be the owner to call this contract.'
