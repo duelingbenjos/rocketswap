@@ -105,6 +105,7 @@
 
 <main>
 	<div style="position: absolute; top:0%; left: 0%; text-align: center; height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column">
+		<img src="RS_Logo.png" height="100" width="100" style="margin-bottom: 20px;" alt="">
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			{width}
