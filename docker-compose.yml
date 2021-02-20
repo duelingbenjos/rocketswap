@@ -32,6 +32,16 @@ services:
       - rocketswap-network
     ports:
       - 5000:5000
+ 
+  website:
+    build: ./website
+    image: rocketswap-client-website
+    container_name: rocketswap-website
+    networks: 
+      - rocketswap-network
+    ports:
+      - 5000:80
+
 
   api:
     build: ./api
