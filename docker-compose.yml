@@ -40,7 +40,7 @@ services:
     networks: 
       - rocketswap-network
     ports:
-      - 5000:80
+      - 80:5000
 
 
   api:
