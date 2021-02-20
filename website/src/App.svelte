@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import PoweredByLamden from './powered-by-lamden.svelte'
+	import PoweredByLamden from "./powered-by-lamden.svelte";
 	export let width = "190px";
 
 	onMount(() => {
@@ -104,8 +104,16 @@
 </script>
 
 <main>
-	<div style="position: absolute; top:0%; left: 0%; text-align: center; height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column">
-		<img src="RS_Logo.png" height="100" width="100" style="margin-bottom: 20px;" alt="">
+	<div
+		style="position: absolute; top:0%; left: 0%; text-align: center; height: 100%; width: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column"
+	>
+		<img
+			src="RS_Logo.png"
+			height="100"
+			width="100"
+			style="margin-bottom: 20px;"
+			alt=""
+		/>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			{width}
@@ -117,14 +125,18 @@
 				fill="#fff"
 			/>
 		</svg>
-		<a style="padding-top: 20px;" target="_blank" href="http://45.63.40.194:5000/">testnet</a>
+		<a
+			style="padding-top: 20px;"
+			target="_blank"
+			href="http://45.63.40.194:5000/">testnet</a
+		>
 	</div>
 	<canvas
 		id="canvas"
 		style="width: 100%; height: 100%; padding: 0; margin: 0; z-index: 99"
 	/>
-	<div style="position:absolute; bottom: 40px;right: 100px;">
-		<PoweredByLamden/>
+	<div id="powered">
+		<PoweredByLamden />
 	</div>
 </main>
 
@@ -140,10 +152,27 @@
 		font-size: 4em;
 		font-weight: 100;
 	}
+	#powered {
+		position: absolute;
+		bottom: 40px;
+		right: 100px;
+	}
 
-	@media (min-width: 640px) {
+	@media (max-width: 500px) {
 		main {
 			max-width: none;
+		}
+
+		#powered {
+			width: 100%;
+			position: relative;
+			bottom: 60px;
+			right: unset;
+			/* bottom: 40px; */
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 		}
 	}
 </style>
