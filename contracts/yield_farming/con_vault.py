@@ -1,7 +1,7 @@
 ## Imports
 
 import currency
-import con_basic_token
+import con_basic_token_01
 
 ## State Variables
 
@@ -87,11 +87,11 @@ def withdrawYield(amount: float):
 
     # Take % of Yield Tokens, send it to dev fund
     dev_share = yield_to_harvest * DevRewardPct.get()
-    con_basic_token.transfer(to = DevRewardWallet.get(), amount = dev_share)
+    con_basic_token_01.transfer(to = DevRewardWallet.get(), amount = dev_share)
 
     # Send remanding Yield Tokens to user
     user_share = yield_to_harvest-dev_share
-    con_basic_token.transfer(to=user, amount = user_share)
+    con_basic_token_01.transfer(to=user, amount = user_share)
 
     Withdrawals[user] = withdrawn_yield + yield_to_harvest
 
@@ -123,11 +123,11 @@ def withdrawTokensAndYield():
         # Take % of Yield Tokens, send it to dev fund
         dev_share = yield_to_harvest * DevRewardPct.get()
         if dev_share > 0:
-            con_basic_token.transfer(to = DevRewardWallet.get(), amount = dev_share)
+            con_basic_token_01.transfer(to = DevRewardWallet.get(), amount = dev_share)
 
         # Send remanding Yield Tokens to user
         user_share = yield_to_harvest-dev_share
-        con_basic_token.transfer(to=user, amount = user_share)
+        con_basic_token_01.transfer(to=user, amount = user_share)
 
     # Reset User's Deposits
     Deposits[user] = False
@@ -143,6 +143,7 @@ def withdrawTokensAndYield():
     incrementEpoch(new_staked_amount = new_staked_amount)
 
 
+## This runs over each of the items in the user's Deposit
 def calculateYield(starting_epoch_index:int, start_time, amount:float):
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index

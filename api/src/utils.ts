@@ -40,6 +40,18 @@ export function validateTokenContract(contract: string): boolean {
 	return missing_idx > -1 ? false : true;
 }
 
+// export function validateStakingContract(contract: string): boolean {
+// 	const required_fields = [
+// 		"def addStakingTokens",
+// 		"def withdrawYield",
+// 		"def withdrawTokensAndYield",
+// 	];
+// 	let missing = required_fields.map((field) => contract.includes(field));
+// 	let missing_idx = missing.findIndex((field) => field === false);
+// 	return missing_idx > -1 ? false : true;
+// }
+
+
 export function getKey(state: IKvp[], idx_1: number, idx_2: number) {
 	return state[idx_1].key.split(":")[idx_2];
 }

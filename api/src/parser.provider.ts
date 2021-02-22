@@ -31,6 +31,9 @@ export class ParserProvider {
  public parseBlock = async (update: IBlockParser) => {
   const { block } = update
 	const { state, fn, contract: contract_name, timestamp } = block
+  // console.log(state)
+  // this.logger.log(contract_name)
+  this.addToActionQue(saveTransfer, {state, handleClientUpdate:this.socketService.handleClientUpdate})
   try {
    if (contract_name === "submission" && fn === "submit_contract") {
     // Check if the submitted contract is a token, if it's a token, add it to the DB
@@ -46,7 +49,6 @@ export class ParserProvider {
      })
 		this.addToActionQue(saveToken, add_token_dto)
 		this.addToActionQue(this.updateTokenList)
-    await this.updateTokenList()
 		}
     return
    } else if (contract_name === config.contractName) {
@@ -58,7 +60,6 @@ export class ParserProvider {
     })
     return
    } else if (this.token_contract_list.includes(contract_name)) {
-    this.addToActionQue(saveTransfer, {state, handleClientUpdate:this.socketService.handleClientUpdate})
     if (isUpdateFn(fn)) {
     this.addToActionQue(saveTokenUpdate, state)
     }

@@ -124,6 +124,7 @@ export class WsService {
   }
 
   private handleBalanceUpdate(data) {
+    console.log(data)
     const { payload } = data
     tokenBalances.set(valuesToBigNumber(payload).balances)
   }

@@ -1,6 +1,6 @@
 balances = Hash(default_value=0) # Required
 
-custodial = Hash(default_value=False)
+custodial = Hash(default_value=False) # Allow perpetual approval.
 
 # use token_owner if you want to change logo, name or symbol after submission
 token_owner = Variable() # Optional
@@ -22,10 +22,10 @@ token_logo_url = Variable()  # Optional
 @construct
 def seed():
     # Create a token with the information from fixtures/tokenInfo
-    token_name.set("TOKEN")
-    token_symbol.set("TKN")
+    token_name.set("BASIC_TOKEN_1")
+    token_symbol.set("BASIC1")
 
-    balances[ctx.caller] = 10000000
+    balances[ctx.caller] = 100000000
     token_owner.set(ctx.caller)
 
 # set_logo, set_name, set_symbol and assert_owner are only needed if you set an owner. Otherwise they can be removed
