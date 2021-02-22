@@ -66,7 +66,7 @@ export class AppGateway
 				if (isMetricsUpdate(update)) {
 					contract_name = update.contract_name;
 					this.wss.emit(`price_feed:${contract_name}`, update);
-					this.logger.log("price update sent");
+					// this.logger.log("price update sent");
 				}
 				break;
 			case "balance_update":
@@ -74,9 +74,6 @@ export class AppGateway
 					this.wss.emit(
 						`balance_update:${update.payload.vk}`,
 						update
-					);
-					this.logger.log(
-						`balance update sent to : ${update.payload.vk}`
 					);
 				}
 				break;
@@ -103,7 +100,6 @@ export class AppGateway
 		client.join(room);
 		client.emit("joined_room", room);
 		const [prefix, subject] = room.split(":");
-		this.logger.log(prefix, subject);
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
@@ -155,12 +151,11 @@ export class AppGateway
 			const { socket_id, payload } = auth_response;
 			this.wss.to(socket_id).emit("auth_response", payload);
 		} catch (err) {
-			console.log(err);
+			this.logger.error(err);
 		}
 	};
 
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
-		this.logger.log(`joined trade feed: ${subject}`);
 		try {
 			const trade_update = await TradeHistoryEntity.find({
 				select: [
@@ -182,7 +177,7 @@ export class AppGateway
 	}
 
 	private async handleJoinBalanceFeed(vk: string, client: Socket) {
-		console.log(`${vk} joined balance feed`);
+		// console.log(`${vk} joined balance feed`);
 		try {
 			let balances: any = await BalanceEntity.findOne(vk);
 			if (!balances)
@@ -217,7 +212,6 @@ export class AppGateway
 				action: "metrics_update",
 				...metrics
 			};
-			// this.logger.log(metrics_action);
 			client.emit(`price_feed:${contract_name}`, metrics_action);
 		} catch (err) {
 			this.logger.error(err);
@@ -225,10 +219,10 @@ export class AppGateway
 	}
 
 	handleDisconnect(client: Socket) {
-		this.logger.log(`Client disconnected: ${client.id}`);
+		// this.logger.log(`Client disconnected: ${client.id}`);
 	}
 
 	async handleConnection(socket: Socket, ...args: any[]) {
-		this.logger.log(`Client connected: ${socket.id}`);
+		// this.logger.log(`Client connected: ${socket.id}`);
 	}
 }

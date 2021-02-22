@@ -82,13 +82,13 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 						try {
 							resolve(JSON.parse(data))
 						} catch (err) {
-							console.log("Error: " + err.message);
+							console.error("Error: " + err.message);
 							resolve(({error: err.message}))
 						}
 					});
 				})
 				.on("error", (err) => {
-					console.log("Error: " + err.message);
+					console.error("Error: " + err.message);
 					resolve({error: err.message})
 				});
 		})

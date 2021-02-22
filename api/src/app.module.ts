@@ -46,7 +46,7 @@ const db_options: TypeOrmModuleOptions = {
 		JwtModule.register({
 			secret: "<SECRET KEY>",
 			signOptions: {
-				expiresIn: "60m"
+				expiresIn: "1m"
 			}
 		})
 	],

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, Logger } from "@nestjs/common"
 import { IKvp } from "./types/misc.types"
 import { config } from "./config"
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity"
@@ -18,6 +18,7 @@ export class ParserProvider {
  private token_contract_list: string[]
  private action_que: { action: any; args: any }[] = []
  private action_que_processing: boolean
+ private logger: Logger = new Logger("ParserProvider");
 
  onModuleInit() {
   this.updateTokenList()
@@ -30,6 +31,9 @@ export class ParserProvider {
  public parseBlock = async (update: IBlockParser) => {
   const { block } = update
 	const { state, fn, contract: contract_name, timestamp } = block
+  // console.log(state)
+  // this.logger.log(contract_name)
+  this.addToActionQue(saveTransfer, {state, handleClientUpdate:this.socketService.handleClientUpdate})
   try {
    if (contract_name === "submission" && fn === "submit_contract") {
     // Check if the submitted contract is a token, if it's a token, add it to the DB
@@ -45,7 +49,6 @@ export class ParserProvider {
      })
 		this.addToActionQue(saveToken, add_token_dto)
 		this.addToActionQue(this.updateTokenList)
-    await this.updateTokenList()
 		}
     return
    } else if (contract_name === config.contractName) {
@@ -57,9 +60,8 @@ export class ParserProvider {
     })
     return
    } else if (this.token_contract_list.includes(contract_name)) {
-    await saveTransfer(state, this.socketService.handleClientUpdate)
     if (isUpdateFn(fn)) {
-     await saveTokenUpdate(state)
+    this.addToActionQue(saveTokenUpdate, state)
     }
    } else if (contract_name === config.identityContract) {
      switch(fn) {
@@ -72,7 +74,7 @@ export class ParserProvider {
      }
    }
   } catch (err) {
-   console.error(err)
+   this.logger.error(err)
   }
  }
 
@@ -80,13 +82,13 @@ export class ParserProvider {
   const { fn, state, timestamp } = args
   try {
    await savePair(state)
-   await saveTransfer(state, this.socketService.handleClientUpdate)
+   await saveTransfer({state,handleClientUpdate: this.socketService.handleClientUpdate})
    await savePairLp(state)
    await saveUserLp(state)
    await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp)
    await savePrice(state, this.socketService.handleClientUpdate)
   } catch (err) {
-   console.error(err)
+   this.logger.error(err)
   }
  }
 
@@ -94,15 +96,15 @@ export class ParserProvider {
   * by the parser. Assuming that it's a race condition causing it, this approach should be effective.
   */
 
- private executeActionQue =  async (action_que: { action: any; args: any }[]) => {
+ private executeActionQue = async (action_que: { action: any; args: any }[]) => {
   try {
    if (action_que.length) {
-    console.log(`ACTION QUE PROCESSING ${action_que.length} `)
+    // this.logger.log(`ACTION QUE PROCESSING ${action_que.length} `)
     const { action, args } = this.action_que[0]
 		if (args) {
 			await action(args)
 		} else {
-			action()
+			await action()
 		}
     this.action_que.splice(0, 1)
     this.executeActionQue(action_que)
@@ -110,14 +112,14 @@ export class ParserProvider {
     this.action_que_processing = false
    }
   } catch (err) {
-   console.error(err)
+   this.logger.error(err)
    setTimeout(async () => this.executeActionQue(action_que), 1000)
   }
  }
 
  private addToActionQue = (action: any, args?) => {
   this.action_que.push({ action, args })
-  console.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
+  // this.logger.log(`ADDING ITEM TO ACTION QUE : ${this.action_que.length} ACTIONS OUTSTANDING`)
   if (!this.action_que_processing) {
    this.action_que_processing = true
    this.executeActionQue(this.action_que)

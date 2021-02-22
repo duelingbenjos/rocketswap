@@ -8,7 +8,7 @@
 	import DirectionalArrow from '../icons/directional-arrow.svelte'
 
 	//Misc
-	import { quoteCalculator, toBigNumber } from '../utils'
+	import { quoteCalculator, toBigNumber, stringToFixed } from '../utils'
 
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
 	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP } = pageStores
@@ -27,22 +27,27 @@
 	const swapSlots = () => {
 		slots = [...slots.reverse()]
 		buy.set(!$buy)
+		console.log($buy)
 	}
 
 	function handleCurrencyChange(e){
-		if (e.detail.toString() === "NaN") saveStoreValue(currencyAmount, null)
+		if (e.detail.toString() === "NaN" || e.detail.isEqualTo(0)) saveStoreValue(currencyAmount, null)
 		else{
 			saveStoreValue(currencyAmount, e.detail)
 			if ($selectedToken && $tokenLP) {
 				let quoteCalc = quoteCalculator($tokenLP)
 				let quote = quoteCalc.calcBuyPrice($currencyAmount)
-				saveStoreValue(tokenAmount, quote.tokensPurchasedLessFee)
+				if (quote.tokensPurchasedLessFee.isGreaterThan(0)){
+					saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quote.tokensPurchasedLessFee, 8)))
+				}else{
+					saveStoreValue(tokenAmount, toBigNumber("0"))
+				}
 			}
 		}
 	}
 
 	function handleTokenChange(e) {
-		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN") saveStoreValue(tokenAmount, null)
+		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN" || e.detail.tokenAmount.isEqualTo(0)) saveStoreValue(tokenAmount, null)
 		else saveStoreValue(tokenAmount, e.detail.tokenAmount)
 
 		if (e.detail.selected) saveStoreValue(selectedToken, e.detail.selected)
@@ -50,17 +55,19 @@
 		if ($tokenLP && $tokenAmount){
 			let quoteCalc = quoteCalculator($tokenLP)
 			let quote = quoteCalc.calcSellPrice($tokenAmount)
-			saveStoreValue(currencyAmount, quote.currencyPurchasedLessFee)
+			saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchasedLessFee, 8)))
 		}
 	}
 </script>
 
 <style>
-.plus-sign{
-	display: flex;
-	justify-content: center;
-	text-align: center;
-}
+	.plus-sign{
+		display: flex;
+		justify-content: center;
+		text-align: center;
+		padding: 5px 0;
+	}
+
 </style>
 
 <div class="panel-container">
@@ -70,10 +77,12 @@
 		this={slots[0].component}
 		on:input={slots[0].handler}
 	/>
-	<div class="plus-sign" on:click={swapSlots}>
+	<div class="plus-sign flex flex-center-center">
 		<DirectionalArrow 
-			direction={$buy ? "down" : "up"} width={"20px"} 
-			margin={"1rem 0"} />
+			direction="down" width={"20px"} 
+			margin={"0.5rem 0 0"} 
+			hover={true}
+			click={swapSlots}/>
 	</div>
 	<svelte:component 
 		label={'To'}

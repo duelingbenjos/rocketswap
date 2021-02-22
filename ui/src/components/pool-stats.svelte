@@ -25,19 +25,17 @@
     $: currencyRatio = "—"
     $: tokenRatio = "—"
 
-    pageStats.subscribe(val => console.log(val))
-
     const calcValues = () => {
         if ($pageStats?.quoteCalc?.prices){
             const { currency, token } = $pageStats.quoteCalc?.prices;
-            currencyRatio = currency.isNaN() ? "—" : stringToFixed(currency, 4);
-            tokenRatio = token.isNaN() ? "—" : stringToFixed(token, 4);
+            currencyRatio = currency.isNaN() ? "—" : stringToFixed(currency, 8);
+            tokenRatio = token.isNaN() ? "—" : stringToFixed(token, 8);
         }
 
         if ($tokenLP && statList.includes("poolShare") && $walletIsReady){
             let quoteCalc = quoteCalculator($tokenLP)
-            currencyRatio = stringToFixed(quoteCalc.prices.currency, 4)
-            tokenRatio = stringToFixed(quoteCalc.prices.token, 4)
+            currencyRatio = stringToFixed(quoteCalc.prices.currency, 8)
+            tokenRatio = stringToFixed(quoteCalc.prices.token, 8)
         }
     }
 

@@ -16,15 +16,16 @@ export class BalanceEntity extends BaseEntity implements IBalance {
 
 export async function updateBalance(balance_dto: BalanceType) {
 	let { contract_name, amount, vk } = balance_dto;
-	if (typeof amount === 'number') amount = (amount as number).toString()
-	let entity = await BalanceEntity.findOne(vk);
+	if (typeof amount === "number") amount = (amount as number).toString();
+	let entity = await BalanceEntity.findOne({ where: { vk } });
 	if (!entity) {
 		entity = new BalanceEntity();
 		entity.vk = vk;
 		entity.balances = {};
 	}
 	entity.balances[contract_name] = amount;
-	return await entity.save();
+	const res = await entity.save();
+	return res;
 }
 
 export type UserBalancesType = {
@@ -42,14 +43,14 @@ export interface IBalance {
 	balances?: UserBalancesType;
 }
 
-export async function saveTransfer(
-	state: IKvp[],
-	handleClientUpdate: handleClientUpdate
-) {
+export async function saveTransfer(args: {
+	state: IKvp[];
+	handleClientUpdate: handleClientUpdate;
+}) {
+	const { state, handleClientUpdate } = args;
 	const balances_kvp = state.filter(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "balances"
 	);
-	//console.log(balances_kvp);
 	const balance_updates = balances_kvp.filter(
 		(kvp) => kvp.key.split(":").length === 2
 	);

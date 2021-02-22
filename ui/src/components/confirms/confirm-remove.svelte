@@ -79,17 +79,17 @@
             <CloseIcon />
         </button>
     </div>
-    <div class="flex-col text-xlarge to-receive">
+    <div class="flex-col text-large to-receive">
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span class="number-reg">{stringToFixed($pageStats.amounts.token, 12)}</span>
+            <span class="number-reg">{stringToFixed($pageStats.amounts.token, 8)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span>{$selectedToken.token_symbol}</span>
-                <Base64SvgLogo string={$selectedToken?.logo_svg_base64} width="30px" margin={"0 0 0 10px"}/>
+                <Base64SvgLogo string={$selectedToken?.token_base64_svg} width="30px" margin={"0 0 0 10px"}/>
             </div>
         </div>
-        <PlusSign width="18px" margin="0" color="var(--text-primary-dim)"/>
+        <PlusSign width="18px" margin="0" />
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 12)}</span>
+            <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 8)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span >{config.currencySymbol}</span>
                 <LamdenLogo width={'30px'} height={'30px'} margin={"0 0 0 10px"}/>

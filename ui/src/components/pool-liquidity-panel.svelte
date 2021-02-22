@@ -18,8 +18,8 @@
 	function handleCurrencyChange(e){
 		if (e.detail.toString() === "NaN") saveStoreValue(currencyAmount, null)
 		else{
-			saveStoreValue(currencyAmount, e.detail)
-			if ($tokenLP && determineValues && $selectedToken) $tokenAmount = quoteCalc.calcTokenValue($currencyAmount)
+			saveStoreValue(currencyAmount, toBigNumber(stringToFixed(e.detail, 8)))
+			if ($tokenLP && determineValues && $selectedToken) saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quoteCalc.calcTokenValue($currencyAmount), 8)))
 		}
 	}
 
@@ -29,7 +29,7 @@
 
 		if (e.detail.selected) saveStoreValue(selectedToken, e.detail.selected)
 		if ($tokenLP && determineValues && $tokenAmount) {
-			saveStoreValue(currencyAmount, quoteCalc.calcCurrencyValue($tokenAmount))
+			saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quoteCalc.calcCurrencyValue($tokenAmount), 8)))
 		}
 	}
 </script>

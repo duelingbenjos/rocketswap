@@ -9,6 +9,12 @@
         max-width: 750px;
         margin-bottom: 6rem;
     }
+
+    @media screen and (min-width: 430px) {
+        main{
+            padding: 20px;
+        }
+    }
 </style>
 
 <main>
