@@ -144,7 +144,6 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 						block.numOfTransactions = block.numOfTransactions + 1;
 						blockTxList.push(tx.hash);
 						subblockTxList.push(tx.hash);
-						console.log('METADATA', tx.transaction.metadata)
 					await handleNewBlock({
 							state: tx.state,
 							fn: tx.transaction.payload.function,
