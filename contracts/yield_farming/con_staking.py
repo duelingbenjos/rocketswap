@@ -215,13 +215,18 @@ def setDevWallet(vk: str):
 @export
 def setDevRewardPct(amount: float):
     assertOwner()
-    assert amount <= 1 and amount >= 0, 'Amount must be a value between 0 and 1'
+    assert amount < 1 and amount >= 0, 'Amount must be a value between 0 and 1'
     DevRewardPct.set(amount)
 
 @export
 def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
+
+@export
+def recoverYieldToken(amount: float):
+    assertOwner()
+    YIELD_TOKEN.transfer(amount=amount, to= Owner.get())
 
 def assertOwner():
     assert Owner.get() == ctx.caller, 'You must be the owner to call this contract.'
