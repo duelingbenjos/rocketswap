@@ -1,7 +1,12 @@
 ## Imports
 
 import currency
-import con_basic_token_01
+import con_basic_token
+
+## Setup Tokens
+
+FARMING_TOKEN = currency
+YIELD_TOKEN = con_basic_token
 
 ## State Variables
 
@@ -40,7 +45,7 @@ def addStakingTokens(amount: float):
     user = ctx.caller
     
     # Take the staking tokens from the user's wallet
-    currency.transfer_from(amount=amount, to=ctx.this, main_account=user)
+    FARMING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     # Update the Staked amount
     staked = StakedBalance.get()
@@ -87,11 +92,13 @@ def withdrawYield(amount: float):
 
     # Take % of Yield Tokens, send it to dev fund
     dev_share = yield_to_harvest * DevRewardPct.get()
-    con_basic_token_01.transfer(to = DevRewardWallet.get(), amount = dev_share)
+
+    if dev_share > 0:
+        YIELD_TOKEN.transfer(to = DevRewardWallet.get(), amount = dev_share)
 
     # Send remanding Yield Tokens to user
     user_share = yield_to_harvest-dev_share
-    con_basic_token_01.transfer(to=user, amount = user_share)
+    YIELD_TOKEN.transfer(to=user, amount = user_share)
 
     Withdrawals[user] = withdrawn_yield + yield_to_harvest
 
@@ -114,7 +121,7 @@ def withdrawTokensAndYield():
     # assert Yield.get() > yield_to_harvest, 'The contract does not have sufficient supplies to fufill your claim.'
 
     # Send Staking Tokens to user
-    currency.transfer(to=user, amount=stake_to_return)
+    FARMING_TOKEN.transfer(to=user, amount=stake_to_return)
     
     # check that the user has yield left to harvest (this should never be negative, but let's check here just in case)
     yield_to_harvest -= withdrawn_yield
@@ -123,11 +130,11 @@ def withdrawTokensAndYield():
         # Take % of Yield Tokens, send it to dev fund
         dev_share = yield_to_harvest * DevRewardPct.get()
         if dev_share > 0:
-            con_basic_token_01.transfer(to = DevRewardWallet.get(), amount = dev_share)
+            YIELD_TOKEN.transfer(to = DevRewardWallet.get(), amount = dev_share)
 
         # Send remanding Yield Tokens to user
         user_share = yield_to_harvest-dev_share
-        con_basic_token_01.transfer(to=user, amount = user_share)
+        YIELD_TOKEN.transfer(to=user, amount = user_share)
 
     # Reset User's Deposits
     Deposits[user] = False
