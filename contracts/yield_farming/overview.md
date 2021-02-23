@@ -21,7 +21,7 @@ Yield will be distributed at a fixed rate per vault over time, divided by the am
 
 Distribution Rate
 
-The distribution rate will change periodically, depending on how many participants are farming at any one time.
+The distribution amount per token staked will change, depending on how many tokens staked at any one time.
 
 Let's run the tape and see how it will work out
 
@@ -66,7 +66,7 @@ Each time someone leaves or enters the farmm the Epoch is incremented, and an ne
 ```
 {
     time: <starting time of next epoch (the turn of the next hour)>
-    pool_value: <the total amount of tokens in the pool>
+    staked: <the total amount of tokens in the pool>
 }
 ```
 
@@ -74,8 +74,8 @@ New joiners of the pool will create an object with the following schema :
 
 ```
 Deposits['TAUJEFF'][vk].append({
-    amount: 100
-    epoch: current_epoch
+    amount: **100**
+    epoch: **current_epoch**
 })
 ```
 
@@ -108,11 +108,4 @@ Deposits['TAUJEFF']['some_key'][].push({
     }
 ]
 
-def calcFarmed(pair: str) :
-    user = ctx.caller
-    farmed = 0
-    withdrawn = Withdrawals['TAUJEFF'][user]
-    let pair_arr = Deposits[pair][user]
-    for p in pair_arr:
-        delta = p.time - now()
 ```
