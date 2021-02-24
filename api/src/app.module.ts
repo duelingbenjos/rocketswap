@@ -20,6 +20,7 @@ import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
+import { TransactionService } from './transaction.service';
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -60,7 +61,8 @@ const db_options: TypeOrmModuleOptions = {
 		JWTGuard,
 		JwtStrategy,
 		AuthService,
-		Logger
+		Logger,
+		TransactionService
 	]
 })
 export class AppModule {}
