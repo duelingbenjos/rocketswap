@@ -1,12 +1,13 @@
 
 <script>
     export let width = "200px";
+    export let minWidth = null;
     export let margin = "0";
     export let color = "var(--text-primary-color)"
 </script>
 
 <svg fill={color} {width} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  viewBox="0 0 110 24"
-    style={`margin: ${margin}; isolation:isolate`}>
+    style={`margin: ${margin}; isolation:isolate; ${minWidth ? `min-width: ${minWidth}` : ""}`}>
     <defs>
         <clipPath id="_clipPath_8Zu7mh7d4n9CXeoQAzBVhhZ847Wneqfq">
             <rect width="110" height="24"/>

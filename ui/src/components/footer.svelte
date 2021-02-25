@@ -103,13 +103,15 @@
 	.wallet-info {
 		position: relative;
 		min-height: 35px;
+		min-width: 150px;
+		padding-right: 10px;
+		padding-bottom: 6px;
 		background-color: var(--color-secondary);
 		border-radius: var(--border-radius);
 		font-size: var(--text-size-large);
-		padding-left: 12px;
 		display: flex;
+		flex-direction: column;
 		justify-content: space-between;
-		align-items: center;
 		
 	}
 	.balance {
@@ -160,6 +162,9 @@
     @media screen and (min-width: 430px) {
         .wallet-info{
 			min-width: 230px;
+			padding: 0 0 0 12px;
+			flex-direction: row;
+			align-items: center;
         }
 		.text-size{
 			font-size: unset;

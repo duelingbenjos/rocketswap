@@ -199,7 +199,7 @@
     <div class="flex-col flex-center-center flex-grow"
         in:fade="{{delay: 0, duration: 300, opacity: 0.5, easing: quintOut}}">
         <input  id="filePicker" type="file" accept=".keystore" on:change={(ev) => handleFileEvent(ev)}>
-        <UploadIcon width="15%" margin="0 auto" />
+        <UploadIcon width="15%" margin="0 auto" minWidth="75px"/>
         <p class="text-large text-primary-dim">Select a Keystore File</p>
         <span class="text-error">{errorMsg}</span>
         <div class="buttons flex-row flex-center-center flex-grow">

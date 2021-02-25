@@ -1,19 +1,27 @@
 <script>
-    export let width = "24px";
     export let margin = "0";
     export let styles = "";
-
-    $: height = width
 </script>
 
 <style>
     div{
         background-image: url(/assets/images/RS_Logo.png);
+        background-repeat: no-repeat;
         background-size: contain;
         border: 2px solid var(--text-primary-color);
         border-radius: 99px;
-        width: 90px;
-        height: 90px;
+        width: 80px;
+        height: 80px;
+        min-width: 80px;
+        min-height: 80px;
+    }
+    @media screen and (min-width: 430px) {
+        div{
+            width: 90px;
+            height: 90px;
+            min-width: 90px;
+            min-height: 90px;
+        }
     }
 </style>
 

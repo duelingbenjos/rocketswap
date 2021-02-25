@@ -26,6 +26,15 @@
     .show{
         display: block;
     }
+    .light-dark-button{
+        display: none;
+    }
+    /* When page width is greater than 320px */
+    @media screen and (min-width: 320px) {
+        .light-dark-button{
+			display: block;
+		}
+    }
 
     @media screen and (min-width: 650px) {
         .main-menu{
@@ -39,7 +48,8 @@
         <slot name="links"> </slot>
         
     </div>
-    <LightDark />
+    <div class="light-dark-button">
+        <LightDark />
+    </div>
     <MenuButtonIcon width="40px" margin="0 0 0 16px"/>
-    
 </div>

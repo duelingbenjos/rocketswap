@@ -22,7 +22,7 @@
     }
     .background-icon{
         position: absolute;
-        top: 0px;
+        top: -9px;
         margin-left: 10px;
     }
 </style>

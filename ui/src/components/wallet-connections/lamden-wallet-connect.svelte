@@ -42,7 +42,7 @@
 
 <div class="flex-col flex-center-center flex-grow"
      in:fade="{{delay: 0, duration: 300, opacity: 0.5, easing: quintOut}}">
-    <LamdenLogoFullIcon width="45%" margin="-1rem 0 1rem"/>
+    <LamdenLogoFullIcon width="45%" margin="1rem 0 2rem" minWidth="200px"/>
     <label class="flex-row chk-container text-body2" id="chk-all">
         Auto Connect to Lamden Wallet?
         <input  type="checkbox" bind:checked={checked} on:change={toggleLamdenWalletAutoConnect}>

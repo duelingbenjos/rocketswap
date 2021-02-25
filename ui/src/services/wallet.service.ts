@@ -42,8 +42,9 @@ export class WalletService {
 	private _ws_joined: boolean = false
 	private connectionRequest = connectionRequest;
 	private installChecker = null;
-	private Lamden = LamdenJS
+	private Lamden = LamdenJS;
 	private keystore = null;
+	private txCallbacks = {};
 
 	public static getInstance() {
 		if (!WalletService._instance) {
@@ -219,20 +220,19 @@ export class WalletService {
 		let stampCost = await this.getStampCost(contractName, method)
 		if (this.userHasSufficientStamps(stampCost, callbacks)){
 			if (this.keystore){
-				console.log("creating a Lamden Transaction")
 				let networkInfo = {
 					type: this.connectionRequest.networkType,
 					hosts: [config.masternode]
 				}
 				let txInfo = this.createTxInfo(method, args, stampCost, contractName)
 				txInfo.senderVk = this.keystore.wallets[0].vk
-				console.log(txInfo)
 				let txb = new this.Lamden.TransactionBuilder(networkInfo, txInfo)
-				txb.sign(undefined, this.keystore.wallets[0])
-				txb.makeTransaction()
-				txb.tx.payload.uid = this.Lamden.utils.str2hex(new Date().toISOString())
-				console.log(txb)
-				console.log(JSON.stringify(txb.tx))
+				txb.getNonce().then(() => {
+					txb.sign(undefined, this.keystore.wallets[0])
+					txb.makeTransaction()
+					txb.tx.payload.uid = this.Lamden.utils.str2hex(new Date().toISOString())
+					this.wsService.sendProxyTxn(txb.tx, callback)
+				})
 			}
 			if (this.lwc.approved){
 				this.lwc.sendTransaction(this.createTxInfo(method, args, stampCost, contractName), callback)

@@ -85,6 +85,19 @@
 
 </script>
 
+<style>
+	button.large{
+		font-size: var(--text-size-large);
+	}
+/* When page width is greater than 430px (tablets) */
+@media screen and (min-width: 430px) {
+		button.large{
+		font-size: var(--text-size-xlarge);
+	}
+}
+
+</style>
+
 <button class="primary large full" disabled={disabled} on:click={openConfirm}> {disabledText || buttonText} </button>
 
 {#if open}

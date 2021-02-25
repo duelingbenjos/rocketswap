@@ -41,6 +41,7 @@
         border-radius:  73px var(--border-radius) var(--border-radius) var(--border-radius);
         background: var(--modal-background-primary);
         background: var(--modal-wallet-setup-background);
+        border: 1px solid var(--text-primary-color-dimmer);
     }
     button, input[type="submit"]{
         margin: 0 4px;

@@ -22,6 +22,7 @@
     const { toggleModal } = getContext('modal_functions')
 
     let selectedOption = 0
+    let screenWidth;
 
     const setSelectedOption = (selected) => selectedOption = selected
     const backToMain = () => selectedOption = 0
@@ -32,19 +33,25 @@
     .modal-style{
         align-items: flex-start;
         max-width: 650px;
-        border-radius:  73px var(--border-radius) var(--border-radius) var(--border-radius);
+        border-radius:  var(--border-radius);
         background: var(--modal-background-primary);
         background: var(--modal-wallet-setup-background);
+        border: 1px solid var(--text-primary-color-dimmer);
     }
     button.primary{
         margin-right: 10px;
         padding: 6px 14px;
+        width: 200px;
     }
     button.close-button{
         align-self: flex-start;
     }
     a{
         text-decoration: underline;
+    }
+    .wallet-button{
+        display: flex;
+        flex-direction: column;
     }
     .wallet-option{
         margin-top: 1rem;
@@ -58,13 +65,22 @@
         margin-top: 2rem;
         margin-bottom: 2rem;
     }
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            border-radius:  73px var(--border-radius) var(--border-radius) var(--border-radius);
+        }
+        .wallet-button{
+            display: flex;
+            flex-direction: row;
+        }
+    }
 </style>
 <div class="modal-style modal-center flex-col"
     in:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
     out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
     <div class="modal-heading text-xlarge">
         <div class="flex flex-center-center">
-            <RocketSwapCircleLogoIcon margin="0 16px 0 0 "/>
+            <RocketSwapCircleLogoIcon margin="0 16px 0 0 " width={screenWidth > 430 ? "24px" : "18px"}/>
             <span>
                 {#if selectedOption === 0} Choose a Login Option {/if}
                 {#if selectedOption === 1} Lamden Wallet Login {/if}
@@ -82,7 +98,7 @@
         <div
             in:fade="{{delay: 0, duration: 300, opacity: 0.5, easing: quintOut}}">
                 <div class="wallet-option">
-                <div class="flex flex-align-center">
+                <div class="wallet-button">
                     <button class="primary flex-row flex-center-center" on:click={() => setSelectedOption(1)} disabled={!$lwc_info.installed || $lwc_info.locked}>
                         <LamdenLogoIcon width="30px" margin="0 8px 0 0"/>
                         Lamden Wallet
@@ -136,3 +152,5 @@
         <KeystoreConnect {backToMain}/>
     {/if}
 </div>
+
+<svelte:window bind:innerWidth={screenWidth}/>
