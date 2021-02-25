@@ -12,6 +12,7 @@
 
     //Components
     import TokenSearch from './token-select-search.svelte'
+    import Modal from './modal.svelte'
 
     //Icons
     import Base64Svg from '../../icons/base64_svg.svelte'
@@ -36,6 +37,7 @@
     $: selected_contract = $selectedToken?.contract_name;
 
     const openTokenSelect = async () => {
+        console.log("TOKEN SELECT OPEN")
         open = true;
         api_tokens = await getTokenList()
     }
@@ -47,7 +49,6 @@
     }
 
     function createTokenList (tokenList, filter) {
-        console.log({tokenList})
         if (tokenList){
             if (filter !== "") {
                 if (filter.startsWith("con_")){
@@ -133,20 +134,14 @@
         align-items: center;
     }
 
-    .heading {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        margin: 0 0 1rem;
-    }
-
     hr {
         width: 100%;
         border-top: 0.5px solid #d9d9d90a;
     }
     .modal-style{
         box-sizing: border-box;
-        height: 80%;
+        max-height: calc(100vh * 0.7);
+        max-width: 400px;
     }
     .chevron{
         position: relative;
@@ -157,7 +152,8 @@
     /* When page width is greater than 430px and less than 650px (phones) */
     @media screen and (min-width: 430px) {
         .modal-style{
-            width: 400px;
+            height: 80%;
+            margin-top: 4rem;
         }
     }
 </style>
@@ -180,12 +176,12 @@
     </button>
 {/if}
 
-    {#if open}
-    <div class="modal">
+<Modal {open} toggleModal={closeTokenSelect}>
+    <div slot="main">
         <div class="modal-style flex-col text-large"
-            in:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
+            in:fly="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
             out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
-            <div class="heading">
+            <div class="modal-heading">
                 <span> Select a token </span> 
                 <button class="nostyle" on:click={closeTokenSelect}> 
                     <CloseIcon width="18px" />
@@ -222,4 +218,4 @@
             </div>
         </div>
     </div>
-{/if}
+</Modal>

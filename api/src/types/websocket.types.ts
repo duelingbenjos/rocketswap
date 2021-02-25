@@ -3,6 +3,7 @@ import { AuthenticationPayload } from "src/authentication/trollbox.controller";
 import { PriceEntity } from "src/entities/price.entity";
 import { BlockDTO } from "./misc.types";
 
+
 export type handleClientUpdate = (update: ClientUpdateType) => {};
 
 export type handleAuthenticateResponse = (auth_response: {
@@ -13,6 +14,10 @@ export type handleAuthenticateResponse = (auth_response: {
 export type handleTrollboxMsg = (payload: ITrollBoxMessage) => void;
 export type handleProxyTxnResponse = (txn_response: IProxyTxnReponse) => void;
 
+export interface ITxnRequest {
+	metadata: any,
+	payload: any
+}
 export interface IProxyTxnReponse {
 	payload: any
 	socket_id: string

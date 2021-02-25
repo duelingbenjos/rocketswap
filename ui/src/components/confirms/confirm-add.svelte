@@ -57,13 +57,18 @@
 
 <style>
     .modal-style{
-        width: 290px;
+        max-width: 330px;
     }
     .modal-sub-box{
         width: 345px;
     }
     .sub-text{
         margin: 0.5rem 0;
+    }
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            margin-top: 8rem;
+        }
     }
 </style>
 <div class="modal-style">

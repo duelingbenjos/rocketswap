@@ -13,8 +13,8 @@
 <style>
     button{
         position: fixed;
-        bottom: 20px;
-        right: 20px;
+        bottom: 10px;
+        right: 10px;
         z-index: 103;
         padding: 8px 12px;
         border-radius: 99px;
@@ -26,7 +26,7 @@
     }
 
     button:active{
-        bottom: 33px;
+        bottom: 8px;
         box-shadow: -1px 8px 23px 0px rgba(0, 0, 0, 0.5);
 	    -webkit-box-shadow: -1px 8px 23px 0px rgba(0, 0, 0, 0.5);
 	    -moz-box-shadow: -1px 8px 23px 0px rgba(0, 0, 0, 0.5);
@@ -34,9 +34,15 @@
     .large{
         display: none;
     }
+
     @media screen and (min-width: 430px) {
         button{
             padding: 10px 14px;
+            bottom: 20px;
+            right: 20px;
+        }
+        button:active{
+            bottom: 18px;
         }
         .small{
             display: none;

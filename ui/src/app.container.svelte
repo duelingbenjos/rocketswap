@@ -18,6 +18,7 @@
 
 	//Misc
 	import { show_token_select_store, show_swap_confirm, bearerToken } from './store'
+	import { setLamdenWalletAutoConnectStore } from './utils'
 
 
 	//TO DO REMOVE THIS!!
@@ -166,5 +167,3 @@
 <Footer />
 <TrollBoxButton />
 <TrollBox />
-
-
