@@ -5,7 +5,7 @@ import con_basic_token
 
 ## Setup Tokens
 
-FARMING_TOKEN = currency
+STAKING_TOKEN = currency
 YIELD_TOKEN = con_basic_token
 
 ## State Variables
@@ -45,7 +45,7 @@ def addStakingTokens(amount: float):
     user = ctx.caller
     
     # Take the staking tokens from the user's wallet
-    FARMING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
+    STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     # Update the Staked amount
     staked = StakedBalance.get()
@@ -121,7 +121,7 @@ def withdrawTokensAndYield():
     # assert Yield.get() > yield_to_harvest, 'The contract does not have sufficient supplies to fufill your claim.'
 
     # Send Staking Tokens to user
-    FARMING_TOKEN.transfer(to=user, amount=stake_to_return)
+    STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
     
     # check that the user has yield left to harvest (this should never be negative, but let's check here just in case)
     yield_to_harvest -= withdrawn_yield
@@ -215,13 +215,18 @@ def setDevWallet(vk: str):
 @export
 def setDevRewardPct(amount: float):
     assertOwner()
-    assert amount <= 1 and amount >= 0, 'Amount must be a value between 0 and 1'
+    assert amount < 1 and amount >= 0, 'Amount must be a value between 0 and 1'
     DevRewardPct.set(amount)
 
 @export
 def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
+
+@export
+def recoverYieldToken(amount: float):
+    assertOwner()
+    YIELD_TOKEN.transfer(amount=amount, to= Owner.get())
 
 def assertOwner():
     assert Owner.get() == ctx.caller, 'You must be the owner to call this contract.'

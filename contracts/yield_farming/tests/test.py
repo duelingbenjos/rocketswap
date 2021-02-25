@@ -312,7 +312,7 @@ class MyTestCase(unittest.TestCase):
 
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        # print(current_epoch['staked'])
+
         self.assertEqual(current_epoch_index, 4)
         self.assertEqual(current_epoch['staked'], 135)
 
@@ -383,6 +383,11 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(janis_deposits, False)
         self.assertEqual(murray_deposits, False)
         self.assertEqual(pete_deposits, False)
+
+    def test_05_recover_yield_token(self):
+        self.assertEqual(self.basic_token.balances['con_staking'], 10000000)
+        self.contract.recoverYieldToken(amount = 10000000)
+        self.assertEqual(self.basic_token.balances['con_staking'], 0)
 
         
 if __name__ == '__main__':
