@@ -14,7 +14,6 @@ import {
 	 } from '../store'
 import { get } from 'svelte/store'
 import { 
-	refreshTAUBalance, 
 	refreshLpBalances, 
 	setBearerToken, 
 	toBigNumber, 
@@ -109,7 +108,7 @@ export class WalletService {
 		if (this.keystore.wallets.length === 0) throw new Error("Keystore is empty.")
 		let vk = this.keystore.wallets[0].vk
 		this.getIntialBalances(vk)
-		this.joinBalanceFeed(vk)
+		this.wsService.joinBalanceFeed(vk)
 	}
 
 	private handleWalletInstalled = (e) => {
@@ -140,27 +139,10 @@ export class WalletService {
 			if (vk.length > 0 && approved){
 				//Get the inital balance 
 				this.getIntialBalances(vk)
-				this.joinBalanceFeed(vk)
+				this.wsService.joinBalanceFeed(vk)
 			}
 			return Object.assign(current, { approved, installed, locked, walletAddress: vk })
 		})
-	}
-
-	// Join Websocket Feeds for balance updates
-	private joinBalanceFeed = (vk) => {
-		if (!this._ws_joined) {
-			this.wsService.joinBalanceFeed(vk)
-			this._ws_joined = true
-		}
-	}
-
-	private getIntialBalances = async (vk) => {
-		await Promise.all([
-			refreshTAUBalance(vk), 
-			refreshLpBalances(vk),
-			this.getAccountName(vk),
-			setBearerToken(vk)
-		]).then((res) => console.log(res))
 	}
 
 	public logout = () => {
@@ -186,6 +168,14 @@ export class WalletService {
 			type: 'info',
 			duration: 3000
 		})
+	}
+
+	private getIntialBalances = async (vk) => {
+		await Promise.all([
+			refreshLpBalances(vk),
+			this.getAccountName(vk),
+			setBearerToken(vk)
+		])
 	}
 
 	private getStampCost = async (contractName, method) => {
@@ -250,7 +240,7 @@ export class WalletService {
 			"variableName": "key_to_name",
 			"key": account
 		  }]
-		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`,body)
+		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`,body).catch(err => console.log(err))
 		if (res?.data[0]?.value) {
 			accountName.set(res.data[0].value)
 			this.toastService.addToast({ 
@@ -270,7 +260,7 @@ export class WalletService {
 			"variableName": "name_to_key",
 			"key": name
 		  }]
-		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`, body)
+		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`, body).catch(err => console.log(err))
 	
 		return res?.data[0]?.value !== null
 	}
@@ -614,7 +604,6 @@ export class WalletService {
 		}
 		if (typeof txResults.txBlockResult.status !== 'undefined') {
 			if (txResults.txBlockResult.status === 0) {
-				setInterval(refreshTAUBalance, 2000)
 				setInterval(refreshLpBalances, 2000)
 				return 'success'
 			}

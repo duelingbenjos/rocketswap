@@ -12,15 +12,6 @@ export const replaceAll = (string, char, replace) => {
 	return string.split(char).join(replace)
 }
 
-export const refreshTAUBalance = async (account = undefined) => {
-	if (!account) account = get(lwc_info).walletAddress
-	if (!account) return toBigNumber("0")
-
-	const res = await API.getCurrencyBalance(account)
-	walletBalance.set(res)
-	return res
-}
-
 export const removeTAUBalance = async () => walletBalance.set("0")
 
 export const refreshLpBalances = async (account = undefined) => {
