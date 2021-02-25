@@ -23,7 +23,7 @@ export class TransactionService {
 			txn.events.on("response", (response) => {
 				this.socketService.handleProxyTxnResponse({
 					socket_id: id,
-					payload: response
+					payload: response.getAllTxnInfo()
 				});
 			});
 			txn.send().then(() => txn.checkForTransactionResult());
