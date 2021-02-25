@@ -2,30 +2,41 @@
 	import { onDestroy } from 'svelte'
 	import { fade } from 'svelte/transition';
 
-	//Misc
-	import { lwc_info, walletBalance, rocketState } from '../store'
+	// Misc
+	import { walletBalance, rocketState, keystore, walletAddress } from '../store'
 	import { config } from '../config'
 	import { formatAccountAddress, stringToFixed, openNewTab } from '../utils'
 
-	//Components
-	import Spinner from './pulse-spinner.svelte'
+	// Components
 	import Rocket from '../icons/rocket.svelte'
 	import Smoke from '../icons/smoke.svelte'
 	import TrollBoxButton from './misc/troll-box-button.svelte'
+	import ChooseWallet from './wallet-connections/choose-wallet.svelte'
+	import KeystoreLogin from './wallet-connections/keystore-login.svelte'
+	import Modal from './misc/modal.svelte'
 
-	//Services
+	// Icons
+	import AntennaIcon from '../icons/antenna.svelte'
+	
+	// Services
 	import { WalletService } from '../services/wallet.service'
 	const walletService = WalletService.getInstance();
 
-	//Bindings
+	// Bindings
 	let rocketElm;
 
 	let smoke = true;
 	let smokeList = [];
 	let smokeTimer = null;
 
+	let openConnectModal = false;
+
 	rocketState.subscribe(val => {
 		if (val == 2) setTimeout(rocketReset, 6000)
+	})
+
+	walletAddress.subscribe(val => {
+		console.log(val)
 	})
 
 	$: makeSmoke = $rocketState == 1 || $rocketState == 2 ? createSmoke() : stopSmoke();
@@ -63,15 +74,21 @@
 		location.reload()
 	}
 
-	const connnectToWallet = () => walletService.connectToWallet();
+	const openWalletUrl = () => openNewTab(`${config.blockExplorer}/addresses/${$walletAddress}`);
 
-	const openWalletUrl = () => openNewTab(`${config.blockExplorer}/addresses/${$lwc_info.walletAddress}`);
+	const toggleModal = (e) => {
+		if (openConnectModal) openConnectModal = false
+		else openConnectModal = true
+	}
+	const logout = () => {
+		walletService.logout()
+	}
 </script>
 
 <style>
 	.footer {
 		position: fixed;
-		bottom: 20px;
+		bottom: 10px;
 
 		display: flex;
 		align-items: center;
@@ -79,7 +96,7 @@
 		background-color: transparent;
 		z-index: 101;
 		width: 100%;
-		padding: 0 20px;
+		padding: 0 10px;
 
 		color: var(--wallet-info-text);
 	}
@@ -102,12 +119,22 @@
 	}
 
 	.wallet-message {
-		padding-right: 16px;
 		margin: 0 auto;
 	}
-	button.primary{
+	.primary{
 		border-radius: var(--border-radius);
 		margin-left: 10px;
+	}
+	button.not-connected{
+		padding: 7px 10px;
+	}
+	.connected{
+		background: var(--color-primary);
+		padding: 3px 10px;
+		color: var(--color-gray-5);
+	}
+	.text-size {
+		font-size: var(--text-size-small);
 	}
 	.rocket{
 		position: absolute;
@@ -123,13 +150,23 @@
 		display: none;
 		top: -59px;
 	}
+	.connected > a{
+		text-decoration: underline;
+		margin-right: 8px;
+	}
 
 
-	/* When page width is greater than 650px (tablets) */
+	/* When page width is greater than 430px (tablets) */
     @media screen and (min-width: 430px) {
         .wallet-info{
 			min-width: 230px;
         }
+		.text-size{
+			font-size: unset;
+		}
+		.connected{
+			padding: 2px 10px;
+		}
     }
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
@@ -145,38 +182,48 @@
 
 <div class="footer">
 	<div class="wallet-info">
-		{#if $lwc_info.installed === null} 
-			<Spinner size={29} color="#FFFFFF" unit="px" margin="0 auto" padding="0 41px 0 0"/>
+		{#if $walletAddress}
+			<div bind:this={rocketElm} 
+					in:fade="{{delay: 0, duration: 500}}"
+					class="rocket" 
+					class:blast-off={$rocketState == 2}
+					class:rocket-reset={$rocketState == 3}>
+				<Rocket 
+					width="75px" 
+					color="var(--success-color)" 
+					direction="up" 
+					shake={$rocketState == 1} 
+					fire={$rocketState == 2}
+					blastOff={$rocketState == 2}
+				/>
+			</div>
+			<div class="balance text-size">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
+			<div class="flex-row flex-center-center primary connected text-size">
+				<button class="flex flex-center-center" on:click={logout} title="logout">
+					<AntennaIcon width="20px" margin="0 8px 0 0" />
+				</button>
+				<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" >
+					{formatAccountAddress($walletAddress,4,2)}
+				</a>
+			</div>
 		{:else}
-			{#if $lwc_info.installed === false}
-				<button class="wallet-message" on:click={refreshPage}>Wallet not Installed</button>
-			{:else}
-				{#if $lwc_info.locked }
-					<div class="wallet-message">Wallet is Locked</div>
-				{:else}
-					{#if $lwc_info.approved}
-						<div bind:this={rocketElm} 
-							 in:fade="{{delay: 0, duration: 500}}"
-							 class="rocket" 
-							 class:blast-off={$rocketState == 2}
-							 class:rocket-reset={$rocketState == 3}>
-							<Rocket 
-								width="75px" 
-								color="var(--success-color)" 
-								direction="up" 
-								shake={$rocketState == 1} 
-								fire={$rocketState == 2}
-								blastOff={$rocketState == 2}
-							/>
-						</div>
-						<div class="balance">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
-						<button class="primary medium" on:click={openWalletUrl}>{formatAccountAddress($lwc_info.walletAddress,4,2)}</button>
-					{:else}
-						<button class="wallet-message" on:click={connnectToWallet}>Connect to Lamden Wallet</button>
-					{/if}
-				{/if}
-			{/if}
+			<button class="flex flex-align-center wallet-message text-size weight-600 text-color-white" on:click={toggleModal} title="login">
+				Connect Wallet
+			</button>
+			<button class="flex flex-center-center primary not-connected medium" on:click={toggleModal} title="login">
+				<AntennaIcon width="20px" margin="0 0 0 0" />
+			</button>
 		{/if}
 	</div>
 </div>
+
+<Modal open={openConnectModal} {toggleModal} zIndex={110}>
+	<div slot="main-centered">
+		{#if walletService.keystore}
+			<KeystoreLogin />
+		{:else}
+			<ChooseWallet {toggleModal}/>
+		{/if}
+	</div>
+</Modal>
 

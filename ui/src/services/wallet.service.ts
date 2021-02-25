@@ -1,7 +1,17 @@
 import WalletController from 'lamden_wallet_controller'
 import axios from 'axios'
+import LamdenJS from 'lamden-js'
 import { config, stamps, connectionRequest } from '../config'
-import { lwc_info, accountName, ws_id, walletBalance } from '../store'
+import { 
+	lwc_info, 
+	accountName, 
+	ws_id, 
+	walletBalance, 
+	lamdenWalletAutoConnect, 
+	tokenBalances,
+	keystore,
+	walletAddress
+	 } from '../store'
 import { get } from 'svelte/store'
 import { 
 	refreshTAUBalance, 
@@ -10,7 +20,15 @@ import {
 	toBigNumber, 
 	stringToFixed, 
 	stampsToTAU, 
-	createBlockExplorerLink } from '../utils'
+	createBlockExplorerLink,
+	setLSValue,
+	setLamdenWalletAutoConnectStore,
+	removeLpBalances,
+	removeTAUBalance,
+	removeBearerToken,
+	hasSavedKeystoreData,
+	getSavedKeystoreData,
+	removeLSValue } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -24,7 +42,8 @@ export class WalletService {
 	private _ws_joined: boolean = false
 	private connectionRequest = connectionRequest;
 	private installChecker = null;
-
+	private Lamden = LamdenJS
+	private keystore = null;
 
 	public static getInstance() {
 		if (!WalletService._instance) {
@@ -35,6 +54,7 @@ export class WalletService {
 
 	constructor() {
 		this.lwc = new WalletController()
+		console.log(LamdenJS)
 
 		// events
 		this.lwc.events.on('newInfo', this.handleWalletInfo)
@@ -43,6 +63,8 @@ export class WalletService {
 
 		//Do first check if wallet is installed, folloups will be done by 
 		this.installChecker = setInterval(this.checkForIntstalledWallet, 1500)
+		//console.log(getSavedKeystoreData())
+		if(hasSavedKeystoreData()) this.addKeystoreEncrypted(new this.Lamden.Keystore({keystoreData: getSavedKeystoreData()}))
 	}
 
 	private checkForIntstalledWallet = async () => {
@@ -53,13 +75,49 @@ export class WalletService {
 	}
 	public connectToWallet = async () => this.lwc.sendConnection(this.connectionRequest)
 
+	public addKeystoreEncrypted = (encryptedKeystore) => {
+		console.log(encryptedKeystore)
+		this.keystore = encryptedKeystore
+		console.log(this.keystore)
+	}
+	public addKeystoreDecrypted = (decrytedKeystore) => {
+		this.keystore = decrytedKeystore
+		keystore.set(this.keystore)
+	}
+	public decryptKeystore = (password) => {
+		if (!this.keystore) throw new Error("No Keystore Data.")
+		if (!this.keystore.encryptedData) throw new Error("No Keystore Data.")
+		if (!password) throw new Error("Password required to decrypt Keystore.")
+		try{
+			this.keystore.decryptKeystore(password) 
+			if (this.keystore.wallets.length === 0) throw new Error("Keystore is empty.")
+			keystore.set(this.keystore)
+		}catch (e){
+			throw new Error(e.message)
+		}
+	}
+
+	public removeKeystoreData = () => {
+		this.keystore = null
+		keystore.set(null)
+		removeLSValue('encrypted_keystore_data')
+	}
+
+	public conenctToKeystore = () => {
+		if (!this.keystore) throw new Error("No Keystore Data.")
+		if (this.keystore.wallets.length === 0) throw new Error("Keystore is empty.")
+		let vk = this.keystore.wallets[0].vk
+		this.getIntialBalances(vk)
+		this.joinBalanceFeed(vk)
+	}
+
 	private handleWalletInstalled = (e) => {
 		lwc_info.set(Object.assign(get(lwc_info), {installed: e}))
 	}
 
 	private handleWalletInfo = (e) => {
 		if (this.lwc.installed){
-			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0) this.connectToWallet();
+			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0 && get(lamdenWalletAutoConnect)) this.connectToWallet();
 
 			//If the wallet is installed then update the store if new information is passed
 			let lwc_info_store = get(lwc_info)
@@ -72,33 +130,58 @@ export class WalletService {
 
 	private updateLwcStore = async () => {
 		if (!this.lwc.installed) return
-
 		lwc_info.update(current => {
-			const { approved, installed, locked, walletAddress } = this.lwc;
-			console.log('get initial balances?')
-			console.log(walletAddress.length > 0 && approved)
-			if (walletAddress.length > 0 && approved){
+			const { approved, installed, locked } = this.lwc;
+			let vk = this.lwc.walletAddress
+			if (vk.length > 0 && approved){
 				//Get the inital balance 
-				this.getIntialBalances(walletAddress)
-				// Join Websocket Feeds for balance updates
-				console.log('ws_joined', this._ws_joined)
-				if (!this._ws_joined) {
-					this.wsService.joinBalanceFeed(walletAddress)
-					this._ws_joined = true
-					console.log('ws_joined', this._ws_joined)
-				}
+				this.getIntialBalances(vk)
+				this.joinBalanceFeed(vk)
 			}
-			return Object.assign(current, { approved, installed, locked, walletAddress })
+			return Object.assign(current, { approved, installed, locked, walletAddress: vk })
 		})
 	}
 
-	private getIntialBalances = async (walletAddress) => {
+	// Join Websocket Feeds for balance updates
+	private joinBalanceFeed = (vk) => {
+		if (!this._ws_joined) {
+			this.wsService.joinBalanceFeed(vk)
+			this._ws_joined = true
+		}
+	}
+
+	private getIntialBalances = async (vk) => {
 		await Promise.all([
-			refreshTAUBalance(walletAddress), 
-			refreshLpBalances(walletAddress),
-			this.getAccountName(walletAddress),
-			setBearerToken(walletAddress)
-		])
+			refreshTAUBalance(vk), 
+			refreshLpBalances(vk),
+			this.getAccountName(vk),
+			setBearerToken(vk)
+		]).then((res) => console.log(res))
+	}
+
+	public logout = () => {
+		lwc_info.update(current => {
+			current.walletAddress = ""
+			current.approved = false
+			return current
+		})
+		this.lwc.walletAddress = ""
+		this.lwc.approved = false
+		tokenBalances.set({})
+		accountName.set(null)
+		this.removeKeystoreData()
+		removeBearerToken()
+		setLSValue("lamden_wallet_autoconnect", false)
+		setLamdenWalletAutoConnectStore()
+		removeLpBalances()
+		removeTAUBalance()
+		this.toastService.addToast({ 
+			icon: "rocketswapLogo",
+			heading: `Goodbye`,
+			text: `Let's fly again soon!`, 
+			type: 'info',
+			duration: 3000
+		})
 	}
 
 	private getStampCost = async (contractName, method) => {
@@ -115,7 +198,6 @@ export class WalletService {
 	}
 
 	private userHasSufficientStamps = (stampCost, callbacks = undefined) => {
-		console.log({stampCost})
 		if (stampsToTAU(stampCost) < get(walletBalance)) return true
 		if (callbacks) callbacks.error(["Insufficient Stamps"])
 		this.insufficientCurrencyForTransactionToast(stampCost)
@@ -135,9 +217,26 @@ export class WalletService {
 
 	private sendTransaction = async (contractName, method, args, callbacks, callback) => {
 		let stampCost = await this.getStampCost(contractName, method)
-		console.log(stampCost)
 		if (this.userHasSufficientStamps(stampCost, callbacks)){
-			this.lwc.sendTransaction(this.createTxInfo(method, args, stampCost, contractName), callback)
+			if (this.keystore){
+				console.log("creating a Lamden Transaction")
+				let networkInfo = {
+					type: this.connectionRequest.networkType,
+					hosts: [config.masternode]
+				}
+				let txInfo = this.createTxInfo(method, args, stampCost, contractName)
+				txInfo.senderVk = this.keystore.wallets[0].vk
+				console.log(txInfo)
+				let txb = new this.Lamden.TransactionBuilder(networkInfo, txInfo)
+				txb.sign(undefined, this.keystore.wallets[0])
+				txb.makeTransaction()
+				txb.tx.payload.uid = this.Lamden.utils.str2hex(new Date().toISOString())
+				console.log(txb)
+				console.log(JSON.stringify(txb.tx))
+			}
+			if (this.lwc.approved){
+				this.lwc.sendTransaction(this.createTxInfo(method, args, stampCost, contractName), callback)
+			}
 		}
 	}
 
@@ -187,7 +286,7 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			const checkForName = async () => {
-				await this.getAccountName(this.lwc.walletAddress);
+				await this.getAccountName(get(walletAddress));
 				if (!get(accountName)){
 					setTimeout(checkForName, 1000)
 				}else{
@@ -275,7 +374,7 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = "0";
 			res.data.txBlockResult.state.forEach(stateChange => {
-				if (stateChange.key === `${connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`){
+				if (stateChange.key === `${connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`){
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
@@ -332,7 +431,7 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = '0'
 			res.data.txBlockResult.state.forEach((stateChange) => {
-				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`) {
+				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`) {
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
@@ -368,7 +467,7 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = "0";
 			res.data.txBlockResult.state.forEach(stateChange => {
-				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${this.lwc.walletAddress}`){
+				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`){
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
@@ -538,7 +637,7 @@ export class WalletService {
 
 	public needsApproval = async (contract, amount) => {
 		console.log({contract, amount})
-		let approvedAmount = await this.getApprovedAmount(this.lwc.walletAddress, contract)
+		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract)
 		console.log({approvedAmount, approvedAmountStr: approvedAmount.toString(), needs: approvedAmount.isLessThan(amount)})
 		return approvedAmount.isLessThan(amount)
 	}

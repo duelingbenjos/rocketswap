@@ -59,7 +59,7 @@
 
 <style>
     .modal-style{
-        width: 290px;
+        max-width: 330px;
     }
     .modal-sub-box{
         width: 345px;
@@ -72,6 +72,12 @@
     }
     .separator{
         margin: 0 11px;
+    }
+
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            margin-top: 8rem;
+        }
     }
 </style>
 <div class="modal-style">

@@ -7,7 +7,7 @@
     const walletService = WalletService.getInstance();
 
     //Stores
-    import { lwc_info, walletIsReady } from '../store'
+    import { walletAddress, walletIsReady } from '../store'
 
     //Icons
     import Base64SvgLogo from '../icons/base64_svg.svelte'
@@ -22,7 +22,7 @@
 
     async function getLpBalances (ready) {
         if (!ready) return []
-        let balancesRes = await apiService.getUserLpBalance($lwc_info.walletAddress)
+        let balancesRes = await apiService.getUserLpBalance($walletAddress)
 
         if (balancesRes) {
             balances = balancesRes.points

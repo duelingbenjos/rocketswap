@@ -59,7 +59,7 @@
 
 <style>
     .modal-style{
-        width: 290px;
+        max-width: 330px;
     }
     .sub-text{
         margin: 0.5rem 0;
@@ -70,6 +70,12 @@
     }
     .modal-confirm-details-box{
         padding-top: 1rem;
+    }
+
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            margin-top: 8rem;
+        }
     }
 </style>
 <div class="modal-style">
