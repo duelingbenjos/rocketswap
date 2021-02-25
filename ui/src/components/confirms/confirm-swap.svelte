@@ -16,7 +16,7 @@
 
     //Misc
     import { rocketState } from '../../store'
-    import { stringToFixed, toBigNumber, refreshTAUBalance, refreshLpBalances } from '../../utils'
+    import { stringToFixed, toBigNumber, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -80,8 +80,6 @@
 
     const finish = () => {
         loading = false;
-        setTimeout(refreshTAUBalance, 2500)
-        setTimeout(refreshTAUBalance, 10000)
     }
 
     const swapBuy = () => {

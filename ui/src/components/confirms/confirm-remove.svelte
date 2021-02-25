@@ -16,7 +16,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, refreshLpBalances, refreshTAUBalance } from '../../utils'
+    import { stringToFixed, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -41,8 +41,6 @@
 
     const finish = () => {
         loading = false;
-        setTimeout(refreshTAUBalance, 2500)
-        setTimeout(refreshTAUBalance, 10000)
     }
 
     const removeLiquidity = () => {

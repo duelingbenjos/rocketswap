@@ -6,7 +6,6 @@
 	//Components
 	import Header from './components/header.svelte'
 	import Footer from './components/footer.svelte'
-	import Dimmer from './components/dimmer.svelte'
 	import TrollBox from './components/misc/troll-box.svelte'
 	import TrollBoxButton from './components/misc/troll-box-button.svelte'
 	import ToastsContainer from './components/toasts-container.svelte'
@@ -15,12 +14,7 @@
 	import { WalletService } from './services/wallet.service'
 	import { ApiService } from './services/api.service'
 	import { WsService } from './services/ws.service'
-
-	//Misc
-	import { show_token_select_store, show_swap_confirm, bearerToken } from './store'
-	import { setLamdenWalletAutoConnectStore } from './utils'
-
-
+	
 	//TO DO REMOVE THIS!!
 	import { ToastService } from './services/toast.service'
 	const toastService = ToastService.getInstance()
