@@ -44,7 +44,6 @@ export class WalletService {
 	private installChecker = null;
 	private Lamden = LamdenJS;
 	private keystore = null;
-	private txCallbacks = {};
 
 	public static getInstance() {
 		if (!WalletService._instance) {
@@ -64,6 +63,7 @@ export class WalletService {
 
 		//Do first check if wallet is installed, folloups will be done by 
 		this.installChecker = setInterval(this.checkForIntstalledWallet, 1500)
+		setLamdenWalletAutoConnectStore()
 		//console.log(getSavedKeystoreData())
 		if(hasSavedKeystoreData()) this.addKeystoreEncrypted(new this.Lamden.Keystore({keystoreData: getSavedKeystoreData()}))
 	}
@@ -118,6 +118,9 @@ export class WalletService {
 
 	private handleWalletInfo = (e) => {
 		if (this.lwc.installed){
+			console.log(this.lwc.approved === false)
+			console.log(this.lwc.walletAddress.length > 0)
+			console.log(get(lamdenWalletAutoConnect))
 			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0 && get(lamdenWalletAutoConnect)) this.connectToWallet();
 
 			//If the wallet is installed then update the store if new information is passed
