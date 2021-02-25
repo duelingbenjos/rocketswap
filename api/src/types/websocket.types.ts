@@ -11,7 +11,12 @@ export type handleAuthenticateResponse = (auth_response: {
 }) => void;
 
 export type handleTrollboxMsg = (payload: ITrollBoxMessage) => void;
+export type handleProxyTxnResponse = (txn_response: IProxyTxnReponse) => void;
 
+export interface IProxyTxnReponse {
+	payload: any
+	socket_id: string
+}
 export interface ITrollBoxMessage {
 	sender: string;
 	message: string;

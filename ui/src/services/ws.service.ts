@@ -31,7 +31,6 @@ export class WsService {
   }
 
   setupEvents = () => {
-    // console.log('setup events')
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
       if (!this.previously_connected) {
@@ -65,6 +64,7 @@ export class WsService {
       setBearerToken()
     })
     this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
+    this.connection.on('proxy_txn_res', this.handleProxyTxnResponse)
   }
 
   setupSubs = () => {
@@ -93,10 +93,10 @@ export class WsService {
 
   private handleTradeUpdate(event) {
     console.log(event)
-    if (event.history) tradeHistory.set( valuesToBigNumber(event.history))
-    else{
-      if (event.action === "trade_update"){
-        tradeUpdates.update(trades => {
+    if (event.history) tradeHistory.set(valuesToBigNumber(event.history))
+    else {
+      if (event.action === 'trade_update') {
+        tradeUpdates.update((trades) => {
           trades.push(valuesToBigNumber(event))
           console.log(trades)
           return trades
@@ -114,6 +114,14 @@ export class WsService {
   private handleTrollboxAuthCode(payload) {
     console.log(payload)
     ws_id.set(payload)
+  }
+
+  private handleProxyTxnResponse(payload) {
+    console.log(payload)
+  }
+
+  public sendProxyTxn(payload) {
+    this.connection.emit('send_transaction', payload)
   }
 
   private handleTrollboxHistory(payload: any[]) {}
