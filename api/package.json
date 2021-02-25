@@ -34,6 +34,7 @@
     "bcrypt": "^5.0.0",
     "bignumber.js": "^9.0.1",
     "class-validator": "^0.13.1",
+    "lamden-js": "^1.4.9",
     "mongoose": "^5.10.9",
     "nodemon": "^2.0.6",
     "passport": "^0.4.1",
