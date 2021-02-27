@@ -1,16 +1,6 @@
 version: '3'
 services:
 
-  # rocketswap-mariadb:
-  #   image: bitnami/mariadb:10.4
-  #   container_name: rocketswap-mariadb
-  #   environment:
-  #     - MARIADB_DATABASE=rocketswap
-  #     - MARIADB_ROOT_USER=root
-  #     - MARIADB_ROOT_PASSWORD=root
-  #   networks:
-  #     - rocketswap-network
-
   mongo:
     image: mongo
     restart: always
@@ -22,7 +12,6 @@ services:
     container_name: rocketswap-mongo
     networks: 
       - rocketswap-network
-
 
   ui:
     build: ./ui
@@ -42,7 +31,6 @@ services:
     ports:
       - 80:80
 
-
   api:
     build: ./api
     image: rocketswap-api
@@ -58,6 +46,16 @@ services:
       - rocketswap-network
     ports:
       - 3002:3002
+
+  docs:
+    build: ./docs
+    image: rocketswap-docs
+    restart: always
+    container_name: rocketswap-docs
+    networks:
+      - rocketswap-network
+    ports:
+      - 3000:3000
 
 volumes:
   rocketswap-volume:
