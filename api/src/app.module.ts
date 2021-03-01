@@ -14,7 +14,7 @@ import { NameEntity } from "./entities/name.entity";
 import { TrollboxController } from "./authentication/trollbox.controller";
 import { RefreshTokensRepository } from "./authentication/refresh-token.repository";
 import { TokensService } from "./authentication/tokens.service";
-import { JwtModule, JwtService } from "@nestjs/jwt";
+import { JwtModule } from "@nestjs/jwt";
 import { JWTGuard } from "./authentication/jwt.guard";
 import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
@@ -47,7 +47,7 @@ const db_options: TypeOrmModuleOptions = {
 		JwtModule.register({
 			secret: "<SECRET KEY>",
 			signOptions: {
-				expiresIn: "1m"
+				expiresIn: "30d"
 			}
 		})
 	],
