@@ -38,7 +38,7 @@ def seed():
         "staked": 0
     }
 
-    EmissionRatePerHour.set(3000)
+    EmissionRatePerHour.set(136.98) # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(0.1)
 
     StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0)) # The datetime from which you want to allow staking.
