@@ -1,28 +1,31 @@
-## Imports
+# Imports
 
 import currency
 import con_basic_token
 
-## Setup Tokens
+# Setup Tokens
 
 STAKING_TOKEN = currency
 YIELD_TOKEN = con_basic_token
 
-## State Variables
+# State Variables
 
 Owner = Variable()
 DevRewardWallet = Variable()
 EmissionRatePerHour = Variable()
 DevRewardPct = Variable()
+StartTime = Variable()
+EndTime = Variable()
+OpenForBusiness = Variable()  # If false, users will be unable to join the pool
 
-## State
+# State
 
-Deposits = Hash(default_value = False)
-Withdrawals = Hash(default_value = 0)
+Users = Hash(default_value=False)
+Deposits = Hash(default_value=False)
+Withdrawals = Hash(default_value=0)
 CurrentEpochIndex = Variable()
-Epochs = Hash(default_value = False)
-StakedBalance = Variable() # The total amount of farming token in the vault.
-Active = Variable() # 
+Epochs = Hash(default_value=False)
+StakedBalance = Variable()  # The total amount of farming token in the vault.
 
 @construct
 def seed():
@@ -38,12 +41,18 @@ def seed():
     EmissionRatePerHour.set(3000)
     DevRewardPct.set(0.1)
 
+    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0)) # The datetime from which you want to allow staking.
+    EndTime.set(datetime.datetime(year=2050, month=1, day=1, hour=0)) # The datetime at which you want staking to finish.
+
+    OpenForBusiness.set(True)
+
 @export
 def addStakingTokens(amount: float):
+    assert OpenForBusiness.get() == True, 'This staking pool is not open right now.'
     assert amount > 0, 'You cannot stake a negative balance.'
 
     user = ctx.caller
-    
+
     # Take the staking tokens from the user's wallet
     STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
@@ -81,7 +90,8 @@ def withdrawYield(amount: float):
     harvestable_yield = 0
 
     for d in deposits:
-        harvestable_yield += calculateYield(starting_epoch_index=d['starting_epoch'], start_time=d['time'], amount=d['amount'])
+        harvestable_yield += calculateYield(
+            starting_epoch_index=d['starting_epoch'], start_time=d['time'], amount=d['amount'])
 
     # Determine maximum amount of yield user can withdraw
     harvestable_yield -= withdrawn_yield
@@ -94,13 +104,14 @@ def withdrawYield(amount: float):
     dev_share = yield_to_harvest * DevRewardPct.get()
 
     if dev_share > 0:
-        YIELD_TOKEN.transfer(to = DevRewardWallet.get(), amount = dev_share)
+        YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
 
     # Send remanding Yield Tokens to user
     user_share = yield_to_harvest-dev_share
-    YIELD_TOKEN.transfer(to=user, amount = user_share)
+    YIELD_TOKEN.transfer(to=user, amount=user_share)
 
     Withdrawals[user] = withdrawn_yield + yield_to_harvest
+
 
 @export
 def withdrawTokensAndYield():
@@ -115,14 +126,13 @@ def withdrawTokensAndYield():
     yield_to_harvest = 0
 
     for d in deposits:
-        yield_to_harvest += calculateYield(starting_epoch_index=d['starting_epoch'], start_time=d['time'], amount=d['amount'])
+        yield_to_harvest += calculateYield(
+            starting_epoch_index=d['starting_epoch'], start_time=d['time'], amount=d['amount'])
         stake_to_return += d['amount']
-
-    # assert Yield.get() > yield_to_harvest, 'The contract does not have sufficient supplies to fufill your claim.'
 
     # Send Staking Tokens to user
     STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
-    
+
     # check that the user has yield left to harvest (this should never be negative, but let's check here just in case)
     yield_to_harvest -= withdrawn_yield
     if yield_to_harvest > 0:
@@ -130,11 +140,11 @@ def withdrawTokensAndYield():
         # Take % of Yield Tokens, send it to dev fund
         dev_share = yield_to_harvest * DevRewardPct.get()
         if dev_share > 0:
-            YIELD_TOKEN.transfer(to = DevRewardWallet.get(), amount = dev_share)
+            YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
 
         # Send remanding Yield Tokens to user
         user_share = yield_to_harvest-dev_share
-        YIELD_TOKEN.transfer(to=user, amount = user_share)
+        YIELD_TOKEN.transfer(to=user, amount=user_share)
 
     # Reset User's Deposits
     Deposits[user] = False
@@ -147,11 +157,11 @@ def withdrawTokensAndYield():
     StakedBalance.set(new_staked_amount)
 
     # Increment Epoch
-    incrementEpoch(new_staked_amount = new_staked_amount)
+    incrementEpoch(new_staked_amount=new_staked_amount)
 
 
-## This runs over each of the items in the user's Deposit
-def calculateYield(starting_epoch_index:int, start_time, amount:float):
+# This runs over each of the items in the user's Deposit
+def calculateYield(starting_epoch_index: int, start_time, amount: float):
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
     y = 0
@@ -162,38 +172,50 @@ def calculateYield(starting_epoch_index:int, start_time, amount:float):
         delta = 0
 
         if starting_epoch_index == current_epoch_index:
-            delta = now - start_time
+            delta = fitTimeToRange(now) - fitTimeToRange(start_time)
         elif this_epoch_index == starting_epoch_index:
-            delta = next_epoch['time'] - start_time
+            delta = fitTimeToRange(next_epoch['time']) - fitTimeToRange(start_time)
         elif this_epoch_index == current_epoch_index:
-            delta = now - this_epoch['time']
+            delta = fitTimeToRange(now) - fitTimeToRange(this_epoch['time'])
         else:
-            delta = next_epoch['time'] - this_epoch['time']
+            delta = fitTimeToRange(next_epoch['time']) - fitTimeToRange(this_epoch['time'])
 
         pct_share_of_stake = amount / this_epoch['staked']
-        ## These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
+        # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond()
-        deposit_yield_this_epoch = decimal(global_yield_this_epoch) * pct_share_of_stake
+        deposit_yield_this_epoch = decimal(
+            global_yield_this_epoch) * pct_share_of_stake
         y += deposit_yield_this_epoch
 
         this_epoch_index += 1
-        
+
     return y
+
+
+def fitTimeToRange(time: Any):
+    if time < StartTime.get():
+        time = StartTime.get()
+    elif time > EndTime.get():
+        time = EndTime.get()
+    return time
+
 
 @export
 def getCurrentEpochIndex():
     current_epoch_index = CurrentEpochIndex.get()
     return current_epoch_index
 
+
 def incrementEpoch(new_staked_amount: float):
     current_epoch = CurrentEpochIndex.get()
     new_epoch_idx = current_epoch + 1
     CurrentEpochIndex.set(new_epoch_idx)
     Epochs[new_epoch_idx] = {
-        "time" : now,
-        "staked" : new_staked_amount
+        "time": now,
+        "staked": new_staked_amount
     }
     return new_epoch_idx
+
 
 @export
 def getEmissionRatePerSecond():
@@ -202,15 +224,18 @@ def getEmissionRatePerSecond():
     emission_rate_per_second = emission_rate_per_minute / 60
     return emission_rate_per_second
 
+
 @export
-def setOwner(vk:str):
+def setOwner(vk: str):
     assertOwner()
     Owner.set(vk)
+
 
 @export
 def setDevWallet(vk: str):
     assertOwner()
     DevRewardWallet.set(vk)
+
 
 @export
 def setDevRewardPct(amount: float):
@@ -218,15 +243,38 @@ def setDevRewardPct(amount: float):
     assert amount < 1 and amount >= 0, 'Amount must be a value between 0 and 1'
     DevRewardPct.set(amount)
 
+
 @export
 def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
 
+
 @export
 def recoverYieldToken(amount: float):
     assertOwner()
-    YIELD_TOKEN.transfer(amount=amount, to= Owner.get())
+    YIELD_TOKEN.transfer(amount=amount, to=Owner.get())
+
+
+@export
+def allowStaking(is_open: bool):
+    assertOwner()
+    OpenForBusiness.set(is_open)
+
+
+@export
+def setStartTime(year: int, month: int, day: int, hour: int):
+    assertOwner()
+    time = datetime.datetime(year, month, day, hour)
+    StartTime.set(time)
+
+
+@export
+def setEndTime(year: int, month: int, day: int, hour: int):
+    assertOwner()
+    time = datetime.datetime(year, month, day, hour)
+    EndTime.set(time)
+
 
 def assertOwner():
-    assert Owner.get() == ctx.caller, 'You must be the owner to call this contract.'
+    assert Owner.get() == ctx.caller, 'You must be the owner to call this function.'
