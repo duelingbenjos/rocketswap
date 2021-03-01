@@ -14,7 +14,7 @@
 	const ws = WsService.getInstance()
 
 	//Stores
-	import { lwc_info, tokenBalances, walletIsReady, saveStoreValue,  } from '../store'
+	import { tokenBalances, walletIsReady, saveStoreValue, walletAddress  } from '../store'
 	
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
@@ -100,12 +100,12 @@
 		let inputAmount = toBigNumber("0");
 		if ($buy) {
 			if ($currencyAmount) inputAmount = $currencyAmount
-			if (await walletService.needsApproval($lwc_info.walletAddress, "currency", inputAmount)){
+			if (await walletService.needsApproval($walletAddress, "currency", inputAmount)){
 				txList.push({contract: "currency", method: "approve"})
 			}
 		}else{
 			if ($tokenAmount) inputAmount = $tokenAmount
-			if (await walletService.needsApproval($lwc_info.walletAddress, contractName, inputAmount)){
+			if (await walletService.needsApproval($walletAddress, contractName, inputAmount)){
 				txList.push({contract: contractName, method: "approve"})
 			}			
 		}

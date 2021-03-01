@@ -28,7 +28,9 @@
 		box-sizing: border-box;
 		justify-content: space-between;
 	}
-
+	.logo-container{
+		margin-right: 20px;
+	}
 	.right-content{
 		display: none;
 		justify-content: flex-end;
@@ -57,6 +59,10 @@
 		padding: 0 5px;
 
 	}
+	
+	.light-dark-button{
+		display: block;
+	}
 
 	a:hover {
 		text-decoration: none;
@@ -72,7 +78,15 @@
 		color: var(--text-primary-color-inverted-color);
 	}
 
-	/* When page width is greater than 650px (tablets) */
+	
+	/* When page width is greater than 320px */
+    @media screen and (min-width: 320px) {
+        .light-dark-button{
+			display: none;
+		}
+    }
+
+	/* When page width is greater than 430px (tablets) */
     @media screen and (min-width: 430px) {
         .wallet-info{
 			min-width: 230px;
@@ -118,6 +132,9 @@
 					</a> 
 				{/if}
 			{/each}
+			<div class="light-dark-button">
+				<LightDark margin="0 auto"/>
+			</div>
 		</div>
 	</MainMenu>
 </div>

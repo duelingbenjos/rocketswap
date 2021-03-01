@@ -2,7 +2,7 @@ import Lamden from 'lamden-js'
 import { config, connectionRequest, stamps } from './config'
 import BigNumber from 'bignumber.js'
 import { get } from 'svelte/store'
-import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue, bearerToken } from './store'
+import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue, bearerToken, lamdenWalletAutoConnect } from './store'
 
 import { ApiService } from './services/api.service'
 
@@ -12,14 +12,7 @@ export const replaceAll = (string, char, replace) => {
 	return string.split(char).join(replace)
 }
 
-export const refreshTAUBalance = async (account = undefined) => {
-	if (!account) account = get(lwc_info).walletAddress
-	if (!account) return toBigNumber("0")
-
-	const res = await API.getCurrencyBalance(account)
-	walletBalance.set(res)
-	return res
-}
+export const removeTAUBalance = async () => walletBalance.set("0")
 
 export const refreshLpBalances = async (account = undefined) => {
 	if (!account) account = get(lwc_info).walletAddress
@@ -35,15 +28,25 @@ export const refreshLpBalances = async (account = undefined) => {
 	return balances
 }
 
+export const removeLpBalances = async () => lpBalances.set({})
+
 export const setBearerToken = (account = undefined) => {
 	if (!account) account = get(lwc_info).walletAddress
 	if (!account) return
 	let tokenInfo = localStorage.getItem('auth_token')
 	if (tokenInfo) {
 		tokenInfo = JSON.parse(tokenInfo)
-		if (tokenInfo?.user?.vk === account) bearerToken.set(tokenInfo?.payload?.token || null)
-		else localStorage.removeItem('auth_token')
+		if (tokenInfo?.user?.vk === account) {
+			console.log("SETTING BEARER TOKEN")
+			bearerToken.set(tokenInfo?.payload?.token || null)
+		}
+		else removeLSValue('auth_token')
 	}
+}
+
+export const removeBearerToken = () => {
+	removeLSValue('auth_token')
+	bearerToken.set(null)
 }
 
 export const stampsToTAU = (stampCost) => stampCost / stamps.currentRatio
@@ -56,6 +59,41 @@ export const getBaseUrl = (url): string => {
 export const openNewTab = (url) => window.open(url);
 
 export const createBlockExplorerLink = (route, id) => `${config.blockExplorer}/${route}/${id}`
+
+export const setLamdenWalletAutoConnectStore = () => {
+	let autoConnect = localStorage.getItem("lamden_wallet_autoconnect")
+	if (autoConnect === null) lamdenWalletAutoConnect.set(false)
+	else lamdenWalletAutoConnect.set(JSON.parse(autoConnect))
+}
+export const toggleLamdenWalletAutoConnect = () => {
+	let autoConnect = get(lamdenWalletAutoConnect)
+	if (autoConnect) {
+		setLSValue("lamden_wallet_autoconnect", false)
+	}else{
+		setLSValue("lamden_wallet_autoconnect", true)
+	}
+	setLamdenWalletAutoConnectStore()
+}
+export const setLSValue = (key, value) => {
+	localStorage.setItem(key, JSON.stringify(value))
+}
+export const removeLSValue = (key) => {
+	console.log({key})
+	localStorage.removeItem(key)
+	console.log(localStorage.getItem(key))
+}
+
+export const hasSavedKeystoreData = () => {
+	let keystoreData = localStorage.getItem("encrypted_keystore_data")
+	if (keystoreData === null) return false
+	if (keystoreData) return true
+	return false
+}
+
+export const getSavedKeystoreData = () => {
+	if (hasSavedKeystoreData()) return JSON.parse(JSON.parse(localStorage.getItem("encrypted_keystore_data")))
+	return null
+}
 
 export const checkForApproval = (account: string) => {
   return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${connectionRequest.contractName}`)
@@ -100,6 +138,7 @@ export const calculateRgba = (input, opacity) => {
     .join(`, `)
   return `rgba(${rgbValues}, ${opacity})`
 }
+
 
 export const stringToFixed = (value: string, precision: number) => {
   if (!value) return "0.0"
@@ -344,6 +383,7 @@ export const pageUtils = (pageStores) => {
 	}
 
 	const applyTokenBalance = (tokenRes) => {
+		console.log(get(walletIsReady))
 		if (!get(walletIsReady)) tokenRes.token.balance = 0
 		else tokenRes.token.balance = get(tokenBalances)[tokenRes.token.contract_name] || 0;
 		return tokenRes

@@ -85,7 +85,6 @@
 			placeholder="0.0" 
 			value={inputValue ? inputValue.isNaN() ? "" : inputValue?.toString() : ""} 
 			bind:this={inputElm}
-			type="text"
 			on:input={handleInputChange}
         />
 

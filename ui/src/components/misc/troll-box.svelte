@@ -253,7 +253,6 @@
                 />
                 <button class="send-message primary" disabled={name === ""} on:click={handleSendMessage}>Send</button>
             {/if}
-
         </div>
     </div>
 </div>

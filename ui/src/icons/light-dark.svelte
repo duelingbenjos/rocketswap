@@ -4,6 +4,8 @@
     //Icons
     import LightMode from './lightmode.svelte'
     import DarkMode from './darkmode.svelte'
+
+    export let margin = "0";
     
     const { currentThemeName, themeToggle } = getContext('app')
 </script>
@@ -65,7 +67,7 @@
 
 </style>
 
-<div class="wrapper">
+<div class="wrapper" style={`margin: ${margin};`}>
     <div class="icons" 
             class:back={$currentThemeName === "dark"} 
             class:front={$currentThemeName === "light"} 

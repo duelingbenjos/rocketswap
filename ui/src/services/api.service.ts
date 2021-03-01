@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { token_list_store, bearerToken } from '../store'
-import { getBaseUrl, valuesToBigNumber } from '../utils'
+import { getBaseUrl, valuesToBigNumber, removeLSValue } from '../utils'
 import { config } from '../config'
 import { get } from 'svelte/store'
 
@@ -85,7 +85,7 @@ export class ApiService {
 			return res
 		} catch (err) {
 			console.log(err)
-			localStorage.removeItem('auth_token')
+			removeLSValue('auth_token')
 			return false
 		}
 	}
