@@ -219,7 +219,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 					if (currBatchMax > batchAmount) currBatchMax + batchAmount;
 					// let to_process = []
 					for (let i = currBlockNum + 1; i <= currBatchMax; i++) {
-						timedelay = (i - currBlockNum) * 100;
+						timedelay = (i - currBlockNum) * 120;
 						console.log(
 							"getting block: " +
 								i +
