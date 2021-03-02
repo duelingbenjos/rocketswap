@@ -18,9 +18,13 @@ if (DBUSER) {
 	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}/block-explorer?authSource=admin`;
 }
 
-var wipeOnStartup = true;
+var wipeOnStartup = false;
 if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
+}
+var reloadAPI = false;
+if (typeof process.env.RE_LOAD_API !== "undefined") {
+	if (process.env.RE_LOAD_API === "yes") reloadAPI = true;
 }
 
 const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
@@ -32,13 +36,15 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 	const route_getLastestBlock = "/latest_block";
 	let lastestBlockNum = 0;
 	let currBatchMax = 0;
-	let batchAmount = 10;
+	let batchAmount = 50;
 	let timerId;
 
-	const wipeDB = async () => {
+	const wipeDB = async (force = false) => {
 		console.log("-----WIPING DATABASE-----");
-		await db.models.Blocks.deleteMany({}).then((res) => console.log(res));
-		console.log("Blocks DB wiped");
+		if (wipeOnStartup || force){
+			await db.models.Blocks.deleteMany({}).then((res) => console.log(res));
+			console.log("Blocks DB wiped");
+		}
 		await db.models.Subblocks.deleteMany({}).then((res) =>
 			console.log(res)
 		);
@@ -57,10 +63,11 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		/*
 		NO TOKEN CONTRACTS EXIST BELOW BLOCK 2345
 
+
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = 2345;
+		currBlockNum = 7170;
 		//currBlockNum = 3660;
 		//currBlockNum = 3500;
 
@@ -100,15 +107,23 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			typeof blockInfo.error === "undefined" &&
 			typeof blockInfo.number !== "undefined"
 		) {
-			let block = new models.Blocks({
-				rawBlock: JSON.stringify(blockInfo),
-				blockNum: blockInfo.number,
-				hash: blockInfo.hash,
-				previous: blockInfo.previous,
-				numOfSubBlocks: 0,
-				numOfTransactions: 0,
-				transactions: JSON.stringify([])
-			});
+			let hasBlockInDB = false
+			let block = await models.Blocks.findOne({blockNum: blockInfo.number})
+			if (!block){
+				console.log("Block doesn't exists, adding new BLOCK model")
+				block = new models.Blocks({
+					rawBlock: JSON.stringify(blockInfo),
+					blockNum: blockInfo.number,
+					hash: blockInfo.hash,
+					previous: blockInfo.previous,
+					numOfSubBlocks: 0,
+					numOfTransactions: 0,
+					transactions: JSON.stringify([])
+				});
+			}else{
+				hasBlockInDB = true
+				console.log("Block already exists, not adding BLOCK model")
+			}
 
 			console.log(
 				"processing block " + blockInfo.number + " - ",
@@ -172,11 +187,13 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		}
 	};
 
-	const getBlock_MN = async (blockNum) => {
-		const block_res = await sendBlockRequest(
-			`${MASTERNODE_URL}${route_getBlockNum}${blockNum}`
-		);
-		return block_res;
+	const getBlock_MN = (blockNum, timedelay = 0) => {
+		return new Promise(resolver => {
+			setTimeout(async () => {
+				const block_res = await sendBlockRequest(`${MASTERNODE_URL}${route_getBlockNum}${blockNum}`);
+				resolver(block_res);
+			}, timedelay)
+		})
 	};
 
 	const getLatestBlock_MN = () => {
@@ -193,55 +210,60 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 	};
 
 	const checkForBlocks = async () => {
+		console.log("checking")
 		let response: any = await getLatestBlock_MN();
 
 		if (!response.error) {
 			lastestBlockNum = response.number;
-			if (lastestBlockNum < currBlockNum || wipeOnStartup) {
+			if (lastestBlockNum < currBlockNum || wipeOnStartup || reloadAPI) {
 				await wipeDB();
 				wipeOnStartup = false;
+				reloadAPI = false;
 			} else {
 				// console.log("lastestBlockNum: " + lastestBlockNum);
 				// console.log("currBlockNum: " + currBlockNum);
 				if (lastestBlockNum === currBlockNum) {
 					if (alreadyCheckedCount < maxCheckCount)
 						alreadyCheckedCount = alreadyCheckedCount + 1;
-					checkNextIn = 100 * alreadyCheckedCount;
+					checkNextIn = 1500 * alreadyCheckedCount;
 					timerId = setTimeout(checkForBlocks, checkNextIn);
 				}
 
 				let to_fetch = [];
-				let timedelay = 0
 				if (lastestBlockNum > currBlockNum) {
 					currBatchMax = currBlockNum + batchAmount;
 					if (currBatchMax > lastestBlockNum)
 						currBatchMax = lastestBlockNum;
 					if (currBatchMax > batchAmount) currBatchMax + batchAmount;
 					// let to_process = []
+					let blocksToGetCount = 1
 					for (let i = currBlockNum + 1; i <= currBatchMax; i++) {
-						timedelay = (i - currBlockNum) * 120;
-						console.log(
-							"getting block: " +
-								i +
-								" with delay of " +
-								timedelay +
-								"ms"
-						);
-							let block = getBlock_MN(i);
-							to_fetch.push(block);
+						let blockInfo = await models.Blocks.findOne({blockNum: i})
+						let blockData = null;
+						if(blockInfo) {
+							blockData = JSON.parse(blockInfo.rawBlock)
+						}else{
+							const timedelay = blocksToGetCount * 500;
+							console.log(
+								"getting block: " +
+									i +
+									" with delay of " +
+									timedelay +
+									"ms"
+							);	
+							blockData = getBlock_MN(i, timedelay)
+							blocksToGetCount = blocksToGetCount + 1
+						}
+						to_fetch.push(blockData);
 					}
-				}
-				setTimeout(async ()=>{
+
 					let to_process = await Promise.all(to_fetch);
-					// console.log(to_process)
 					to_process.sort((a, b) => a.number - b.number);
-					for (let block of to_process) {
-						await processBlock(block);
-					}
-				}, timedelay)
+					for (let block of to_process) await processBlock(block);
+				}
 
 				if (lastestBlockNum < currBlockNum) {
-					wipeDB();
+					await wipeDB(true);
 					timerId = setTimeout(checkForBlocks, 10000);
 				}
 			}

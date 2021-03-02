@@ -28,12 +28,8 @@ export const getNewJoiner = (state, prev_state): string => {
 export function validateTokenContract(contract: string): boolean {
 	const required_fields = [
 		"def transfer",
-		"def balance_of",
-		"def allowance",
 		"def approve",
-		"def transfer_from",
-		"token_name = Variable",
-		"token_symbol = Variable"
+		"def transfer_from"
 	];
 	let missing = required_fields.map((field) => contract.includes(field));
 	let missing_idx = missing.findIndex((field) => field === false);
@@ -72,7 +68,6 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 
 export function getContractName(state: IKvp[]) {
 	let code_entry = getContractEntry(state);
-	//console.log(code_entry);
 	if (code_entry) {
 		let code_key = code_entry.key;
 		let contract_name = code_key.split(".")[0];
