@@ -53,7 +53,6 @@ export class WalletService {
 
 	constructor() {
 		this.lwc = new WalletController()
-		console.log(LamdenJS)
 
 		// events
 		this.lwc.events.on('newInfo', this.handleWalletInfo)
@@ -76,9 +75,7 @@ export class WalletService {
 	public connectToWallet = async () => this.lwc.sendConnection(this.connectionRequest)
 
 	public addKeystoreEncrypted = (encryptedKeystore) => {
-		console.log(encryptedKeystore)
 		this.keystore = encryptedKeystore
-		console.log(this.keystore)
 	}
 	public addKeystoreDecrypted = (decrytedKeystore) => {
 		this.keystore = decrytedKeystore
@@ -117,9 +114,6 @@ export class WalletService {
 
 	private handleWalletInfo = (e) => {
 		if (this.lwc.installed){
-			console.log(this.lwc.approved === false)
-			console.log(this.lwc.walletAddress.length > 0)
-			console.log(get(lamdenWalletAutoConnect))
 			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0 && get(lamdenWalletAutoConnect)) this.connectToWallet();
 
 			//If the wallet is installed then update the store if new information is passed
@@ -315,7 +309,6 @@ export class WalletService {
 	private handleAuth = (res, callbacks) => {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
-			console.log(res.data)
 			callbacks.success()
 			this.toastService.addToast({ 
 				icon: "userAuth",
@@ -628,9 +621,7 @@ export class WalletService {
 	}
 
 	public needsApproval = async (contract, amount) => {
-		console.log({contract, amount})
 		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract)
-		console.log({approvedAmount, approvedAmountStr: approvedAmount.toString(), needs: approvedAmount.isLessThan(amount)})
 		return approvedAmount.isLessThan(amount)
 	}
 
@@ -658,7 +649,6 @@ export class WalletService {
 				if (err || !res) resolve(false)
 				if (res === true) resolve(true)
 				else {
-					console.log(res.status)
 					if (res.status === "Transaction Cancelled") {
 						this.handleTxErrors(res.data.errors)
 						resolve(false)
@@ -671,7 +661,6 @@ export class WalletService {
 	}
 
 	private insufficientCurrencyForTransactionToast = (stampCost) => {
-		console.log({stampCost, toTAU: stampsToTAU(stampCost)})
 		let currencyAmount = stringToFixed(get(walletBalance), 8)
 		this.toastService.addToast({
 			heading: `Insufficient ${config.currencySymbol}`,

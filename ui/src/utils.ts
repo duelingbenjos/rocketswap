@@ -37,7 +37,6 @@ export const setBearerToken = (account = undefined) => {
 	if (tokenInfo) {
 		tokenInfo = JSON.parse(tokenInfo)
 		if (tokenInfo?.user?.vk === account) {
-			console.log("SETTING BEARER TOKEN")
 			bearerToken.set(tokenInfo?.payload?.token || null)
 		}
 		else removeLSValue('auth_token')
@@ -77,11 +76,7 @@ export const toggleLamdenWalletAutoConnect = () => {
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))
 }
-export const removeLSValue = (key) => {
-	console.log({key})
-	localStorage.removeItem(key)
-	console.log(localStorage.getItem(key))
-}
+export const removeLSValue = (key) => localStorage.removeItem(key)
 
 export const hasSavedKeystoreData = () => {
 	let keystoreData = localStorage.getItem("encrypted_keystore_data")
@@ -370,7 +365,6 @@ export const pageUtils = (pageStores) => {
 		if (!contractName) return
 		let tokenRes = await getTokenInfo(contractName)
 		if (!tokenRes || Object.keys(tokenRes).length === 0) return false;
-		console.log(tokenRes)
 		applyTokenBalance(tokenRes)
 		const { token, lp_info }  = tokenRes
 		saveStoreValue(selectedToken, token)
@@ -383,7 +377,6 @@ export const pageUtils = (pageStores) => {
 	}
 
 	const applyTokenBalance = (tokenRes) => {
-		console.log(get(walletIsReady))
 		if (!get(walletIsReady)) tokenRes.token.balance = 0
 		else tokenRes.token.balance = get(tokenBalances)[tokenRes.token.contract_name] || 0;
 		return tokenRes

@@ -10,7 +10,7 @@ export const connectionRequest = {
   appName: 'RocketSwap',
   version: '1.0.1', //Change for PROD
   logo: 'images/logo.png',
-  contractName: 'con_amm2', //Change for PROD
+  contractName: 'con_amm_v3', //Change for PROD
   networkType: 'testnet'  //Change for PROD
 }
 

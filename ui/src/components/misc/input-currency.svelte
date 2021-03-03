@@ -92,7 +92,7 @@
 			{#if ($buy === true || typeof $buy === 'undefined') && !pressedMaxValue && $selectedToken}
 				<button on:click={handleMaxInput} class="primary small">MAX</button> 
 			{/if}
-			<LamdenLogo width="23px" margin="0 3px 0 0" color="white"/>
+			<LamdenLogo width="23px" margin="0 3px 0 0" />
 			<span class="input-token-label text-xlarge"> {config.currencySymbol} </span>
 		</div>
 	</div>

@@ -29,8 +29,6 @@
 	$: tokenBalance = $selectedToken ? $tokenBalances[$selectedToken.contract_name] : toBigNumber("0.0")
 	$: inputValue = $tokenAmount;
 
-	tokenBalances.subscribe(val => console.log(val))
-
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
 		if (validateValue !== e.target.value) {

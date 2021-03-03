@@ -35,10 +35,6 @@
 		if (val == 2) setTimeout(rocketReset, 6000)
 	})
 
-	walletAddress.subscribe(val => {
-		console.log(val)
-	})
-
 	$: makeSmoke = $rocketState == 1 || $rocketState == 2 ? createSmoke() : stopSmoke();
 
     const createSmoke = () =>{
@@ -227,7 +223,7 @@
 		{#if walletService.keystore}
 			<KeystoreLogin />
 		{:else}
-			<ChooseWallet {toggleModal}/>
+			<ChooseWallet />
 		{/if}
 	</div>
 </Modal>
