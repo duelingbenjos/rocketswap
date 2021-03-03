@@ -1,16 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { Server } from "socket.io";
 import {
-	handleAuthenticateResponse,
-	handleClientUpdate,
+	handleAuthenticateResponseType,
+	handleClientUpdateType,
 	handleTrollboxMsg,
 	handleProxyTxnResponse
 } from "./types/websocket.types";
 
 @Injectable()
 export class SocketService {
-	public handleClientUpdate: handleClientUpdate = null;
-	public handleAuthenticateResponse: handleAuthenticateResponse = null;
+	public handleClientUpdate: handleClientUpdateType = null;
+	public handleAuthenticateResponse: handleAuthenticateResponseType = null;
 	public handleTrollboxMsg: handleTrollboxMsg = null
 	public handleProxyTxnResponse: handleProxyTxnResponse = null
 }

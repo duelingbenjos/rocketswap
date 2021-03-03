@@ -21,6 +21,7 @@ import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { TransactionService } from './transaction.service';
+import { AmmMetaEntity } from "./entities/amm-meta.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -35,7 +36,8 @@ const db_options: TypeOrmModuleOptions = {
 		TradeHistoryEntity,
 		NameEntity,
 		RefreshTokenEntity,
-		ChatHistoryEntity
+		ChatHistoryEntity,
+		AmmMetaEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true

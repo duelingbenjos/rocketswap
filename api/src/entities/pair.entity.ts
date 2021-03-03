@@ -7,7 +7,7 @@ import {
 	BaseEntity,
 	PrimaryGeneratedColumn
 } from "typeorm";
-import { handleClientUpdate, TradeUpdateType } from "src/types/websocket.types";
+import { handleClientUpdateType, TradeUpdateType } from "src/types/websocket.types";
 import { TokenEntity } from "./token.entity";
 import { saveTradeUpdate } from "./trade-history.entity";
 
@@ -37,7 +37,7 @@ export class PairEntity extends BaseEntity {
 export async function saveReserves(
 	fn: string,
 	state: IKvp[],
-	handleClientUpdate: handleClientUpdate,
+	handleClientUpdate: handleClientUpdateType,
 	timestamp: number
 ) {
 	// console.log(state);
@@ -140,7 +140,7 @@ function updateTradeFeed(args: {
 	type: "buy" | "sell";
 	amount: string;
 	price: string;
-	handleClientUpdate: handleClientUpdate;
+	handleClientUpdate: handleClientUpdateType;
 	time: number;
 }) {
 	const {

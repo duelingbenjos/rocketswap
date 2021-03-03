@@ -1,7 +1,7 @@
 import { IKvp } from "../types/misc.types";
 import { getVal } from "../utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
-import { handleClientUpdate } from "../types/websocket.types";
+import { handleClientUpdateType } from "../types/websocket.types";
 
 /** Updated when the token balance from one of the token contracts the API detects has a change. */
 
@@ -45,7 +45,7 @@ export interface IBalance {
 
 export async function saveTransfer(args: {
 	state: IKvp[];
-	handleClientUpdate: handleClientUpdate;
+	handleClientUpdate: handleClientUpdateType;
 }) {
 	const { state, handleClientUpdate } = args;
 	const balances_kvp = state.filter(

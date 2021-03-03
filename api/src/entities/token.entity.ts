@@ -138,13 +138,13 @@ export async function saveTokenUpdate(state: IKvp[]) {
 	state.forEach(async (change) => {
 		let contract_name = change.key.split(".")[0]
 		const entity = await TokenEntity.findOne({contract_name})
-		if (entity){
+		if (entity) {
 			if (change.key.includes(".metadata:token_logo_base64_svg")) entity.token_base64_svg = change.value
 			if (change.key.includes(".metadata:token_logo_base64_png")) entity.token_base64_png = change.value
 			if (change.key.includes(".metadata:token_logo_url")) entity.token_logo_url = change.value
 			if (change.key.includes(".metadata:token_symbol")) entity.token_symbol = change.value
 			if (change.key.includes(".metadata:token_name")) entity.token_name = change.value
-			try{
+			try {
 				await entity.save()
 			}catch (err) {
 				console.error(err)

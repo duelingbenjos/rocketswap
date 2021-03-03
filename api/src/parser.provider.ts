@@ -2,7 +2,7 @@ import { Injectable, Logger } from "@nestjs/common"
 import { IKvp } from "./types/misc.types"
 import { config } from "./config"
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity"
-import { getContractCode, validateTokenContract } from "./utils"
+import { getContractCode, getContractName, validateTokenContract } from "./utils"
 import { saveTransfer, updateBalance } from "./entities/balance.entity"
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity"
 import { saveUserLp } from "./entities/lp-points.entity"
@@ -11,6 +11,7 @@ import { IBlockParser } from "./types/websocket.types"
 import { SocketService } from "./socket.service"
 import { setName } from "./entities/name.entity"
 import { AuthService } from "./authentication/trollbox.service"
+import { updateAmmMeta } from "./entities/amm-meta.entity"
 
 @Injectable()
 export class ParserProvider {
@@ -38,9 +39,15 @@ public parseBlock = async (update: IBlockParser) => {
 			// Check if the submitted contract is a token, if it's a token, add it to the DB
 			const contract_str = getContractCode(state)
 			const token_is_valid = validateTokenContract(contract_str)
+			const submitted_contract_name = getContractName(state);
+
+			if (submitted_contract_name === config.contractName) {
+				this.addToActionQue(updateAmmMeta,{state, handleClientUpdate: this.socketService.handleClientUpdate})
+			}
 			if (token_is_valid) {
 				const add_token_dto = prepareAddToken(state)
 				const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto
+
 				this.addToActionQue(updateBalance, {
 					amount,
 					contract_name,
@@ -84,6 +91,7 @@ processAmmBlock = async (args: { fn: string; state: IKvp[],timestamp: number }) 
 		await saveUserLp(state)
 		await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp)
 		await savePrice(state, this.socketService.handleClientUpdate)
+		await updateAmmMeta({state, handleClientUpdate: this.socketService.handleClientUpdate})
 	} catch (err) {
 		this.logger.error(err)
 	}

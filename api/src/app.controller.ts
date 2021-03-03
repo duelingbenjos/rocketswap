@@ -1,4 +1,5 @@
 import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
+import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { PairEntity } from "./entities/pair.entity";
@@ -9,6 +10,17 @@ import { decideLogo } from "./utils";
 @Controller("api")
 export class AppController {
 	constructor() {}
+
+	@Get("amm_meta")
+	public async getAmmMeta() {
+		try {
+			const amm_meta_entity = await AmmMetaEntity.findOne()
+			if (!amm_meta_entity) throw "AMM Meta Entity does not exist"
+			return amm_meta_entity
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
 
 	@Get("get_trade_history")
 	public async getTradeHistory(@Query() params) {

@@ -22,7 +22,7 @@ var wipeOnStartup = false;
 if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
 }
-var reloadAPI = false;
+var reloadAPI = true;
 if (typeof process.env.RE_LOAD_API !== "undefined") {
 	if (process.env.RE_LOAD_API === "yes") reloadAPI = true;
 }
@@ -36,7 +36,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 	const route_getLastestBlock = "/latest_block";
 	let lastestBlockNum = 0;
 	let currBatchMax = 0;
-	let batchAmount = 50;
+	let batchAmount = 25;
 	let timerId;
 
 	const wipeDB = async (force = false) => {
@@ -67,12 +67,10 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = 7170;
-		//currBlockNum = 3660;
-		//currBlockNum = 3500;
+		currBlockNum = 7100;
 
 		console.log("Set currBlockNum = 0");
-		timerId = setTimeout(checkForBlocks, 1000);
+		timerId = setTimeout(checkForBlocks, 500);
 	};
 
 	const sendBlockRequest = (url) => {
