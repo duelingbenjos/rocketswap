@@ -22,7 +22,7 @@ var wipeOnStartup = false;
 if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
 }
-var reloadAPI = true;
+var reloadAPI = false;
 if (typeof process.env.RE_LOAD_API !== "undefined") {
 	if (process.env.RE_LOAD_API === "yes") reloadAPI = true;
 }
