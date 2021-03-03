@@ -6,74 +6,75 @@ import { get } from 'svelte/store'
 
 /** Singleton Api Service */
 export class ApiService {
-  public static getInstance() {
-    if (!ApiService.instance) ApiService.instance = new ApiService()
-    return ApiService.instance
-  }
-  private static instance: ApiService
-  private base_url = `${getBaseUrl(document.location.href)}:3002`
+public static getInstance() {
+	if (!ApiService.instance) ApiService.instance = new ApiService()
+	return ApiService.instance
+}
+private static instance: ApiService
+private base_url = `${getBaseUrl(document.location.href)}:3002`
 
-  async getTokenList(filter = []) {
-    try {
-      let token_list = await axios.get(`${this.base_url}/api/token_list`).then((res) => valuesToBigNumber(res.data))
-      if (filter.includes('no-market')) token_list = token_list.filter((token) => !token.has_market)
-      token_list_store.set(token_list)
-      return token_list
-    } catch (err) {
-      console.error(err)
-      throw err
-    }
-  }
+async getTokenList(filter = []) {
+	try {
+		let token_list = await axios.get(`${this.base_url}/api/token_list`).then((res) => valuesToBigNumber(res.data))
+	if (filter.includes('no-market')) token_list = token_list.filter((token) => !token.has_market)
+		token_list_store.set(token_list)
+		return token_list
+	} catch (err) {
+		console.error(err)
+		throw err
+	}
+}
 
-  async getMarketList() {
-    try {
-      let token_list = await axios.get(`${this.base_url}/api/market_list`).then((res) => valuesToBigNumber(res.data))
-      token_list_store.set(token_list)
-      return token_list
-    } catch (err) {
-      console.error(err)
-      throw err
-    }
-  }
+async getMarketList() {
+	try {
+		let token_list = await axios.get(`${this.base_url}/api/market_list`).then((res) => valuesToBigNumber(res.data))
+		token_list_store.set(token_list)
+		return token_list
+	} catch (err) {
+		console.error(err)
+		throw err
+	}
+}
 
-  async getTokenBalances(vk: string) {
-    try {
-      const res = await axios.get(`${this.base_url}/api/balances/${vk}`).then((res) => valuesToBigNumber(res.data))
-      return res
-    } catch (err) {
-      console.error(err)
-    }
-  }
+async getTokenBalances(vk: string) {
+	try {
+		const res = await axios.get(`${this.base_url}/api/balances/${vk}`).then((res) => valuesToBigNumber(res.data))
+		return res
+	} catch (err) {
+		console.error(err)
+	}
+}
 
-  async getToken(contract_name: string) {
-    try {
-      const res = await axios.get(`${this.base_url}/api/token/${contract_name}`).then((res) => valuesToBigNumber(res.data))
-      return res
-    } catch (err) {
-      console.error(err)
-    }
-  }
+async getToken(contract_name: string) {
+	try {
+		const res = await axios.get(`${this.base_url}/api/token/${contract_name}`).then((res) => valuesToBigNumber(res.data))
+		return res
+	} catch (err) {
+		console.error(err)
+	}
+}
 
-  async getUserLpBalance(vk: string) {
-    try {
-      const res = await axios.get(`${this.base_url}/api/user_lp_balance/${vk}`).then((res) => valuesToBigNumber(res.data))
-      return res
-    } catch (err) {
-      return false
-    }
-  }
+async getUserLpBalance(vk: string) {
+	try {
+		const res = await axios.get(`${this.base_url}/api/user_lp_balance/${vk}`).then((res) => valuesToBigNumber(res.data))
+		return res
+	} catch (err) {
+		return false
+	}
+}
 
-  async getPairs(contracts: string) {
-    try {
-      const res = await axios.get(`${this.base_url}/api/get_pairs/${contracts}`).then((res) => valuesToBigNumber(res.data))
-      return res
-    } catch (err) {
-      return false
-    }
-  }
+async getPairs(contracts: string) {
+	try {
+		const res = await axios.get(`${this.base_url}/api/get_pairs/${contracts}`).then((res) => valuesToBigNumber(res.data))
+		return res
+	} catch (err) {
+		return false
+	}
+}
 
-	async sendMessage(message: string){
-		if (!get(bearerToken)) return false
+async sendMessage(message: string){
+	console.log(get(bearerToken))
+	if (!get(bearerToken)) return false
 		try {
 			const res = await axios.post(`${this.base_url}/api/trollbox/message`, JSON.stringify({message}), {
 				headers: {
@@ -81,11 +82,11 @@ export class ApiService {
 				'Authorization': `Bearer ${get(bearerToken)}`,
 			}
 		})
-			console.log(res)
-			return res
+		console.log(res)
+		return res
 		} catch (err) {
 			console.log(err)
-			removeLSValue('auth_token')
+			//removeLSValue('auth_token')
 			return false
 		}
 	}

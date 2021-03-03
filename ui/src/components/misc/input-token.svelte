@@ -7,9 +7,6 @@
 	//Components
 	import TokenSelect from './token-select-toggle.svelte'
 
-	//Icons
-	import Base64Svg from '../../icons/base64_svg.svelte'
-
 	//Misc
 	import { config } from '../../config'
 	import { stringToFixed, toBigNumber, determinePrecision } from '../../utils.js'

@@ -7,7 +7,7 @@
 
     //Icons
     import LamdenLogo from '../../icons/lamden-logo.svelte';
-    import Base64SvgLogo from '../../icons/base64_svg.svelte';
+    import TokenLogo from '../../icons/token-logo.svelte'
     import CloseIcon from '../../icons/close.svelte';
 
     //Services
@@ -57,10 +57,12 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .modal-sub-box{
-        width: 345px;
+        width: 100vw;
+        max-width: 380px;
     }
     .pair-display{
         margin: 1rem 0 1.5rem;
@@ -89,7 +91,7 @@
         <LamdenLogo width="27px"  margin="0 5px 0 0"/>
         <span>{`${config.currencySymbol}`}</span>
         <span class="separator">/</span>
-        <Base64SvgLogo string={$selectedToken.token_base64_svg} width="29px"  margin="0 5px 0 0"/>
+        <TokenLogo tokenMeta={$selectedToken} width="29px"  margin="0 5px 0 0"/>
         <span>{`${$selectedToken.token_symbol}`}</span>
     </div>
     <div class="flex-col modal-confirm-details-box text-small weight-400">

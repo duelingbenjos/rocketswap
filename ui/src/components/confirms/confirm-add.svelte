@@ -55,10 +55,12 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .modal-sub-box{
-        width: 345px;
+        width: 100vw;
+        max-width: 380px;
     }
     .sub-text{
         margin: 0.5rem 0;

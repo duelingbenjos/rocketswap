@@ -10,7 +10,7 @@
     import { walletAddress, walletIsReady } from '../store'
 
     //Icons
-    import Base64SvgLogo from '../icons/base64_svg.svelte'
+    import TokenLogo from '../icons/token-logo.svelte'
 
     //Misc
     import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
@@ -128,7 +128,7 @@
             {#each pairs as pair}
                 <tr>
                     <td class="flex-row symbol max-width">
-                            <Base64SvgLogo string={pair.token_base64_svg} width={'27px'} height={'27px'} margin={"0 10px 0 0"}/>
+                            <TokenLogo tokenMeta={pair} width={'27px'} height={'27px'} margin={"0 10px 0 0"}/>
                             <span class="symbol">{pair.token_symbol || "none"}</span>
                     </td>
                     <td class="max-width">{pair.contract_name}</td>

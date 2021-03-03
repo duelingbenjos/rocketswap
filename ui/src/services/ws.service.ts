@@ -63,6 +63,8 @@ export class WsService {
       this.connection.off(`trollbox_history`)
     })
     this.connection.on('auth_response', (msg) => {
+      console.log("BEARER TOKEN!")
+      console.log(msg)
       localStorage.setItem('auth_token', JSON.stringify(msg))
       setBearerToken()
     })
@@ -114,7 +116,14 @@ export class WsService {
     this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
   }
 
+  public leaveBalanceFeed(vk: string) {
+    this.connection.off(`balance_list:${vk}`)
+    this.connection.off(`balance_update:${vk}`)
+    tokenBalances.set({})
+  }
+
   private handleTrollboxAuthCode(payload) {
+    console.log("AUTH_CODE!")
     console.log(payload)
     ws_id.set(payload)
   }

@@ -5,7 +5,7 @@
     import Button from '../button.svelte';
 
     //Icons
-    import Base64SvgLogo from '../../icons/base64_svg.svelte'
+    import TokenLogo from '../../icons/token-logo.svelte'
     import LamdenLogo from '../../icons/lamden-logo.svelte'
     import DirectionalArrow from '../../icons/directional-arrow.svelte'
     import CloseIcon from '../../icons/close.svelte';
@@ -47,7 +47,7 @@
                 amount: stringToFixed($currencyAmount, 12)
             },
             {
-                logoComponent: Base64SvgLogo,
+                logoComponent: TokenLogo,
                 symbol: $selectedToken.token_symbol,
                 amount: stringToFixed($tokenAmount, 12)
             },
@@ -86,8 +86,10 @@
         if (!$currencyAmount) return
         loading = true;
         walletService.swapBuy({
-        'contract': $selectedToken.contract_name,
-        'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)}
+            'contract': $selectedToken.contract_name,
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)},
+            'minimum_received': 0,
+            'token_fees': false
         }, $selectedToken, $currencyAmount, { success, error })
     }
 
@@ -104,7 +106,8 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .sub-text{
         margin: 1rem 0;
@@ -134,7 +137,7 @@
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[0].logoComponent} 
-                    string={$selectedToken.token_base64_svg}
+                    tokenMeta={$selectedToken}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />
@@ -147,7 +150,7 @@
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[1].logoComponent}
-                    string={$selectedToken.token_base64_svg}
+                    tokenMeta={$selectedToken}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />

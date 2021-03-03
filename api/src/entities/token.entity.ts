@@ -87,7 +87,6 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 	entity.token_base64_svg = token_base64_svg;
 	entity.token_base64_png = token_base64_png;
 	entity.token_logo_url = token_logo_url;
-
 	return await entity.save();
 };
 
