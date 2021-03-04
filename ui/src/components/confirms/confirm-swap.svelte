@@ -23,12 +23,12 @@
     export let closeConfirm;
 
     const { pageStats, resetPage, pageStores } = getContext('pageContext')
-    const { selectedToken, currencyAmount, tokenAmount, buy  } = pageStores
+    const { selectedToken, currencyAmount, tokenAmount, buy, payInRswp  } = pageStores
 
     let logoSize = "30px"
-    let minimumReceived = toBigNumber("0.0")
 
-    $: slots = createSlots($buy, $currencyAmount, $tokenAmount)
+    $: minimumReceived = $buy ? $payInRswp ? $pageStats.minimumTokens : $pageStats.minimumTokensLessFee : $payInRswp ? $pageStats.minimumCurrency : $pageStats.minimumCurrencyLessFee;
+    $: slots = createSlots($buy, $currencyAmount, $tokenAmount, $payInRswp)
     $: receivedSymbol = $buy ? $selectedToken.token_symbol : config.currencySymbol
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
     $: slippageWarning = slippage.isGreaterThan(5)
@@ -42,21 +42,19 @@
             {
                 logoComponent: LamdenLogo,
                 symbol: config.currencySymbol,
-                amount: stringToFixed($currencyAmount, 12)
+                amount: stringToFixed($currencyAmount, 8)
             },
             {
                 logoComponent: TokenLogo,
                 symbol: $selectedToken.token_symbol,
-                amount: stringToFixed($tokenAmount, 12)
+                amount: stringToFixed($tokenAmount, 8)
             },
         ]
-        if (!$buy) {
-            minimumReceived = $pageStats.currencyPurchasedLessFee
-            slotArray[0].amount = stringToFixed(minimumReceived, 12)
-            slotArray.reverse();
+        if ($buy) {
+            slotArray[1].amount = stringToFixed($payInRswp ? $pageStats.tokensPurchased : $pageStats.tokensPurchasedLessFee, 8)
         }else{
-            minimumReceived = $pageStats.tokensPurchasedLessFee
-            slotArray[1].amount = stringToFixed(minimumReceived, 12)
+            slotArray[0].amount = stringToFixed($payInRswp ? $pageStats.currencyPurchased : $pageStats.currencyPurchasedLessFee, 8)
+            slotArray.reverse(); 
         }
         return slotArray;
     }
@@ -167,12 +165,12 @@
             <p class="text-primary-dim">Price</p>
             {#if $buy}
                 <div class="flex-row flex-align-center">
-                    <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
+                    <span class="number number-span margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
                     <span>{`${$selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
                 </div>
             {:else}
                 <div class="flex-row flex-align-center">
-                    <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
+                    <span class="number number-span margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
                     <span>{`${config.currencySymbol} per ${$selectedToken.token_symbol}`}</span>
                 </div>
             {/if}
@@ -188,16 +186,21 @@
             </p>
         </div>
         <div class="flex-row flex-align-center modal-confirm-item">
-            <p class="text-primary-dim">Liquidity Provider Fee</p>
+            <p class="text-primary-dim">Fee</p>
             <div class="flex-row flex-align-center">
-                <span class="number margin-r-3">{stringToFixed($pageStats.fee, 8)}</span>
-                <span>{receivedSymbol}</span>
+                {#if $payInRswp}
+                    <span class="number margin-r-3 number-span">{stringToFixed($pageStats.rswpFee, 8)}</span>
+                    <span>{config.ammTokenSymbol}</span>
+                {:else}
+                    <span class="number margin-r-3 number-span">{stringToFixed($pageStats.fee, 8)}</span>
+                    <span>{receivedSymbol}</span>
+                {/if}
             </div>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-bold text-primary-dim">Minimum Recieved</p>
             <div class="flex-row flex-align-center">
-                <span class="number margin-r-3">{stringToFixed(minimumReceived, 8)}</span>
+                <span class="number margin-r-3 number-span">{stringToFixed(minimumReceived, 8)}</span>
                 <span>{receivedSymbol}</span>
             </div>
         </div>

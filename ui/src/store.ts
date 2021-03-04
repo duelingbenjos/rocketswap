@@ -34,6 +34,8 @@ export const bearerToken = writable(null)
 export const keystore = writable(null);
 export const slippageTolerance = writable(toBigNumber("1.0"));
 export const lamdenWalletAutoConnect = writable(false);
+export const rswpPrice = writable(toBigNumber("0"))
+export const payInRswp = writable(false)
 
 export const rocketState = writable(0);
 

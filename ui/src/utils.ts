@@ -11,7 +11,9 @@ import {
 	saveStoreValue, 
 	bearerToken, 
 	lamdenWalletAutoConnect,
-	slippageTolerance } from './store'
+	slippageTolerance,
+	rswpPrice,
+	payInRswp } from './store'
 
 import { ApiService } from './services/api.service'
 
@@ -35,6 +37,18 @@ export const refreshLpBalances = async (account = undefined) => {
 
 	lpBalances.set(balances)
 	return balances
+}
+export const getRswapPrice = async () => {
+	let reserves = await API.getVariable(connectionRequest.contractName, 'reserves', 'con_rswp_lst001') 
+	if (Array.isArray(reserves)){
+		if (reserves[0].__fixed__) reserves[0] = toBigNumber(reserves[0].__fixed__)
+		else reserves[0] = toBigNumber(reserves[0])
+		if (reserves[1].__fixed__) reserves[1] = toBigNumber(reserves[1].__fixed__)
+		else reserves[1] = toBigNumber(reserves[1])
+		let quote = quoteCalculator({reserves})
+		rswpPrice.set(quote.prices.token)
+		return quote.prices.token
+	}
 }
 
 export const removeLpBalances = async () => lpBalances.set({})
@@ -82,6 +96,10 @@ export const toggleLamdenWalletAutoConnect = () => {
 	}
 	setLamdenWalletAutoConnectStore()
 }
+export const initializeStateFromLocalStorage = () => {
+	getSlippageTolerance()
+	getPayInRswp()
+}
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
 	if (st === null) slippageTolerance.set(toBigNumber("1.0"))
@@ -90,6 +108,15 @@ export const getSlippageTolerance = () => {
 export const setSlippageTolerance = (value) => {
 	setLSValue("slippage_tolerance", value.toString())
 	slippageTolerance.set(value)
+}
+export const getPayInRswp = () => {
+	let value = localStorage.getItem("pay_in_rswp")
+	if (value=== null) payInRswp.set(false)
+	else payInRswp.set(JSON.parse(value))
+}
+export const setPayInRswp = (value) => {
+	setLSValue("pay_in_rswp", value)
+	payInRswp.set(value)
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))
@@ -251,8 +278,8 @@ export function valuesToBigNumber(obj: any) {
 }
 
 export const quoteCalculator = (tokenInfo) => {
-	const currencyReserves = toBigNumberPrecision(toBigNumber(tokenInfo?.reserves[0] || ["0", "0"]), 8)
-	const tokenReserves = toBigNumberPrecision(toBigNumber(tokenInfo?.reserves[1] || ["0", "0"]), 8)
+	const currencyReserves = toBigNumberPrecision(toBigNumber(tokenInfo?.reserves[0] || "0"), 8)
+	const tokenReserves = toBigNumberPrecision(toBigNumber(tokenInfo?.reserves[1] || "0"), 8)
 
 	const prices = getPrices([currencyReserves, tokenReserves])
 
@@ -318,13 +345,13 @@ export const quoteCalculator = (tokenInfo) => {
 		let tokensPurchased = toBigNumberPrecision(tokenReserves.minus(newTokenReserve), 8)
 		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(0.03), 8)
 		let tokensPurchasedLessFee = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
-		let minimumTokens = calcMinimumTokens(currencyAmount)
 
 		return {
 			tokensPurchased,
 			fee,
+			rswpFee: calcFeeInRswp_FromTokenFee(fee),
 			tokensPurchasedLessFee,
-			minimumTokens,
+			...calcMinimumTokens(currencyAmount),
 			...calcSlippage(newTokenReserve, newCurrencyReserve)
 		}
 	}
@@ -337,13 +364,13 @@ export const quoteCalculator = (tokenInfo) => {
 		let currencyPurchased = toBigNumberPrecision(currencyReserves.minus(newCurrencyReserve), 8)
 		let fee = toBigNumberPrecision(currencyPurchased.multipliedBy(0.03), 8)
 		let currencyPurchasedLessFee = toBigNumberPrecision(currencyPurchased.minus(fee), 8)
-		let minimumCurrency = calcMinimumCurrency(tokenAmount)
 
 		return {
 			currencyPurchased,
 			fee,
+			rswpFee: calcFeeInRswp_FromCurrencyFee(fee),
 			currencyPurchasedLessFee,
-			minimumCurrency,
+			...calcMinimumCurrency(tokenAmount),
 			...calcSlippage(newTokenReserve, newCurrencyReserve)
 		}
 	}
@@ -364,13 +391,18 @@ export const quoteCalculator = (tokenInfo) => {
 
 	const calcMinimumCurrency = (tokenAmount) => {
 		let slipTol = get(slippageTolerance)
-		if (slipTol.isLessThanOrEqualTo(0)) return toBigNumber("0.0")
+		if (slipTol.isLessThanOrEqualTo(0)) {
+			return {
+				minimumCurrency: toBigNumber("0.0"),
+				minimumCurrencyLessFee: toBigNumber("0.0")
+			}
+		}
 		let slipTolDec = slipTol.dividedBy(100)
 		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
 		let maxSlippagePrice = toBigNumberPrecision(prices.token.multipliedBy(slipTolDecInverted), 8)
-		let tokensPurchased = toBigNumberPrecision(tokenAmount.multipliedBy(maxSlippagePrice), 8)
-		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(0.03), 8)
-		let minimumCurrency = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
+		let minimumCurrency = toBigNumberPrecision(tokenAmount.multipliedBy(maxSlippagePrice), 8)
+		let fee = toBigNumberPrecision(minimumCurrency.multipliedBy(0.03), 8)
+		let minimumCurrencyLessFee = toBigNumberPrecision(minimumCurrency.minus(fee), 8)
 		console.log({
 			slipTol: slipTol.toString(),
 			slipTolDec: slipTolDec.toString(),
@@ -383,18 +415,26 @@ export const quoteCalculator = (tokenInfo) => {
 			fee: fee.toString(),
 			minimumTokens: minimumCurrency.toString()
 		})
-		return minimumCurrency
+		return {
+			minimumCurrency,
+			minimumCurrencyLessFee,
+		}
 	}
 
 	const calcMinimumTokens = (currencyAmount) => {
 		let slipTol = get(slippageTolerance)
-		if (slipTol.isLessThanOrEqualTo(0)) return toBigNumber("0.0")
+		if (slipTol.isLessThanOrEqualTo(0)) {
+			return {
+				minimumTokens: toBigNumber("0.0"),
+				minimumTokensLessFee: toBigNumber("0.0")
+			}
+		}
 		let slipTolDec = slipTol.dividedBy(100)
 		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
 		let maxSlippagePrice = toBigNumberPrecision(prices.currency.multipliedBy(slipTolDecInverted), 8)
-		let tokensPurchased = toBigNumberPrecision(currencyAmount.multipliedBy(maxSlippagePrice), 8)
-		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(0.03), 8)
-		let minimumTokens = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
+		let minimumTokens = toBigNumberPrecision(currencyAmount.multipliedBy(maxSlippagePrice), 8)
+		let fee = toBigNumberPrecision(minimumTokens.multipliedBy(0.03), 8)
+		let minimumTokensLessFee = toBigNumberPrecision(minimumTokens.minus(fee), 8)
 		console.log({
 			slipTol: slipTol.toString(),
 			slipTolDec: slipTolDec.toString(),
@@ -403,11 +443,40 @@ export const quoteCalculator = (tokenInfo) => {
 			prices_currency: prices.currency.toString(),
 			prices_token: prices.token.toString(),
 			maxSlippagePrice: maxSlippagePrice.toString(),
-			tokensPurchased: maxSlippagePrice.toString(),
+			minimumTokens: minimumTokens.toString(),
 			fee: fee.toString(),
-			minimumTokens: minimumTokens.toString()
+			minimumTokensLessFee: minimumTokensLessFee.toString()
 		})
-		return minimumTokens
+		return {
+			minimumTokensLessFee,
+			minimumTokens
+		}
+	}
+
+	const calcFeeInRswp_FromCurrencyFee = (amount) => {
+		let rswpAmount = get(rswpPrice).multipliedBy(amount)
+		console.log({
+			'rswpPrice': get(rswpPrice).toString(),
+			rswpAmount: rswpAmount.toString()
+		})
+		return rswpAmount
+		// fee is usually 0.3%
+		// fee paid in RSWP is the value of the TOKEN or currency in RSWAP
+
+		// get the amount of the fee in tokens
+
+	}
+	const calcFeeInRswp_FromTokenFee = (amount) => {
+		let tokenFeeToCurrency = prices.token.multipliedBy(amount)
+		let rswpAmount = get(rswpPrice).multipliedBy(tokenFeeToCurrency)
+		console.log({
+			'rswpPrice': get(rswpPrice).toString(),
+			tokenFeeToCurrency: tokenFeeToCurrency.toString(),
+			rswpAmount: rswpAmount.toString()
+		})
+		return rswpAmount
+		// fee is usually 0.3%
+		// fee paid in RSWP is the value of the TOKEN or currency in RSWAP
 	}
 
 	return {

@@ -14,10 +14,10 @@
 	const ws = WsService.getInstance()
 
 	//Stores
-	import { tokenBalances, walletIsReady, saveStoreValue, walletAddress, slippageTolerance  } from '../store'
+	import { tokenBalances, walletIsReady, saveStoreValue, walletAddress, slippageTolerance, rswpPrice, payInRswp  } from '../store'
 	
 	//Misc
-	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils, getSlippageTolerance } from '../utils'
+	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
 	import { connectionRequest } from '../config'
 
 	//Components
@@ -40,14 +40,15 @@
 		tokenAmount,
 		selectedToken,
 		buy,
-		tokenLP
+		tokenLP,
+		payInRswp
 	}
 
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
 	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap';
-	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken, $slippageTolerance)
+	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken, $slippageTolerance, $rswpPrice, $payInRswp)
 
 	selectedToken.subscribe(value => {
 		if (value) {
@@ -66,7 +67,6 @@
 	});
 
 	onMount(() => {
-		getSlippageTolerance()
 		if (contractName) joinTradeFeed_UpdateWindow(contractName)
 		return () => ws.leaveTradeFeed()
 	})

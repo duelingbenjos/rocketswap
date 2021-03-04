@@ -88,7 +88,7 @@
             </span> 
         </div>
         
-        <button class="nostyle close-button" on:click={toggleModal}> 
+        <button class="nostyle close-button flex" on:click={toggleModal}> 
             <CloseIcon width="18px" />
         </button>
         

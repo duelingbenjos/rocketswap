@@ -122,7 +122,10 @@
         -ms-overflow-style: none; /* IE and Edge */
         scrollbar-width: none; /* Firefox */
     }
-
+    .input-token-label{
+        margin: 1px 3px 0;
+        font-size: 1.4em;
+    }
     .token-scroll::-webkit-scrollbar {
         display: none;
     }
@@ -169,7 +172,7 @@
     	{#if $selectedToken}
 			<TokenLogo tokenMeta={$selectedToken} width="21px" margin="0 3px" />
 		{/if}
-        <span class="input-token-label text-xlarge">{$selectedToken.token_symbol.toUpperCase()}</span> 
+        <span class="input-token-label">{$selectedToken.token_symbol.toUpperCase()}</span> 
         <div class="chevron">
             <DirectionalChevron width="12px" direction="down" margin="0"/>
         </div>

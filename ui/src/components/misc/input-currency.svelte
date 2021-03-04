@@ -23,12 +23,18 @@
 	const dispatch = createEventDispatcher();
 
 	const { pageStores, getStampCost } = getContext('pageContext')
-	const { currencyAmount, buy, selectedToken } = pageStores
+	const { currencyAmount, buy, selectedToken, payInRswp } = pageStores
 
 	let inputElm;
 	let pressedMaxValue = false;
 
 	$: inputValue = $currencyAmount;
+
+	payInRswp.subscribe(val => {
+		if ($currencyAmount){
+			if (inputValue > 0) dispatchEvent(inputValue)
+		}
+	})
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')

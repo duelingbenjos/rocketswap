@@ -14,7 +14,10 @@
 	import { WalletService } from './services/wallet.service'
 	import { ApiService } from './services/api.service'
 	import { WsService } from './services/ws.service'
-	
+
+	// Misc
+	import { getRswapPrice, initializeStateFromLocalStorage  } from './utils'
+
 	//TO DO REMOVE THIS!!
 	import { ToastService } from './services/toast.service'
 	const toastService = ToastService.getInstance()
@@ -34,8 +37,9 @@
 		WalletService.getInstance()
 		ApiService.getInstance()
 
-		// TO DO REMOVE THIS!! 
-		/*
+		getRswapPrice()
+		initializeStateFromLocalStorage()
+/*
 		toastService.addToast({ 
 			icon: "buyToken",
 					heading: `TESTING TOAST!`,
@@ -84,8 +88,7 @@
 			icon: "popout"
 			},
 					duration: 7000000
-		})
-		*/
+		})*/
 	})
 
 	function themeToggle() {

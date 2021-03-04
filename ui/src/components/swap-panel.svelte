@@ -11,7 +11,7 @@
 	import { quoteCalculator, toBigNumber, stringToFixed } from '../utils'
 
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
-	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP } = pageStores
+	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP, payInRswp } = pageStores
 
 	let slots = [
 		{
@@ -37,10 +37,20 @@
 			if ($selectedToken && $tokenLP) {
 				let quoteCalc = quoteCalculator($tokenLP)
 				let quote = quoteCalc.calcBuyPrice($currencyAmount)
-				if (quote.tokensPurchasedLessFee.isGreaterThan(0)){
-					saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quote.tokensPurchasedLessFee, 8)))
+				console.log($payInRswp)
+				if ($payInRswp){
+					console.log("PAYING IN RSWP!")
+					if (quote.tokensPurchased.isGreaterThan(0)){
+						saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quote.tokensPurchased, 8)))
+					}else{
+						saveStoreValue(tokenAmount, toBigNumber("0"))
+					}
 				}else{
-					saveStoreValue(tokenAmount, toBigNumber("0"))
+					if (quote.tokensPurchasedLessFee.isGreaterThan(0)){
+						saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quote.tokensPurchasedLessFee, 8)))
+					}else{
+						saveStoreValue(tokenAmount, toBigNumber("0"))
+					}
 				}
 			}
 		}
@@ -55,7 +65,11 @@
 		if ($tokenLP && $tokenAmount){
 			let quoteCalc = quoteCalculator($tokenLP)
 			let quote = quoteCalc.calcSellPrice($tokenAmount)
-			saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchasedLessFee, 8)))
+			if ($payInRswp){
+				saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchased, 8)))
+			}else{
+				saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchasedLessFee, 8)))
+			}
 		}
 	}
 </script>

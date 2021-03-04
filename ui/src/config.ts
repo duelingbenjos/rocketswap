@@ -1,6 +1,7 @@
 //Change there for for PROD
 
 const CURRENCY_SYMBOL = "DTAU"
+const AMM_TOKEN_SYMBOL = "RSWP"
 const NAMES_CONTRACT= "con_ipseity_5"
 const BLOCKEXPLORER_URL = "https://testnet.lamden.io"
 const MASTERNODE_URL = "https://testnet-master-1.lamden.io"
@@ -30,6 +31,7 @@ export const stamps = {
 export const config = {
   namesContract: NAMES_CONTRACT, //Change for PROD
   currencySymbol: CURRENCY_SYMBOL, //Change for PROD
+  ammTokenSymbol: AMM_TOKEN_SYMBOL, //Change for PROD
   blockExplorer: BLOCKEXPLORER_URL, //Change for PROD
   masternode: MASTERNODE_URL, //Change for PROD
 }

@@ -9,11 +9,13 @@
 	import MainMenu from './main-menu.svelte'
 
 	// Misc
-	import { mainMenuOpen } from '../store'
+	import { mainMenuOpen, rswpPrice } from '../store'
+	import { config } from '../config'
+	import { stringToFixed } from '../utils'
 
 	const { themeToggle, currentThemeName } = getContext('app')
 
-	let links: any[]
+	let links
 	$: links = Object.values($routes)
 
 	const handleLinkClick = () => mainMenuOpen.set(false)
@@ -73,6 +75,9 @@
 		margin: 0.5rem auto;
 
 	}
+	.price{
+		display: none;
+	}
 
 	button.primary.small{
 		color: var(--text-primary-color-inverted-color);
@@ -100,6 +105,9 @@
         .right-content{
 			display: flex;
 		}
+		.price{
+			display: block;
+		}
     }
 </style>
 
@@ -109,6 +117,9 @@
 		<RocketSwap />
 		<PoweredByLamden margin="-5px 0 0 0"/>
 	</div>
+	<p class="price">
+		{`${config.ammTokenSymbol} = ${stringToFixed($rswpPrice ,2)} ${config.currencySymbol}`}
+	</p>
 	<div class="right-content flex-row flex-align-center flex-grow">
 		<div class="links flex-row">
 			{#each links as e}
