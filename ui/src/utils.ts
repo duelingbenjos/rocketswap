@@ -2,7 +2,16 @@ import Lamden from 'lamden-js'
 import { config, connectionRequest, stamps } from './config'
 import BigNumber from 'bignumber.js'
 import { get } from 'svelte/store'
-import { lwc_info, walletIsReady, tokenBalances, walletBalance, lpBalances, saveStoreValue, bearerToken, lamdenWalletAutoConnect } from './store'
+import { 
+	lwc_info, 
+	walletIsReady, 
+	tokenBalances, 
+	walletBalance, 
+	lpBalances, 
+	saveStoreValue, 
+	bearerToken, 
+	lamdenWalletAutoConnect,
+	slippageTolerance } from './store'
 
 import { ApiService } from './services/api.service'
 
@@ -72,6 +81,15 @@ export const toggleLamdenWalletAutoConnect = () => {
 		setLSValue("lamden_wallet_autoconnect", true)
 	}
 	setLamdenWalletAutoConnectStore()
+}
+export const getSlippageTolerance = () => {
+	let st = localStorage.getItem("slippage_tolerance")
+	if (st === null) slippageTolerance.set(toBigNumber("1.0"))
+	else slippageTolerance.set(toBigNumber(JSON.parse(st)))
+}
+export const setSlippageTolerance = (value) => {
+	setLSValue("slippage_tolerance", value.toString())
+	slippageTolerance.set(value)
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))
@@ -204,6 +222,11 @@ export const toBigNumber = (value) => {
 
 export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value)
 
+export const toBigNumberPrecision = (value, precision) => {
+	if (!isBigNumber(value)) return toBigNumber("0")
+	return toBigNumber(stringToFixed(value, precision))
+  }
+
 /**
  * Recurses through any object, converts stringified numbers and numbers to BigNumber.
  * Probably some edge cases I've ignored here, like what happens if it finds a BigNumber in the object ?
@@ -228,8 +251,8 @@ export function valuesToBigNumber(obj: any) {
 }
 
 export const quoteCalculator = (tokenInfo) => {
-	const currencyReserves = toBigNumber(tokenInfo?.reserves[0] || ["0", "0"])
-	const tokenReserves = toBigNumber(tokenInfo?.reserves[1] || ["0", "0"])
+	const currencyReserves = toBigNumberPrecision(toBigNumber(tokenInfo?.reserves[0] || ["0", "0"]), 8)
+	const tokenReserves = toBigNumberPrecision(toBigNumber(tokenInfo?.reserves[1] || ["0", "0"]), 8)
 
 	const prices = getPrices([currencyReserves, tokenReserves])
 
@@ -240,77 +263,87 @@ export const quoteCalculator = (tokenInfo) => {
 		if (!reserves) return
 		return {
 			reserves,
-			currency: reserves[1].dividedBy(reserves[0]),
-			token: reserves[0].dividedBy(reserves[1])
+			currency: toBigNumberPrecision(reserves[1].dividedBy(reserves[0]), 8),
+			token: toBigNumberPrecision(reserves[0].dividedBy(reserves[1]), 8)
 		}
 	}
 
-	const calcCurrencyValue = (value) =>  prices.token.multipliedBy(value)
-	const calcTokenValue = (value) =>  prices.currency.multipliedBy(value)
+	const calcCurrencyValue = (value) =>  toBigNumberPrecision(prices.token.multipliedBy(value), 8)
+	const calcTokenValue = (value) =>  toBigNumberPrecision(prices.currency.multipliedBy(value), 8)
 
-	const calcLpPercent = (lp_balance) => lp_balance.dividedBy(totalLP)
+	const calcLpPercent = (lp_balance) => toBigNumberPrecision(lp_balance.dividedBy(totalLP), 8)
 
 	const calcTokenValueInCurrency = (lp_balance) => {
 		const share = calcLpPercent(lp_balance)
-		return  (currencyReserves.multipliedBy(share)) + (lp_balance.multipliedBy(share).multipliedBy(prices.currency) )
+		return  toBigNumberPrecision((currencyReserves.multipliedBy(share)) + (lp_balance.multipliedBy(share).multipliedBy(prices.currency) ), 8)
 	}
 
-	const calcPointsPerCurrency = () => totalLP.dividedBy(currencyReserves)
+	const calcPointsPerCurrency = () => toBigNumberPrecision(totalLP.dividedBy(currencyReserves), 8)
 
 	const calcInitialLpMintAmount = () => toBigNumber(100);
 
-	const calcNewLpMintAmount = (currencyAmount) => calcPointsPerCurrency().multipliedBy(currencyAmount) 
+	const calcNewLpMintAmount = (currencyAmount) => toBigNumberPrecision(calcPointsPerCurrency().multipliedBy(currencyAmount), 8)
 
 	const calcNewShare = (lp_balance, currencyAmount) => {
 		if (!currencyAmount || !lp_balance) return toBigNumber("0")
+		currencyAmount = toBigNumberPrecision(currencyAmount, 8)
+		lp_balance = toBigNumberPrecision(lp_balance, 8)
 		let newLpMinted = calcNewLpMintAmount(currencyAmount)
 		let newShare =  lp_balance.plus(newLpMinted).dividedBy(totalLP.plus(newLpMinted))
 		if (newShare.isNaN()) return toBigNumber("0")
-		return newShare
+		return toBigNumberPrecision(newShare, 8)
 	}
 
 	const calcNewShare_removeTokens = (lpCurrentBalance, lpTokensToRemove) => {
-		return lpCurrentBalance.minus(lpTokensToRemove).dividedBy(totalLP.minus(lpTokensToRemove))
+		lpCurrentBalance = toBigNumberPrecision(lpCurrentBalance, 8)
+		lpTokensToRemove = toBigNumberPrecision(lpTokensToRemove, 8)
+		return toBigNumberPrecision(lpCurrentBalance.minus(lpTokensToRemove).dividedBy(totalLP.minus(lpTokensToRemove)), 8)
 	}
 
 	const calcAmountsFromLpTokens = (lpTokenAmount) => {
 		if (!lpTokenAmount) return undefined
-
+		lpTokenAmount = toBigNumberPrecision(lpTokenAmount, 8)
 		let lp_percent = calcLpPercent(lpTokenAmount)
 		return {
-			currency: currencyReserves.multipliedBy(lp_percent),
-			token: tokenReserves.multipliedBy(lp_percent)
+			currency: toBigNumberPrecision(currencyReserves.multipliedBy(lp_percent), 8),
+			token: toBigNumberPrecision(tokenReserves.multipliedBy(lp_percent), 8)
 		}
 	}
 
 	const calcBuyPrice = (currencyAmount) => {
 		if (!currencyAmount) currencyAmount = toBigNumber("0")
+		currencyAmount = toBigNumberPrecision(currencyAmount, 8)
 		let newCurrencyReserve = currencyReserves.plus(currencyAmount)
-		let newTokenReserve = k.dividedBy(newCurrencyReserve)
-		let tokensPurchased = tokenReserves.minus(newTokenReserve)
-		let fee = tokensPurchased.multipliedBy(0.03)
-		let tokensPurchasedLessFee = tokensPurchased.minus(fee)
+		let newTokenReserve = toBigNumberPrecision(k.dividedBy(newCurrencyReserve), 8)
+		let tokensPurchased = toBigNumberPrecision(tokenReserves.minus(newTokenReserve), 8)
+		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(0.03), 8)
+		let tokensPurchasedLessFee = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
+		let minimumTokens = calcMinimumTokens(currencyAmount)
 
 		return {
 			tokensPurchased,
 			fee,
 			tokensPurchasedLessFee,
+			minimumTokens,
 			...calcSlippage(newTokenReserve, newCurrencyReserve)
 		}
 	}
 
 	const calcSellPrice = (tokenAmount) => {
 		if (!tokenAmount) tokenAmount = toBigNumber("0")
-		let newTokenReserve = tokenReserves.plus(tokenAmount)
-		let newCurrencyReserve = k.dividedBy(newTokenReserve)
-		let currencyPurchased = currencyReserves.minus(newCurrencyReserve)
-		let fee = currencyPurchased.multipliedBy(0.03)
-		let currencyPurchasedLessFee = currencyPurchased.minus(fee)
+		tokenAmount = toBigNumberPrecision(tokenAmount, 8)
+		let newTokenReserve = toBigNumberPrecision(tokenReserves.plus(tokenAmount), 8)
+		let newCurrencyReserve = toBigNumberPrecision(k.dividedBy(newTokenReserve), 8)
+		let currencyPurchased = toBigNumberPrecision(currencyReserves.minus(newCurrencyReserve), 8)
+		let fee = toBigNumberPrecision(currencyPurchased.multipliedBy(0.03), 8)
+		let currencyPurchasedLessFee = toBigNumberPrecision(currencyPurchased.minus(fee), 8)
+		let minimumCurrency = calcMinimumCurrency(tokenAmount)
 
 		return {
 			currencyPurchased,
 			fee,
 			currencyPurchasedLessFee,
+			minimumCurrency,
 			...calcSlippage(newTokenReserve, newCurrencyReserve)
 		}
 	}
@@ -322,10 +355,59 @@ export const quoteCalculator = (tokenInfo) => {
 		if (newPrices.token.isNaN()) newPrices.token = toBigNumber("0.0")
 
 		return {
+			prices,
 			newPrices,
-			tokenSlippage: prices.token.dividedBy(newPrices.token).minus(1).multipliedBy(100).absoluteValue(),
-			currencySlippage: prices.currency.dividedBy(newPrices.currency).minus(1).multipliedBy(100).absoluteValue()
+			tokenSlippage: toBigNumberPrecision(prices.token.dividedBy(newPrices.token).minus(1).multipliedBy(100).absoluteValue(), 8),
+			currencySlippage: toBigNumberPrecision(prices.currency.dividedBy(newPrices.currency).minus(1).multipliedBy(100).absoluteValue(), 8)
 		}
+	}
+
+	const calcMinimumCurrency = (tokenAmount) => {
+		let slipTol = get(slippageTolerance)
+		if (slipTol.isLessThanOrEqualTo(0)) return toBigNumber("0.0")
+		let slipTolDec = slipTol.dividedBy(100)
+		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
+		let maxSlippagePrice = toBigNumberPrecision(prices.token.multipliedBy(slipTolDecInverted), 8)
+		let tokensPurchased = toBigNumberPrecision(tokenAmount.multipliedBy(maxSlippagePrice), 8)
+		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(0.03), 8)
+		let minimumCurrency = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
+		console.log({
+			slipTol: slipTol.toString(),
+			slipTolDec: slipTolDec.toString(),
+			slipTolDecInverted: slipTolDecInverted.toString(),
+			tokenAmount: tokenAmount.toString(),
+			prices_currency: prices.currency.toString(),
+			prices_token: prices.token.toString(),
+			maxSlippagePrice: maxSlippagePrice.toString(),
+			tokensPurchased: maxSlippagePrice.toString(),
+			fee: fee.toString(),
+			minimumTokens: minimumCurrency.toString()
+		})
+		return minimumCurrency
+	}
+
+	const calcMinimumTokens = (currencyAmount) => {
+		let slipTol = get(slippageTolerance)
+		if (slipTol.isLessThanOrEqualTo(0)) return toBigNumber("0.0")
+		let slipTolDec = slipTol.dividedBy(100)
+		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
+		let maxSlippagePrice = toBigNumberPrecision(prices.currency.multipliedBy(slipTolDecInverted), 8)
+		let tokensPurchased = toBigNumberPrecision(currencyAmount.multipliedBy(maxSlippagePrice), 8)
+		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(0.03), 8)
+		let minimumTokens = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
+		console.log({
+			slipTol: slipTol.toString(),
+			slipTolDec: slipTolDec.toString(),
+			slipTolDecInverted: slipTolDecInverted.toString(),
+			currencyAmount: currencyAmount.toString(),
+			prices_currency: prices.currency.toString(),
+			prices_token: prices.token.toString(),
+			maxSlippagePrice: maxSlippagePrice.toString(),
+			tokensPurchased: maxSlippagePrice.toString(),
+			fee: fee.toString(),
+			minimumTokens: minimumTokens.toString()
+		})
+		return minimumTokens
 	}
 
 	return {

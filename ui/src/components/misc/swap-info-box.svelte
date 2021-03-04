@@ -1,18 +1,34 @@
 <script lang="ts">
     import { getContext } from 'svelte'
 
-    //Misc
-    import { stringToFixed, quoteCalculator } from '../../utils' 
+    // Components
+    import Modal from './modal.svelte'
+    import PopupChangeSlippage from './popup-change-slippage.svelte'
+
+    // Misc
+    import { stringToFixed, quoteCalculator, toBigNumber} from '../../utils' 
     import { config } from '../../config'
+    import { slippageTolerance } from '../../store'
 
     const { pageStats, pageStores } = getContext('pageContext');
     const { selectedToken, buy, currencyAmount, tokenAmount, tokenLP } = pageStores
 
-    $: tokenSymbol = $selectedToken?.token_symbol || "???";
-    $: slippage = $buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage
-    $: slippageDisplay = slippage.isFinite() ? stringToFixed(slippage, 2) :  "0.0"
-    $: feeDisplay = isNaN($pageStats?.fee) ? "0.0" : $pageStats?.fee
+    let openChangeSlippage = false;
 
+    pageStats.subscribe(val => console.log(val))
+
+    $: tokenSymbol = $selectedToken?.token_symbol || "???";
+    $: slippage = $buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage;
+    $: slippageDisplay = slippage.isFinite() ? stringToFixed(slippage, 2) :  "0.0";
+    $: feeDisplay = isNaN($pageStats?.fee) ? "0.0" : $pageStats?.fee;
+    $: percentOfTolerance = slippage.dividedBy($slippageTolerance)
+    $: minimumReceived = $buy ? $pageStats.minimumTokens : $pageStats.minimumCurrency;
+
+
+    const toggleChangeSlippageModal = () => {
+        if (openChangeSlippage) openChangeSlippage = false
+        else openChangeSlippage = true
+    }
 </script>
 
 <style>
@@ -25,6 +41,11 @@
     }
     .flex-row{
         justify-content: space-between;
+    }
+    span > button {
+        position: relative;
+        top: -1.5px;
+        margin-left: 8px;
     }
 </style>
 
@@ -50,12 +71,11 @@
     <div class="flex-row flex-align-center ">
         <span class="text-primary-dim">Price Impact</span>
         <span class="number"
-              class:text-warning={slippage.isFinite() && slippage.isLessThan(5) && slippage.isGreaterThan(0)}
-              class:text-error={slippage.isFinite() && slippage.isGreaterThanOrEqualTo(5)}>
+              class:text-warning={slippage.isFinite() && percentOfTolerance.isGreaterThanOrEqualTo(0.75)}
+              class:text-error={slippage.isFinite() && slippage.isGreaterThanOrEqualTo($slippageTolerance)}>
                 {`${slippageDisplay}%`}
         </span>
     </div>
-
     <div class="flex-row flex-align-center ">
         <span class="text-primary-dim">Fee</span>
         <div class="flex-row flex-align-center">
@@ -63,4 +83,29 @@
             <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>
         </div>
     </div>
+     <div class="flex-row flex-align-center ">
+        <span class="text-primary-dim">Slippage Tolerance</span>
+        <span> {stringToFixed($slippageTolerance, 2)}%
+            <button 
+                class="primary small" 
+                on:click={toggleChangeSlippageModal}>
+                change
+            </button>
+        </span>
+    </div>
+    <div class="flex-row flex-align-center ">
+        <span class="text-primary-dim">Guaranteed Minimum</span>
+        <div class="flex-row flex-align-center">
+            <span class="number margin-r-3">
+                {stringToFixed(minimumReceived, 8)}
+            </span>
+            <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>
+        </div>
+    </div>
 </div>
+
+<Modal toggleModal={toggleChangeSlippageModal} open={openChangeSlippage}>
+    <div slot="main-centered">
+        <PopupChangeSlippage toggleModal={toggleChangeSlippageModal}/>
+    </div>
+</Modal>

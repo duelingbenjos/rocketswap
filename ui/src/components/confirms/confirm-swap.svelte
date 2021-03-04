@@ -15,7 +15,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { rocketState } from '../../store'
+    import { rocketState, slippageTolerance } from '../../store'
     import { stringToFixed, toBigNumber, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
@@ -25,13 +25,11 @@
     const { pageStats, resetPage, pageStores } = getContext('pageContext')
     const { selectedToken, currencyAmount, tokenAmount, buy  } = pageStores
 
-
     let logoSize = "30px"
     let minimumReceived = toBigNumber("0.0")
-    
-    $: minimumReceivedString = stringToFixed(minimumReceived.toString(), 4)
+
     $: slots = createSlots($buy, $currencyAmount, $tokenAmount)
-    $: receivedSymbol = buy ? $selectedToken.token_symbol : config.currencySymbol
+    $: receivedSymbol = $buy ? $selectedToken.token_symbol : config.currencySymbol
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
     $: slippageWarning = slippage.isGreaterThan(5)
 
@@ -87,8 +85,8 @@
         loading = true;
         walletService.swapBuy({
             'contract': $selectedToken.contract_name,
-            'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)},
-            'minimum_received': 0,
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 8)},
+            'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
             'token_fees': false
         }, $selectedToken, $currencyAmount, { success, error })
     }
@@ -97,8 +95,10 @@
         if (!$tokenAmount) return
         loading = true;
         walletService.swapSell({
-        'contract': $selectedToken.contract_name,
-        'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
+            'contract': $selectedToken.contract_name,
+            'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 8)},
+            'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
+            'token_fees': false
         }, $selectedToken, $tokenAmount, { success, error })
     }
 </script>
@@ -177,12 +177,7 @@
                 </div>
             {/if}
         </div>
-        <!--
-        <div class="flex-row modal-confirm-item">
-            <p>Minimum Recieved</p>
-            <p class="text-bold">{minimumReceivedString} {receivedSymbol}</p>
-        </div>
-        -->
+
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Price Impacted</p>
             <p  class="number" 
@@ -196,6 +191,13 @@
             <p class="text-primary-dim">Liquidity Provider Fee</p>
             <div class="flex-row flex-align-center">
                 <span class="number margin-r-3">{stringToFixed($pageStats.fee, 8)}</span>
+                <span>{receivedSymbol}</span>
+            </div>
+        </div>
+        <div class="flex-row modal-confirm-item">
+            <p class="text-bold text-primary-dim">Minimum Recieved</p>
+            <div class="flex-row flex-align-center">
+                <span class="number margin-r-3">{stringToFixed(minimumReceived, 8)}</span>
                 <span>{receivedSymbol}</span>
             </div>
         </div>

@@ -122,7 +122,7 @@
 		width: 100%;
 		background-image: var(--main-background-gradient);
 
-		overflow-y: scroll;
+		overflow-y: hidden;
 	}
 
 	.bg-solid {
