@@ -107,7 +107,7 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row flex-align-center modal-confirm-item">
             <p class="text-primary-dim">{`Pool Tokens Burned`}</p>
-            <p class="number">{stringToFixed($lpTokenAmount, 4)}</p>
+            <p class="number number-span">{stringToFixed($lpTokenAmount, 4)}</p>
         </div>
         <ShareChange />
         <div class="modal-confirm-buttons flex-col">

@@ -78,7 +78,7 @@
 <div class="input-container flex-col"
 	 in:scale="{{duration: 300, delay: 0, opacity: 0.5, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
-		<div class="input-label">
+		<div class="input-label text-primary">
 			{label}
 		</div>
 		<span class="number text-small">

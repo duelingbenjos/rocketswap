@@ -208,7 +208,7 @@
                                                 <SelectedArrow width="10px" margin="0 8px" direction="left"/>
                                             {/if}
                                         </div>
-                                        <span class="token-amount number"> {stringToFixed(token.balance || 0, 8)} </span>
+                                        <span class="token-amount number number-span"> {stringToFixed(token.balance || 0, 8)} </span>
                                     </button>
                                 </div>
                             {/each}

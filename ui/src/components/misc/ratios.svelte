@@ -48,15 +48,15 @@
     <div class="flex-col prices">
         {#if showAll}
             <div class="flex-row weight-400">
-                <span class="number">1</span>
+                <span class="number number-span">1</span>
                 <span class="">{` ${tokenSymbol} = `}</span>
-                <span class="number">{stringToFixed($pageStats?.quoteCalc.prices.currency, 8)}</span>
+                <span class="number number-span">{stringToFixed($pageStats?.quoteCalc.prices.currency, 8)}</span>
                 <span class="">{` ${config.currencySymbol}`}</span>
             </div>
             <div class="flex-row weight-400">
-                <span class="number">1</span>
+                <span class="number number-span">1</span>
                 <span class="">{` ${config.currencySymbol} = `}</span>
-                <span class="number">{stringToFixed($pageStats?.quoteCalc.prices.token, 8)}</span>
+                <span class="number number-span">{stringToFixed($pageStats?.quoteCalc.prices.token, 8)}</span>
                 <span class="">{` ${tokenSymbol}`}</span>
             </div>
         {:else}

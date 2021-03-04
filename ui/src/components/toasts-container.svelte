@@ -81,7 +81,7 @@
 
 	.close{
 		position: relative;
-		top: -9px;
+		top: -8px;
 		right: 0;
 	}
 

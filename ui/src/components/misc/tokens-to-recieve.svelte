@@ -44,14 +44,14 @@
 
 <div class="container flex-col">
     <div class="flex-row">
-        <p class="number flex-grow text-large">{currencyToReceive.isNaN() ? "0" : stringToFixed(currencyToReceive, 8)}</p>
+        <p class="number flex-grow text-large number-span">{currencyToReceive.isNaN() ? "0" : stringToFixed(currencyToReceive, 8)}</p>
         <div class="flex-row">
             <p class="input-token-label text-large">{tokenSymbol}</p>
             <TokenLogo tokenMeta={$selectedToken} width={'25px'}  margin={"0 10px"}/>
         </div>
     </div>
     <div class="flex-row">
-        <p class="number flex-grow text-large">{tokensToReceive.isNaN() ? "0" : stringToFixed(tokensToReceive, 8)}</p>
+        <p class="number flex-grow text-large number-span">{tokensToReceive.isNaN() ? "0" : stringToFixed(tokensToReceive, 8)}</p>
         <div class="flex-row">
             <p class="input-token-label text-large">{config.currencySymbol}</p>
             <LamdenLogo width={'25px'} margin={"0 10px"} />

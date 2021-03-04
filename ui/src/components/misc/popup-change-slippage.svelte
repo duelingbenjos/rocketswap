@@ -110,23 +110,23 @@
             class="primary small" 
             disabled={$slippageTolerance.isEqualTo(0.1)  && !hasSlippageInput} 
             on:click={() => handleClick_slippageTolerance("0.1")}>
-            <span class="number">0.1</span>%
+            <span class="number number-span">0.1</span>%
         </button>
         <button 
             class="primary small" 
             disabled={$slippageTolerance.isEqualTo(0.5)  && !hasSlippageInput} 
             on:click={() => handleClick_slippageTolerance("0.5")}>
-            <span class="number">0.5</span>%
+            <span class="number number-span">0.5</span>%
         </button>
         <button 
             class="primary small" 
             disabled={$slippageTolerance.isEqualTo(1) && !hasSlippageInput} 
             on:click={() => handleClick_slippageTolerance("1.0")}>
-            <span class="number">1.0</span>%
+            <span class="number number-span">1.0</span>%
         </button>
         <div class="slippage-input">
             <input 
-                class="number primaryInput input-small"
+                class="number primaryInput input-small number-span"
                 placeholder="1.00"
                 bind:this={inputElm}
                 bind:value={inputVal}

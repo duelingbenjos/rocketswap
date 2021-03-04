@@ -59,11 +59,14 @@
 <div class="input-container flex-col"
 	 in:scale="{{duration: 300, delay: 0, opacity: 0.0, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
-		<div class="input-label">{label}</div>
+		<div class="input-label text-primary">
+			{label}
+		</div>
 		<div class="input-balance">
 			{#if $selectedToken}
-				Balance: 
-				<span class="number text-small">{stringToFixed(tokenBalance, 8)}</span>
+				<span class="number text-small">
+					{`Balance: ${stringToFixed(tokenBalance, 8)}`}
+				</span>
 			{/if}
 		</div>
 	</div>
