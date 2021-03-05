@@ -6,7 +6,7 @@
     import ShareChange from './confirm-share-change.svelte'
 
     //Icons
-    import Base64SvgLogo from '../../icons/base64_svg.svelte'
+    import TokenLogo from '../../icons/token-logo.svelte'
     import LamdenLogo from '../../icons/lamden-logo.svelte'
     import PlusSign from '../../icons/plus-sign.svelte'
     import CloseIcon from '../../icons/close.svelte';
@@ -57,7 +57,8 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .sub-text{
         margin: 0.5rem 0;
@@ -88,7 +89,7 @@
             <span class="number-reg">{stringToFixed($pageStats.amounts.token, 8)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span>{$selectedToken.token_symbol}</span>
-                <Base64SvgLogo string={$selectedToken?.token_base64_svg} width="30px" margin={"0 0 0 10px"}/>
+                <TokenLogo tokenMeta={$selectedToken} width="30px" margin={"0 0 0 10px"}/>
             </div>
         </div>
         <PlusSign width="18px" margin="0" />
@@ -106,7 +107,7 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row flex-align-center modal-confirm-item">
             <p class="text-primary-dim">{`Pool Tokens Burned`}</p>
-            <p class="number">{stringToFixed($lpTokenAmount, 4)}</p>
+            <p class="number number-span">{stringToFixed($lpTokenAmount, 4)}</p>
         </div>
         <ShareChange />
         <div class="modal-confirm-buttons flex-col">

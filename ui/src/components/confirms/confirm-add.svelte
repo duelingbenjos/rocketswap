@@ -55,10 +55,12 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .modal-sub-box{
-        width: 345px;
+        width: 100vw;
+        max-width: 380px;
     }
     .sub-text{
         margin: 0.5rem 0;
@@ -84,11 +86,11 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number">{stringToFixed($currencyAmount, 12)}</p>
+            <p class="number number-span">{stringToFixed($currencyAmount, 12)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
-            <p class="number">{stringToFixed($tokenAmount, 12)}</p>
+            <p class="number number-span">{stringToFixed($tokenAmount, 12)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}

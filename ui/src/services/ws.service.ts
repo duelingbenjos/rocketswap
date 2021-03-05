@@ -24,7 +24,7 @@ export class WsService {
   connection: SocketIOClient.Socket
 
   constructor() {
-    console.log('WS Service STARTED')
+    //console.log('WS Service STARTED')
     this.base_url = getBaseUrl(document.location.href)
     this.port = 3002
     this.connection = socket(`${this.base_url}:${this.port}`)
@@ -35,7 +35,7 @@ export class WsService {
 
   setupEvents = () => {
     this.connection.on('connect', () => {
-      console.log(`socket connected to : ${this.base_url}:${this.port}`)
+      //console.log(`socket connected to : ${this.base_url}:${this.port}`)
       if (!this.previously_connected) {
         this.connection.emit('join_room', `trollbox`)
         this.previously_connected = true
@@ -46,7 +46,7 @@ export class WsService {
         val.push({ sender: msg.sender.name, message: msg.message })
         return val
       })
-      console.log(msg)
+      //console.log(msg)
     })
     this.connection.on(`trollbox_history`, (history) => {
       trollboxMessages.update((val) => {
@@ -63,6 +63,8 @@ export class WsService {
       this.connection.off(`trollbox_history`)
     })
     this.connection.on('auth_response', (msg) => {
+      //console.log("BEARER TOKEN!")
+      //console.log(msg)
       localStorage.setItem('auth_token', JSON.stringify(msg))
       setBearerToken()
     })
@@ -82,26 +84,26 @@ export class WsService {
     this.connection.on(`trade_update:${contract_name}`, this.handleTradeUpdate)
     this.connection.emit('join_room', `trade_feed:${contract_name}`)
     this.current_trade_feed = contract_name
-    console.log('joined trade feed : ', contract_name)
+    //console.log('joined trade feed : ', contract_name)
   }
 
   public leaveTradeFeed() {
     const contract_name = this.current_trade_feed
     this.connection.off(`trade_update:${contract_name}`)
     this.current_trade_feed = ''
-    console.log('left trade feed : ', contract_name)
+    //console.log('left trade feed : ', contract_name)
     tradeHistory.set([])
     tradeUpdates.set([])
   }
 
   private handleTradeUpdate(event) {
-    console.log(event)
+    //console.log(event)
     if (event.history) tradeHistory.set(valuesToBigNumber(event.history))
     else {
       if (event.action === 'trade_update') {
         tradeUpdates.update((trades) => {
           trades.push(valuesToBigNumber(event))
-          console.log(trades)
+          //console.log(trades)
           return trades
         })
       }
@@ -114,8 +116,15 @@ export class WsService {
     this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
   }
 
+  public leaveBalanceFeed(vk: string) {
+    this.connection.off(`balance_list:${vk}`)
+    this.connection.off(`balance_update:${vk}`)
+    tokenBalances.set({})
+  }
+
   private handleTrollboxAuthCode(payload) {
-    console.log(payload)
+    //console.log("AUTH_CODE!")
+    //console.log(payload)
     ws_id.set(payload)
   }
 
@@ -127,33 +136,33 @@ export class WsService {
   }
 
   public sendProxyTxn(tx, callback) {
-    console.log(this.txCallbacks)
+    //console.log(this.txCallbacks)
     this.txCallbacks[tx.payload.uid] = callback
-    console.log(this.txCallbacks)
+    //console.log(this.txCallbacks)
     this.connection.emit('send_transaction', tx)
   }
 
   private handleTrollboxHistory(payload: any[]) {}
 
   private handleBalanceList(payload) {
-    console.log(payload)
+    //console.log(payload)
     tokenBalances.set(valuesToBigNumber(payload).balances)
   }
 
   private handleBalanceUpdate(data) {
-    console.log(data)
+    //console.log(data)
     const { payload } = data
     tokenBalances.set(valuesToBigNumber(payload).balances)
   }
 
   public joinPriceFeed(contract_name: string) {
-    console.log('join price feed')
+    //console.log('join price feed')
     this.connection.emit('join_room', `price_feed:${contract_name}`)
     this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
   }
 
   public leavePriceFeed(contract_name: string) {
-    console.log('leave price feed')
+    //console.log('leave price feed')
     this.connection.emit('leave_room', `price_feed:${contract_name}`)
     this.connection.off(`price_feed:${contract_name}`)
   }
@@ -161,7 +170,7 @@ export class WsService {
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
     let { contract_name } = metrics_update
     const metrics = this.token_metrics
-    console.log(metrics_update)
+    //console.log(metrics_update)
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     token_metrics_store.set(valuesToBigNumber(metrics))
   }

@@ -7,9 +7,6 @@
 	//Components
 	import TokenSelect from './token-select-toggle.svelte'
 
-	//Icons
-	import Base64Svg from '../../icons/base64_svg.svelte'
-
 	//Misc
 	import { config } from '../../config'
 	import { stringToFixed, toBigNumber, determinePrecision } from '../../utils.js'
@@ -28,8 +25,6 @@
 
 	$: tokenBalance = $selectedToken ? $tokenBalances[$selectedToken.contract_name] : toBigNumber("0.0")
 	$: inputValue = $tokenAmount;
-
-	tokenBalances.subscribe(val => console.log(val))
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -64,11 +59,14 @@
 <div class="input-container flex-col"
 	 in:scale="{{duration: 300, delay: 0, opacity: 0.0, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
-		<div class="input-label">{label}</div>
+		<div class="input-label text-primary">
+			{label}
+		</div>
 		<div class="input-balance">
 			{#if $selectedToken}
-				Balance: 
-				<span class="number text-small">{stringToFixed(tokenBalance, 8)}</span>
+				<span class="number text-small">
+					{`Balance: ${stringToFixed(tokenBalance, 8)}`}
+				</span>
 			{/if}
 		</div>
 	</div>

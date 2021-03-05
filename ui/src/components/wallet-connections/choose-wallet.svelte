@@ -80,7 +80,7 @@
     out:fly="{{delay: 0, duration: 200, x: 0, y: 20, opacity: 0.0, easing: quintOut}}">
     <div class="modal-heading text-xlarge">
         <div class="flex flex-center-center">
-            <RocketSwapCircleLogoIcon margin="0 16px 0 0 " width={screenWidth > 430 ? "24px" : "18px"}/>
+            <RocketSwapCircleLogoIcon margin="0 16px 0 0 " />
             <span>
                 {#if selectedOption === 0} Choose a Login Option {/if}
                 {#if selectedOption === 1} Lamden Wallet Login {/if}
@@ -88,7 +88,7 @@
             </span> 
         </div>
         
-        <button class="nostyle close-button" on:click={toggleModal}> 
+        <button class="nostyle close-button flex" on:click={toggleModal}> 
             <CloseIcon width="18px" />
         </button>
         

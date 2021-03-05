@@ -57,6 +57,7 @@
 	--text-primary-color-inverted-dim: #120e4a;
 	--text-primary-color-inverted-dimmer: #120e4a;
 
+	--text-size-tiny: 0.6em; 
 	--text-size-xsmall: 0.7em; 
 	--text-size-small: 0.9em;
 	--text-size-large: 1.2em;
@@ -323,12 +324,20 @@
 	align-items: center;
 }
 
+.flex-align-start{
+	align-items: flex-start;
+}
+
 
 .number{
 	font-family: 'Roboto Mono', monospace;
 	font-size: 0.9em;
 	position: relative;
-	top: -0.05em;
+    top: 0.1rem;
+}
+
+.number-span{
+	top: -0.05rem;
 }
 
 .number-reg{

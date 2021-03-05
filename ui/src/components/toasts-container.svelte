@@ -81,7 +81,7 @@
 
 	.close{
 		position: relative;
-		top: -11px;
+		top: -8px;
 		right: 0;
 	}
 
@@ -99,7 +99,7 @@
 		padding: 10px 10px 5px 10px;
 		z-index: 110;
 
-		border-radius: 8px 16px 8px 8px;
+		border-radius: 8px;
 		background-color: var(--toast-background);
 
 		min-height: 50px;
@@ -134,6 +134,12 @@
 		text-align: end;
 		margin-top: 0.5rem;
 	}
+	/* When page width is greater than 650px (tablets) */
+    @media screen and (min-width: 650px) {
+		.toasts-container {
+			margin-top: 8rem;
+		}
+	}
 </style>
 
 <div class="toasts-container">
@@ -141,7 +147,7 @@
 		<div in:receive={{ key: t.id }} out:send={{ key: t.id }} animate:flip={{ duration: 700 }} class={`toast-container ${t.type}`}>
 			{#if t.icon}
 				<div class="toast-icon">
-					<svelte:component this={iconMap[t.icon]} width="36px" color={"var(--toast-icon-color)"}/>
+					<svelte:component this={iconMap[t.icon]} width="36px" color={"var(--toast-icon-color)"} minWidth="36px" />
 				</div>
 			{/if}
 		<div class={`text-container`}>

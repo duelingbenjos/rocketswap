@@ -1,6 +1,8 @@
 //Change there for for PROD
 
 const CURRENCY_SYMBOL = "DTAU"
+const AMM_TOKEN_SYMBOL = "RSWP"
+const AMM_FEE = "0.003"
 const NAMES_CONTRACT= "con_ipseity_5"
 const BLOCKEXPLORER_URL = "https://testnet.lamden.io"
 const MASTERNODE_URL = "https://testnet-master-1.lamden.io"
@@ -8,21 +10,30 @@ const GENERIC_ICON = "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG
 
 export const connectionRequest = {
   appName: 'RocketSwap',
-  version: '1.0.1', //Change for PROD
-  logo: 'images/logo.png',
-  contractName: 'con_amm2', //Change for PROD
+  version: '6.0.0', //Change for PROD
+  logo: 'assets/images/RS_Logo.png',
+  background: 'assets/images/background.jpeg',
+  contractName: 'con_amm_v6', //Change for PROD
   networkType: 'testnet'  //Change for PROD
 }
 
 export const stamps = {
   defaultValue: 50,
+  create_market: 110,
+  add_liquidity: 85,
+  remove_liquidity: 80,
+  buy: 200,
+  auth: 35,
+  approve: 30,
   buffer: 10,
-  currentRatio: 20 //Change for PROD
+  currentRatio: 13 //Change for PROD
 }
 
 export const config = {
   namesContract: NAMES_CONTRACT, //Change for PROD
   currencySymbol: CURRENCY_SYMBOL, //Change for PROD
+  ammTokenSymbol: AMM_TOKEN_SYMBOL, //Change for PROD
+  ammFee: AMM_FEE, //Change for PROD
   blockExplorer: BLOCKEXPLORER_URL, //Change for PROD
   masternode: MASTERNODE_URL, //Change for PROD
 }

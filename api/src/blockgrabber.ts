@@ -223,7 +223,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 				if (lastestBlockNum === currBlockNum) {
 					if (alreadyCheckedCount < maxCheckCount)
 						alreadyCheckedCount = alreadyCheckedCount + 1;
-					checkNextIn = 1500 * alreadyCheckedCount;
+					checkNextIn = 200 * alreadyCheckedCount;
 					timerId = setTimeout(checkForBlocks, checkNextIn);
 				}
 
