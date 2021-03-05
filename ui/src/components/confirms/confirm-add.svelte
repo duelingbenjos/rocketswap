@@ -46,7 +46,7 @@
         loading = true;
         walletService.addLiquidity({
             'contract': $selectedToken.contract_name,
-            'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)}
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 30)}
         }, $selectedToken, $tokenAmount, $currencyAmount, { success, error })
     }
 

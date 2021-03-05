@@ -48,7 +48,7 @@
         loading = true;
         walletService.removeLiquidity({
         'contract': $selectedToken.contract_name,
-        'amount': {'__fixed__': stringToFixed($lpTokenAmount.toString(), 30)}
+        'amount': {'__fixed__': stringToFixed($lpTokenAmount, 30)}
         }, $selectedToken, { success, error })
     }
 

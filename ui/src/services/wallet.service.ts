@@ -438,7 +438,7 @@ export class WalletService {
 			this.toastService.addToast({
 				icon: "gaugePlus",
 				heading: `Added Liquidity to ${selectedToken.token_name}!`,
-				text: `Your ${selectedToken.token_symbol} / ${config.currencySymbol} LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`,
+				text: `Your ${selectedToken.token_symbol} / ${config.currencySymbol} LP Token balance is now ${stringToFixed(lpPoints, 4)}.`,
 				type: 'success',
 				duration: 5000,
 				link:{
@@ -474,7 +474,7 @@ export class WalletService {
 			this.toastService.addToast({ 
 				icon: "gaugeMinus",
 				heading: `Removed Liquidity from ${selectedToken.token_symbol}!`,
-				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints.toString(), 4)}.`, 
+				text: `You have removed liquidity from ${selectedToken.token_name}, your LP Token balance is now ${stringToFixed(lpPoints, 4)}.`, 
 				type: 'success',
 				duration: 5000,
 				link:{

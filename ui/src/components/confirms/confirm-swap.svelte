@@ -84,7 +84,7 @@
         loading = true;
         walletService.swapBuy({
             'contract': $selectedToken.contract_name,
-            'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 8)},
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 8)},
             'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
             'token_fees': false
         }, $selectedToken, $currencyAmount, { success, error })
@@ -95,7 +95,7 @@
         loading = true;
         walletService.swapSell({
             'contract': $selectedToken.contract_name,
-            'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 8)},
+            'token_amount': {'__fixed__': stringToFixed($tokenAmount, 8)},
             'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
             'token_fees': false
         }, $selectedToken, $tokenAmount, { success, error })

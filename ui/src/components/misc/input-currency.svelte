@@ -7,7 +7,7 @@
 	import LamdenLogo from '../../icons/lamden-logo.svelte'
 
 	//Stores
-	import { walletBalance } from '../../store'
+	import { walletBalance, payInRswp } from '../../store'
 
 	//Services
 	import { WalletService } from '../../services/wallet.service'
@@ -23,7 +23,7 @@
 	const dispatch = createEventDispatcher();
 
 	const { pageStores, getStampCost } = getContext('pageContext')
-	const { currencyAmount, buy, selectedToken, payInRswp } = pageStores
+	const { currencyAmount, buy, selectedToken  } = pageStores
 
 	let inputElm;
 	let pressedMaxValue = false;
@@ -36,6 +36,11 @@
 				if (inputValue > 0) dispatchEvent(inputValue)
 			}
 		})
+
+		let small = toBigNumber("0.000000008")
+		console.log(small.toPrecision(8)) // 0.0000000080000000
+		console.log(small.toFixed(8)) // 0.00000000
+		console.log(stringToFixed(small, 8)) // 0
 	})
 
 
@@ -46,8 +51,8 @@
 		}else{
 			let value = toBigNumber(e.target.value)
 			if (determinePrecision(value) > 8){
-				value = toBigNumber(stringToFixed(value.toString(), 8))
-				inputElm.value = value.toString()
+				value = toBigNumber(stringToFixed(value, 8))
+				inputElm.value = stringToFixed(value, 8)
 			}
 			pressedMaxValue = false;
 			dispatchEvent(value)
@@ -61,7 +66,7 @@
 			adjustedValue = $walletBalance.minus(toBigNumber(txTAUCost))
 		}
 		inputValue = toBigNumber(stringToFixed(adjustedValue, 8))
-		inputElm.value = stringToFixed(inputValue.toString(), 8)
+		inputElm.value = stringToFixed(inputValue, 8)
 		pressedMaxValue = true;
 		dispatchEvent(inputValue)
 	}
@@ -92,7 +97,7 @@
 	    <input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			value={inputValue ? inputValue.isNaN() ? "" : inputValue?.toString() : ""} 
+			value={inputValue ? inputValue.isNaN() ? "" : stringToFixed(inputValue, 8) : ""} 
 			bind:this={inputElm}
 			on:input={handleInputChange}
         />

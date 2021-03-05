@@ -124,7 +124,12 @@
     }
     .input-token-label{
         margin: 1px 3px 0;
+    }
+    .input-token-label.has-token{
         font-size: 1.4em;
+    }
+    .input-token-label.no-token{
+        font-size: var(--text-size-small);
     }
     .token-scroll::-webkit-scrollbar {
         display: none;
@@ -164,17 +169,19 @@
 
 {#if !$selectedToken}
     <button on:click={openTokenSelect} class="select-token flex-row" >
-        <span class="input-token-label text-small ">Select Token</span> 
-        <DirectionalChevron width="10px" direction="down" />
+        <span class="input-token-label no-token">Select Token</span> 
+        <div class="chevron">
+            <DirectionalChevron width="9px" direction="down"/>
+        </div>
     </button>
 {:else}
     <button class="select-token flex-row" on:click={openTokenSelect}>
     	{#if $selectedToken}
 			<TokenLogo tokenMeta={$selectedToken} width="21px" margin="0 3px" />
 		{/if}
-        <span class="input-token-label">{$selectedToken.token_symbol.toUpperCase()}</span> 
+        <span class="input-token-label has-token">{$selectedToken.token_symbol.toUpperCase()}</span> 
         <div class="chevron">
-            <DirectionalChevron width="12px" direction="down" margin="0"/>
+            <DirectionalChevron width="9px" direction="down" margin="0"/>
         </div>
         
     </button>

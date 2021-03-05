@@ -47,8 +47,8 @@
     loading = true;
     walletService.createMarket({
       'contract': $selectedToken.contract_name,
-      'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)},
-      'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
+      'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 30)},
+      'token_amount': {'__fixed__': stringToFixed($tokenAmount, 30)}
     }, $selectedToken, $tokenAmount, $currencyAmount, { success, error })
   }
 
