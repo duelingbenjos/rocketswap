@@ -10,5 +10,5 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     container_name: rocketswap-mongo
-    networks: 
-      - rocketswap-network
+    # networks: 
+    #   - rocketswap-network
