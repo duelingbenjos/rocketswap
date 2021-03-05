@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
+	import { createEventDispatcher, afterUpdate, getContext, onMount } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -30,11 +30,14 @@
 
 	$: inputValue = $currencyAmount;
 
-	payInRswp.subscribe(val => {
-		if ($currencyAmount){
-			if (inputValue > 0) dispatchEvent(inputValue)
-		}
+	onMount(() => {
+		payInRswp.subscribe(val => {
+			if ($currencyAmount && typeof inputValue !== 'undefined'){
+				if (inputValue > 0) dispatchEvent(inputValue)
+			}
+		})
 	})
+
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')

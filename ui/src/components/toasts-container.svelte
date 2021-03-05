@@ -137,7 +137,7 @@
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
 		.toasts-container {
-			padding-top: 8rem;
+			margin-top: 8rem;
 		}
 	}
 </style>

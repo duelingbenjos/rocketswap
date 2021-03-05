@@ -31,6 +31,7 @@
     $: slots = createSlots($buy, $currencyAmount, $tokenAmount, $payInRswp)
     $: receivedSymbol = $buy ? $selectedToken.token_symbol : config.currencySymbol
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
+    $: percentOfTolerance = slippage.dividedBy($slippageTolerance)
     $: slippageWarning = slippage.isGreaterThan(5)
 
     onMount(() => {
@@ -179,9 +180,8 @@
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Price Impacted</p>
             <p  class="number" 
-                class:text-warning={slippage.isLessThan(5)}
-                class:text-error={slippage.isGreaterThanOrEqualTo(5)}
-            >
+                class:text-warning={slippage.isFinite() && percentOfTolerance.isGreaterThanOrEqualTo(0.75)}
+                class:text-error={slippage.isFinite() && slippage.isGreaterThanOrEqualTo($slippageTolerance)}>
                 {`${stringToFixed(slippage, 2)}%`}
             </p>
         </div>

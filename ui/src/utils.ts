@@ -338,19 +338,22 @@ export const quoteCalculator = (tokenInfo) => {
 	}
 
 	const calcBuyPrice = (currencyAmount) => {
+		console.log("CALC BUY")
 		if (!currencyAmount) currencyAmount = toBigNumber("0")
 		currencyAmount = toBigNumberPrecision(currencyAmount, 8)
 		let newCurrencyReserve = currencyReserves.plus(currencyAmount)
 		let newTokenReserve = toBigNumberPrecision(k.dividedBy(newCurrencyReserve), 8)
 		let tokensPurchased = toBigNumberPrecision(tokenReserves.minus(newTokenReserve), 8)
-		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(0.03), 8)
+		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let tokensPurchasedLessFee = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
+		let pricePaid = tokensPurchased.isGreaterThan(0) ? tokensPurchased.dividedBy(currencyAmount) : false
 
 		return {
 			tokensPurchased,
 			fee,
 			rswpFee: calcFeeInRswp_FromTokenFee(fee),
 			tokensPurchasedLessFee,
+			pricePaid,
 			...calcMinimumTokens(currencyAmount),
 			...calcSlippage(newTokenReserve, newCurrencyReserve)
 		}
@@ -362,14 +365,16 @@ export const quoteCalculator = (tokenInfo) => {
 		let newTokenReserve = toBigNumberPrecision(tokenReserves.plus(tokenAmount), 8)
 		let newCurrencyReserve = toBigNumberPrecision(k.dividedBy(newTokenReserve), 8)
 		let currencyPurchased = toBigNumberPrecision(currencyReserves.minus(newCurrencyReserve), 8)
-		let fee = toBigNumberPrecision(currencyPurchased.multipliedBy(0.03), 8)
+		let fee = toBigNumberPrecision(currencyPurchased.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let currencyPurchasedLessFee = toBigNumberPrecision(currencyPurchased.minus(fee), 8)
+		let pricePaid = currencyPurchased.isGreaterThan(0) ? currencyPurchased.dividedBy(tokenAmount) : false
 
 		return {
 			currencyPurchased,
 			fee,
 			rswpFee: calcFeeInRswp_FromCurrencyFee(fee),
 			currencyPurchasedLessFee,
+			pricePaid,
 			...calcMinimumCurrency(tokenAmount),
 			...calcSlippage(newTokenReserve, newCurrencyReserve)
 		}
@@ -401,8 +406,9 @@ export const quoteCalculator = (tokenInfo) => {
 		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
 		let maxSlippagePrice = toBigNumberPrecision(prices.token.multipliedBy(slipTolDecInverted), 8)
 		let minimumCurrency = toBigNumberPrecision(tokenAmount.multipliedBy(maxSlippagePrice), 8)
-		let fee = toBigNumberPrecision(minimumCurrency.multipliedBy(0.03), 8)
+		let fee = toBigNumberPrecision(minimumCurrency.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let minimumCurrencyLessFee = toBigNumberPrecision(minimumCurrency.minus(fee), 8)
+		/*
 		console.log({
 			slipTol: slipTol.toString(),
 			slipTolDec: slipTolDec.toString(),
@@ -414,7 +420,7 @@ export const quoteCalculator = (tokenInfo) => {
 			tokensPurchased: maxSlippagePrice.toString(),
 			fee: fee.toString(),
 			minimumTokens: minimumCurrency.toString()
-		})
+		})*/
 		return {
 			minimumCurrency,
 			minimumCurrencyLessFee,
@@ -433,8 +439,9 @@ export const quoteCalculator = (tokenInfo) => {
 		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
 		let maxSlippagePrice = toBigNumberPrecision(prices.currency.multipliedBy(slipTolDecInverted), 8)
 		let minimumTokens = toBigNumberPrecision(currencyAmount.multipliedBy(maxSlippagePrice), 8)
-		let fee = toBigNumberPrecision(minimumTokens.multipliedBy(0.03), 8)
+		let fee = toBigNumberPrecision(minimumTokens.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let minimumTokensLessFee = toBigNumberPrecision(minimumTokens.minus(fee), 8)
+		/*
 		console.log({
 			slipTol: slipTol.toString(),
 			slipTolDec: slipTolDec.toString(),
@@ -446,7 +453,7 @@ export const quoteCalculator = (tokenInfo) => {
 			minimumTokens: minimumTokens.toString(),
 			fee: fee.toString(),
 			minimumTokensLessFee: minimumTokensLessFee.toString()
-		})
+		})*/
 		return {
 			minimumTokensLessFee,
 			minimumTokens
@@ -455,10 +462,12 @@ export const quoteCalculator = (tokenInfo) => {
 
 	const calcFeeInRswp_FromCurrencyFee = (amount) => {
 		let rswpAmount = get(rswpPrice).multipliedBy(amount)
+		/*
 		console.log({
 			'rswpPrice': get(rswpPrice).toString(),
 			rswpAmount: rswpAmount.toString()
 		})
+		*/
 		return rswpAmount
 		// fee is usually 0.3%
 		// fee paid in RSWP is the value of the TOKEN or currency in RSWAP
@@ -469,11 +478,12 @@ export const quoteCalculator = (tokenInfo) => {
 	const calcFeeInRswp_FromTokenFee = (amount) => {
 		let tokenFeeToCurrency = prices.token.multipliedBy(amount)
 		let rswpAmount = get(rswpPrice).multipliedBy(tokenFeeToCurrency)
+		/*
 		console.log({
 			'rswpPrice': get(rswpPrice).toString(),
 			tokenFeeToCurrency: tokenFeeToCurrency.toString(),
 			rswpAmount: rswpAmount.toString()
-		})
+		})*/
 		return rswpAmount
 		// fee is usually 0.3%
 		// fee paid in RSWP is the value of the TOKEN or currency in RSWAP

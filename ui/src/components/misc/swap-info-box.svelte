@@ -15,9 +15,8 @@
 
     let openChangeSlippage = false;
 
-    pageStats.subscribe(val => console.log(val))
-
     $: tokenSymbol = $selectedToken?.token_symbol || "???";
+    $: pricePaid = $pageStats.pricePaid ? $pageStats.pricePaid : $buy ? $pageStats?.newPrices?.currency : $pageStats?.newPrices?.token;
     $: slippage = $buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage;
     $: slippageDisplay = slippage.isFinite() ? stringToFixed(slippage, 2) :  "0.0";
     $: feeDisplay = isNaN($pageStats?.fee) ? "0.0" : $pageStats?.fee;
@@ -84,22 +83,17 @@
 
 <div class="container container-border flex-col text-xsmall weight-400">
     <div class="flex-row flex-align-center">
-        <span class="text-primary-dim">Price</span>
-        {#if $buy}
-            <div class="flex-row flex-align-center">
-                <span class="number margin-r-3 number-span">
-                    {stringToFixed($pageStats?.newPrices?.currency, 8)}
-                </span>
+        <span class="text-primary-dim">Price {$pageStats.pricePaid}</span>
+        <div class="flex-row flex-align-center">
+            <span class="number margin-r-3 number-span">
+                {stringToFixed(pricePaid, 8)}
+            </span>
+            {#if $buy}
                 <span>{` ${tokenSymbol} per  ${config.currencySymbol}`}</span>
-            </div>
-        {:else}
-            <div class="flex-row flex-align-center">
-                <span class="number margin-r-3">
-                    {stringToFixed($pageStats?.newPrices?.token, 8)}
-                </span>
+            {:else}
                 <span>{`${config.currencySymbol} per ${tokenSymbol}`}</span>
-            </div>
-        {/if}
+            {/if}
+        </div>
     </div>
     <div class="flex-row flex-align-center ">
         <span class="text-primary-dim">Price Impact</span>
