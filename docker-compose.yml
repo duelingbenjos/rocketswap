@@ -13,7 +13,7 @@ services:
     networks: 
       - rocketswap-network
     volumes: 
-      - ~/mongo/data
+      - ~/mongo/data:/data/db
 
 
   ui:
