@@ -1,0 +1,2 @@
+* This mongo instance is designed to sync the blockchain once and hold onto the data forever.
+* Why ? Rate limit changes on the masternodes have made in infeasible to re-sync the testnet, blockchain at any kind of regularity.

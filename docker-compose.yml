@@ -1,17 +1,17 @@
 version: '3'
 services:
 
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - 8081:8081    
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    container_name: rocketswap-mongo
-    networks: 
-      - rocketswap-network
+  # mongo:
+  #   image: mongo
+  #   restart: always
+  #   ports:
+  #     - 8081:8081    
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: root
+  #     MONGO_INITDB_ROOT_PASSWORD: example
+  #   container_name: rocketswap-mongo
+  #   networks: 
+  #     - rocketswap-network
 
   ui:
     build: ./ui
