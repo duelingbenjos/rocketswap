@@ -33,8 +33,8 @@
 		}else{
 			let value = toBigNumber(e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1'))
 			if (determinePrecision(value) > 8){
-				value = toBigNumber(stringToFixed(value.toString(), 8))
-				inputElm.value = value.toString()
+				value = toBigNumber(stringToFixed(value, 8))
+				inputElm.value = stringToFixed(value, 8)
 			}
 			pressedMaxValue = false
 			dispatchEvent(value)
@@ -43,7 +43,7 @@
 
 	const handleMaxInput = () => {
 		inputValue = tokenBalance
-		inputElm.value = inputValue.toString()
+		inputElm.value = stringToFixed(inputValue, 8)
 		pressedMaxValue = true
 		dispatchEvent(inputValue)
 	}
@@ -74,7 +74,7 @@
 		<input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			value={inputValue?.toString() || ""}
+			value={inputValue ? stringToFixed(inputValue, 8) : ""}
 			bind:this={inputElm} 
 			on:input={handleInputChange}
 			disabled={!$selectedToken} 

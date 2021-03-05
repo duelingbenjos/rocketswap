@@ -83,7 +83,7 @@
 
 <div class="container container-border flex-col text-xsmall weight-400">
     <div class="flex-row flex-align-center">
-        <span class="text-primary-dim">Price {$pageStats.pricePaid}</span>
+        <span class="text-primary-dim">Price</span>
         <div class="flex-row flex-align-center">
             <span class="number margin-r-3 number-span">
                 {stringToFixed(pricePaid, 8)}
