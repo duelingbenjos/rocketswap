@@ -106,12 +106,13 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			typeof blockInfo.number !== "undefined"
 		) {
 			let hasBlockInDB = false
-			let block = await models.Blocks.findOne({blockNum: blockInfo.number})
+			let blockNum = blockInfo.number.__fixed__ ? parseInt(blockInfo.number.__fixed__) : blockInfo.number;
+			let block = await models.Blocks.findOne({blockNum})
 			if (!block){
 				console.log("Block doesn't exists, adding new BLOCK model")
 				block = new models.Blocks({
 					rawBlock: JSON.stringify(blockInfo),
-					blockNum: blockInfo.number,
+					blockNum,
 					hash: blockInfo.hash,
 					previous: blockInfo.previous,
 					numOfSubBlocks: 0,
@@ -124,7 +125,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			}
 
 			console.log(
-				"processing block " + blockInfo.number + " - ",
+				"processing block " + blockNum + " - ",
 				block.hash
 			);
 
@@ -134,7 +135,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 					block.numOfSubBlocks = block.numOfSubBlocks + 1;
 					let subblockTxList = [];
 					let subblock = new models.Subblocks({
-						blockNum: blockInfo.number,
+						blockNum,
 						inputHash: sb.input_hash,
 						merkleLeaves: JSON.stringify(sb.merkle_leaves),
 						prevBlockHash: sb.previous,
@@ -146,7 +147,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 
 					sb.signatures.forEach((sig) => {
 						new models.SubblockSigs({
-							blockNum: blockInfo.number,
+							blockNum,
 							subBlockNum: sb.subblock,
 							signature: sig.signature,
 							signer: sig.signer
@@ -176,9 +177,9 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			block.transactions = JSON.stringify(blockTxList);
 			block.save(function(err) {
 				if (err) console.log(err);
-				console.log("saved " + blockInfo.number);
+				console.log("saved " + blockNum);
 			});
-			if (blockInfo.number === currBatchMax) {
+			if (blockNum === currBatchMax) {
 				currBlockNum = currBatchMax;
 				timerId = setTimeout(checkForBlocks, 3000);
 			}
@@ -209,10 +210,17 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 
 	const checkForBlocks = async () => {
 		console.log("checking")
-		let response: any = await getLatestBlock_MN();
-
+		let response = await getLatestBlock_MN();
+		
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		if (!response.error) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			lastestBlockNum = response.number;
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			if (lastestBlockNum.__fixed__) lastestBlockNum = parseInt(lastestBlockNum.__fixed__)
 			if (lastestBlockNum < currBlockNum || wipeOnStartup || reloadAPI) {
 				await wipeDB();
 				wipeOnStartup = false;
