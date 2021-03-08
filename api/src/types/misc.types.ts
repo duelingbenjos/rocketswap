@@ -3,6 +3,7 @@ export class BlockDTO {
 	fn: string;
 	contract: string;
 	timestamp: number;
+	hash: string;
 }
 
 export interface IKvp {
