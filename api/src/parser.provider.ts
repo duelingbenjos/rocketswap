@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common"
 import { IKvp } from "./types/misc.types"
-import { config } from "./config"
+import { config, staking_contracts } from "./config"
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity"
 import { getContractCode, getContractName, validateTokenContract } from "./utils"
 import { saveTransfer, updateBalance } from "./entities/balance.entity"
@@ -12,6 +12,7 @@ import { SocketService } from "./socket.service"
 import { setName } from "./entities/name.entity"
 import { AuthService } from "./authentication/trollbox.service"
 import { updateAmmMeta } from "./entities/amm-meta.entity"
+import { updateStakingContractMeta } from "./entities/staking-meta.entity"
 
 @Injectable()
 export class ParserProvider {
@@ -44,6 +45,9 @@ public parseBlock = async (update: IBlockParser) => {
 			if (submitted_contract_name === config.contractName) {
 				this.addToActionQue(updateAmmMeta,{state, handleClientUpdate: this.socketService.handleClientUpdate})
 			}
+			if (staking_contracts.includes(submitted_contract_name)) {
+				this.addToActionQue(updateStakingContractMeta, {state,handleClientUpdate: this.socketService.handleClientUpdate, staking_contract: submitted_contract_name})
+			}
 			if (token_is_valid) {
 				const add_token_dto = prepareAddToken(state)
 				const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto
@@ -69,13 +73,15 @@ public parseBlock = async (update: IBlockParser) => {
 			this.addToActionQue(saveTokenUpdate, state)
 		} else if (contract_name === config.identityContract) {
 			switch(fn) {
-			case 'setName':
+				case 'setName':
 				this.addToActionQue(setName,state)
-				break
+					break
 				case 'auth':
 				this.authService.authenticate(state)
-				break
+					break
 			}
+		} else if (staking_contracts.includes(contract_name) ) {
+				this.addToActionQue(updateStakingContractMeta, {state,handleClientUpdate: this.socketService.handleClientUpdate, staking_contract: contract_name})
 		}
 	} catch (err) {
 		this.logger.error(err)

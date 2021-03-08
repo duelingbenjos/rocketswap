@@ -1,8 +1,8 @@
 import { Client } from "socket.io";
 import { AuthenticationPayload } from "src/authentication/trollbox.controller";
 import { PriceEntity } from "src/entities/price.entity";
+import { StakingMetaEntity } from "src/entities/staking-meta.entity";
 import { BlockDTO } from "./misc.types";
-
 
 export type handleClientUpdateType = (update: ClientUpdateType) => {};
 
@@ -15,12 +15,12 @@ export type handleTrollboxMsg = (payload: ITrollBoxMessage) => void;
 export type handleProxyTxnResponse = (txn_response: IProxyTxnReponse) => void;
 
 export interface ITxnRequest {
-	metadata: any,
-	payload: any
+	metadata: any;
+	payload: any;
 }
 export interface IProxyTxnReponse {
-	payload: any
-	socket_id: string
+	payload: any;
+	socket_id: string;
 }
 export interface ITrollBoxMessage {
 	sender: string;
@@ -36,7 +36,13 @@ export type ClientUpdateType =
 	| PriceUpdateType
 	| MetricsUpdateType
 	| BalanceUpdateType
-	| TradeUpdateType;
+	| TradeUpdateType
+	| StakingMetaUpdateType;
+
+export interface StakingMetaUpdateType extends UpdateType {
+	action: "staking_meta_update";
+	data: StakingMetaEntity;
+}
 
 export interface PriceUpdateType extends UpdateType {
 	action: "price_update";
@@ -70,7 +76,8 @@ export type UpdateType = {
 		| "price_update"
 		| "user_lp_update"
 		| "balance_update"
-		| "trade_update";
+		| "trade_update"
+		| "staking_meta_update";
 };
 
 export interface TradeUpdateType extends UpdateType {

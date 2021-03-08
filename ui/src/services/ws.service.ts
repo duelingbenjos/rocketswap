@@ -19,7 +19,7 @@ export class WsService {
   private port: number
   private current_trade_feed: string
   private previously_connected = false
-  private txCallbacks: any;
+  private txCallbacks: any
 
   connection: SocketIOClient.Socket
 
@@ -30,7 +30,7 @@ export class WsService {
     this.connection = socket(`${this.base_url}:${this.port}`)
     this.setupEvents()
     this.setupSubs()
-    this.txCallbacks = {};
+    this.txCallbacks = {}
   }
 
   setupEvents = () => {
@@ -110,6 +110,31 @@ export class WsService {
     }
   }
 
+  public joinStakingPanel() {
+    this.connection.emit('join_room', 'staking_panel')
+
+    /*
+    This payload is an array containing all the registered staking pools in the API
+    */
+    this.connection.on(`staking_panel`, (payload) => {
+      console.log(payload)
+    })
+
+    /*
+    Changes which effect individual staking contracts will be emitted on the event 'staking_panel_update'
+    Type : StakingMetaEntity
+    */
+    this.connection.on('staking_panel_update', (payload) => {
+      console.log(payload)
+    })
+  }
+
+  public leaveStakingPanel() {
+    this.connection.emit('leave_room', 'staking_panel')
+    this.connection.off(`staking_panel`)
+    this.connection.off(`staking_panel_update`)
+  }
+
   public joinBalanceFeed(vk: string) {
     this.connection.emit('join_room', `balance_feed:${vk}`)
     this.connection.on(`balance_list:${vk}`, this.handleBalanceList)
@@ -129,9 +154,9 @@ export class WsService {
   }
 
   private handleProxyTxnResponse(payload, txCallbacks) {
-    if (payload?.uid) txCallbacks[payload.uid]({data: payload})
+    if (payload?.uid) txCallbacks[payload.uid]({ data: payload })
     else {
-      if (payload?.error) txCallbacks[payload.uid]({data: {error: payload?.error}})
+      if (payload?.error) txCallbacks[payload.uid]({ data: { error: payload?.error } })
     }
   }
 

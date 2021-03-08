@@ -1,12 +1,12 @@
 # Imports
 
-import currency
-import con_basic_token
+import con_rswp_lst001
+import con_doug_dash
 
 # Setup Tokens
 
-STAKING_TOKEN = currency
-YIELD_TOKEN = con_basic_token
+STAKING_TOKEN = con_rswp_lst001
+YIELD_TOKEN = con_doug_dash
 
 
 # State
@@ -39,20 +39,19 @@ def seed():
         "staked": 0
     }
 
-    meta['version'] = 0.01
+    meta['version'] = '0.0.1'
     meta['type'] = 'staking'  # staking || lp_farming
-    meta['STAKING_TOKEN'] = 'currency'
-    meta['YIELD_TOKEN'] = 'con_basic_token'
+    meta['STAKING_TOKEN'] = 'con_rswp_lst001'
+    meta['YIELD_TOKEN'] = 'con_doug_dash'
 
-    # EmissionRatePerHour.set(6849) # value for yield farming
+    EmissionRatePerHour.set(2283)
 
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(0.1)
 
     # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
+    StartTime.set(datetime.datetime(year=2021, month=3, day=10, hour=12))
     # The datetime at which you want staking to finish.
-    EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
+    EndTime.set(datetime.datetime(year=2022, month=3, day=10, hour=00))
 
     OpenForBusiness.set(True)
 
@@ -289,10 +288,10 @@ def setEndTime(year: int, month: int, day: int, hour: int):
     EndTime.set(time)
 
 
-# @export
-# def updateMeta(field: str, value: str):
-#     assertOwner()
-#     meta[field] = value
+@export
+def updateMeta(field: str, value: str):
+    assertOwner()
+    meta[field] = value
 
 
 def assertOwner():

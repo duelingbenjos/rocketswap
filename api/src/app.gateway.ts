@@ -14,6 +14,7 @@ import { BalanceEntity } from "./entities/balance.entity";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics } from "./entities/price.entity";
+import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
@@ -54,7 +55,6 @@ export class AppGateway
 		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
 		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 		this.socketService.handleProxyTxnResponse = this.handleTxnResponse;
-
 	}
 
 	handleNewBlock = async (block: BlockDTO) => {
@@ -118,14 +118,24 @@ export class AppGateway
 			case "trade_feed":
 				if (!subject) return;
 				this.handleJoinTradeFeed(subject, client);
+				break;
 			case "trollbox":
 				this.handleJoinTrollBox(client);
+				break;
+			case "staking_panel":
+				this.handleJoinStakingPanel(client);
+				break;
 		}
 	}
 
 	@SubscribeMessage("send_transaction")
 	async handleClientTransaction(client: Socket, txn: any) {
-		this.txnService.broadcastTxn(client.id, txn)
+		this.txnService.broadcastTxn(client.id, txn);
+	}
+
+	private async handleJoinStakingPanel(client: Socket) {
+		const staking_entities = await StakingMetaEntity.find()
+		client.emit('staking_panel', staking_entities)
 	}
 
 	private async handleJoinTrollBox(client: Socket) {
@@ -166,9 +176,9 @@ export class AppGateway
 	};
 
 	public handleTxnResponse = (args: IProxyTxnReponse) => {
-		const {payload, socket_id} = args
-		this.wss.to(socket_id).emit("proxy_txn_res", payload)
-	}
+		const { payload, socket_id } = args;
+		this.wss.to(socket_id).emit("proxy_txn_res", payload);
+	};
 
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
 		try {

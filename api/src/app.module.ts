@@ -22,6 +22,7 @@ import { JwtStrategy } from "./authentication/jwt.strategy";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { TransactionService } from './transaction.service';
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
+import { StakingMetaEntity } from "./entities/staking-meta.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -37,7 +38,8 @@ const db_options: TypeOrmModuleOptions = {
 		NameEntity,
 		RefreshTokenEntity,
 		ChatHistoryEntity,
-		AmmMetaEntity
+		AmmMetaEntity,
+		StakingMetaEntity,
 	],
 	synchronize: true,
 	autoLoadEntities: true
