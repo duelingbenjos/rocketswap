@@ -67,7 +67,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = 7100;
+		currBlockNum = parseInt(process.env.currBlockNum) || 7100;
 
 		console.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
@@ -166,7 +166,8 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 								state: tx.state,
 								fn: tx.transaction.payload.function,
 								contract: tx.transaction.payload.contract,
-								timestamp: tx.transaction.metadata.timestamp
+								timestamp: tx.transaction.metadata.timestamp,
+								hash: tx.hash
 							});
 						}
 					})();
