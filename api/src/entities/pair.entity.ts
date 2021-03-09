@@ -38,7 +38,8 @@ export async function saveReserves(
 	fn: string,
 	state: IKvp[],
 	handleClientUpdate: handleClientUpdateType,
-	timestamp: number
+	timestamp: number,
+	hash: string
 ) {
 	// console.log(state);
 	const reserve_kvp = state.find(
@@ -52,15 +53,18 @@ export async function saveReserves(
 			kvp.key.includes("lp_points") && kvp.key.split(":").length === 2
 	);
 	if (reserve_kvp) {
+		// console.log(reserve_kvp)
 		let contract_name = reserve_kvp.key.split(":")[1];
+		console.log(state)
 		let vk_kvp = state.find((kvp) => {
+			console.log(kvp.key)
 			// console.log(`${contract_name}.balances`);
 			return (
 				kvp.key.includes(`${contract_name}.balances`) &&
 				isLamdenKey(kvp.key.split(":")[1])
 			);
 		});
-		let vk = vk_kvp.key.split(":")[1];
+		let vk = 'vk_kvp.key.split(":")[1];'
 		let old_currency_reserve: string;
 		let old_token_reserve: string;
 		let reserves: [string, string] = [
@@ -92,7 +96,8 @@ export async function saveReserves(
 					amount: amount_exchanged,
 					price,
 					handleClientUpdate,
-					time: timestamp
+					time: timestamp,
+					hash
 				});
 				saveTradeUpdate({
 					contract_name,
@@ -101,7 +106,8 @@ export async function saveReserves(
 					vk,
 					amount: amount_exchanged,
 					price,
-					time: timestamp
+					time: timestamp,
+					hash
 				});
 			}
 		}
@@ -142,6 +148,7 @@ function updateTradeFeed(args: {
 	price: string;
 	handleClientUpdate: handleClientUpdateType;
 	time: number;
+	hash: string
 }) {
 	const {
 		type,
@@ -150,7 +157,8 @@ function updateTradeFeed(args: {
 		token_symbol,
 		price,
 		handleClientUpdate,
-		time
+		time,
+		hash
 	} = args;
 
 	const payload: TradeUpdateType = {
@@ -160,7 +168,8 @@ function updateTradeFeed(args: {
 		contract_name,
 		token_symbol,
 		price,
-		time
+		time,
+		hash
 	};
 	handleClientUpdate(payload);
 }
