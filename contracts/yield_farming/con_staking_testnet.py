@@ -1,13 +1,12 @@
 # Imports
 
+import currency
 import con_rswp_lst001
-import con_doug_dash
 
 # Setup Tokens
 
-STAKING_TOKEN = con_rswp_lst001
-YIELD_TOKEN = con_doug_dash
-
+STAKING_TOKEN = currency
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
@@ -41,8 +40,8 @@ def seed():
 
     meta['version'] = '0.0.1'
     meta['type'] = 'staking'  # staking || lp_farming
-    meta['STAKING_TOKEN'] = 'con_rswp_lst001'
-    meta['YIELD_TOKEN'] = 'con_doug_dash'
+    meta['STAKING_TOKEN'] = 'currency'
+    meta['YIELD_TOKEN'] = 'con_rswp_lst001'
 
     EmissionRatePerHour.set(2283)
 
@@ -79,11 +78,15 @@ def addStakingTokens(amount: float):
 
     # Create a record of the user's deposit
 
-    Deposits[user].append({
+    deposits = Deposits[user]
+
+    deposits.append({
         'starting_epoch': new_epoch_idx,
         'time': now,
         'amount': amount
     })
+
+    Deposits[user] = deposits
 
 
 @export

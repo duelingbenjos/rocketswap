@@ -80,11 +80,15 @@ def addStakingTokens(amount: float):
 
     # Create a record of the user's deposit
 
-    Deposits[user].append({
+    deposits = Deposits[user]
+
+    deposits.append({
         'starting_epoch': new_epoch_idx,
         'time': now,
         'amount': amount
     })
+
+    Deposits[user] = deposits
 
 
 @export
