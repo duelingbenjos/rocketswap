@@ -1,3 +1,4 @@
+import { StakingEpochEntity } from "src/entities/staking-epoch.entity";
 import { AuthenticationPayload } from "../authentication/trollbox.controller";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { UserStakingEntity } from "../entities/user-staking.entity";
@@ -34,11 +35,17 @@ export type ClientUpdateType =
 	| BalanceUpdateType
 	| TradeUpdateType
 	| StakingMetaUpdateType
-	| UserStakingUpdateType;
+	| UserStakingUpdateType
+	| EpochUpdateType;
 
 export interface UserStakingUpdateType extends UpdateType {
 	action: "user_staking_update";
 	data: UserStakingEntity;
+}
+
+export interface EpochUpdateType extends UpdateType {
+	action: "epoch_update";
+	data: StakingEpochEntity;
 }
 
 export interface StakingMetaUpdateType extends UpdateType {
@@ -80,7 +87,8 @@ export type UpdateType = {
 		| "balance_update"
 		| "trade_update"
 		| "staking_meta_update"
-		| "user_staking_update";
+		| "user_staking_update"
+		| "epoch_update";
 };
 
 export interface TradeUpdateType extends UpdateType {
@@ -112,4 +120,8 @@ export function isTradeUpdate(client_update: ClientUpdateType): client_update is
 
 export function isStakingUpdate(client_update: ClientUpdateType): client_update is UserStakingUpdateType {
 	return (client_update as UserStakingUpdateType).action === "user_staking_update";
+}
+
+export function isEpochUpdate(client_update: ClientUpdateType): client_update is EpochUpdateType {
+	return (client_update as EpochUpdateType).action === "epoch_update";
 }

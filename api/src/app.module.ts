@@ -24,6 +24,7 @@ import { TransactionService } from "./transaction.service";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { UserStakingEntity } from "./entities/user-staking.entity";
+import { StakingEpochEntity } from "./entities/staking-epoch.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -41,7 +42,8 @@ const db_options: TypeOrmModuleOptions = {
 		ChatHistoryEntity,
 		AmmMetaEntity,
 		StakingMetaEntity,
-		UserStakingEntity
+		UserStakingEntity,
+		StakingEpochEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true
@@ -68,7 +70,8 @@ const db_options: TypeOrmModuleOptions = {
 		JwtStrategy,
 		AuthService,
 		Logger,
-		TransactionService
+		TransactionService,
+		StakingEpochEntity
 	]
 })
 export class AppModule {}

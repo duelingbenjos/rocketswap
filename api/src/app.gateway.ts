@@ -14,6 +14,7 @@ import { BalanceEntity } from "./entities/balance.entity";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics } from "./entities/price.entity";
+import { StakingEpochEntity } from "./entities/staking-epoch.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
@@ -30,7 +31,8 @@ import {
 	IProxyTxnReponse,
 	MetricsUpdateType,
 	UserLpUpdateType,
-	isStakingUpdate
+	isStakingUpdate,
+	isEpochUpdate
 } from "./types/websocket.types";
 import { async } from "rxjs";
 
@@ -90,7 +92,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "user_staking_update":
 				if (isStakingUpdate(update)) {
-					this.wss.emit(`user_staking_update:${update.data.vk}`, update.data);
+					this.wss.emit(`user_staking_update:${update.data.vk}`, update);
+				}
+			case "epoch_update":
+				if (isEpochUpdate(update)) {
+					this.wss.emit(`epoch_update`, update);
 				}
 		}
 	};
@@ -159,6 +165,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 		})
 		client.emit('staking_panel', await Promise.all(response))
+		const epoch_data = await StakingEpochEntity.find();
+		client.emit("epoch_data", epoch_data);
 	}
 
 	private async handleJoinTrollBox(client: Socket) {

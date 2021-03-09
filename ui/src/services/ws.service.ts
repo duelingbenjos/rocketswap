@@ -131,6 +131,17 @@ export class WsService {
     this.connection.on('staking_panel_update', (payload) => {
       console.log(payload)
     })
+
+    /*
+    Epoch Data
+    */
+    this.connection.on(`epoch_data`, (payload) => {
+      console.log(payload)
+    })
+
+    this.connection.on(`epoch_update`, (payload) => {
+      console.log(payload)
+    })
   }
 
   public leaveStakingPanel() {
