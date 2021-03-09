@@ -1,15 +1,11 @@
-import { Client } from "socket.io";
-import { AuthenticationPayload } from "src/authentication/trollbox.controller";
-import { PriceEntity } from "src/entities/price.entity";
-import { StakingMetaEntity } from "src/entities/staking-meta.entity";
+import { AuthenticationPayload } from "../authentication/trollbox.controller";
+import { StakingMetaEntity } from "../entities/staking-meta.entity";
+import { UserStakingEntity } from "../entities/user-staking.entity";
 import { BlockDTO } from "./misc.types";
 
 export type handleClientUpdateType = (update: ClientUpdateType) => {};
 
-export type handleAuthenticateResponseType = (auth_response: {
-	socket_id: string;
-	payload: AuthenticationPayload;
-}) => void;
+export type handleAuthenticateResponseType = (auth_response: { socket_id: string; payload: AuthenticationPayload }) => void;
 
 export type handleTrollboxMsg = (payload: ITrollBoxMessage) => void;
 export type handleProxyTxnResponse = (txn_response: IProxyTxnReponse) => void;
@@ -37,7 +33,13 @@ export type ClientUpdateType =
 	| MetricsUpdateType
 	| BalanceUpdateType
 	| TradeUpdateType
-	| StakingMetaUpdateType;
+	| StakingMetaUpdateType
+	| UserStakingUpdateType;
+
+export interface UserStakingUpdateType extends UpdateType {
+	action: "user_staking_update";
+	data: UserStakingEntity;
+}
 
 export interface StakingMetaUpdateType extends UpdateType {
 	action: "staking_meta_update";
@@ -77,7 +79,8 @@ export type UpdateType = {
 		| "user_lp_update"
 		| "balance_update"
 		| "trade_update"
-		| "staking_meta_update";
+		| "staking_meta_update"
+		| "user_staking_update";
 };
 
 export interface TradeUpdateType extends UpdateType {
@@ -88,28 +91,25 @@ export interface TradeUpdateType extends UpdateType {
 	token_symbol: string;
 	price: string;
 	time: number;
+	hash: string;
 }
 
-export function isMetricsUpdate(
-	client_update: ClientUpdateType
-): client_update is MetricsUpdateType {
+export function isMetricsUpdate(client_update: ClientUpdateType): client_update is MetricsUpdateType {
 	return (client_update as MetricsUpdateType).action === "metrics_update";
 }
 
-export function isBalanceUpdate(
-	client_update: ClientUpdateType
-): client_update is BalanceUpdateType {
+export function isBalanceUpdate(client_update: ClientUpdateType): client_update is BalanceUpdateType {
 	return (client_update as BalanceUpdateType).action === "balance_update";
 }
 
-export function isPriceUpdate(
-	client_update: ClientUpdateType
-): client_update is PriceUpdateType {
+export function isPriceUpdate(client_update: ClientUpdateType): client_update is PriceUpdateType {
 	return (client_update as PriceUpdateType).action === "price_update";
 }
 
-export function isTradeUpdate(
-	client_update: ClientUpdateType
-): client_update is TradeUpdateType {
+export function isTradeUpdate(client_update: ClientUpdateType): client_update is TradeUpdateType {
 	return (client_update as TradeUpdateType).action === "trade_update";
+}
+
+export function isStakingUpdate(client_update: ClientUpdateType): client_update is UserStakingUpdateType {
+	return (client_update as UserStakingUpdateType).action === "user_staking_update";
 }

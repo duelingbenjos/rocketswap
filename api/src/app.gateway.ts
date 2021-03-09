@@ -17,6 +17,7 @@ import { getTokenMetrics } from "./entities/price.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
+import { UserStakingEntity } from "./entities/user-staking.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
 import { TransactionService } from "./transaction.service";
@@ -28,7 +29,8 @@ import {
 	isTradeUpdate,
 	IProxyTxnReponse,
 	MetricsUpdateType,
-	UserLpUpdateType
+	UserLpUpdateType,
+	isStakingUpdate
 } from "./types/websocket.types";
 import { async } from "rxjs";
 
@@ -37,8 +39,7 @@ import { async } from "rxjs";
  * https://socket.io/docs/v2/server-api/
  */
 @WebSocketGateway()
-export class AppGateway
-	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger("AppGateway");
 
 	@WebSocketServer() wss: Server;
@@ -78,21 +79,19 @@ export class AppGateway
 				break;
 			case "balance_update":
 				if (isBalanceUpdate(update)) {
-					this.wss.emit(
-						`balance_update:${update.payload.vk}`,
-						update
-					);
+					this.wss.emit(`balance_update:${update.payload.vk}`, update);
 				}
 				break;
 			case "trade_update":
 				if (isTradeUpdate(update)) {
 					this.wss.emit(`trade_update`, { update });
-					this.wss.emit(
-						`trade_update:${update.contract_name}`,
-						update
-					);
+					this.wss.emit(`trade_update:${update.contract_name}`, update);
 				}
 				break;
+			case "user_staking_update":
+				if (isStakingUpdate(update)) {
+					this.wss.emit(`user_staking_update:${update.data.vk}`, update.data);
+				}
 		}
 	};
 
@@ -127,12 +126,24 @@ export class AppGateway
 			case "staking_panel":
 				this.handleJoinStakingPanel(client);
 				break;
+			case "user_staking_feed":
+				this.handleJoinUserStakingFeed(subject, client);
+				break;
 		}
 	}
 
 	@SubscribeMessage("send_transaction")
 	async handleClientTransaction(client: Socket, txn: any) {
 		this.txnService.broadcastTxn(client.id, txn);
+	}
+
+	private async handleJoinUserStakingFeed(subject: string, client: Socket) {
+		try {
+			const entity = await UserStakingEntity.findOneOrFail(subject);
+			client.emit("user_staking_update", entity);
+		} catch (err) {
+			this.logger.error(err);
+		}
 	}
 
 	private async handleJoinStakingPanel(client: Socket) {
@@ -167,18 +178,11 @@ export class AppGateway
 		}
 	}
 
-	public handleTrollboxMsg = (message: {
-		sender: string;
-		message: string;
-		timestamp: number;
-	}) => {
+	public handleTrollboxMsg = (message: { sender: string; message: string; timestamp: number }) => {
 		this.wss.emit("trollbox_message", message);
 	};
 
-	public handleAuthenticateResponse = (auth_response: {
-		socket_id: string;
-		payload: AuthenticationPayload;
-	}) => {
+	public handleAuthenticateResponse = (auth_response: { socket_id: string; payload: AuthenticationPayload }) => {
 		try {
 			const { socket_id, payload } = auth_response;
 			this.wss.to(socket_id).emit("auth_response", payload);
@@ -195,14 +199,7 @@ export class AppGateway
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
 		try {
 			const trade_update = await TradeHistoryEntity.find({
-				select: [
-					"contract_name",
-					"token_symbol",
-					"price",
-					"type",
-					"time",
-					"amount"
-				],
+				select: ["contract_name", "token_symbol", "price", "type", "time", "amount"],
 				order: { time: "DESC" },
 				where: { contract_name: subject },
 				take: 50

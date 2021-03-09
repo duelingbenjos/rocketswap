@@ -20,9 +20,10 @@ import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
-import { TransactionService } from './transaction.service';
+import { TransactionService } from "./transaction.service";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
+import { UserStakingEntity } from "./entities/user-staking.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -40,6 +41,7 @@ const db_options: TypeOrmModuleOptions = {
 		ChatHistoryEntity,
 		AmmMetaEntity,
 		StakingMetaEntity,
+		UserStakingEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true
