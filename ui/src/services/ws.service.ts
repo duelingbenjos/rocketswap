@@ -129,6 +129,12 @@ export class WsService {
     Type : StakingMetaEntity
     */
     this.connection.on('staking_panel_update', (payload) => {
+      stakingInfo.update(currentValue => {
+        currentValue.forEach((info, index) => {
+          if (info.contract_name === payload.data.contract_name) currentValue[index] = payload.data
+        })
+        return currentValue
+      })
       console.log(payload)
     })
 
