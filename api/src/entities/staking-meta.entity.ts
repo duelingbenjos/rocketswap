@@ -3,6 +3,7 @@ import { getVal } from "../utils";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
 import { updateUserStakingInfo } from "./user-staking.entity";
+import { updateEpoch } from "./staking-epoch.entity";
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -95,7 +96,7 @@ export const updateStakingContractMeta = async (args: {
 		entity = new StakingMetaEntity();
 		entity.contract_name = staking_contract;
 	}
-	state.forEach((kvp) => {
+	state.forEach(async (kvp) => {
 		switch (kvp.key) {
 			case `${staking_contract}.Owner`:
 				entity["Owner"] = getVal(kvp);
@@ -150,11 +151,13 @@ export const updateStakingContractMeta = async (args: {
 			// },
 			const index = kvp.key.split(":")[1];
 			const { staked, time } = kvp.value;
+			await updateEpoch({staking_contract, epoch_index: index, time, amount_staked: staked, handleClientUpdate })
 			entity.Epoch = {
 				index,
 				staked,
 				time
 			};
+			
 		}
 	});
 	const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
