@@ -2,6 +2,7 @@ import { IKvp } from "src/types/misc.types";
 import { getVal } from "../utils";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
+import { updateUserStakingInfo } from "./user-staking.entity";
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -109,32 +110,16 @@ export const updateStakingContractMeta = async (args: {
 				entity["StakedBalance"] = getVal(kvp);
 				break;
 			case `${staking_contract}.meta:version`:
-				entity["meta"] = updateMetaProperty(
-					entity.meta,
-					"version",
-					getVal(kvp)
-				);
+				entity["meta"] = updateMetaProperty(entity.meta, "version", getVal(kvp));
 				break;
 			case `${staking_contract}.meta:type`:
-				entity["meta"] = updateMetaProperty(
-					entity.meta,
-					"type",
-					getVal(kvp)
-				);
+				entity["meta"] = updateMetaProperty(entity.meta, "type", getVal(kvp));
 				break;
 			case `${staking_contract}.meta:STAKING_TOKEN`:
-				entity["meta"] = updateMetaProperty(
-					entity.meta,
-					"STAKING_TOKEN",
-					getVal(kvp)
-				);
+				entity["meta"] = updateMetaProperty(entity.meta, "STAKING_TOKEN", getVal(kvp));
 				break;
 			case `${staking_contract}.meta:YIELD_TOKEN`:
-				entity["meta"] = updateMetaProperty(
-					entity.meta,
-					"YIELD_TOKEN",
-					getVal(kvp)
-				);
+				entity["meta"] = updateMetaProperty(entity.meta, "YIELD_TOKEN", getVal(kvp));
 				break;
 			case `${staking_contract}.meta:STAKING_TOKEN`:
 				entity["meta_STAKING_TOKEN"] = getVal(kvp);
@@ -172,7 +157,12 @@ export const updateStakingContractMeta = async (args: {
 			};
 		}
 	});
-	console.log(entity);
+	const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
+	const withdrawals = state.find((kvp) => kvp.key.includes("Withdrawals"));
+	if (deposits || withdrawals) {
+		const user_staking_res = await updateUserStakingInfo({ deposits, withdrawals, staking_contract });
+		handleClientUpdate({ action: "user_staking_update", data: user_staking_res });
+	}
 	handleClientUpdate({ action: "staking_meta_update", data: entity });
 	await entity.save();
 };
