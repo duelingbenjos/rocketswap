@@ -52,9 +52,9 @@
 {#if $rswpToken}
     <div class="flex-col panel-container text-small">
         <div class="flex flex-center-center header">
-            Trade Fee Discount
+            RSWP Fuel Tank
         </div>
-        <span>Current Discount:</span>  
+        <span>Current Trade Fee Discount:</span>  
         <span class="text-massive weight-600">0%</span>
 
         <div class="flex-grow flex-col flex-justify-end">
@@ -64,8 +64,8 @@
             </div>
             <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} {getStampCost} small={true}/>
             <div class="flex-row flex-center-center buttons">
-                <button class="primary">STAKE</button>
-                <button class="primary outline">REMOVE STAKE</button>
+                <button class="primary">FILL</button>
+                <button class="primary outline">EMPTY</button>
             </div>
         </div>
     </div>

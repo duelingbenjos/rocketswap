@@ -43,10 +43,12 @@
         max-width: 1020px;
         margin-bottom: 6rem;
         margin: 0 auto;
+        box-sizing: border-box;
     }
 
     .panels{
         flex-direction: column;
+        box-sizing: border-box;
     }
 
     @media screen and (min-width: 430px) {

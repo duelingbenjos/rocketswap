@@ -113,9 +113,11 @@
 
 	color: var(--text-primary-color);
 
-	Background-attachment: fixed;
+	background-repeat:no-repeat;
 	background: var(--main-background-solid);
 	background: var(--main-background-gradient);
+	background-attachment: fixed;
+
 }
 
 	body.light{
