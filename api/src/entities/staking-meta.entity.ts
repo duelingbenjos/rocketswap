@@ -166,7 +166,7 @@ export const updateStakingContractMeta = async (args: {
 		const user_staking_res = await updateUserStakingInfo({ deposits, withdrawals, staking_contract });
 		handleClientUpdate({ action: "user_staking_update", data: user_staking_res });
 	}
-	handleClientUpdate({ action: "staking_meta_update", data: entity });
+	handleClientUpdate({ action: "staking_panel_update", data: entity });
 	await entity.save();
 };
 
