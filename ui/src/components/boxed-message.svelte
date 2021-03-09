@@ -1,3 +1,9 @@
+<script>
+    export let title
+    export let messages
+
+</script>
+
 <style>
     div{
         box-sizing: border-box;
@@ -13,6 +19,13 @@
         width: 100%;
     }
 
+    p{
+        margin: 0.25rem 0;
+    }
+    strong{
+        margin: 1rem 0 ;
+    }
+
     @media screen and (min-width: 430px) {
         div{
             padding: 30px;
@@ -26,9 +39,8 @@
 </style>
 
 <div>
-    <p><strong>Liquidity provider rewards</strong></p>
-    <p>
-        Liquidity providers earn a 0.3% fee on all trades proportional to the their share of the pool. 
-        Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity.
-    </p>
+    {#if title}<p><strong>{title}</strong></p> {/if}
+    {#each messages as message}
+        <p>{message}</p>
+    {/each}
 </div>

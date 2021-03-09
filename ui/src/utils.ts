@@ -12,7 +12,8 @@ import {
 	bearerToken, 
 	lamdenWalletAutoConnect,
 	slippageTolerance,
-	rswpPrice,
+	rswpPrice, 
+	rswpBalance,
 	payInRswp } from './store'
 
 import { ApiService } from './services/api.service'
@@ -38,8 +39,9 @@ export const refreshLpBalances = async (account = undefined) => {
 	lpBalances.set(balances)
 	return balances
 }
+/*
 export const getRswapPrice = async () => {
-	let reserves = await API.getVariable(connectionRequest.contractName, 'reserves', 'con_rswp_lst001') 
+	let reserves = await API.getVariable(connectionRequest.contractName, 'reserves', config.ammTokenContract) 
 	if (Array.isArray(reserves)){
 		if (reserves[0].__fixed__) reserves[0] = toBigNumber(reserves[0].__fixed__)
 		else reserves[0] = toBigNumber(reserves[0])
@@ -50,7 +52,7 @@ export const getRswapPrice = async () => {
 		return quote.prices.token
 	}
 }
-
+*/
 export const removeLpBalances = async () => lpBalances.set({})
 
 export const setBearerToken = (account = undefined) => {
@@ -59,7 +61,11 @@ export const setBearerToken = (account = undefined) => {
 	let tokenInfo = localStorage.getItem('auth_token')
 	if (tokenInfo) {
 		tokenInfo = JSON.parse(tokenInfo)
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		if (tokenInfo?.user?.vk === account) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			bearerToken.set(tokenInfo?.payload?.token || null)
 		}
 		else removeLSValue('auth_token')
@@ -253,7 +259,12 @@ export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value
 export const toBigNumberPrecision = (value, precision) => {
 	if (!isBigNumber(value)) return toBigNumber("0")
 	return toBigNumber(stringToFixed(value, precision))
-  }
+}
+
+export const displayBalanceToPrecision = (value, precision) => {
+	if (!value) return "0"
+	return toBigNumberPrecision(value, precision).toFormat({  decimalSeparator: '.', groupSeparator: ',', groupSize: 3})
+}
 
 /**
  * Recurses through any object, converts stringified numbers and numbers to BigNumber.
@@ -547,7 +558,11 @@ export const pageUtils = (pageStores) => {
 	const updateWindowHistory = (route, contractExists = true) => {
 		if (contractExists){
 			if (get(selectedToken)){
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				if (!location.pathname.includes(get(selectedToken).contract_name))
+					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+					// @ts-ignore
 				  window.history.pushState("", "", `/#/${route}${get(selectedToken).contract_name}`);
 			  }
 		}else{

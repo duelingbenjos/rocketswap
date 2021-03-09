@@ -1,7 +1,15 @@
 <script>
-    import PoolLiquidityMsg from './pool-liqudity_msg.svelte'
+    import BoxedMsg from './boxed-message.svelte'
     import PoolCreateLiquidityButton from './pool-create_liquidity_button.svelte'
     import PoolsChart from './pool-pools_chart.svelte'
+
+    let liquidityMessage = {
+        title: "Liquidity provider rewards",
+        messages: [
+            "Liquidity providers earn a 0.3% fee on all trades proportional to the their share of the pool.", 
+            "Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity."
+        ]
+    }
 </script>
 
 <style>
@@ -18,7 +26,7 @@
 </style>
 
 <main>
-    <PoolLiquidityMsg />
+    <BoxedMsg title={liquidityMessage.title} messages={liquidityMessage.messages}/>
     <PoolCreateLiquidityButton />
     <PoolsChart />
 </main>

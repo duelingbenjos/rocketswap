@@ -16,6 +16,7 @@
 	const { themeToggle, currentThemeName } = getContext('app')
 
 	let links
+	let menuItems = ["Swap", "Pools", "$RSWP"]
 	$: links = Object.values($routes)
 
 	const handleLinkClick = () => mainMenuOpen.set(false)
@@ -77,6 +78,7 @@
 	}
 	.price{
 		display: none;
+		margin: 0;
 	}
 
 	button.primary.small{
@@ -116,14 +118,15 @@
 	<div class="logo-container">
 		<RocketSwap />
 		<PoweredByLamden margin="-5px 0 0 0"/>
+		<p class="price text-xsmall">
+			{`${config.ammTokenSymbol} = ${stringToFixed($rswpPrice ,2)} ${config.currencySymbol}`}
+		</p>
 	</div>
-	<p class="price">
-		{`${config.ammTokenSymbol} = ${stringToFixed($rswpPrice ,2)} ${config.currencySymbol}`}
-	</p>
+
 	<div class="right-content flex-row flex-align-center flex-grow">
 		<div class="links flex-row">
 			{#each links as e}
-				{#if e.$$name === "Pools" || e.$$name === "Swap"}
+				{#if menuItems.includes(e.$$name)}
 					<a class:active={e === $active} href={e.$$href}> 
 						{e.$$name} 
 					</a> 
@@ -135,7 +138,7 @@
 	<MainMenu>
 		<div class="mobile-links flex-col" slot="links">
 			{#each links as e}
-				{#if e.$$name === "Pools" || e.$$name === "Swap"}
+				{#if menuItems.includes(e.$$name)}
 					<a  class="text-xxlarge text-color-white weight-600"
 						class:active={e === $active} 
 						href={e.$$href} on:click={handleLinkClick}> 

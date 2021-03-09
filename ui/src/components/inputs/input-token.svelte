@@ -5,7 +5,7 @@
 
 
 	//Components
-	import TokenSelect from './token-select-toggle.svelte'
+	import TokenSelect from '../misc/token-select-toggle.svelte'
 
 	//Misc
 	import { config } from '../../config'

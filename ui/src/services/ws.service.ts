@@ -1,8 +1,9 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeUpdates, tradeHistory } from '../store'
+import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeUpdates, tradeHistory, stakingInfo } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber, setBearerToken } from '../utils'
 import * as LamdenJs from 'lamden-js'
+import { config } from '../config'
 
 /** Singleton socket.io service */
 export class WsService {
@@ -39,6 +40,7 @@ export class WsService {
       if (!this.previously_connected) {
         this.connection.emit('join_room', `trollbox`)
         this.previously_connected = true
+        this.joinPriceFeed(config.ammTokenContract)
       }
     })
     this.connection.on('trollbox_message', (msg) => {
@@ -109,7 +111,7 @@ export class WsService {
       }
     }
   }
-
+  
   public joinStakingPanel() {
     this.connection.emit('join_room', 'staking_panel')
 
@@ -118,6 +120,8 @@ export class WsService {
     */
     this.connection.on(`staking_panel`, (payload) => {
       console.log(payload)
+      stakingInfo.set(valuesToBigNumber(payload))
+      console.log(valuesToBigNumber(payload))
     })
 
     /*
@@ -195,7 +199,7 @@ export class WsService {
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
     let { contract_name } = metrics_update
     const metrics = this.token_metrics
-    //console.log(metrics_update)
+    console.log(metrics_update)
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     token_metrics_store.set(valuesToBigNumber(metrics))
   }

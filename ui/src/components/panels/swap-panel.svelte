@@ -2,13 +2,13 @@
 	import { getContext } from 'svelte'
 
 	//Components
-	import InputCurrency from './misc/input-currency.svelte'
-	import InputToken from './misc/input-token.svelte'
-	import Buttons from './buttons.svelte'
-	import DirectionalArrow from '../icons/directional-arrow.svelte'
+	import InputCurrency from '../inputs/input-currency.svelte'
+	import InputToken from '../inputs/input-token.svelte'
+	import Buttons from '../buttons.svelte'
+	import DirectionalArrow from '../../icons/directional-arrow.svelte'
 
 	//Misc
-	import { quoteCalculator, toBigNumber, stringToFixed } from '../utils'
+	import { quoteCalculator, toBigNumber, stringToFixed } from '../../utils'
 
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
 	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP, payInRswp } = pageStores

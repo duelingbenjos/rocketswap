@@ -21,7 +21,7 @@
 	import { connectionRequest } from '../config'
 
 	//Components
-	import SwapPanel from '../components/swap-panel.svelte'
+	import SwapPanel from '../components/panels/swap-panel.svelte'
 	import TradeTable from '../components/misc/trade-table.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
 	import PoolStats from '../components/pool-stats.svelte'

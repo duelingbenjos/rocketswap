@@ -10,7 +10,7 @@
 	const apiService = ApiService.getInstance();
 
 	//Components
-	import PoolRemoveLiquidityPanel from '../components/pool-remove-liquidity-panel.svelte'
+	import PoolRemoveLiquidityPanel from '../components/panels/pool-remove-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'

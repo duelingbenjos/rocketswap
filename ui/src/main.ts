@@ -1,5 +1,6 @@
 import Swap from './pages/swap.page.svelte'
 import Pools from './pages/pool.page.svelte'
+import RSWP from './pages/rswp.page.svelte'
 import CreatePool from './pages/pool-create.page.svelte'
 import AddPool from './pages/pool-add.page.svelte'
 import RemovePool from './pages/pool-remove.page.svelte'
@@ -15,6 +16,10 @@ routes.set({
   '/pool-main/': {
     $$component: Pools,
     $$name: 'Pools'
+  },
+  '/rswp/': {
+    $$component: RSWP,
+    $$name: '$RSWP'
   },
   '/pool-create/': {
     $$component: CreatePool,

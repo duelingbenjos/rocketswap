@@ -1,5 +1,4 @@
 <script>
-    import { onMount } from 'svelte'
     export let width = "20px"
     export let color = "var(--color-secondary)"
     export let direction = "up"

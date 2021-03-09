@@ -16,7 +16,7 @@
 	import { WsService } from './services/ws.service'
 
 	// Misc
-	import { getRswapPrice, initializeStateFromLocalStorage  } from './utils'
+	import { initializeStateFromLocalStorage  } from './utils'
 
 	//TO DO REMOVE THIS!!
 	import { ToastService } from './services/toast.service'
@@ -37,7 +37,6 @@
 		WalletService.getInstance()
 		ApiService.getInstance()
 
-		getRswapPrice()
 		initializeStateFromLocalStorage()
 /*
 		toastService.addToast({ 
@@ -119,28 +118,6 @@
 </script>
 
 <style>
-	.bg-gradient {
-		position: absolute;
-		height: 100%;
-		width: 100%;
-		background-image: var(--main-background-gradient);
-
-		overflow-y: hidden;
-	}
-
-	.bg-solid {
-		position: absolute;
-		height: 100%;
-		width: 100%;
-		background-color: var(--main-background-solid);
-	}
-
-	.flex {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
 	main {
 		height: 100%;
 		width: 100%;
@@ -153,13 +130,9 @@
 </style>
 
 <main>
-	<div class="bg-solid">
-		<div class="bg-gradient flex">
-			<Header />
-			<Router />
-			<ToastsContainer />
-		</div>
-	</div>
+	<Header />
+	<Router />
+	<ToastsContainer />
 </main>
 <Footer />
 <TrollBoxButton />

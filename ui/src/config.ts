@@ -1,7 +1,10 @@
 //Change there for for PROD
 
 const CURRENCY_SYMBOL = "DTAU"
+const CURRENCY_NAME = "Lamden Testnet Token"
+const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
+const AMM_TOKEN_STAKING_CONTRACT = "con_staking_dtau_rswp_lst001_4"
 const AMM_FEE = "0.003"
 const NAMES_CONTRACT= "con_ipseity_5"
 const BLOCKEXPLORER_URL = "https://testnet.lamden.io"
@@ -32,10 +35,19 @@ export const stamps = {
 export const config = {
   namesContract: NAMES_CONTRACT, //Change for PROD
   currencySymbol: CURRENCY_SYMBOL, //Change for PROD
+  currencyName: CURRENCY_NAME, // Change for PROD
   ammTokenSymbol: AMM_TOKEN_SYMBOL, //Change for PROD
+  ammTokenContract: AMM_TOKEN_CONTRACT, // Change for PROD
+  ammTokenStakingContract: AMM_TOKEN_STAKING_CONTRACT, // Change for PROD
   ammFee: AMM_FEE, //Change for PROD
   blockExplorer: BLOCKEXPLORER_URL, //Change for PROD
   masternode: MASTERNODE_URL, //Change for PROD
+}
+
+export const currencyToken = {
+  contract_name: "currency",
+  token_name: CURRENCY_NAME,
+  token_symbol: CURRENCY_SYMBOL
 }
 
 export const walletDownloadURL = "https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim"

@@ -222,6 +222,8 @@ export class WalletService {
 					hosts: [config.masternode]
 				}
 				let txInfo = this.createTxInfo(method, args, stampCost, contractName)
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  				// @ts-ignore
 				txInfo.senderVk = this.keystore.wallets[0].vk
 				let txb = new this.Lamden.TransactionBuilder(networkInfo, txInfo)
 				txb.getNonce().then(() => {
@@ -245,6 +247,8 @@ export class WalletService {
 			"key": account
 		  }]
 		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`,body).catch(err => console.log(err))
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		if (res?.data[0]?.value) {
 			accountName.set(res.data[0].value)
 			this.toastService.addToast({ 
@@ -265,7 +269,8 @@ export class WalletService {
 			"key": name
 		  }]
 		const res = await axios.post(`${config.blockExplorer}/api/states/history/getKeys`, body).catch(err => console.log(err))
-	
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		return res?.data[0]?.value !== null
 	}
 

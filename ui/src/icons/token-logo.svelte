@@ -11,8 +11,9 @@
     $: pngLogo = tokenMeta ? tokenMeta.token_base64_png || undefined : undefined;
     $: urlB64Logo = tokenMeta ? tokenMeta.logo_base64_url || undefined : undefined;
     $: urlLogo = tokenMeta ? tokenMeta.token_logo_url || undefined : undefined;
+    $: componentLogo = tokenMeta ? tokenMeta.logo_component || undefined : undefined;
 
-    $: placeholderLogo = !svgLogo && !pngLogo && !urlLogo && !urlB64Logo ? genericIcon_base64_svg : undefined;
+    $: placeholderLogo = !svgLogo && !pngLogo && !urlLogo && !urlB64Logo && !componentLogo ? genericIcon_base64_svg : undefined;
 </script>
 
 <style>
@@ -37,6 +38,10 @@
     {#if urlLogo && !urlB64Logo}   
         <img style={`margin: ${margin};`} {width} {height} src="{urlLogo}" alt="token logo"/>
     {/if}
+{/if}
+
+{#if componentLogo}
+    <svelte:component this={componentLogo} {width} {margin} {height}/>
 {/if}
 
 {#if placeholderLogo}   

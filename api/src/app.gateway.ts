@@ -15,6 +15,7 @@ import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { getTokenMetrics } from "./entities/price.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
+import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
@@ -29,6 +30,7 @@ import {
 	MetricsUpdateType,
 	UserLpUpdateType
 } from "./types/websocket.types";
+import { async } from "rxjs";
 
 /**
  * Gateway uses socket.io v2^
@@ -135,7 +137,17 @@ export class AppGateway
 
 	private async handleJoinStakingPanel(client: Socket) {
 		const staking_entities = await StakingMetaEntity.find()
-		client.emit('staking_panel', staking_entities)
+		let response = staking_entities.map(async (entity) => {
+			return new Promise(async (resolver) => {
+				const staking_token = await TokenEntity.findOne({contract_name: entity.meta.STAKING_TOKEN})
+				const yeild_token = await TokenEntity.findOne({contract_name: entity.meta.YIELD_TOKEN})
+				resolver({
+					...entity, staking_token, yeild_token
+				})
+			})
+
+		})
+		client.emit('staking_panel', await Promise.all(response))
 	}
 
 	private async handleJoinTrollBox(client: Socket) {
