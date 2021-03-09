@@ -49,7 +49,7 @@ export interface EpochUpdateType extends UpdateType {
 }
 
 export interface StakingMetaUpdateType extends UpdateType {
-	action: "staking_meta_update";
+	action: "staking_panel_update";
 	data: StakingMetaEntity;
 }
 
@@ -86,7 +86,7 @@ export type UpdateType = {
 		| "user_lp_update"
 		| "balance_update"
 		| "trade_update"
-		| "staking_meta_update"
+		| "staking_panel_update"
 		| "user_staking_update"
 		| "epoch_update";
 };
