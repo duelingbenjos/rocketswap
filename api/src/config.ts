@@ -11,5 +11,5 @@ export const config = {
 }
 
 export const staking_contracts = [
-  'con_staking_dtau_rswp_lst001_3', 'con_staking_rswp_doug'
+  'con_staking_dtau_rswp_lst001_4', 'con_staking_rswp_doug'
 ]
