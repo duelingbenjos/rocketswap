@@ -6,13 +6,13 @@ export class StakingEpochEntity extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: string;
 
-	@Column()
+	@Column({nullable: true})
 	epoch_index: string;
 
-	@Column({ type: "simple-json" })
+	@Column({ type: "simple-json", nullable: true })
 	time: any[];
 
-	@Column()
+	@Column({nullable: true})
 	amount_staked: number;
 
 	@Column()
