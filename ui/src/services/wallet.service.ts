@@ -583,7 +583,7 @@ export class WalletService {
 		}
 	}
 
-	public async stakeTokens(stakingContractName, args, stakingToken, yeildToken, callbacks = undefined) {
+	public async stakeTokens(stakingContractName, args, stakingToken, yieldToken, callbacks = undefined) {
 		let txList = [{contract: stakingContractName, method: "addStakingTokens"}]
 		if (await this.needsApproval(stakingToken.contract_name, args.amount, stakingContractName)){
 			txList.push({contract: stakingToken.contract_name, method: "approve"})
@@ -597,7 +597,7 @@ export class WalletService {
 					"addStakingTokens", 
 					args, 
 					callbacks, 
-					(res) => this.handleStakeTokens(res, stakingToken, yeildToken, callbacks)
+					(res) => this.handleStakeTokens(res, stakingToken, yieldToken, callbacks)
 				)
 			}else{
 				if (callbacks) callbacks.error()
@@ -605,13 +605,13 @@ export class WalletService {
 		}
 	}
 
-	private handleStakeTokens = (res, stakingToken, yeildToken, callbacks = undefined) => {
+	private handleStakeTokens = (res, stakingToken, yieldToken, callbacks = undefined) => {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
 				icon: "gaugePlus",
 				heading: `Tokens Staked!`,
-				text: `You have staked ${stakingToken.token_symbol} and will start to accumulate ${yeildToken.token_symbol}.`, 
+				text: `You have staked ${stakingToken.token_symbol} and will start to accumulate ${yieldToken.token_symbol}.`, 
 				type: 'success',
 				duration: 5000,
 				link:{
@@ -624,7 +624,7 @@ export class WalletService {
 		}
 	}
 
-	public async removeStake(stakingContractName, args, stakingToken, yeildToken, callbacks = undefined) {
+	public async removeStake(stakingContractName, args, stakingToken, yieldToken, callbacks = undefined) {
 		let txList = [{contract: stakingContractName, method: "withdrawTokensAndYield"}]
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
@@ -633,18 +633,18 @@ export class WalletService {
 				"withdrawTokensAndYield", 
 				args, 
 				callbacks, 
-				(res) => this.handleRemoveStake(res, stakingToken, yeildToken, callbacks)
+				(res) => this.handleRemoveStake(res, stakingToken, yieldToken, callbacks)
 			)
 		}
 	}
 
-	private handleRemoveStake = (res, stakingToken, yeildToken, callbacks = undefined) => {
+	private handleRemoveStake = (res, stakingToken, yieldToken, callbacks = undefined) => {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
 				icon: "gaugeMinus",
-				heading: `Stake and Yeild Removed!`,
-				text: `You have removed your stake of ${stakingToken.token_symbol} and any earned ${yeildToken.token_symbol}.`, 
+				heading: `Stake and Yield Removed!`,
+				text: `You have removed your stake of ${stakingToken.token_symbol} and any earned ${yieldToken.token_symbol}.`, 
 				type: 'success',
 				duration: 5000,
 				link:{

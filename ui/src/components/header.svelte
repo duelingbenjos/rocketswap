@@ -16,7 +16,7 @@
 	const { themeToggle, currentThemeName } = getContext('app')
 
 	let links
-	let menuItems = ["Swap", "Pools", "$RSWP"]
+	let menuItems = ["Swap", "Pools", "$RSWP", "Earn"]
 	$: links = Object.values($routes)
 
 	const handleLinkClick = () => mainMenuOpen.set(false)

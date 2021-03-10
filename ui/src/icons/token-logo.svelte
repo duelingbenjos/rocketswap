@@ -6,7 +6,7 @@
     export let margin = '0 10px';
 
     let height = width;
-
+    
     $: svgLogo = tokenMeta ? tokenMeta.token_base64_svg || undefined : undefined;
     $: pngLogo = tokenMeta ? tokenMeta.token_base64_png || undefined : undefined;
     $: urlB64Logo = tokenMeta ? tokenMeta.logo_base64_url || undefined : undefined;

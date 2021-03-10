@@ -1,6 +1,7 @@
 <script type="ts">
 	import { onDestroy } from 'svelte'
 	import { fade } from 'svelte/transition';
+	import { active } from 'svelte-hash-router'
 
 	// Misc
 	import { walletBalance, rocketState, keystore, walletAddress } from '../store'
@@ -108,6 +109,10 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
+
+		box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
+		-webkit-box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
+		-moz-box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
 		
 	}
 	.balance {
@@ -171,12 +176,7 @@
     }
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
-		.footer{
-			bottom: 35px;
-		}
-        .wallet-info{
-            margin-left: 48px;
-        }
+
     }
 </style>
 
@@ -184,20 +184,22 @@
 <div class="footer">
 	<div class="wallet-info">
 		{#if $walletAddress}
-			<div bind:this={rocketElm} 
-					in:fade="{{delay: 0, duration: 500}}"
-					class="rocket" 
-					class:blast-off={$rocketState == 2}
-					class:rocket-reset={$rocketState == 3}>
-				<Rocket 
-					width="75px" 
-					color="var(--success-color)" 
-					direction="up" 
-					shake={$rocketState == 1} 
-					fire={$rocketState == 2}
-					blastOff={$rocketState == 2}
-				/>
-			</div>
+			{#if active === "Swap"}
+				<div bind:this={rocketElm} 
+						in:fade="{{delay: 0, duration: 500}}"
+						class="rocket" 
+						class:blast-off={$rocketState == 2}
+						class:rocket-reset={$rocketState == 3}>
+					<Rocket 
+						width="75px" 
+						color="var(--success-color)" 
+						direction="up" 
+						shake={$rocketState == 1} 
+						fire={$rocketState == 2}
+						blastOff={$rocketState == 2}
+					/>
+				</div>
+			{/if}
 			<div class="balance text-size">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
 			<div class="flex-row flex-center-center primary connected text-size">
 				<button class="flex flex-center-center" on:click={logout} title="logout">

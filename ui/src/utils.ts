@@ -14,6 +14,7 @@ import {
 	slippageTolerance,
 	rswpPrice, 
 	rswpBalance,
+	earnFilters,
 	payInRswp } from './store'
 
 import { ApiService } from './services/api.service'
@@ -105,6 +106,7 @@ export const toggleLamdenWalletAutoConnect = () => {
 export const initializeStateFromLocalStorage = () => {
 	getSlippageTolerance()
 	getPayInRswp()
+	getEarnFilters()
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -123,6 +125,15 @@ export const getPayInRswp = () => {
 export const setPayInRswp = (value) => {
 	setLSValue("pay_in_rswp", value)
 	payInRswp.set(value)
+}
+export const getEarnFilters = () => {
+	let value = localStorage.getItem("earn_filters")
+	if (value === null) return
+	else earnFilters.set(JSON.parse(value))
+}
+export const setEarnFilters = (value) => {
+	setLSValue("earn_filters", value)
+	earnFilters.set(value)
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))
@@ -603,14 +614,13 @@ export const stakingCalculator = (stakingInfo, deposits, withdrawAmount) => {
 	}
 
 	const calcStakedAmount = () => {
-		console.log(stringToFixed(totalDepositAmount, 8))
-		console.log(stringToFixed(withdrawAmount, 8))
 		return totalDepositAmount.minus(withdrawAmount)
 	}
 
 	const calcEarned = () => {
 		return toBigNumber("0")
 	}
+
 
 	const totalDepositAmount = addDeposits()
 

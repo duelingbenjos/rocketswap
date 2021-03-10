@@ -3,7 +3,9 @@ import { Writable, writable, derived, get } from 'svelte/store'
 import type { TokenListType, TokenMetricsType, TokenSelectType } from './types/api.types'
 import type { ToastMetaType } from './types/toast.types'
 import { toBigNumber, setLSValue, toBigNumberPrecision } from './utils'
-import { config } from './config'
+import { config, currencyToken } from './config'
+import CurrencyLogo from './icons/lamden-logo.svelte'
+currencyToken.logo_component = CurrencyLogo
 
 export const saveStoreValue = (store, value) => {
   let currValue = JSON.stringify(get(store))
@@ -43,20 +45,32 @@ export const keystore = writable(null);
 export const slippageTolerance = writable(toBigNumber("1.0"));
 export const lamdenWalletAutoConnect = writable(false);
 export const payInRswp = writable(false)
+
 export const stakingInfo = writable([]);
+export const stakingInfoProcessed = derived(stakingInfo, ($stakingInfo) => {
+  return $stakingInfo.map(stakeInfo => {
+      if (!stakeInfo.yield_token && stakeInfo.meta.YIELD_TOKEN === "currency") stakeInfo.yield_token = currencyToken
+      if (!stakeInfo.staking_token && stakeInfo.meta.STAKING_TOKEN === "currency") stakeInfo.staking_token = currencyToken
+      console.log(stakeInfo)
+      return stakeInfo
+  })
+})
+
 export const userStakingInfo = writable(null);
 export const rswpStakingDeposits = derived(userStakingInfo, ($userStakingInfo) => $userStakingInfo?.deposits || {})
 export const rswpStakingWithdrawls = derived(userStakingInfo, ($userStakingInfo) => $userStakingInfo?.withdrawals || {})
 
+export const epochs = writable({});
 export const rocketState = writable(0);
+export const earnFilters = writable({});
 
 export const token_list_store: Writable<TokenListType[]> = writable([])
 export const toast_store: Writable<ToastMetaType[]> = writable([])
 export const ws_id: Writable<string> = writable('')
 export const token_metrics_store: Writable<TokenMetricsType> = writable({})
 
-export const rswpStakingInfo = derived(stakingInfo, ($stakingInfo) => {
-  return $stakingInfo.find(info => info.contract_name === config.ammTokenStakingContract) || null
+export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
+  return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
 
 export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => {

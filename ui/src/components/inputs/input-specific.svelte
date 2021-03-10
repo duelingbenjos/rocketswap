@@ -19,7 +19,8 @@
     export let label = null
     export let tokenInfo
     export let getStampCost
-    export let small = false;
+	export let small = false;
+	export let short = false;
 
 	const dispatch = createEventDispatcher();
 
@@ -64,16 +65,21 @@
 </script>
 
 <style>
-
 	button.primary.small{
 		margin-right: 6px;
 	}
+
 	.input-container {
   		position: relative;
   	}
+	.input-container.short{
+		max-width: 230px;
+		border: 0;
+		margin: 0;
+	}
 </style>
 
-<div class="input-container flex-col" class:small={small}>
+<div class="input-container flex-col" class:small={small} class:short={short}>
 	<div class="input-row-1 flex-row " class:small={small}>
         {#if label}
             <div class="input-label text-primary">

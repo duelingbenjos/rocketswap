@@ -22,7 +22,7 @@
 
 	--color-primary-light: #e4fff8;
 	--color-primary: #24ffbd;
-	--color-primary-dark: #b8dfff;
+	--color-primary-dark: #28b389;
 
 	--color-secondary: #a128fd;
 	--color-secondary-dark: #3c2052;
@@ -338,6 +338,11 @@
 	justify-content: space-between;
 }
 
+.flex-center-spaceevenly{
+	align-items: center;
+	justify-content: space-evenly;
+}
+
 .flex-center-end{
 	align-items: center;
 	justify-content: flex-end;
@@ -357,6 +362,10 @@
 
 .flex-justify-end{
 	justify-content: flex-end;
+}
+
+.flex-justify-spaceevenly{
+	justify-content: space-evenly;
 }
 
 .number{
@@ -586,6 +595,7 @@ button.primary, input[type="submit"].primary {
 	padding: 3px 10px;
 
 	min-width: fit-content;
+	width: max-content;
 }
 
 button.primary:not(:disabled):hover, input[type="submit"].primary:not(:disabled):hover{
@@ -957,15 +967,15 @@ div[slot="main-centered"]{
 		width: 50%;
 	}
 	.panel-container {
-			margin: 0 auto;
-			padding: 30px;
-			border-radius: 32px;
-			max-width: 430px;
-			background: var(--panel-background-gradient);
+		margin: 0 auto;
+		padding: 30px;
+		border-radius: 32px;
+		max-width: 430px;
+		background: var(--panel-background-gradient);
 
-			box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
-			-webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
-			-moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		-webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		-moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
 	}
 	.modal{
 		padding-top: 0;

@@ -18,7 +18,7 @@
     //Props
     export let stakingInfo;
     export let stakingToken;
-    export let yeildToken;
+    export let yieldToken;
     export let stakingAmount;
     export let closeConfirm;
 
@@ -42,11 +42,11 @@
 
     const handleStakeTokens = () => {
         loading = true;
-        // stakingContractName, args, stakingToken, yeildToken
+        // stakingContractName, args, stakingToken, yieldToken
         let args = {
             amount: {"__fixed__": stringToFixed(stakingAmount, 8)}
         }
-        walletService.stakeTokens(stakingInfo.contract_name, args, stakingToken, yeildToken, {success, error})
+        walletService.stakeTokens(stakingInfo.contract_name, args, stakingToken, yieldToken, {success, error})
         .catch(err => {
             console.log(err)
             finish()
@@ -58,7 +58,7 @@
 <style>
     .modal-style{
         width: 100vw;
-        max-width:300px;
+        max-width:350px;
     }
     .modal-confirm-header{
         margin-bottom: 1rem;
@@ -102,9 +102,9 @@
         <p class="to-earn text-primary-dim text-large">To Earn</p>
         <div class="flex-row flex-center-start amount-row text-xlarge">
             <div class="flex-row flex-center-spacebetween">
-                <TokenLogo tokenMeta={yeildToken} width={logoSize}  margin="0 10px 0 0" />
+                <TokenLogo tokenMeta={yieldToken} width={logoSize}  margin="0 10px 0 0" />
             </div>
-            <span>{yeildToken.token_symbol}</span>
+            <span>{yieldToken.token_symbol}</span>
         </div>
     </div>
     <p class="text-xsmall sub-text text-primary-dim">

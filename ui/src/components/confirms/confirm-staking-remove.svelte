@@ -18,7 +18,7 @@
     //Props
     export let stakingInfo;
     export let stakingToken;
-    export let yeildToken;
+    export let yieldToken;
     export let stakedAmount;
     export let closeConfirm;
 
@@ -42,9 +42,9 @@
 
     const handleRemoveStakedTokens = () => {
         loading = true;
-        // stakingContractName, args, stakingToken, yeildToken
+        // stakingContractName, args, stakingToken, yieldToken
         let args = {}
-        walletService.removeStake(stakingInfo.contract_name, args, stakingToken, yeildToken, {success, error})
+        walletService.removeStake(stakingInfo.contract_name, args, stakingToken, yieldToken, {success, error})
         .catch(err => {
             console.log(err)
             finish()
@@ -56,7 +56,7 @@
 <style>
     .modal-style{
         width: 100vw;
-        max-width:300px;
+        max-width:350px;
     }
     .modal-confirm-header{
         margin-bottom: 1rem;
@@ -99,13 +99,13 @@
         <PlusSignIcon width="20px" color="var(--text-primary-color-dim)" margin={"0 0 0 5px"}/>
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
-                <TokenLogo tokenMeta={yeildToken} width={logoSize}  margin="0.25rem 10px 0 0" />
+                <TokenLogo tokenMeta={yieldToken} width={logoSize}  margin="0.25rem 10px 0 0" />
             </div>
-            <span>{yeildToken.token_symbol}</span>
+            <span>{yieldToken.token_symbol}</span>
         </div>
     </div>
     <p class="text-xsmall sub-text text-primary-dim">
-        ** This will remove your entire stake as well as all earned yeild. To only remove your yield use the WITHDRAW button.
+        ** This will remove your entire stake as well as all earned yield. To only remove your yield use the WITHDRAW button.
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="modal-confirm-buttons flex-col">

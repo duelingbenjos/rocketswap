@@ -157,9 +157,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		let response = staking_entities.map(async (entity) => {
 			return new Promise(async (resolver) => {
 				const staking_token = await TokenEntity.findOne({contract_name: entity.meta.STAKING_TOKEN})
-				const yeild_token = await TokenEntity.findOne({contract_name: entity.meta.YIELD_TOKEN})
+				const yield_token = await TokenEntity.findOne({contract_name: entity.meta.YIELD_TOKEN})
 				resolver({
-					...entity, staking_token, yeild_token
+					...entity, staking_token, yield_token
 				})
 			})
 

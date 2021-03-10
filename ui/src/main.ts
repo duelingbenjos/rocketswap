@@ -1,6 +1,7 @@
 import Swap from './pages/swap.page.svelte'
 import Pools from './pages/pool.page.svelte'
 import RSWP from './pages/rswp.page.svelte'
+import Earn from './pages/earn.page.svelte'
 import CreatePool from './pages/pool-create.page.svelte'
 import AddPool from './pages/pool-add.page.svelte'
 import RemovePool from './pages/pool-remove.page.svelte'
@@ -20,6 +21,10 @@ routes.set({
   '/rswp/': {
     $$component: RSWP,
     $$name: '$RSWP'
+  },
+  '/earn/': {
+    $$component: Earn,
+    $$name: 'Earn'
   },
   '/pool-create/': {
     $$component: CreatePool,

@@ -1,8 +1,16 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeUpdates, tradeHistory, stakingInfo, userStakingInfo } from '../store'
+import { 
+  token_metrics_store, 
+  tokenBalances, 
+  ws_id, 
+  trollboxMessages, 
+  tradeUpdates, 
+  tradeHistory, 
+  stakingInfo, 
+  userStakingInfo,
+  epochs } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber, setBearerToken } from '../utils'
-import * as LamdenJs from 'lamden-js'
 import { config } from '../config'
 
 /** Singleton socket.io service */
@@ -129,7 +137,7 @@ export class WsService {
     this.connection.on(`staking_panel`, (payload) => {
       console.log({staking_panel: payload})
       stakingInfo.set(valuesToBigNumber(payload))
-      console.log(valuesToBigNumber(payload))
+      console.log(payload)
     })
 
     /*
@@ -151,11 +159,13 @@ export class WsService {
     Epoch Data
     */
     this.connection.on(`epoch_data`, (payload) => {
-      console.log(payload)
+      epochs.set(valuesToBigNumber(payload))
+      console.log({epoch_data: payload})
     })
 
     this.connection.on(`epoch_update`, (payload) => {
       console.log(payload)
+      console.log({epoch_update: payload})
     })
 
     this.joinedFeeds['staking_panel'] = true
