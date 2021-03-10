@@ -44,6 +44,9 @@ export const slippageTolerance = writable(toBigNumber("1.0"));
 export const lamdenWalletAutoConnect = writable(false);
 export const payInRswp = writable(false)
 export const stakingInfo = writable([]);
+export const userStakingInfo = writable(null);
+export const rswpStakingDeposits = derived(userStakingInfo, ($userStakingInfo) => $userStakingInfo?.deposits || {})
+export const rswpStakingWithdrawls = derived(userStakingInfo, ($userStakingInfo) => $userStakingInfo?.withdrawals || {})
 
 export const rocketState = writable(0);
 

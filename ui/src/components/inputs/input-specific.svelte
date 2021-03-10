@@ -16,7 +16,7 @@
 	import { stringToFixed, toBigNumberPrecision, toBigNumber, determinePrecision, stampsToTAU } from '../../utils.js'
 
 	//Props
-    export let label
+    export let label = null
     export let tokenInfo
     export let getStampCost
     export let small = false;

@@ -104,7 +104,7 @@ export class WalletService {
 		if (this.keystore.wallets.length === 0) throw new Error("Keystore is empty.")
 		let vk = this.keystore.wallets[0].vk
 		this.getIntialBalances(vk)
-		this.wsService.joinBalanceFeed(vk)
+		this.joinUserFeeds(vk)
 	}
 
 	private handleWalletInstalled = (e) => {
@@ -132,10 +132,16 @@ export class WalletService {
 			if (vk.length > 0 && approved){
 				//Get the inital balance 
 				this.getIntialBalances(vk)
-				this.wsService.joinBalanceFeed(vk)
+				this.joinUserFeeds(vk)
 			}
 			return Object.assign(current, { approved, installed, locked, walletAddress: vk })
 		})
+	}
+
+	private joinUserFeeds = (vk) => {
+		console.log("JOINING USER FEEDS")
+		this.wsService.joinBalanceFeed(vk)
+		this.wsService.joinUserStakingFeed(vk)
 	}
 
 	public logout = () => {
@@ -169,6 +175,7 @@ export class WalletService {
 			this.getAccountName(vk),
 			setBearerToken(vk)
 		])
+		this.wsService.joinUserStakingFeed(vk)
 	}
 
 	private getStampCost = async (contractName, method) => {
@@ -565,7 +572,81 @@ export class WalletService {
 				heading: `Swap Completed!`,
 				text: `You have swapped ${selectedToken.token_symbol} for ${config.currencySymbol}.`, 
 				type: 'success',
-				duration: 10000,
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
+			})
+			if (callbacks) callbacks.success()
+		}
+	}
+
+	public async stakeTokens(stakingContractName, args, stakingToken, yeildToken, callbacks = undefined) {
+		let txList = [{contract: stakingContractName, method: "addStakingTokens"}]
+		if (await this.needsApproval(stakingToken.contract_name, args.amount, stakingContractName)){
+			txList.push({contract: stakingToken.contract_name, method: "approve"})
+		}
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			let results = await this.callApprove(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)
+			if (results){
+				this.sendTransaction(
+					stakingContractName, 
+					"addStakingTokens", 
+					args, 
+					callbacks, 
+					(res) => this.handleStakeTokens(res, stakingToken, yeildToken, callbacks)
+				)
+			}else{
+				if (callbacks) callbacks.error()
+			}
+		}
+	}
+
+	private handleStakeTokens = (res, stakingToken, yeildToken, callbacks = undefined) => {
+		let status = this.txResult(res.data, callbacks)
+		if (status === 'success') {
+			this.toastService.addToast({ 
+				icon: "gaugePlus",
+				heading: `Tokens Staked!`,
+				text: `You have staked ${stakingToken.token_symbol} and will start to accumulate ${yeildToken.token_symbol}.`, 
+				type: 'success',
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
+			})
+			if (callbacks) callbacks.success()
+		}
+	}
+
+	public async removeStake(stakingContractName, args, stakingToken, yeildToken, callbacks = undefined) {
+		let txList = [{contract: stakingContractName, method: "withdrawTokensAndYield"}]
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			this.sendTransaction(
+				stakingContractName, 
+				"withdrawTokensAndYield", 
+				args, 
+				callbacks, 
+				(res) => this.handleRemoveStake(res, stakingToken, yeildToken, callbacks)
+			)
+		}
+	}
+
+	private handleRemoveStake = (res, stakingToken, yeildToken, callbacks = undefined) => {
+		let status = this.txResult(res.data, callbacks)
+		if (status === 'success') {
+			this.toastService.addToast({ 
+				icon: "gaugeMinus",
+				heading: `Stake and Yeild Removed!`,
+				text: `You have removed your stake of ${stakingToken.token_symbol} and any earned ${yeildToken.token_symbol}.`, 
+				type: 'success',
+				duration: 5000,
 				link:{
 					href: createBlockExplorerLink("transactions", res.data.txHash),
 					icon: "popout",
@@ -624,8 +705,8 @@ export class WalletService {
 		}
 	}
 
-	public getApprovedAmount = async (vk, contract) => {
-		return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${connectionRequest.contractName}`)
+	public getApprovedAmount = async (vk, contract, approvalTo) => {
+		return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${approvalTo || connectionRequest.contractName}`)
 				.then((res) => res.json())
 				.then((json) => {
 					let approval
@@ -637,16 +718,17 @@ export class WalletService {
 				.catch((e) => console.log(e.message))
 	}
 
-	public needsApproval = async (contract, amount) => {
-		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract)
+	public needsApproval = async (contract, amount, approvalTo = undefined) => {
+		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract, approvalTo)
+		console.log({contract, amount, approvedAmount})
 		return approvedAmount.isLessThan(amount)
 	}
 
-	public async approveBN(contractName, approveAmount, callback = undefined) {
-		if (await this.needsApproval(contractName, approveAmount)){
+	public async approveBN(contractName, approveAmount, approveTo, callback = undefined) {
+		if (await this.needsApproval(contractName, approveAmount, approveTo)){
 			let args = {
 				amount: { __fixed__: "9999999999999" },
-				to: connectionRequest.contractName
+				to: approveTo || connectionRequest.contractName
 			}
 			this.sendTransaction(
 				contractName, 
@@ -660,9 +742,9 @@ export class WalletService {
 		}
 	}
 
-	private callApprove (contract, amount) {
+	private callApprove (contract, amount, to = undefined) {
 		return new Promise((resolve) => {
-			this.approveBN(contract, amount, (res, err) => {
+			this.approveBN(contract, amount, to, (res, err) => {
 				if (err || !res) resolve(false)
 				if (res === true) resolve(true)
 				else {

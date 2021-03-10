@@ -159,7 +159,7 @@
         </div>
     </div>
     <p class="text-xsmall sub-text text-primary-dim">
-        ** Output is estimated. <!--You will receive at least {minimumReceivedString} {receivedSymbol} or the transaction will revert.-->
+        ** Output is estimated. You will receive at least {stringToFixed(minimumReceived, 8)} {receivedSymbol} or the transaction will revert.
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">

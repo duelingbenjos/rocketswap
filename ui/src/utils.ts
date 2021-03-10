@@ -590,3 +590,32 @@ export const pageUtils = (pageStores) => {
 		resetPage
 	}
 }
+
+/*
+	Staking Calculations
+*/
+
+export const stakingCalculator = (stakingInfo, deposits, withdrawAmount) => {
+	const addDeposits = () => {
+		let amount = toBigNumber("0")
+		deposits.forEach(deposit => amount = amount.plus(deposit.amount.__fixed__))
+		return amount
+	}
+
+	const calcStakedAmount = () => {
+		console.log(stringToFixed(totalDepositAmount, 8))
+		console.log(stringToFixed(withdrawAmount, 8))
+		return totalDepositAmount.minus(withdrawAmount)
+	}
+
+	const calcEarned = () => {
+		return toBigNumber("0")
+	}
+
+	const totalDepositAmount = addDeposits()
+
+	return {
+		earnedAmount: calcEarned(),
+		stakedAmount: calcStakedAmount()
+	}
+}

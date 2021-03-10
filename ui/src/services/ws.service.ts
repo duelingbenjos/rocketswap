@@ -1,5 +1,5 @@
 import socket from 'socket.io-client'
-import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeUpdates, tradeHistory, stakingInfo } from '../store'
+import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeUpdates, tradeHistory, stakingInfo, userStakingInfo } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber, setBearerToken } from '../utils'
 import * as LamdenJs from 'lamden-js'
@@ -21,6 +21,7 @@ export class WsService {
   private current_trade_feed: string
   private previously_connected = false
   private txCallbacks: any
+  private joinedFeeds: any
 
   connection: SocketIOClient.Socket
 
@@ -32,6 +33,7 @@ export class WsService {
     this.setupEvents()
     this.setupSubs()
     this.txCallbacks = {}
+    this.joinedFeeds = {}
   }
 
   setupEvents = () => {
@@ -82,20 +84,25 @@ export class WsService {
 
   public joinTradeFeed(contract_name: string) {
     if (this.current_trade_feed === contract_name) return
-    this.leaveTradeFeed()
+    //this.leaveTradeFeed()
     this.connection.on(`trade_update:${contract_name}`, this.handleTradeUpdate)
     this.connection.emit('join_room', `trade_feed:${contract_name}`)
     this.current_trade_feed = contract_name
+
+    this.joinedFeeds[`trade_feed:${contract_name}`] = true
     //console.log('joined trade feed : ', contract_name)
   }
 
   public leaveTradeFeed() {
     const contract_name = this.current_trade_feed
     this.connection.off(`trade_update:${contract_name}`)
+    
     this.current_trade_feed = ''
     //console.log('left trade feed : ', contract_name)
     tradeHistory.set([])
     tradeUpdates.set([])
+
+    this.joinedFeeds[`trade_feed:${contract_name}`] = false
   }
 
   private handleTradeUpdate(event) {
@@ -113,13 +120,14 @@ export class WsService {
   }
   
   public joinStakingPanel() {
+    if (this.joinedFeeds['staking_panel']) return
     this.connection.emit('join_room', 'staking_panel')
 
     /*
     This payload is an array containing all the registered staking pools in the API
     */
     this.connection.on(`staking_panel`, (payload) => {
-      console.log(payload)
+      console.log({staking_panel: payload})
       stakingInfo.set(valuesToBigNumber(payload))
       console.log(valuesToBigNumber(payload))
     })
@@ -129,6 +137,7 @@ export class WsService {
     Type : StakingMetaEntity
     */
     this.connection.on('staking_panel_update', (payload) => {
+      console.log({staking_update: payload})
       stakingInfo.update(currentValue => {
         currentValue.forEach((info, index) => {
           if (info.contract_name === payload.data.contract_name) currentValue[index] = payload.data
@@ -148,33 +157,54 @@ export class WsService {
     this.connection.on(`epoch_update`, (payload) => {
       console.log(payload)
     })
+
+    this.joinedFeeds['staking_panel'] = true
   }
 
   public leaveStakingPanel() {
     this.connection.emit('leave_room', 'staking_panel')
     this.connection.off(`staking_panel`)
     this.connection.off(`staking_panel_update`)
+
+    this.joinedFeeds['staking_panel'] = false
   }
 
   public joinBalanceFeed(vk: string) {
+    if (this.joinedFeeds[`balance_list:${vk}`]) return
+    
     this.connection.emit('join_room', `balance_feed:${vk}`)
     this.connection.on(`balance_list:${vk}`, this.handleBalanceList)
     this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
-  }
 
-  public joinUserStakingFeed(vk: string) {
-    this.connection.emit('join_room', `user_staking_feed:${vk}`)
-    this.connection.on(`user_staking_update:${vk}`, (data) => console.log(data))
-  }
-
-  public leaveUserStakingFeed(vk: string) {
-    this.connection.off(`user_staking_update:${vk}`)
+    this.joinedFeeds[`balance_feed:${vk}`] = true
   }
 
   public leaveBalanceFeed(vk: string) {
     this.connection.off(`balance_list:${vk}`)
     this.connection.off(`balance_update:${vk}`)
     tokenBalances.set({})
+
+    this.joinedFeeds[`balance_feed:${vk}`] = false
+  }
+
+  public joinUserStakingFeed(vk: string) {
+    if (this.joinedFeeds[`user_staking_feed:${vk}`]) return    
+
+    this.connection.emit('join_room', `user_staking_feed:${vk}`)
+    this.connection.on(`user_staking_update:${vk}`, this.handleUserStakingFeed)
+
+    this.joinedFeeds[`user_staking_feed:${vk}`] = true
+  }
+
+  private handleUserStakingFeed = (payload) => {
+    userStakingInfo.set(valuesToBigNumber(payload?.data || payload))
+    console.log({user_staking_feed: payload?.data || payload})
+  }
+
+  public leaveUserStakingFeed(vk: string) {
+    this.connection.off(`user_staking_update:${vk}`)
+
+    this.joinedFeeds[`user_staking_feed:${vk}`] = false
   }
 
   private handleTrollboxAuthCode(payload) {
@@ -211,15 +241,20 @@ export class WsService {
   }
 
   public joinPriceFeed(contract_name: string) {
+    if(this.joinedFeeds[`price_feed:${contract_name}`]) return
     //console.log('join price feed')
     this.connection.emit('join_room', `price_feed:${contract_name}`)
     this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
+
+    this.joinedFeeds[`price_feed:${contract_name}`] = true
   }
 
   public leavePriceFeed(contract_name: string) {
     //console.log('leave price feed')
     this.connection.emit('leave_room', `price_feed:${contract_name}`)
     this.connection.off(`price_feed:${contract_name}`)
+
+    this.joinedFeeds[`price_feed:${contract_name}`] = false
   }
 
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {

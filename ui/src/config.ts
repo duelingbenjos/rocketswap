@@ -25,6 +25,8 @@ export const stamps = {
   create_market: 110,
   add_liquidity: 85,
   remove_liquidity: 80,
+  addStakingTokens: 120,
+  withdrawTokensAndYield: 130,
   buy: 200,
   auth: 35,
   approve: 30,

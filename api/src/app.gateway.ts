@@ -146,7 +146,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	private async handleJoinUserStakingFeed(subject: string, client: Socket) {
 		try {
 			const entity = await UserStakingEntity.findOne(subject);
-			client.emit("user_staking_update", entity);
+			client.emit(`user_staking_update:${subject}`, entity);
 		} catch (err) {
 			this.logger.error(err);
 		}
