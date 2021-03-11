@@ -24,6 +24,7 @@
 	--color-primary: #24ffbd;
 	--color-primary-dark: #28b389;
 
+	--color-secondary-light: #dcaeff;
 	--color-secondary: #a128fd;
 	--color-secondary-dark: #3c2052;
 
@@ -118,6 +119,8 @@
 	background: var(--main-background-gradient);
 	background-attachment: fixed;
 
+	--staking-pannel-header-symbols-text-shadow: var(--color-secondary-dark);
+	--pool-pannel-header-percent-text-shadow: var(--color-secondary-dark);
 }
 
 	body.light{
@@ -169,6 +172,9 @@
 	--checkbox-bg-dim:  #fff;
 
 	color: var(--text-primary-color);
+
+	--staking-pannel-header-symbols-text-shadow: var(--color-primary-light);
+	--pool-pannel-header-percent-text-shadow: var(--color-gray-5);
 }
 
 .text-xsmall{
@@ -266,6 +272,10 @@
 	text-align: left;
 }
 
+.text-align-end{
+	text-align: end;
+}
+
 .weight-200{
 	font-weight: 200;
 }
@@ -341,6 +351,11 @@
 .flex-center-spaceevenly{
 	align-items: center;
 	justify-content: space-evenly;
+}
+
+.flex-start-end{
+	align-items: flex-start;
+	justify-content: flex-end;
 }
 
 .flex-center-end{

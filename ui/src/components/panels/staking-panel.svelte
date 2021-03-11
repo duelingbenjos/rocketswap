@@ -96,9 +96,10 @@
     }
     .header{
         position: relative;
+        margin-bottom: 1rem;
     }
     .symbols{
-        text-shadow: 2px 2px var(--color-secondary-dark);
+        text-shadow: 2px 2px var(--staking-pannel-header-symbols-text-shadow);
         margin-bottom: -1rem;
         z-index: 1;
     }

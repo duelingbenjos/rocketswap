@@ -114,6 +114,7 @@ export class WsService {
   }
 
   private handleTradeUpdate(event) {
+    console.log({trade_feed: event})
     //console.log(event)
     if (event.history) tradeHistory.set(valuesToBigNumber(event.history))
     else {
@@ -135,9 +136,8 @@ export class WsService {
     This payload is an array containing all the registered staking pools in the API
     */
     this.connection.on(`staking_panel`, (payload) => {
-      console.log({staking_panel: payload})
       stakingInfo.set(valuesToBigNumber(payload))
-      console.log(payload)
+      console.log({staking_panel: payload})
     })
 
     /*
@@ -152,7 +152,6 @@ export class WsService {
         })
         return currentValue
       })
-      console.log(payload)
     })
 
     /*
@@ -164,7 +163,6 @@ export class WsService {
     })
 
     this.connection.on(`epoch_update`, (payload) => {
-      console.log(payload)
       console.log({epoch_update: payload})
     })
 
@@ -218,8 +216,6 @@ export class WsService {
   }
 
   private handleTrollboxAuthCode(payload) {
-    //console.log("AUTH_CODE!")
-    //console.log(payload)
     ws_id.set(payload)
   }
 
@@ -231,9 +227,7 @@ export class WsService {
   }
 
   public sendProxyTxn(tx, callback) {
-    //console.log(this.txCallbacks)
     this.txCallbacks[tx.payload.uid] = callback
-    //console.log(this.txCallbacks)
     this.connection.emit('send_transaction', tx)
   }
 

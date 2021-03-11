@@ -123,7 +123,7 @@
     }
     .symbols{
         position: absolute;
-        text-shadow: 2px 2px var(--color-secondary-dark);
+        text-shadow: 2px 2px var(--staking-pannel-header-symbols-text-shadow);
         top: 10px;
         left: 30px;
         

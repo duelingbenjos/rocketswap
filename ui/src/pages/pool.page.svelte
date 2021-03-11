@@ -1,8 +1,26 @@
-<script lang="ts">
-  import PoolMain from '../components/pool-main.svelte'
+<script>
+	import { setContext } from 'svelte'
 
-  $: pageTitle = 'RocketSwap Pools'
+	// Components
+	import PoolMain from '../components/pools/pool-main.svelte'
 
+	$: pageTitle = 'RocketSwap Liqidity'
+
+	setContext("pageContext", {
+		adjustLiquidityRedirect,
+		removeLiquidityRedirect
+	})
+
+	function adjustLiquidityRedirect (contract) {
+		window.location.assign(`/#/pool-add/${contract}`)
+	}
+
+	function removeLiquidityRedirect (contract) {
+		window.location.assign(`/#/pool-remove/${contract}`)
+	}
+
+
+	
 </script>
 
 

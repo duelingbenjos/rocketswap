@@ -1,6 +1,6 @@
 <script>
     // Components
-    import BoxedMessage from '../boxed-message.svelte'
+    import BoxedMessage from '../misc/boxed-message.svelte'
 
     // Icons
     import RocketSwapCircleLogo from '../../icons/rocketswap-circle-logo.svelte'

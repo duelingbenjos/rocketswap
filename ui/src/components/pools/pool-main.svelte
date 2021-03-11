@@ -1,7 +1,7 @@
 <script>
-    import BoxedMsg from './boxed-message.svelte'
+    import BoxedMsg from '../misc/boxed-message.svelte'
     import PoolCreateLiquidityButton from './pool-create_liquidity_button.svelte'
-    import PoolsChart from './pool-pools_chart.svelte'
+    import PoolsDisplay from './pool-pools-display.svelte'
 
     let liquidityMessage = {
         title: "Liquidity provider rewards",
@@ -13,20 +13,21 @@
 </script>
 
 <style>
-    main{
-        max-width: 750px;
+    div{
+        max-width: 1020px;
         margin-bottom: 6rem;
+        margin: 0 auto;
     }
 
     @media screen and (min-width: 430px) {
-        main{
+        div{
             padding: 20px;
         }
     }
 </style>
 
-<main>
+<div>
     <BoxedMsg title={liquidityMessage.title} messages={liquidityMessage.messages}/>
     <PoolCreateLiquidityButton />
-    <PoolsChart />
-</main>
+    <PoolsDisplay />
+</div>

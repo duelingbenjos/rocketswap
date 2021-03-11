@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   	import { onMount, setContext } from 'svelte'
   	import { writable } from 'svelte/store'
 
@@ -99,8 +99,8 @@
 		let txList = [{contract: connectionRequest.contractName, method: "add_liquidity"}]
 		let inputCurrencyAmount = toBigNumber("0");
 		let inputTokenAmount = toBigNumber("0");
-		if ($currencyAmount) inputAmount = $currencyAmount
-		if ($tokenAmount) inputAmount = $tokenAmount
+		if ($currencyAmount) inputCurrencyAmount = $currencyAmount
+		if ($tokenAmount) inputCurrencyAmount = $tokenAmount
 		if (await walletService.needsApproval('currency', inputCurrencyAmount)){
 			txList.push({contract: 'currency', method: "approve"})
 		}

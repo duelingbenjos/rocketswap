@@ -80,9 +80,6 @@
     </div>
     <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 4)}</p>
     <p class="text-large margin-0 text-primary-dim">{`${$selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
-    <p class="text-xsmall sub-text text-primary-dimmer">
-        Output is estimated. If the price changes by more than 0.5% your transaction will revert.
-    </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>

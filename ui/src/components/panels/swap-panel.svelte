@@ -27,7 +27,6 @@
 	const swapSlots = () => {
 		slots = [...slots.reverse()]
 		buy.set(!$buy)
-		console.log($buy)
 	}
 
 	function handleCurrencyChange(e){
@@ -54,7 +53,6 @@
 				})*/
 				console.log($payInRswp)
 				if ($payInRswp){
-					console.log("PAYING IN RSWP!")
 					if (quote.tokensPurchased.isGreaterThan(0)){
 						saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quote.tokensPurchased, 8)))
 					}else{

@@ -361,7 +361,6 @@ export const quoteCalculator = (tokenInfo) => {
 	}
 
 	const calcBuyPrice = (currencyAmount) => {
-		console.log("CALC BUY")
 		if (!currencyAmount) currencyAmount = toBigNumber("0")
 		currencyAmount = toBigNumberPrecision(currencyAmount, 8)
 		let newCurrencyReserve = currencyReserves.plus(currencyAmount)

@@ -36,11 +36,6 @@
 				if (inputValue > 0) dispatchEvent(inputValue)
 			}
 		})
-
-		let small = toBigNumber("0.000000008")
-		console.log(small.toPrecision(8)) // 0.0000000080000000
-		console.log(small.toFixed(8)) // 0.00000000
-		console.log(stringToFixed(small, 8)) // 0
 	})
 
 
