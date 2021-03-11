@@ -11,10 +11,14 @@
 	import LightDark from '../icons/light-dark.svelte'
 	import PoweredByLamden from './misc/powered-by-lamden.svelte'
 	import Rocket from '../icons/rocket.svelte'
+	import AntennaIcon from '../icons/antenna.svelte'
 
+	// Services
+	import { WalletService } from '../services/wallet.service'
+	const walletService = WalletService.getInstance();
 
 	// Misc
-	import { mainMenuOpen, rswpPrice } from '../store'
+	import { mainMenuOpen, rswpPrice, walletAddress } from '../store'
 	import { config } from '../config'
 	import { stringToFixed } from '../utils'
 
@@ -25,6 +29,10 @@
 	$: links = Object.values($routes)
 
 	const handleLinkClick = () => mainMenuOpen.set(false)
+
+	const logout = () => {
+		walletService.logout()
+	}
 </script>
 
 
@@ -117,6 +125,9 @@
 		top: 0;
 		right: 20px;
 	}
+	.logout{
+		margin: 1rem auto 0;
+	}
 	/* When page width is greater than 320px */
     @media screen and (min-width: 320px) {
         .light-dark-button{
@@ -130,13 +141,14 @@
 		.header{
 			padding: 40px 20px;
 		}
-		.socials{
-			display: block;
-		}
+
     }
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
 		.price{
+			display: block;
+		}
+		.socials{
 			display: block;
 		}
     }
@@ -193,6 +205,11 @@
 					</div>
 				{/if}
 			{/each}
+			{#if $walletAddress}
+				<button class="logout flex flex-center-center primary outline" on:click={logout} title="logout">
+						<AntennaIcon width="20px" margin="0 8px 0 0" /> Logout
+				</button>
+			{/if}
 			<div class="light-dark-button">
 				<LightDark margin="0 auto"/>
 			</div>

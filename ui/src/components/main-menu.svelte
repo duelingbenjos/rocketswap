@@ -7,7 +7,9 @@
     import LightDark from '../icons/light-dark.svelte'
 
     // Misc
-	import { mainMenuOpen } from '../store'
+    import { mainMenuOpen } from '../store'
+    
+    mainMenuOpen.subscribe(val => console.log({mainMenuOpen: $mainMenuOpen}))
 </script>
 
 <style>

@@ -87,7 +87,7 @@
 	--modal-background-primary: #312a43;
 	--modal-background-secondary: #e400ff12;
 	--modal-text-color: var(--text-primary-color);
-	--modal-wallet-setup-background: linear-gradient(333deg, var(--color-secondary-dark) 10%, var(--modal-background-primary) 50%);
+	--modal-wallet-setup-background: linear-gradient(333deg, #441769 10%, #7300cf 50%);
 	
 	--msg-box-background: #2b284b;
 

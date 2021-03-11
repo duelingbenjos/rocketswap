@@ -1,5 +1,8 @@
 <script>
-    import { setContext, onDestroy } from 'svelte'
+    import { setContext, beforeUpdate } from 'svelte'
+
+    // Misc
+    import { mainMenuOpen } from '../../store'
     
     export let open;
     export let toggleModal;
@@ -9,7 +12,9 @@
 		toggleModal
     });
 
-    onDestroy(() => console.log("DESTROYED!"))
+    beforeUpdate(() => {
+        if (open) mainMenuOpen.set(false)
+    })
 
     const slots = ["main", "main-centered"]
 
