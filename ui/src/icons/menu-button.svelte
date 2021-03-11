@@ -21,6 +21,10 @@
         z-index: 110;
     }
 
+    svg:hover > path{
+        stroke: var(--color-primary);
+    }
+
 </style>
 
 <div class="flex align-center-center" class:open={$mainMenuOpen} style={`margin: ${margin};`} on:click={handleClick}>

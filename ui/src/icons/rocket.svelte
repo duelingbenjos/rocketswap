@@ -6,6 +6,7 @@
     export let shakeRight = false;
     export let fire = true;
     export let blastOff = false;
+    export let styles = "";
 
     //Bindings
     let rocket
@@ -62,7 +63,7 @@
 <svg {width}  fill={color} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"
     class:shake={shake}
     class:shake-right={shakeRight}
-    style={`transform: rotate(${directions[direction]}deg);`}>
+    style={`transform: rotate(${directions[direction]}deg); ${styles}`}>
     <path 
         class:no-fire={!fire} 
         class:blast-off={blastOff} 

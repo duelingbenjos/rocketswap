@@ -171,8 +171,6 @@
 	--checkbox-bg:  var(--color-secondary);
 	--checkbox-bg-dim:  #fff;
 
-	color: var(--text-primary-color);
-
 	--staking-pannel-header-symbols-text-shadow: var(--color-primary-light);
 	--pool-pannel-header-percent-text-shadow: var(--color-gray-5);
 }
