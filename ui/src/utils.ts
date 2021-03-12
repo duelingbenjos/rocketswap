@@ -78,7 +78,11 @@ export const removeBearerToken = () => {
 	bearerToken.set(null)
 }
 
-export const stampsToTAU = (stampCost) => stampCost / stamps.currentRatio
+export const stampsToTAU = (stampCost) => {
+	let currentRatio = toBigNumber(stamps.currentRatio)
+	let sc = toBigNumber(stampCost)
+	return toBigNumberPrecision(sc.dividedBy(currentRatio), 8)
+}
 
 export const getBaseUrl = (url): string => {
   const parts = url.split(':')
@@ -267,9 +271,13 @@ export const toBigNumber = (value) => {
 
 export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value)
 
-export const toBigNumberPrecision = (value, precision) => {
-	if (!isBigNumber(value)) return toBigNumber("0")
-	return toBigNumber(stringToFixed(value, precision))
+export const toBigNumberPrecision = (value = null, precision) => {
+	if (value === null) return toBigNumber("0")
+	try{
+		return toBigNumber(stringToFixed(value, precision))
+	}catch(e){
+		return toBigNumber("0")
+	}
 }
 
 export const displayBalanceToPrecision = (value, precision) => {
@@ -289,9 +297,11 @@ export function valuesToBigNumber(obj: any) {
         // ignore these values
       } else if (typeof obj[property] === 'string') {
         // Check if item is a string
-        if (!isNaN(parseFloat(obj[property]))) obj[property] = new BigNumber(obj[property])
+        if (!isNaN(parseFloat(obj[property]))) {
+			obj[property] = toBigNumberPrecision(obj[property], 8)
+		}
       } else if (typeof obj[property] === 'number') {
-        obj[property] = new BigNumber(obj[property])
+		obj[property] = toBigNumberPrecision(obj[property], 8)
       } else if (typeof obj[property] === 'object') {
         valuesToBigNumber(obj[property])
       }

@@ -60,6 +60,8 @@ body {
 	--text-primary-color-inverted-dim: #120e4a;
 	--text-primary-color-inverted-dimmer: #120e4a;
 
+	--text-color-highlight: var(--color-primary);
+
 	--text-size-tiny: 0.6em; 
 	--text-size-xsmall: 0.7em; 
 	--text-size-small: 0.9em;
@@ -138,6 +140,8 @@ body.light{
 	--text-primary-color-inverted-dim: #fff;
 	--text-primary-color-inverted-dimmer: #fff;
 
+	--text-color-highlight: var(--color-secondary);
+
 	--color-gray-1: #f2f2f2;
 	--color-gray-2: #d6d6d6;
 	--color-gray-3: #aaaaaa;
@@ -177,7 +181,7 @@ body.light{
 
 	--staking-pannel-header-symbols-text-shadow: var(--color-primary-light);
 	--pool-pannel-header-percent-text-shadow: var(--color-gray-5);
-	--fuel-tank-panel-fuel-bg-color: #a128fd7a;
+	--fuel-tank-panel-fuel-bg-color: #9100fffc;
 	--fuel-tank-text-shadow: var(--color-gray-3);
 	--small-box-background: #2b284b00;
 
@@ -795,7 +799,7 @@ button.close{
 	margin-bottom: 0px;
 }
 
-.tx-fee-label{
+.input-message{
 	margin: 0;
 	position: absolute;
 	bottom: 3px;

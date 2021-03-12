@@ -34,6 +34,7 @@
 	let selectedToken = writable()
 	let tokenLP = writable()
 	let buy = writable(true)
+	let txOkay = writable(true)
 
 	let pageStores = {
 		currencyAmount,
@@ -41,7 +42,8 @@
 		selectedToken,
 		buy,
 		tokenLP,
-		payInRswp
+		payInRswp,
+		txOkay
 	}
 
 	let pageUtilites = pageUtils(pageStores)

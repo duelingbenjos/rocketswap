@@ -30,6 +30,7 @@ export const trollBoxOpen = writable(null);
 
 export const tokenBalances = writable({})
 export const walletBalance = derived(tokenBalances, ($tokenBalances) => {
+	console.log({tokenBalances: $tokenBalances})
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	return $tokenBalances?.currency ? $tokenBalances.currency : toBigNumber("0")

@@ -15,7 +15,7 @@
 
 	//Misc
 	import { config } from '../../config'
-	import { stringToFixed, toBigNumber, determinePrecision, stampsToTAU } from '../../utils.js'
+	import { stringToFixed, toBigNumber, determinePrecision, stampsToTAU, toBigNumberPrecision } from '../../utils.js'
 
 	//Props
 	export let label
@@ -23,17 +23,38 @@
 	const dispatch = createEventDispatcher();
 
 	const { pageStores, getStampCost } = getContext('pageContext')
-	const { currencyAmount, buy, selectedToken  } = pageStores
+	const { currencyAmount, buy, selectedToken, txOkay  } = pageStores
 
 	let inputElm;
 	let pressedMaxValue = false;
+	let txTAUCost = getStampCost().then(res => stampsToTAU(res));
 
-	$: inputValue = $currencyAmount;
+	let inputValue;
+
+	currencyAmount.subscribe(newCurrencyAmount => {
+		if (!inputValue) {
+			inputValue = newCurrencyAmount
+			checkCurrencyAmountForStamps()
+			return
+		}
+		if (newCurrencyAmount?.isEqualTo(inputValue)) return
+		else{
+			checkCurrencyAmountForStamps()
+			inputValue = newCurrencyAmount
+			pressedMaxValue = false;
+		}
+	})
 
 	onMount(() => {
 		payInRswp.subscribe(val => {
 			if ($currencyAmount && typeof inputValue !== 'undefined'){
 				if (inputValue > 0) dispatchEvent(inputValue)
+			}
+		})
+		getStampCost().then(res => {
+			if (inputValue) {
+				txTAUCost = stampsToTAU(res)
+				checkCurrencyAmountForStamps()
 			}
 		})
 	})
@@ -45,25 +66,39 @@
 			inputElm.value = validateValue
 		}else{
 			let value = toBigNumber(e.target.value)
+			checkCurrencyAmountForStamps()
 			if (determinePrecision(value) > 8){
 				value = toBigNumber(stringToFixed(value, 8))
 				inputElm.value = stringToFixed(value, 8)
+
 			}
 			pressedMaxValue = false;
 			dispatchEvent(value)
 		}
 	}
 
+	async function checkCurrencyAmountForStamps() {
+		let txCost = await txTAUCost;
+
+		if(!$currencyAmount){
+			txOkay.set(true)
+		}else{
+			if ($currencyAmount.plus(txCost).isGreaterThan($walletBalance)) txOkay.set(false)
+			else txOkay.set(true)
+		}
+	}
+
 	const handleMaxInput = async () => {
 		let adjustedValue = 0;
-		let txTAUCost = stampsToTAU(await getStampCost())
-		if ($walletBalance.isGreaterThan(txTAUCost)){
-			adjustedValue = $walletBalance.minus(toBigNumber(txTAUCost))
+		let txCost = await txTAUCost;
+		if ($walletBalance.isGreaterThan(txCost)){
+			adjustedValue = $walletBalance.minus(txCost)
 		}
 		inputValue = toBigNumber(stringToFixed(adjustedValue, 8))
 		inputElm.value = stringToFixed(inputValue, 8)
 		pressedMaxValue = true;
 		dispatchEvent(inputValue)
+		checkCurrencyAmountForStamps()
 	}
 	
 	const dispatchEvent = (value) => dispatch('input', value)
@@ -106,6 +141,9 @@
 		</div>
 	</div>
 	{#if pressedMaxValue}
-		<p class="tx-fee-label text-xsmall text-primary-dim">** adjusted for tx fees</p>
+		<p class="input-message text-xsmall text-primary-dim">** adjusted for tx fees</p>
+	{/if}
+	{#if !$txOkay}
+		<p class="input-message text-xsmall text-error">** cannot cover tx fees</p>
 	{/if}
 </div>

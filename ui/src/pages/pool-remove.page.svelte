@@ -27,6 +27,7 @@
 	let lpBalance = writable()
 	let lpTokenAmount = writable()
 	let lpTokenPercentInput = writable(0)
+	let txOkay = writable(true)
 
 	let pageStores = {
 		currencyAmount,
@@ -34,7 +35,8 @@
 		selectedToken,
 		tokenLP,
 		lpTokenPercentInput,
-		lpTokenAmount
+		lpTokenAmount,
+		txOkay
 	}
 
 	let pageUtilites = pageUtils(pageStores)

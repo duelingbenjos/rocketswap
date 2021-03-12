@@ -23,11 +23,11 @@
 	export let buttonText;
 
 	const { pageStats, pageStores } = getContext('pageContext');
-	const { selectedToken, currencyAmount, tokenAmount, lpTokenAmount, buy } = pageStores
+	const { selectedToken, currencyAmount, tokenAmount, lpTokenAmount, buy, txOkay } = pageStores
 
 	let open = false;
 
-	$: disabled = disableButton($currencyAmount, $tokenAmount, $selectedToken, $pageStats, $lwc_info, $lpTokenAmount, $walletBalance);
+	$: disabled = disableButton($currencyAmount, $tokenAmount, $selectedToken, $pageStats, $lwc_info, $lpTokenAmount, $walletBalance, $txOkay);
 	$: disabledText = undefined;
 
 
@@ -47,6 +47,11 @@
 			disabledText = `Wallet Not Connected`
 			return true
 		}
+		console.log()
+		if (!$txOkay) {
+			disabledText = `Insufficient Stamps`
+			return true
+		}
 
 		if (buttonFunction === "create" || buttonFunction === "add" || buttonFunction === "swap"){
 			if (!$currencyAmount || !$tokenAmount || !$selectedToken) return true
@@ -55,12 +60,12 @@
 
 			if (typeof $buy === 'undefined'){
 				if ($currencyAmount.isGreaterThan($walletBalance)){
-					disabledText = `Insufficent ${config.currencySymbol}`
+					disabledText = `Insufficient ${config.currencySymbol}`
 					return true
 				}
 				
 				if ($tokenAmount.isGreaterThan(tokenBalance)){
-					disabledText = `Insufficent ${$selectedToken.token_symbol}`
+					disabledText = `Insufficient ${$selectedToken.token_symbol}`
 					return true
 				}
 			}else{
@@ -71,7 +76,7 @@
 				}
 				
 				if ($tokenAmount.isGreaterThan(tokenBalance) && $buy === false){
-					disabledText = `Insufficent ${$selectedToken.token_symbol}`
+					disabledText = `Insufficient ${$selectedToken.token_symbol}`
 					return true
 				}
 			}

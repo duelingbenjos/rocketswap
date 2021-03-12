@@ -78,20 +78,20 @@
             <CloseIcon />
         </button>
     </div>
-    <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 4)}</p>
+    <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 8)}</p>
     <p class="text-large margin-0 text-primary-dim">{`${$selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number number-span">{stringToFixed($currencyAmount, 12)}</p>
+            <p class="number number-span">{stringToFixed($currencyAmount, 8)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
-            <p class="number number-span">{stringToFixed($tokenAmount, 12)}</p>
+            <p class="number number-span">{stringToFixed($tokenAmount, 8)}</p>
         </div>
         <ConfirmRates 
-            currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}
-            tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 4)}
+            currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 8)}
+            tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 8)}
             {$selectedToken}
         />
         <ShareChange />

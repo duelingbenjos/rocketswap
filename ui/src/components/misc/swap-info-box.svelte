@@ -52,7 +52,7 @@
         flex-direction: row;
     }
     label.pay-in-rswp{
-        color: var(--color-primary);
+        color: var(--text-color-highlight);
     }
     button.small{
         padding: 0px 5px;

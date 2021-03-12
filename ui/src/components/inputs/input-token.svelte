@@ -17,14 +17,26 @@
 
 	const dispatch = createEventDispatcher();
 	
-	let { pageStores } = getContext('pageContext')
+	let { pageStores, showMax } = getContext('pageContext')
 	const { selectedToken, tokenAmount, buy } = pageStores
 
 	let inputElm;
 	let pressedMaxValue = false;
 
 	$: tokenBalance = $selectedToken ? $tokenBalances[$selectedToken.contract_name] : toBigNumber("0.0")
-	$: inputValue = $tokenAmount;
+	let inputValue;
+
+	tokenAmount.subscribe(newTokenAmount => {
+		if (!inputValue) {
+			inputValue = newTokenAmount
+			return
+		}
+		if (newTokenAmount.isEqualTo(inputValue)) return
+		else{
+			inputValue = newTokenAmount
+			pressedMaxValue = false;
+		}
+	})
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -80,7 +92,7 @@
 			disabled={!$selectedToken} 
 		/>
 		<div class="input-controls">
-			{#if $buy === false && $selectedToken && !pressedMaxValue}
+			{#if ($buy === false && $selectedToken && !pressedMaxValue) || (showMax &&  !pressedMaxValue && $selectedToken)}
 				<button disabled={!$selectedToken} on:click={handleMaxInput} class="primary small">MAX</button>
 			{/if}
 			<TokenSelect on:selected={handleTokenSelect} />

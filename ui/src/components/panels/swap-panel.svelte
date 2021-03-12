@@ -16,11 +16,11 @@
 	let slots = [
 		{
 			component: InputCurrency,
-			handler: handleCurrencyChange,
+			handler: handleCurrencyChange
 		},
 		{
 			component: InputToken,
-			handler: handleTokenChange,
+			handler: handleTokenChange
 		}
 	]
 
@@ -51,7 +51,6 @@
 					tokensPurchased: quote.tokensPurchased.toString(),
 					tokensPurchasedLessFee: quote.tokensPurchasedLessFee.toString()
 				})*/
-				console.log($payInRswp)
 				if ($payInRswp){
 					if (quote.tokensPurchased.isGreaterThan(0)){
 						saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quote.tokensPurchased, 8)))

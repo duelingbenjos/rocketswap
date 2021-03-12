@@ -28,13 +28,15 @@
 	let selectedToken = writable()
 	let tokenLP = writable()
 	let lpBalance = writable()
+	let txOkay = writable(true)
 
 	let pageStores = {
 		currencyAmount,
 		tokenAmount,
 		selectedToken,
 		tokenLP,
-		lpBalance
+		lpBalance,
+		txOkay
 	}
 
   	let pageUtilites = pageUtils(pageStores)
@@ -62,7 +64,8 @@
 		resetPage: () => pageUtilites.resetPage(contractName, [currencyAmount, tokenAmount]),
 		pageStores,
 		saveStoreValue,
-		getStampCost
+		getStampCost,
+		showMax: true
 	});
 
 	onMount(() => {
