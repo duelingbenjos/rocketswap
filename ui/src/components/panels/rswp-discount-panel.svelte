@@ -1,6 +1,8 @@
 <script>
     import { getContext } from 'svelte'
     //Icons 
+    import FuelTankIcon from '../../icons/fuel-tank.svelte'
+    import RocketswapIcon from '../../icons/rocketswap-logo.svelte'
 
     // Components
     import InputSpecific from '../inputs/input-specific.svelte'
@@ -14,6 +16,8 @@
     import { config } from "../../config" 
 
     const { rswpToken } = getContext('rswpContext')
+
+    let tankPercent = 20
 
     async function getStampCost(contract, method){
 		let txList = [
@@ -30,10 +34,21 @@
 <style>
     .panel-container{
         max-width: 300px;
+        height: 364px;
         padding: 20px;
+        background: var(--panel-background-gradient);
+        margin: 0;
     }
     .header{
-        margin-bottom: 2rem;
+        margin-bottom: 0;
+    }
+    .fuel-tank-icon{
+        position: relative;
+    }
+    .rocketswap-icon{
+        position: absolute;
+        top: 11px;
+        left: 25px;
     }
     .buttons{
         margin-top: 1rem;
@@ -41,30 +56,48 @@
     .buttons > button{
         margin: 0 4px;
     }
+    button.outline{
+        color: var(--color-white);
+    }
     .text-massive{
-        margin: 1rem auto 0;
+        margin: 0rem auto 0;
     }
     .staked{
-        margin-bottom: 1rem;
+        margin-bottom: 0;
+        
+    }
+    .text-shadow{
+        text-shadow: 1px 1px var(--fuel-tank-text-shadow);
     }
 </style>
 
 {#if $rswpToken}
-    <div class="flex-col panel-container text-small">
+    <div 
+        class="flex-col panel-container text-small" 
+        style={`
+            background: 
+                linear-gradient(0deg, var(--fuel-tank-panel-fuel-bg-color) ${tankPercent}%, rgba(255,255,255,0) ${tankPercent}%),
+                var(--panel-background-gradient);
+        `}>
         <div class="flex flex-center-center header">
-            RSWP Fuel Tank
+            <div class="fuel-tank-icon">
+                <FuelTankIcon width="75px" color="var(--text-primary-color)"/>
+                <div class="rocketswap-icon">
+                    <RocketswapIcon width="25px" color="var(--text-primary-color-inverted)"/>
+                </div>
+            </div>
         </div>
         <span>Current Trade Fee Discount:</span>  
         <span class="text-massive weight-600">0%</span>
 
-        <div class="flex-grow flex-col flex-justify-end">
+        <div class="flex-grow flex-col flex-justify-spacearound">
             <div class="staked flex-row">
                 <span class="flex-grow">Staked:</span>
-                <span class="weight-600">0 <strong class="text-color-secondary">{config.ammTokenSymbol}</strong></span>
+                <span class="weight-600">0 <strong class="text-shadow text-color-secondary">{config.ammTokenSymbol}</strong></span>
             </div>
             <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} {getStampCost} small={true}/>
             <div class="flex-row flex-center-center buttons">
-                <button class="primary">FILL</button>
+                <button class="text-color-white primary ">FILL</button>
                 <button class="primary outline">EMPTY</button>
             </div>
         </div>

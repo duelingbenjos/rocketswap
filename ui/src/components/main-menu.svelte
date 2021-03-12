@@ -50,7 +50,7 @@
     /* When page width is greater than 430px */
     @media screen and (min-width: 430px) {
         .menu{
-            border-radius: 0 0 0 32px;
+            border-radius: 0 0 0 var(--button-border-radius);
             max-width: 320px;
             max-height: 600px;
         }

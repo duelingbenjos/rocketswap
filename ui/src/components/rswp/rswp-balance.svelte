@@ -1,7 +1,7 @@
 <script>
     // Components
-    import BoxedMessage from '../misc/boxed-message.svelte'
-
+    import RSWPPayFeesChkBox from './rswp-pay-fees-chkbox.svelte'
+    
     // Icons
     import RocketSwapCircleLogo from '../../icons/rocketswap-circle-logo.svelte'
 
@@ -10,41 +10,43 @@
     import { displayBalanceToPrecision } from '../../utils'
     import { config } from '../../config'
 
-    const balanceMessage = {
-        title: "The $RSWP token has the following benefits:",
-        messages: [
-            "Pay fees with an instant 30% discount.",
-            "Stake to gain access to even lower discount on fees"
-        ]
-    }
-
     let logoSize = "80px";
 </script>
 
 <style>
     .container{
-        flex-direction: column;
-        margin-bottom: 2rem;
+        box-sizing: border-box;
+        background: url("/assets/images/stars-bg.jpg");
+        background-size: contain;
+        color: var(--text-primary-color);
+        font-size: var(--text-size-small);
+        border-radius: 0;
+        border-top: 2px solid var(--color-primary);
+        padding: 10px 20px;
+        box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
+        -webkit-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: -1px 10px 82px 0px rgba(0, 0, 0, 0.3);
+        padding-top: 15px;
+        width: 100%;
     }
     p{
         margin: 0
     }
-    .balance{
-        width: 100%;
-    }
     .rswp-balance-info{
-        line-height: 1.2;
+        line-height: 1.3;
     }
-
-    @media screen and (min-width: 650px) {
+    @media screen and (min-width: 430px) {
         .container{
-            flex-direction: row;
+            padding: 30px;
+            border-radius: var(--border-radius);
         }
     }
 </style>
+<div>
 
-<div class="flex container flex-start-center">
-    <div class="balance flex-row">
+</div>
+<div class="flex-row container">
+    <div class="flex-row">
         <RocketSwapCircleLogo 
             styles={`width: ${logoSize}; height: ${logoSize}; min-width: ${logoSize}; min-height: ${logoSize};`} 
             margin="0 16px 0 0 "
@@ -54,6 +56,7 @@
             <p class="text-primary-dimmer">{`(${displayBalanceToPrecision($rswpBalance.dividedBy($rswpPrice), 8)} ${config.currencySymbol})`}</p>
         </div>
     </div>
-    <BoxedMessage title={balanceMessage.title} messages={balanceMessage.messages}/>
+    <div class="flex flex-end-end flex-grow">
+        <RSWPPayFeesChkBox />
+    </div>
 </div>
-

@@ -102,9 +102,9 @@
 		border-radius: 99px;
 		background: black;
 
-		box-shadow: 0 0 30px 8px rgba(0, 0, 0, 0.5);
-	    -webkit-box-shadow: 0 0 30px 8px rgba(0, 0, 0, 0.5);
-	    -moz-box-shadow: 0 0 30px 8px rgba(0, 0, 0, 0.5);
+		box-shadow: 0 0 30px 8px rgba(0, 0, 0, 0.3);
+	    -webkit-box-shadow: 0 0 30px 8px rgba(0, 0, 0, 0.3);
+	    -moz-box-shadow: 0 0 30px 8px rgba(0, 0, 0, 0.3);
 	}
 	.mobile-link > a {
 		color: white;
@@ -127,6 +127,7 @@
 	}
 	.logout{
 		margin: 1rem auto 0;
+		color: white;
 	}
 	/* When page width is greater than 320px */
     @media screen and (min-width: 320px) {
@@ -206,7 +207,7 @@
 				{/if}
 			{/each}
 			{#if $walletAddress}
-				<button class="logout flex flex-center-center primary outline" on:click={logout} title="logout">
+				<button class="logout flex flex-center-center primary outline " on:click={logout} title="logout">
 						<AntennaIcon width="20px" margin="0 8px 0 0" /> Logout
 				</button>
 			{/if}
