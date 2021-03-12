@@ -1,3 +1,4 @@
+import { IContractingTime } from "src/types/misc.types";
 import { handleClientUpdateType } from "src/types/websocket.types";
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 
@@ -7,10 +8,10 @@ export class StakingEpochEntity extends BaseEntity {
 	id: string;
 
 	@Column({nullable: true})
-	epoch_index: string;
+	epoch_index: number;
 
 	@Column({ type: "simple-json", nullable: true })
-	time: any[];
+	time: IContractingTime;
 
 	@Column({nullable: true})
 	amount_staked: number;
@@ -21,7 +22,7 @@ export class StakingEpochEntity extends BaseEntity {
 
 export async function updateEpoch(args: {
 	staking_contract: string;
-	epoch_index: string;
+	epoch_index: number;
 	amount_staked: any;
 	time: any;
 	handleClientUpdate: handleClientUpdateType;

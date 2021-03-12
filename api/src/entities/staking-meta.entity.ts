@@ -1,4 +1,4 @@
-import { IKvp } from "src/types/misc.types";
+import { IContractingTime, IKvp } from "src/types/misc.types";
 import { getVal } from "../utils";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
@@ -14,22 +14,22 @@ export class StakingMetaEntity extends BaseEntity {
 	DevRewardWallet: string;
 
 	@Column({ nullable: true })
-	StakedBalance: string;
+	StakedBalance: number;
 
 	@Column({ nullable: true, type: "simple-json" })
 	meta: any; // Version Number of the staking contract
 
 	@Column({ nullable: true })
-	EmissionRatePerHour: string;
+	EmissionRatePerHour: number;
 
 	@Column({ nullable: true })
-	DevRewardPct: string;
+	DevRewardPct: number;
 
 	@Column({ nullable: true, type: "simple-json" })
-	StartTime: string;
+	StartTime: IContractingTime;
 
 	@Column({ nullable: true, type: "simple-json" })
-	EndTime: string;
+	EndTime: IContractingTime;
 
 	@Column({ nullable: true })
 	OpenForBusiness: boolean;
@@ -38,7 +38,11 @@ export class StakingMetaEntity extends BaseEntity {
 	__developer__: string;
 
 	@Column({ nullable: true, type: "simple-json" })
-	Epoch: any;
+	Epoch: {
+		index: number;
+		staked: number;
+		time: IContractingTime;
+	};
 }
 
 // [
@@ -149,22 +153,22 @@ export const updateStakingContractMeta = async (args: {
 			//     key: "con_staking_dtau_rswp_lst001_2.Epochs:0",
 			//     value: { staked: 0, time: [Object] }
 			// },
-			const index = kvp.key.split(":")[1];
+			const index = parseInt(kvp.key.split(":")[1]);
 			const { staked, time } = kvp.value;
-			await updateEpoch({staking_contract, epoch_index: index, time, amount_staked: staked, handleClientUpdate })
+			await updateEpoch({ staking_contract, epoch_index: index, time, amount_staked: staked, handleClientUpdate });
 			entity.Epoch = {
 				index,
 				staked,
 				time
 			};
-			
 		}
 	});
 	const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
 	const withdrawals = state.find((kvp) => kvp.key.includes("Withdrawals"));
 	if (deposits || withdrawals) {
 		const user_staking_res = await updateUserStakingInfo({ deposits, withdrawals, staking_contract });
-		handleClientUpdate({ action: "user_staking_update", data: user_staking_res });
+		/** BELOW LINE IS REDUNDANT SINCE UPDATES SHOULD BE TRIGGERED ON ALL INTERESTED CLIENTS ON EPOCH UPDATE */
+		// handleClientUpdate({ action: "user_staking_update", data: user_staking_res });
 	}
 	handleClientUpdate({ action: "staking_panel_update", data: entity });
 	await entity.save();

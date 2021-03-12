@@ -195,24 +195,15 @@ export class WsService {
     this.joinedFeeds[`balance_feed:${vk}`] = false
   }
 
-  public joinUserStakingFeed(vk: string) {
-    if (this.joinedFeeds[`user_staking_feed:${vk}`]) return    
-
-    this.connection.emit('join_room', `user_staking_feed:${vk}`)
-    this.connection.on(`user_staking_update:${vk}`, this.handleUserStakingFeed)
-
-    this.joinedFeeds[`user_staking_feed:${vk}`] = true
+  public joinUserYieldFeed(vk: string) {
+    this.connection.emit('join_room', `user_yield_feed:${vk}`)
+    this.connection.on(`user_yield_list`, (data) => console.log('user_yield_list', data))
+    this.connection.on(`user_yield_update:${vk}`, (data) => console.log('user_yield_update', data))
   }
 
-  private handleUserStakingFeed = (payload) => {
-    userStakingInfo.set(valuesToBigNumber(payload?.data || payload))
-    console.log({user_staking_feed: payload?.data || payload})
-  }
-
-  public leaveUserStakingFeed(vk: string) {
-    this.connection.off(`user_staking_update:${vk}`)
-
-    this.joinedFeeds[`user_staking_feed:${vk}`] = false
+  public leaveUserYieldFeed(vk: string) {
+    this.connection.off(`user_yield_list:${vk}`)
+    this.connection.off(`user_yield_update:${vk}`)
   }
 
   private handleTrollboxAuthCode(payload) {

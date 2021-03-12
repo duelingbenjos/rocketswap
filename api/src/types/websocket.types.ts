@@ -25,6 +25,14 @@ export interface ITrollBoxMessage {
 	timestamp: number;
 }
 
+export interface IUserYieldInfo {
+	total_staked: number;
+	current_yield: number;
+	yield_per_sec: number;
+	epoch_updated: number;
+	time_updated: number;
+}
+
 export interface IBlockParser {
 	block: BlockDTO;
 }
@@ -35,17 +43,27 @@ export type ClientUpdateType =
 	| BalanceUpdateType
 	| TradeUpdateType
 	| StakingMetaUpdateType
-	| UserStakingUpdateType
+	| UserYieldUpdateType
 	| EpochUpdateType;
 
-export interface UserStakingUpdateType extends UpdateType {
-	action: "user_staking_update";
-	data: UserStakingEntity;
-}
+// export interface UserStakingUpdateType extends UpdateType {
+// 	action: "user_staking_update";
+// 	data: UserStakingEntity;
+// }
 
 export interface EpochUpdateType extends UpdateType {
 	action: "epoch_update";
 	data: StakingEpochEntity;
+}
+
+export interface UserYieldUpdateType extends UpdateType {
+	action: "user_yield_update";
+	data: IUserYieldPayload;
+	vk: string;
+}
+
+export interface IUserYieldPayload {
+	[key: string]: IUserYieldInfo;
 }
 
 export interface StakingMetaUpdateType extends UpdateType {
@@ -88,7 +106,8 @@ export type UpdateType = {
 		| "trade_update"
 		| "staking_panel_update"
 		| "user_staking_update"
-		| "epoch_update";
+		| "epoch_update"
+		| "user_yield_update";
 };
 
 export interface TradeUpdateType extends UpdateType {
@@ -118,8 +137,8 @@ export function isTradeUpdate(client_update: ClientUpdateType): client_update is
 	return (client_update as TradeUpdateType).action === "trade_update";
 }
 
-export function isStakingUpdate(client_update: ClientUpdateType): client_update is UserStakingUpdateType {
-	return (client_update as UserStakingUpdateType).action === "user_staking_update";
+export function isUserYieldUpdate(client_update: ClientUpdateType): client_update is UserYieldUpdateType {
+	return (client_update as UserYieldUpdateType).action === "user_yield_update";
 }
 
 export function isEpochUpdate(client_update: ClientUpdateType): client_update is EpochUpdateType {

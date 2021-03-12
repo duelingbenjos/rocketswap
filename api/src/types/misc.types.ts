@@ -14,3 +14,7 @@ export interface IKvp {
 export interface handleNewBlock {
 	(block: BlockDTO): Promise<void>;
 }
+
+export interface IContractingTime {
+	__time__: [number, number, number, number, number, number];
+}
