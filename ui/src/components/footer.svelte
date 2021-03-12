@@ -26,6 +26,8 @@
 	// Bindings
 	let rocketElm;
 
+	active.subscribe(val => console.log({val}))
+
 	let smoke = true;
 	let smokeList = [];
 	let smokeTimer = null;
@@ -184,7 +186,7 @@
 <div class="footer">
 	<div class="wallet-info">
 		{#if $walletAddress}
-			{#if active === "Swap"}
+			{#if $active.$$component.name === "Swap_page"}
 				<div bind:this={rocketElm} 
 						in:fade="{{delay: 0, duration: 500}}"
 						class="rocket" 

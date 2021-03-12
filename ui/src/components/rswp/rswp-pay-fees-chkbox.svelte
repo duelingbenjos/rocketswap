@@ -15,11 +15,11 @@
         margin: 0 0 0 auto;
     }
     label.pay-in-rswp{
-        color: var(--color-primary);
+        color: var(--text-color-highlight);
     }
 </style>
 
-<label class="flex-row chk-container text-primary" class:pay-in-rswp={$payInRswp} id="chk-all">
+<label class="flex-row chk-container text-color-dim" class:pay-in-rswp={$payInRswp} id="chk-all">
     Pay all Fees in RSWP (30% discount)
     <input  type="checkbox" bind:checked on:change={handleCheckChange}>
     <span  class="chk-checkmark chk-small"></span>

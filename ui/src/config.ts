@@ -30,7 +30,7 @@ export const stamps = {
   buy: 200,
   auth: 35,
   approve: 30,
-  buffer: 10,
+  buffer: 30,
   currentRatio: 13 //Change for PROD
 }
 

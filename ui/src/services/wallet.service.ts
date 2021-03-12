@@ -141,7 +141,7 @@ export class WalletService {
 	private joinUserFeeds = (vk) => {
 		console.log("JOINING USER FEEDS")
 		this.wsService.joinBalanceFeed(vk)
-		this.wsService.joinUserStakingFeed(vk)
+		this.wsService.joinUserYieldFeed(vk)
 	}
 
 	public logout = () => {
@@ -175,7 +175,6 @@ export class WalletService {
 			this.getAccountName(vk),
 			setBearerToken(vk)
 		])
-		this.wsService.joinUserStakingFeed(vk)
 	}
 
 	private getStampCost = async (contractName, method) => {
@@ -203,7 +202,7 @@ export class WalletService {
 	}
 
 	private userHasSufficientStamps = (stampCost, callbacks = undefined) => {
-		if (stampsToTAU(stampCost) < get(walletBalance)) return true
+		if (stampsToTAU(stampCost).isLessThan(get(walletBalance))) return true
 		if (callbacks) callbacks.error(["Insufficient Stamps"])
 		this.insufficientCurrencyForTransactionToast(stampCost)
 		return false;
@@ -761,9 +760,10 @@ export class WalletService {
 
 	private insufficientCurrencyForTransactionToast = (stampCost) => {
 		let currencyAmount = stringToFixed(get(walletBalance), 8)
+		let stampCostString = stringToFixed(stampsToTAU(stampCost), 8)
 		this.toastService.addToast({
 			heading: `Insufficient ${config.currencySymbol}`,
-			text: `It costs ${stampsToTAU(stampCost)} ${config.currencySymbol} to send this transaction and you only have ${currencyAmount} ${config.currencySymbol} in your wallet.`,
+			text: `It costs ${stampCostString} ${config.currencySymbol} to send this transaction and you only have ${currencyAmount} ${config.currencySymbol} in your wallet.`,
 			type: 'info',
 			duration: 5000
 		})

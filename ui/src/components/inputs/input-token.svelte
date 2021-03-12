@@ -31,7 +31,7 @@
 			inputValue = newTokenAmount
 			return
 		}
-		if (newTokenAmount.isEqualTo(inputValue)) return
+		if (newTokenAmount?.isEqualTo(inputValue)) return
 		else{
 			inputValue = newTokenAmount
 			pressedMaxValue = false;

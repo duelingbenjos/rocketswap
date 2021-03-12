@@ -255,7 +255,6 @@ export class WsService {
   private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
     let { contract_name } = metrics_update
     const metrics = this.token_metrics
-    console.log(metrics_update)
     metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
     token_metrics_store.set(valuesToBigNumber(metrics))
   }

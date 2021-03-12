@@ -150,19 +150,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.txnService.broadcastTxn(client.id, txn);
 	}
 
-<<<<<<< HEAD
-	private async handleJoinUserStakingFeed(subject: string, client: Socket) {
-		try {
-			const entity = await UserStakingEntity.findOne(subject);
-			client.emit(`user_staking_update:${subject}`, entity);
-		} catch (err) {
-			this.logger.error(err);
-		}
-=======
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
 		const yield_list = await this.socketService.getClientYieldList(subject);
 		client.emit("user_yield_list", yield_list);
->>>>>>> api
 	}
 
 	private async handleJoinStakingPanel(client: Socket) {

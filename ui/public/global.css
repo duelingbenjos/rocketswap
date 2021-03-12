@@ -247,6 +247,9 @@ body.light{
 .text-color-secondary{
 	color: var(--color-secondary);
 }
+.text-color-highlight{
+	color: var(--text-color-highlight);
+}
 .text-primary{
 	color: var(--text-primary-color);
 }

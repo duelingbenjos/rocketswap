@@ -18,12 +18,12 @@
         
         padding-top: 15px;
         width: fit-content;
-        margin: 1rem;
-        width: 100%;
-        max-width: 350px;
 
-        border-left: 2px solid var(--color-secondary);
-        border-right: 2px solid var(--color-secondary);
+        width: 100%;
+        max-width: 300px;
+        margin: 10px 0;
+
+        border-top: 2px solid var(--text-color-highlight);
     }
 
     p{
@@ -40,6 +40,10 @@
     }
 
     @media screen and (min-width: 650px) {
+        div{
+            margin: 10px;
+        }
+                
 
     }
 </style>
