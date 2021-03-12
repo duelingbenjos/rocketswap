@@ -152,13 +152,15 @@ export class WsService {
     this.connection.on(`balance_update:${vk}`, this.handleBalanceUpdate)
   }
 
-  public joinUserStakingFeed(vk: string) {
-    this.connection.emit('join_room', `user_staking_feed:${vk}`)
-    this.connection.on(`user_staking_update:${vk}`, (data) => console.log(data))
+  public joinUserYieldFeed(vk: string) {
+    this.connection.emit('join_room', `user_yield_feed:${vk}`)
+    this.connection.on(`user_yield_list`, (data) => console.log('user_yield_list', data))
+    this.connection.on(`user_yield_update:${vk}`, (data) => console.log('user_yield_update', data))
   }
 
-  public leaveUserStakingFeed(vk: string) {
-    this.connection.off(`user_staking_update:${vk}`)
+  public leaveUserYieldFeed(vk: string) {
+    this.connection.off(`user_yield_list:${vk}`)
+    this.connection.off(`user_yield_update:${vk}`)
   }
 
   public leaveBalanceFeed(vk: string) {

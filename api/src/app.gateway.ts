@@ -30,8 +30,8 @@ import {
 	IProxyTxnReponse,
 	MetricsUpdateType,
 	UserLpUpdateType,
-	isStakingUpdate,
-	isEpochUpdate
+	isEpochUpdate,
+	isUserYieldUpdate
 } from "./types/websocket.types";
 
 /**
@@ -88,13 +88,20 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 					this.wss.emit(`trade_update:${update.contract_name}`, update);
 				}
 				break;
-			case "user_staking_update":
-				if (isStakingUpdate(update)) {
-					this.wss.emit(`user_staking_update:${update.data.vk}`, update);
-				}
+			// case "user_staking_update":
+			// 	/** TO DO - Bring this into line with schema in epoch update */
+			// 	if (isStakingUpdate(update)) {
+			// 		this.wss.emit(`user_staking_update:${update.data.vk}`, update);
+			// 	}
 			case "epoch_update":
 				if (isEpochUpdate(update)) {
+					this.socketService.sendClientStakingUpdates(update);
 					this.wss.emit(`epoch_update`, update);
+				}
+				break;
+			case "user_yield_update":
+				if (isUserYieldUpdate(update)) {
+					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
 		}
 	};
@@ -109,7 +116,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async handleJoinRoom(client: Socket, room: string) {
 		client.join(room);
 		client.emit("joined_room", room);
-		const [prefix, subject] = room.split(":"); 
+		const [prefix, subject] = room.split(":");
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
@@ -130,8 +137,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			case "staking_panel":
 				this.handleJoinStakingPanel(client);
 				break;
-			case "user_staking_feed":
-				this.handleJoinUserStakingFeed(subject, client);
+			case "user_yield_feed":
+				this.handleJoinUserYieldFeed(subject, client);
 				break;
 		}
 	}
@@ -141,13 +148,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.txnService.broadcastTxn(client.id, txn);
 	}
 
-	private async handleJoinUserStakingFeed(subject: string, client: Socket) {
-		try {
-			const entity = await UserStakingEntity.findOne(subject);
-			client.emit("user_staking_update", entity);
-		} catch (err) {
-			this.logger.error(err);
-		}
+	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
+		const yield_list = await this.socketService.getClientYieldList(subject);
+		client.emit("user_yield_list", yield_list);
 	}
 
 	private async handleJoinStakingPanel(client: Socket) {
