@@ -6,7 +6,8 @@
 <style>
     div{
         box-sizing: border-box;
-        background-color: var(--msg-box-background);
+        /*background-color: var(--msg-box-background);*/
+        background-color: var(--small-box-background);
         color: var(--text-primary-color);
         border-radius: 0;
         padding: 10px 20px;

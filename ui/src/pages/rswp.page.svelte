@@ -9,6 +9,9 @@
     import RSWPFarming from '../components/rswp/rswp-farming.svelte'
     import SmallBoxedMessage from '../components/misc/small-boxed-message.svelte'
 
+    // Icons
+    import RocketswapLogoIcon from '../icons/rocketswap-logo.svelte'
+
     // Services
     import { WsService } from '../services/ws.service'
     const ws = WsService.getInstance()
@@ -65,8 +68,6 @@
     }
     li{
         list-style-position: outside;
-        background:url('/assets/images/rocketswap_icon.svg') no-repeat 0px 0px;
-        padding-left: 25px;
     }
 
     @media screen and (min-width: 430px) {
@@ -93,16 +94,42 @@
     <div class="flex-row flex-justify-spacearound">
         <SmallBoxedMessage title="What does my RSWP token do?" >
             <ul slot="message" class="text-xsmall">
-                <li>Stake {config.currencySymbol} below to earn RSWP over time.</li>
-                <li>Buy RWSP from the RSWP/{config.currencySymbol} pairing. 
-                    <a href="{`/#/${config.ammTokenContract}`}" class="weight-600">Buy Now!</a>
+                <li>
+                    <RocketswapLogoIcon 
+                        width="20px" 
+                        margin="0 10px 0 0" 
+                        color="var(--text-color-primary)" 
+                        styles="position: relative; top: 6px;"/> 
+                        {config.currencySymbol} below to earn RSWP over time.
+                </li>
+                <li><RocketswapLogoIcon 
+                        width="20px" 
+                        margin="0 10px 0 0" 
+                        color="var(--text-color-primary)" 
+                        styles="position: relative; top: 6px;"/> 
+                        Buy RWSP from the RSWP/{config.currencySymbol} pairing. 
+                        <a href="{`/#/${config.ammTokenContract}`}" class="weight-600">Buy Now!</a>
                 </li>
             </ul>
         </SmallBoxedMessage>
         <SmallBoxedMessage title="How do I get RSWP?" >
             <ul slot="message" class="text-xsmall">
-                <li>Instant 30% discount on fees when paying in RSWP.</li>
-                <li>Additional discount on fees depending on how much RSWP is in your Fuel Tank</li>
+                <li>
+                    <RocketswapLogoIcon 
+                        width="20px" 
+                        margin="0 10px 0 0" 
+                        color="var(--text-color-primary)" 
+                        styles="position: relative; top: 6px;"/> 
+                        Instant 30% discount on fees when paying in RSWP.
+                </li>
+                <li>
+                    <RocketswapLogoIcon 
+                        width="20px" 
+                        margin="0 10px 0 0" 
+                        color="var(--text-color-primary)" 
+                        styles="position: relative; top: 6px;"/> 
+                        Additional discount on fees depending on how much RSWP is in your Fuel Tank
+                </li>
             </ul>
         </SmallBoxedMessage>
     </div>

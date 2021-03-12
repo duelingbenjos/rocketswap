@@ -16,7 +16,7 @@
     .yield-logo{
         position: absolute;
         top: 33px;
-        left: 30px;
+        left: 40px;
     }
 </style>
 

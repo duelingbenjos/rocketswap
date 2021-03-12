@@ -117,6 +117,7 @@ body {
 	--pool-pannel-header-percent-text-shadow: var(--color-secondary-dark);
 	--fuel-tank-panel-fuel-bg-color: #a128fd57;
 	--fuel-tank-text-shadow: var(--color-gray-8);
+	--small-box-background: #2b284b69;
 
 	background-repeat:no-repeat;
 	background: url("assets/images/stars-bg.png"), var(--main-background-solid);
@@ -178,6 +179,7 @@ body.light{
 	--pool-pannel-header-percent-text-shadow: var(--color-gray-5);
 	--fuel-tank-panel-fuel-bg-color: #a128fd7a;
 	--fuel-tank-text-shadow: var(--color-gray-3);
+	--small-box-background: #2b284b26;
 
 	background-repeat:no-repeat;
 	background: var(--main-background-solid);

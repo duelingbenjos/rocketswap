@@ -36,6 +36,9 @@
     .layout-buttons{
         display: none;
     }
+    input.primaryInput{
+        height: 32px;
+    }
 
     @media screen and (min-width: 800px) {
         .layout-buttons{

@@ -100,7 +100,7 @@
     }
     .symbols{
         text-shadow: 2px 2px var(--staking-pannel-header-symbols-text-shadow);
-        margin-bottom: -1rem;
+        margin-bottom: -1.5rem;
         z-index: 1;
     }
     .symbol{
@@ -130,7 +130,7 @@
 {#if hasBothTokens}
     <div class="panel-container text-small">
         <div class="flex-col flex-center-center header ">
-            <span class="symbols weight-600 text-large">{`${stakingToken.token_symbol} - ${yieldToken.token_symbol}`}</span>
+            <span class="symbols weight-600 text-xlarge">{`${stakingToken.token_symbol} - ${yieldToken.token_symbol}`}</span>
             <YieldLogo {yieldToken} {stakingToken} />
         </div>
         <div class="info">

@@ -47,7 +47,7 @@
     }
     .rocketswap-icon{
         position: absolute;
-        top: 11px;
+        top: 12px;
         left: 25px;
     }
     .buttons{
