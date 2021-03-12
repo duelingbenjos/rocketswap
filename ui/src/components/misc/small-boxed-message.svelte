@@ -11,9 +11,11 @@
         color: var(--text-primary-color);
         border-radius: 0;
         padding: 10px 20px;
-        box-shadow: -1px 10px 20px 0px rgba(0, 0, 0, 0.3);
-        -webkit-box-shadow: -1px 10px 20px 0px rgba(0, 0, 0, 0.3);
-        -moz-box-shadow: -1px 10px 20px 0px rgba(0, 0, 0, 0.3);
+
+        box-shadow: 0px 4px 14px 2px rgba(0, 0, 0, 0.3);
+        -webkit-box-shadow: 0px 4px 14px 2px rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: 0px 4px 14px 2px rgba(0, 0, 0, 0.3);
+        
         padding-top: 15px;
         width: fit-content;
         margin: 1rem;

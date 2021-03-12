@@ -98,14 +98,14 @@
                     <RocketswapLogoIcon 
                         width="20px" 
                         margin="0 10px 0 0" 
-                        color="var(--text-color-primary)" 
+                        color="var(--text-primary-color)" 
                         styles="position: relative; top: 6px;"/> 
                         {config.currencySymbol} below to earn RSWP over time.
                 </li>
                 <li><RocketswapLogoIcon 
                         width="20px" 
                         margin="0 10px 0 0" 
-                        color="var(--text-color-primary)" 
+                        color="var(--text-primary-color)" 
                         styles="position: relative; top: 6px;"/> 
                         Buy RWSP from the RSWP/{config.currencySymbol} pairing. 
                         <a href="{`/#/${config.ammTokenContract}`}" class="weight-600">Buy Now!</a>
@@ -118,7 +118,7 @@
                     <RocketswapLogoIcon 
                         width="20px" 
                         margin="0 10px 0 0" 
-                        color="var(--text-color-primary)" 
+                        color="var(--text-primary-color)" 
                         styles="position: relative; top: 6px;"/> 
                         Instant 30% discount on fees when paying in RSWP.
                 </li>
@@ -126,7 +126,7 @@
                     <RocketswapLogoIcon 
                         width="20px" 
                         margin="0 10px 0 0" 
-                        color="var(--text-color-primary)" 
+                        color="var(--text-primary-color)" 
                         styles="position: relative; top: 6px;"/> 
                         Additional discount on fees depending on how much RSWP is in your Fuel Tank
                 </li>

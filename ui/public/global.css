@@ -179,7 +179,7 @@ body.light{
 	--pool-pannel-header-percent-text-shadow: var(--color-gray-5);
 	--fuel-tank-panel-fuel-bg-color: #a128fd7a;
 	--fuel-tank-text-shadow: var(--color-gray-3);
-	--small-box-background: #2b284b26;
+	--small-box-background: #2b284b00;
 
 	background-repeat:no-repeat;
 	background: var(--main-background-solid);
