@@ -86,8 +86,15 @@
         max-width: 300px;
         height: 364px;
         padding: 20px;
-        background: var(--panel-background-gradient);
+
         margin: 0;
+
+        border-radius: 32px;
+        background: var(--panel-background-gradient);
+
+        box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+        -webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
     }
     .header{
         margin-bottom: 0;
@@ -115,6 +122,11 @@
     }
     .text-shadow{
         text-shadow: 1px 1px var(--fuel-tank-text-shadow);
+    }
+    @media screen and (min-width: 430px) {
+        .panel-container{
+            margin: 10px;
+        }
     }
 </style>
 
