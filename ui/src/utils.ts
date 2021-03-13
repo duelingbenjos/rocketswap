@@ -312,7 +312,7 @@ export const displayBalanceToPrecision = (value, precision) => {
 export function valuesToBigNumber(obj: any) {
   if (typeof obj === 'object') {
     for (let property in obj) {
-      if (property === 'time' || property === 'vk') {
+      if (property === 'time' || property === 'vk' || property === 'time_updated') {
         // ignore these values
       } else if (typeof obj[property] === 'string') {
         // Check if item is a string
@@ -634,26 +634,24 @@ export const pageUtils = (pageStores) => {
 	Staking Calculations
 */
 
-export const stakingCalculator = (stakingInfo, deposits, withdrawAmount) => {
-	const addDeposits = () => {
-		let amount = toBigNumber("0")
-		deposits.forEach(deposit => amount = amount.plus(deposit.amount.__fixed__))
-		return amount
+export const stakingCalculator = (stakingInfo) => {
+	const calcNewYeild = (userYieldInfo) => {
+		console.log({calcNewYeild: userYieldInfo})
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		if (!userYieldInfo?.yield_per_sec) return toBigNumber("0");
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		return userYieldInfo.yield_per_sec.multipliedBy(toBigNumber(new Date() - userYieldInfo.time_updated).dividedBy(1000))
 	}
 
-	const calcStakedAmount = () => {
-		return totalDepositAmount.minus(withdrawAmount)
+	const calcEmissionRatePerYear = () => {
+		if (!stakingInfo?.EmissionRatePerHour) return toBigNumber("0")
+		return stakingInfo?.EmissionRatePerHour.multipliedBy(24).multipliedBy(365);
 	}
-
-	const calcEarned = () => {
-		return toBigNumber("0")
-	}
-
-
-	const totalDepositAmount = addDeposits()
 
 	return {
-		earnedAmount: calcEarned(),
-		stakedAmount: calcStakedAmount()
+		calcNewYeild,
+		emissionRatePerYear: calcEmissionRatePerYear()
 	}
 }

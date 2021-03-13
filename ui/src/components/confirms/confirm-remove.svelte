@@ -97,7 +97,7 @@
             <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 8)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span >{config.currencySymbol}</span>
-                <LamdenLogo width={'30px'} height={'30px'} margin={"0 0 0 10px"}/>
+                <LamdenLogo width={'30px'} margin={"0 0 0 10px"}/>
             </div>
         </div>
     </div>

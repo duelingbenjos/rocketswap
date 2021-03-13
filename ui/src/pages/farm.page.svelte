@@ -93,6 +93,9 @@
             align-items: center;
             justify-content: space-evenly;
         }
+    }
+
+    @media screen and (min-width: 800px) {
         .horizontal{
             flex-direction: column;
             align-items: unset;
@@ -110,25 +113,12 @@
 <div class="page">
     <PageHeader title={pageTitle} />
     <EarnFilters />
-    {#if innerWidth > 800}
-        <div class="flex earn-content panels" 
-            class:horizontal={$earnFilters?.rowView}>
-
-            {#each filteredList as stakeInfo}
-                {#if $earnFilters?.rowView}
-                    <HorizontalStakingPanel stakingInfo={stakeInfo}/>
-                {:else}
-                    <StakingPanel stakingInfo={stakeInfo}/>
-                {/if}
-            {/each}
-        </div>
-    {:else}
-        <div class="flex earn-content panels" >
-            {#each filteredList as stakeInfo}
-                    <StakingPanel stakingInfo={stakeInfo}/>
-            {/each}
-        </div>
-    {/if}
+    <div class="flex earn-content panels" 
+        class:horizontal={$earnFilters?.rowView}>
+        {#each filteredList as stakeInfo}
+            <StakingPanel stakingInfo={stakeInfo} horizontal={$earnFilters?.rowView && innerWidth > 800}/>
+        {/each}
+    </div>
 </div>
 
 <svelte:window bind:innerWidth />

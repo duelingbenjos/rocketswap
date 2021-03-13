@@ -40,6 +40,9 @@
 </script>    
 
 <style>
+    .container{
+        border-bottom: 4px dotted var(--color-secondary);
+    }
     .rocket{
         display: none;
         position: relative;
@@ -52,8 +55,8 @@
             display: block;
             margin: 0 0 0 10px;
         }
-        div.flex-row{
-            margin-bottom: 1rem;
+        .container{
+            margin-bottom: 2rem;
         }
     }
 
@@ -65,8 +68,8 @@
 
 </style>
 
-<div class="flex-row">
-    <span class="text-massive">{title}</span>
+<div class="container flex-row">
+    <span class="text-massive weight-800">{title}</span>
     <div class="rocket" bind:this={rocketElm}>
         <Rocket width="65px" direction={"down"} color={"var(--color-primary)"} shakeRight={true} blastOff={true}/>
     </div>

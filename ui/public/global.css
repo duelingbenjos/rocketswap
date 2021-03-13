@@ -291,6 +291,10 @@ body.light{
 	text-align: left;
 }
 
+.text-align-right{
+	text-align: right;
+}
+
 .text-align-end{
 	text-align: end;
 }
@@ -306,6 +310,11 @@ body.light{
 .weight-600{
 	font-weight: 600;
 }
+
+.weight-800{
+	font-weight: 800;
+}
+
 
 .margin-0{
 	margin: 0;

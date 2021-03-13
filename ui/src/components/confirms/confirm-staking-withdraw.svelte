@@ -1,0 +1,125 @@
+<script>
+    //Components
+    import Button from '../button.svelte';
+    import InputNumber from '../inputs/input-number.svelte'
+
+    //Icons
+    import TokenLogo from '../../icons/token-logo.svelte'
+    import PlusSignIcon from '../../icons/plus-sign.svelte'
+    import CloseIcon from '../../icons/close.svelte';
+
+    //Services
+    import { WalletService } from '../../services/wallet.service'
+    const walletService = WalletService.getInstance()
+
+    //Misc
+    import { stringToFixed, toBigNumberPrecision, toBigNumber } from '../../utils'
+
+    //Props
+    export let stakingInfo;
+    export let stakingToken;
+    export let yieldToken;
+    export let closeConfirm;
+    export let clearInput;
+    export let currentYield;
+
+    let logoSize = "30px"
+    let loading = false;
+
+    let withdrawAmount = toBigNumber("0");
+
+    $: withdrawAmountOverBalance = withdrawAmount.isGreaterThan(currentYield)
+
+    const handleAmountInput = (e) => {
+        withdrawAmount = e.detail
+    }
+
+    const success = () => {
+        clearInput();
+        finish();
+        closeConfirm();
+    }
+
+    const error = () => {
+        finish()
+    }
+
+    const finish = () => {
+        loading = false;
+    }
+
+    const handleWithdrawStakedTokens = () => {
+        loading = true;
+        let args = {
+            amount: {"__fixed__": stringToFixed(withdrawAmount, 8)}
+        }
+        walletService.withdrawStake(stakingInfo.contract_name, args, stakingToken, yieldToken, {success, error})
+        .catch(err => {
+            console.log(err)
+            finish()
+        })
+    }
+</script>
+
+
+<style>
+    .modal-style{
+        width: 100vw;
+        max-width:350px;
+    }
+    .modal-confirm-header{
+        margin-bottom: 1rem;
+    }
+    .modal-confirm-details-box{
+        padding-top: 1rem;
+    }
+    .sub-text{
+        margin: 1rem 0;
+        width: 90%;
+    }
+    .amount-row{
+        margin: 0.25rem 0;
+    }
+    .staking-deatils{
+        margin: 0 0 1rem 0;
+    }
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            margin-top: 8rem;
+        }
+    }
+</style>
+
+<div class="modal-style">
+    <div class="flex-row modal-confirm-header">
+        <span class="text-large">Confirm Withdraw {yieldToken.token_symbol}</span>
+        <button class="close nostyle" on:click={closeConfirm}>
+            <CloseIcon />
+        </button>
+    </div>
+    <div class="staking-deatils flex-col text-xlarge">
+        <div class="flex-row flex-align-center">
+            <TokenLogo tokenMeta={yieldToken} width={logoSize}  margin="0 10px 0 0" />
+            {yieldToken.token_symbol}
+        </div>
+        <InputNumber placeholder="0" on:input={handleAmountInput} margin="0.25rem 0 1rem"/>
+    </div>
+    <div class="flex-col modal-confirm-details-box text-small weight-400">
+         <div class="flex-row">
+            <span><strong class="symbol-horizontal text-color-secondary">{yieldToken.token_symbol}</strong> Earned:</span>
+            <span class="weight-600 flex-grow text-align-right">{stringToFixed(currentYield, 8)}</span>
+        </div>
+        <div class="modal-confirm-buttons flex-col">
+            <Button style="secondary" 
+                loading={loading} 
+                disabled={withdrawAmountOverBalance}
+                callback={handleWithdrawStakedTokens} 
+                text={
+                    withdrawAmountOverBalance ? 
+                    `INSUFFICIENT ${yieldToken.token_symbol}` : 
+                    `WITHDRAW ${yieldToken.token_symbol} `
+                } 
+            />
+        </div>
+    </div>
+</div>

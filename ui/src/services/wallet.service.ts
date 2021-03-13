@@ -586,7 +586,7 @@ export class WalletService {
 
 	public async stakeTokens(stakingContractName, args, stakingToken, yieldToken, callbacks = undefined) {
 		let txList = [{contract: stakingContractName, method: "addStakingTokens"}]
-		if (await this.needsApproval(stakingToken.contract_name, args.amount, stakingContractName)){
+		if (await this.needsApproval(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)){
 			txList.push({contract: stakingToken.contract_name, method: "approve"})
 		}
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
@@ -646,6 +646,39 @@ export class WalletService {
 				icon: "gaugeMinus",
 				heading: `Stake and Yield Removed!`,
 				text: `You have removed your stake of ${stakingToken.token_symbol} and any earned ${yieldToken.token_symbol}.`, 
+				type: 'success',
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
+			})
+			if (callbacks) callbacks.success()
+		}
+	}
+
+	public async withdrawStake(stakingContractName, args, stakingToken, yieldToken, callbacks = undefined) {
+		let txList = [{contract: stakingContractName, method: "withdrawYield"}]
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			this.sendTransaction(
+				stakingContractName, 
+				"withdrawYield", 
+				args, 
+				callbacks, 
+				(res) => this.handleWithdrawStake(res, stakingToken, yieldToken, args.amount.__fixed__, callbacks)
+			)
+		}
+	}
+
+	private handleWithdrawStake = (res, stakingToken, yieldToken, amount, callbacks = undefined) => {
+		let status = this.txResult(res.data, callbacks)
+		if (status === 'success') {
+			this.toastService.addToast({ 
+				icon: "buyToken",
+				heading: `${yieldToken.token_symbol} Received!`,
+				text: `You have withdrawn ${stringToFixed(amount, 8)} ${yieldToken.token_symbol} from the ${stakingToken.token_symbol}/${yieldToken.token_symbol} contract.`, 
 				type: 'success',
 				duration: 5000,
 				link:{
@@ -736,6 +769,11 @@ export class WalletService {
 		if (txResults.errors) {
 			this.handleTxErrors(txResults.errors, callbacks)
 			return txResults.errors
+		}
+		if (txResults?.txBlockResult?.errors?.length > 0) {
+			let errors = txResults?.txBlockResult?.errors
+			this.handleTxErrors(errors, callbacks)
+			return errors
 		}
 		if (typeof txResults.txBlockResult.status !== 'undefined') {
 			if (txResults.txBlockResult.status === 0) {

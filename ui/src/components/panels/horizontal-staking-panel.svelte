@@ -1,5 +1,5 @@
 <script>
-    import { setContext } from 'svelte'
+    import { setContext, onDestroy } from 'svelte'
     
     //Icons 
     import YieldLogo from '../../icons/yield-logo.svelte'
@@ -16,8 +16,8 @@
 	const walletService = WalletService.getInstance();
 
     // Misc
-    import { rswpStakingDeposits, rswpStakingWithdrawls } from "../../store"  
-    import { toBigNumberPrecision, toBigNumber, stakingCalculator } from "../../utils"  
+    import { userYieldInfo } from "../../store"  
+    import { toBigNumberPrecision, stringToFixed, toBigNumber, stakingCalculator } from "../../utils"  
 
     setContext('stakingPanelContext', {
 		getStampCost
@@ -29,29 +29,35 @@
     let loading = false;
     let showStakingConfirm = false;
     let showRemoveStakeConfirm = false;
-
-    $: deposits = $rswpStakingDeposits[stakingInfo?.contract_name] || [];
-    $: withdrawAmount = $rswpStakingWithdrawls[stakingInfo?.contract_name] || toBigNumber("0");
-    $: stakingToken = stakingInfo?.staking_token || null
-    $: yieldToken = stakingInfo?.yield_token || null
-    $: hasBothTokens = yieldToken && stakingToken;
-    $: validStakingAmount = stakingAmount.isGreaterThan(0);
+    let timer_yieldUpdate = null;
     
+    $: stakingCalcs = stakingCalculator(stakingInfo);
 
-    $: stakingCalcs = stakingCalculator(stakingInfo, deposits, withdrawAmount);
-    $: hasStake = stakingCalcs?.stakedAmount?.isGreaterThan(0) || false;
-    $: EmissionRatePerYear = stakingInfo?.EmissionRatePerHour.multipliedBy(24).multipliedBy(365);
+    $: userYield = $userYieldInfo[stakingInfo?.contract_name];
+    $: totalStaked = userYield ? userYield.total_staked : toBigNumber("0");
+    $: additionalYield = userYield ? stakingCalcs.calcNewYeild(userYield) : toBigNumber("0");
+    $: currentYield = userYield ? userYield.current_yield.plus(additionalYield) : toBigNumber("0");
+    $: hasStake = totalStaked?.isGreaterThan(0) || false;
+    $: startTimer = !startTimer && currentYield.isGreaterThan(0) ? startUpdater() : null;
 
-    $: log = console.log({
-        deposits, 
-        withdrawAmount, 
-        stakingToken, 
-        yieldToken, 
-        hasBothTokens, 
-        validStakingAmount, 
-        stakingCalcs, 
-        EmissionRatePerYear
+    $: stakingToken = stakingInfo?.staking_token || null;
+    $: yieldToken = stakingInfo?.yield_token || null;
+    $: hasBothTokens = yieldToken && stakingToken;
+
+    $: validStakingAmount = stakingAmount.isGreaterThan(0);
+
+    onDestroy(() => {
+       clearInterval(startTimer)
+       startTimer = null
     })
+
+    const startUpdater = () => {
+        if (!timer_yieldUpdate) timer_yieldUpdate = setInterval(updateYeild, 1000)
+    }
+    
+    const updateYeild = () =>{
+        additionalYield = stakingCalcs.calcNewYeild(userYield)
+    }
 
     async function getStampCost(contract, method){
 		let txList = [
@@ -110,6 +116,9 @@
         height: max-content;
 
     }
+    button.primary.small{
+        margin: 0;
+    }
     .smallStakeButton{
         margin: 0;
     }   
@@ -125,11 +134,7 @@
         position: absolute;
         text-shadow: 2px 2px var(--staking-pannel-header-symbols-text-shadow);
         top: 10px;
-        left: 30px;
-        
-    }
-    .symbol{
-        margin-left: 4px;
+        left: 30px; 
     }
     @media screen and (min-width: 430px) {
         .panel-container{
@@ -158,37 +163,46 @@
             <div class="flex-col detail-col">
                 <span>APY:</span>
                 <div class="flex-col flex-align-end ">
-                    <span class="weight-600">{EmissionRatePerYear}</span>
-                    <span class="text-primary-dimmer">{stakingInfo.EmissionRatePerHour}/hour</span>
+                    <span class="weight-600">{stringToFixed(stakingCalcs.emissionRatePerYear, 8)}</span>
+                    <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span>
                 </div>
             </div>
             <div class="flex-col detail-col">
-                <span>Staked:</span>
+                <span><strong class="symbol text-color-secondary">{stakingToken.token_symbol}</strong> Staked:</span>
                 <div class="flex-row">
-                    <span class="text-primary-dimmer">{toBigNumberPrecision(stakingCalcs.stakedAmount, 8)}</span>
-                    <strong class="symbol text-color-secondary">{stakingToken.token_symbol}</strong>
+                    <span class="text-primary-dimmer">{stringToFixed(totalStaked, 8)}</span>
                 </div>
-                {#if stakingCalcs.stakedAmount.isGreaterThan(0)}
+                {#if totalStaked.isGreaterThan(0)}
                     <button class="primary small" on:click={openRemoveStakingConfirm} disabled={loading || !hasStake}>REMOVE STAKE</button>
                 {/if}
 
             </div>
             <div class="flex-col detail-col">
-                <span>Earned:</span>
+                <span><strong class="symbol text-color-secondary">{yieldToken.token_symbol}</strong> Earned:</span>
                 <div class="flex-row">
-                    <span class="text-primary-dimmer">{stakingInfo.EmissionRatePerHour}</span>
-                    <strong class="symbol text-color-secondary">{yieldToken.token_symbol}</strong>
+                    <span class="text-primary-dimmer">{stringToFixed(currentYield, 8)}</span>
+                    
                 </div>
-                {#if stakingCalcs.stakedAmount.isGreaterThan(0)}
-                    <button class="primary small" disabled={loading}>WITHDRAW</button>
+                {#if currentYield.isGreaterThan(0)}
+                    <button class="primary small" disabled={currentYield.isEqualTo(0)}>WITHDRAW {yieldToken.token_symbol}</button>
                 {/if}
             </div>
         </div>
         
         <div class="flex-row flex-center-center stake">
             <InputSpecific on:input={handleInput} tokenInfo={stakingToken} {getStampCost} small={true} short={true}/>   
-            <button class="stake primary small smallStakeButton" on:click={openStakingConfirm} disabled={loading || !validStakingAmount}>STAKE</button>
-            <button class="stake primary largeStakeButton" on:click={openStakingConfirm} disabled={loading || !validStakingAmount}>STAKE</button>
+            <button 
+                class="stake primary small smallStakeButton" 
+                on:click={openStakingConfirm} 
+                disabled={loading || !validStakingAmount}>
+                STAKE
+            </button>
+            <button 
+                class="stake primary largeStakeButton" 
+                on:click={openStakingConfirm} 
+                disabled={loading || !validStakingAmount}>
+                STAKE
+            </button>
         </div>
     </div>
 {/if}

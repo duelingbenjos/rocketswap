@@ -84,6 +84,7 @@
 		max-width: 230px;
 		border: 0;
 		margin: 0;
+		padding: 0 20px 20px;
 	}
 </style>
 

@@ -36,7 +36,7 @@
         getRSWPTokenInfo()
         return () => ws.leaveStakingPanel()
     })
-    rswpToken.subscribe(r => console.log(r))
+
     const getRSWPTokenInfo = async () => rswpToken.set(await api.getToken(config.ammTokenContract).then(res => res.token))
 
     const gotoBuyRSWP = () => location.assign(`/#/${config.ammTokenContract}`)
