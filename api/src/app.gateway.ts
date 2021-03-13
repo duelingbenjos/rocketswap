@@ -31,7 +31,8 @@ import {
 	MetricsUpdateType,
 	UserLpUpdateType,
 	isEpochUpdate,
-	isUserYieldUpdate
+	isUserYieldUpdate,
+	isClientStakingUpdate
 } from "./types/websocket.types";
 
 /**
@@ -90,13 +91,25 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "epoch_update":
 				if (isEpochUpdate(update)) {
-					await this.socketService.sendClientStakingUpdates(update);
+					console.log("EPOCH_UPDATE", update);
+					setTimeout(async () => {
+						await this.socketService.sendClientStakingUpdates(update.data.staking_contract);
+					}, 2000);
 					// this.wss.emit(`epoch_update`, update);
 				}
 				break;
+				case "client_staking_update":
+					if (isClientStakingUpdate(update)) {
+						console.log("EPOCH_UPDATE", update);
+						setTimeout(async () => {
+							await this.socketService.sendClientStakingUpdates(update.staking_contract);
+						}, 2000);
+						// this.wss.emit(`epoch_update`, update);
+					}
+					break;
 			case "user_yield_update":
 				if (isUserYieldUpdate(update)) {
-					console.log("UPDATE", update)
+					console.log("UPDATE", update);
 					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
 		}
@@ -154,8 +167,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
 		this.socketService.addStakingPanelClient(subject);
-		const yield_list = await this.socketService.getClientYieldList(subject)
-		console.log('called')
+		const yield_list = await this.socketService.getClientYieldList(subject);
+		console.log("called");
 		client.emit("user_yield_list", yield_list);
 	}
 
@@ -258,7 +271,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	handleDisconnect(client: Socket) {
-		// this.logger.log(`Client disconnected: ${client.id}`);
+		this.logger.log(`Client disconnected: ${client.id}`);
 	}
 
 	async handleConnection(socket: Socket, ...args: any[]) {

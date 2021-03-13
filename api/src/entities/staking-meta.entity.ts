@@ -45,50 +45,6 @@ export class StakingMetaEntity extends BaseEntity {
 	};
 }
 
-// [
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.Owner",
-// 		value:
-// 			"f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def"
-// 	},
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.DevRewardWallet",
-// 		value:
-// 			"f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def"
-// 	},
-// 	{ key: "con_staking_dtau_rswp_lst001_2.CurrentEpochIndex", value: 0 },
-// 	{ key: "con_staking_dtau_rswp_lst001_2.StakedBalance", value: 0 },
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.Epochs:0",
-// 		value: { staked: 0, time: [Object] }
-// 	},
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.meta:version",
-// 		value: { __fixed__: "0.01" }
-// 	},
-// 	{ key: "con_staking_dtau_rswp_lst001_2.meta:type", value: "staking" },
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.EmissionRatePerHour",
-// 		value: 6849
-// 	},
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.DevRewardPct",
-// 		value: { __fixed__: "0.1" }
-// 	},
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.StartTime",
-// 		value: { __time__: [Array] }
-// 	},
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.EndTime",
-// 		value: { __time__: [Array] }
-// 	},
-// 	{
-// 		key: "con_staking_dtau_rswp_lst001_2.OpenForBusiness",
-// 		value: true
-// 	}
-// ];
-
 export const updateStakingContractMeta = async (args: {
 	state: IKvp[];
 	handleClientUpdate: handleClientUpdateType;
@@ -152,10 +108,6 @@ export const updateStakingContractMeta = async (args: {
 						break;
 				}
 				if (kvp.key.includes("Epochs")) {
-					// {
-					//     key: "con_staking_dtau_rswp_lst001_2.Epochs:0",
-					//     value: { staked: 0, time: [Object] }
-					// },
 					const index = parseInt(kvp.key.split(":")[1]);
 					const { staked, time } = kvp.value;
 					await updateEpoch({ staking_contract, epoch_index: index, time, amount_staked: staked, handleClientUpdate });
@@ -164,7 +116,6 @@ export const updateStakingContractMeta = async (args: {
 						staked,
 						time
 					};
-					// console.log("EPOCH UPDATED", entity);
 				}
 		}
 		await entity.save();
@@ -172,8 +123,7 @@ export const updateStakingContractMeta = async (args: {
 		const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
 		const withdrawals = state.find((kvp) => kvp.key.includes("Withdrawals"));
 		if (deposits || withdrawals) {
-			// console.log(deposits);
-			await updateUserStakingInfo({ deposits, withdrawals, staking_contract, fn });
+			await updateUserStakingInfo({ deposits, withdrawals, staking_contract, fn, handleClientUpdate });
 		}
 		handleClientUpdate({ action: "staking_panel_update", data: entity });
 	} catch (err) {
