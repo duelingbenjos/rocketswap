@@ -133,6 +133,7 @@ export class WalletService {
 				//Get the inital balance 
 				this.getIntialBalances(vk)
 				this.wsService.joinBalanceFeed(vk)
+				this.wsService.joinUserYieldFeed(vk)
 			}
 			return Object.assign(current, { approved, installed, locked, walletAddress: vk })
 		})

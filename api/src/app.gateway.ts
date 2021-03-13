@@ -88,19 +88,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 					this.wss.emit(`trade_update:${update.contract_name}`, update);
 				}
 				break;
-			// case "user_staking_update":
-			// 	/** TO DO - Bring this into line with schema in epoch update */
-			// 	if (isStakingUpdate(update)) {
-			// 		this.wss.emit(`user_staking_update:${update.data.vk}`, update);
-			// 	}
 			case "epoch_update":
 				if (isEpochUpdate(update)) {
-					this.socketService.sendClientStakingUpdates(update);
-					this.wss.emit(`epoch_update`, update);
+					await this.socketService.sendClientStakingUpdates(update);
+					// this.wss.emit(`epoch_update`, update);
 				}
 				break;
 			case "user_yield_update":
 				if (isUserYieldUpdate(update)) {
+					console.log("UPDATE", update)
 					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
 		}
@@ -110,6 +106,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	handleLeaveRoom(client: Socket, room: string) {
 		client.leave(room);
 		client.emit("left_room", room);
+		this.logger.log("LEFT ROOM");
+		const [prefix, subject] = room.split(":");
+
+		switch (prefix) {
+			case "user_yield_feed":
+				this.socketService.removeStakingPanelClient(subject);
+				break;
+		}
 	}
 
 	@SubscribeMessage("join_room")
@@ -149,7 +153,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
-		const yield_list = await this.socketService.getClientYieldList(subject);
+		this.socketService.addStakingPanelClient(subject);
+		const yield_list = await this.socketService.getClientYieldList(subject)
+		console.log('called')
 		client.emit("user_yield_list", yield_list);
 	}
 

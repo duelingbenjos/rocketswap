@@ -93,85 +93,92 @@ export const updateStakingContractMeta = async (args: {
 	state: IKvp[];
 	handleClientUpdate: handleClientUpdateType;
 	staking_contract: string;
+	fn: string;
 }) => {
-	const { state, handleClientUpdate, staking_contract } = args;
-	let entity = await StakingMetaEntity.findOne(staking_contract);
-	if (!entity) {
-		entity = new StakingMetaEntity();
-		entity.contract_name = staking_contract;
-	}
-	state.forEach(async (kvp) => {
-		switch (kvp.key) {
-			case `${staking_contract}.Owner`:
-				entity["Owner"] = getVal(kvp);
-				break;
-			case `${staking_contract}.DevRewardWallet`:
-				entity["DevRewardWallet"] = getVal(kvp);
-				break;
-			case `${staking_contract}:CurrentEpochIndex`:
-				entity["CurrentEpochIndex"] = getVal(kvp);
-				break;
-			case `${staking_contract}.StakedBalance`:
-				entity["StakedBalance"] = getVal(kvp);
-				break;
-			case `${staking_contract}.meta:version`:
-				entity["meta"] = updateMetaProperty(entity.meta, "version", getVal(kvp));
-				break;
-			case `${staking_contract}.meta:type`:
-				entity["meta"] = updateMetaProperty(entity.meta, "type", getVal(kvp));
-				break;
-			case `${staking_contract}.meta:STAKING_TOKEN`:
-				entity["meta"] = updateMetaProperty(entity.meta, "STAKING_TOKEN", getVal(kvp));
-				break;
-			case `${staking_contract}.meta:YIELD_TOKEN`:
-				entity["meta"] = updateMetaProperty(entity.meta, "YIELD_TOKEN", getVal(kvp));
-				break;
-			case `${staking_contract}.meta:STAKING_TOKEN`:
-				entity["meta_STAKING_TOKEN"] = getVal(kvp);
-				break;
-			case `${staking_contract}.EmissionRatePerHour`:
-				entity["EmissionRatePerHour"] = getVal(kvp);
-				break;
-			case `${staking_contract}.DevRewardPct`:
-				entity["DevRewardPct"] = getVal(kvp);
-				break;
-			case `${staking_contract}.StartTime`:
-				entity["StartTime"] = getVal(kvp);
-				break;
-			case `${staking_contract}.EndTime`:
-				entity["EndTime"] = getVal(kvp);
-				break;
-			case `${staking_contract}.OpenForBusiness`:
-				entity["OpenForBusiness"] = getVal(kvp);
-				break;
-			case `${staking_contract}.__developer__`:
-				entity["__developer__"] = getVal(kvp);
-				break;
+	try {
+		const { state, handleClientUpdate, staking_contract, fn } = args;
+		let entity = await StakingMetaEntity.findOne(staking_contract);
+		if (!entity) {
+			entity = new StakingMetaEntity();
+			entity.contract_name = staking_contract;
 		}
-		if (kvp.key.includes("Epochs")) {
-			// {
-			//     key: "con_staking_dtau_rswp_lst001_2.Epochs:0",
-			//     value: { staked: 0, time: [Object] }
-			// },
-			const index = parseInt(kvp.key.split(":")[1]);
-			const { staked, time } = kvp.value;
-			await updateEpoch({ staking_contract, epoch_index: index, time, amount_staked: staked, handleClientUpdate });
-			entity.Epoch = {
-				index,
-				staked,
-				time
-			};
+		for (let kvp of state) {
+
+				switch (kvp.key) {
+					case `${staking_contract}.Owner`:
+						entity["Owner"] = getVal(kvp);
+						break;
+					case `${staking_contract}.DevRewardWallet`:
+						entity["DevRewardWallet"] = getVal(kvp);
+						break;
+					case `${staking_contract}:CurrentEpochIndex`:
+						entity["CurrentEpochIndex"] = getVal(kvp);
+						break;
+					case `${staking_contract}.StakedBalance`:
+						entity["StakedBalance"] = getVal(kvp);
+						break;
+					case `${staking_contract}.meta:version`:
+						entity["meta"] = updateMetaProperty(entity.meta, "version", getVal(kvp));
+						break;
+					case `${staking_contract}.meta:type`:
+						entity["meta"] = updateMetaProperty(entity.meta, "type", getVal(kvp));
+						break;
+					case `${staking_contract}.meta:STAKING_TOKEN`:
+						entity["meta"] = updateMetaProperty(entity.meta, "STAKING_TOKEN", getVal(kvp));
+						break;
+					case `${staking_contract}.meta:YIELD_TOKEN`:
+						entity["meta"] = updateMetaProperty(entity.meta, "YIELD_TOKEN", getVal(kvp));
+						break;
+					case `${staking_contract}.meta:STAKING_TOKEN`:
+						entity["meta_STAKING_TOKEN"] = getVal(kvp);
+						break;
+					case `${staking_contract}.EmissionRatePerHour`:
+						entity["EmissionRatePerHour"] = getVal(kvp);
+						break;
+					case `${staking_contract}.DevRewardPct`:
+						entity["DevRewardPct"] = getVal(kvp);
+						break;
+					case `${staking_contract}.StartTime`:
+						entity["StartTime"] = getVal(kvp);
+						break;
+					case `${staking_contract}.EndTime`:
+						entity["EndTime"] = getVal(kvp);
+						break;
+					case `${staking_contract}.OpenForBusiness`:
+						entity["OpenForBusiness"] = getVal(kvp);
+						break;
+					case `${staking_contract}.__developer__`:
+						entity["__developer__"] = getVal(kvp);
+						break;
+				}
+				if (kvp.key.includes("Epochs")) {
+					// {
+					//     key: "con_staking_dtau_rswp_lst001_2.Epochs:0",
+					//     value: { staked: 0, time: [Object] }
+					// },
+					const index = parseInt(kvp.key.split(":")[1]);
+					const { staked, time } = kvp.value;
+					await updateEpoch({ staking_contract, epoch_index: index, time, amount_staked: staked, handleClientUpdate });
+					entity.Epoch = {
+						index,
+						staked,
+						time
+					};
+					// console.log("EPOCH UPDATED", entity);
+				}
 		}
-	});
-	const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
-	const withdrawals = state.find((kvp) => kvp.key.includes("Withdrawals"));
-	if (deposits || withdrawals) {
-		const user_staking_res = await updateUserStakingInfo({ deposits, withdrawals, staking_contract });
-		/** BELOW LINE IS REDUNDANT SINCE UPDATES SHOULD BE TRIGGERED ON ALL INTERESTED CLIENTS ON EPOCH UPDATE */
-		// handleClientUpdate({ action: "user_staking_update", data: user_staking_res });
+		await entity.save();
+
+		const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
+		const withdrawals = state.find((kvp) => kvp.key.includes("Withdrawals"));
+		if (deposits || withdrawals) {
+			// console.log(deposits);
+			await updateUserStakingInfo({ deposits, withdrawals, staking_contract, fn });
+		}
+		handleClientUpdate({ action: "staking_panel_update", data: entity });
+	} catch (err) {
+		console.error(err);
 	}
-	handleClientUpdate({ action: "staking_panel_update", data: entity });
-	await entity.save();
 };
 
 const updateMetaProperty = (metadata: any, key: string, value: string) => {

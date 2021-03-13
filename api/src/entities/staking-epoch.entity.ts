@@ -7,13 +7,13 @@ export class StakingEpochEntity extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: string;
 
-	@Column({nullable: true})
+	@Column({ nullable: true })
 	epoch_index: number;
 
 	@Column({ type: "simple-json", nullable: true })
 	time: IContractingTime;
 
-	@Column({nullable: true})
+	@Column({ nullable: true })
 	amount_staked: number;
 
 	@Column()
@@ -34,6 +34,7 @@ export async function updateEpoch(args: {
 	entity.epoch_index = epoch_index;
 	entity.staking_contract = staking_contract;
 
-	const res = await entity.save();
-	handleClientUpdate({ action: "epoch_update", data: res });
+	await entity.save();
+	handleClientUpdate({ action: "epoch_update", data: entity });
+	// return res
 }
