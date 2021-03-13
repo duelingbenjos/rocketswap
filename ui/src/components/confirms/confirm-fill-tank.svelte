@@ -33,7 +33,7 @@
         clearInput();
         setTimeout(getAmmStakeDetails, 2000)
         setTimeout(getAmmStakeDetails, 5000)
-        closeConfirm();
+        closeConfirm(false);
     }
 
     const error = () => {

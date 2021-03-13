@@ -32,7 +32,7 @@
         setTimeout(refreshLpBalances, 2500)
         setTimeout(refreshLpBalances, 10000)
         resetPage();
-        closeConfirm();
+        closeConfirm(false);
     }
 
     const error = () => {

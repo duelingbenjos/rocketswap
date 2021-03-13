@@ -70,11 +70,14 @@
         fillAmount = toBigNumberPrecision(e.detail, 8)
     }
 
-    const openFillTankConfirm = () => showFillTankConfirm = true
-
-    const toggleFillTankConfirm = () => {
-        if (showFillTankConfirm) showFillTankConfirm = false
-        else showFillTankConfirm = true
+    const openFillTankConfirm = () => toggleFillTankConfirm(true)
+    const toggleFillTankConfirm = (force = null) => {
+        if (force === null){
+            if (showFillTankConfirm) showFillTankConfirm = false
+            else showFillTankConfirm = true
+        }else{
+            showFillTankConfirm = force;
+        }
     }
 </script>
 

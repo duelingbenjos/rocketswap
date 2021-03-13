@@ -812,10 +812,13 @@ button.close{
 }
 
 .input-message{
-	margin: 0;
 	position: absolute;
 	bottom: 3px;
 	left: 21px;
+}
+
+.input-trollbox-message{
+	margin: 0;
 }
 
 .input-controls{

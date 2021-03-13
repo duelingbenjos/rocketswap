@@ -37,7 +37,7 @@
     const success = () => {
         clearInput();
         finish();
-        closeConfirm();
+        closeConfirm(false);
     }
 
     const error = () => {

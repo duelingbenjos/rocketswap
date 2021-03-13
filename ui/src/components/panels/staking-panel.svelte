@@ -50,6 +50,12 @@
 
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
 
+    $: log = console.log({
+        startingYield: userYield?.current_yield.toString(),
+        additionalYield: additionalYield.toString(),
+        currentYield: currentYield.toString()
+    })
+
     onDestroy(() => {
        clearInterval(startTimer)
        startTimer = null
@@ -76,28 +82,35 @@
         //console.log({e: e.detail, stakingAmount, validStakingAmount})
     }
 
-    const openStakingConfirm = () => showStakingConfirm = true
-
-    const toggleStakingConfirm = () => {
-        if (showStakingConfirm) showStakingConfirm = false
-        else showStakingConfirm = true
+    const openStakingConfirm = () => toggleStakingConfirm(true)
+    const toggleStakingConfirm = (e, force = null) => {
+        if (force === null){
+            if (showStakingConfirm) showStakingConfirm = false
+            else showStakingConfirm = true
+        }else{
+            showStakingConfirm = force;
+        }
     }
 
-    const openRemoveStakingConfirm = () => showRemoveStakeConfirm = true
-
-    const toggleRemoveStakingConfirm = () => {
-        if (showRemoveStakeConfirm) showRemoveStakeConfirm = false
-        else showRemoveStakeConfirm = true
+    const openRemoveStakingConfirm = () => toggleRemoveStakingConfirm(true)
+    const toggleRemoveStakingConfirm = (e, force = null) => {
+        if (force === null){
+            if (showRemoveStakeConfirm) showRemoveStakeConfirm = false
+            else showRemoveStakeConfirm = true
+        }else{
+            showRemoveStakeConfirm = force;
+        }
     }
 
-    const openWithdrawStakingConfirm = () => showWithdrawStakeConfirm = true
-
-    const toggleWithdrawStakingConfirm = () => {
-        if (showWithdrawStakeConfirm) showWithdrawStakeConfirm = false
-        else showWithdrawStakeConfirm = true
+    const openWithdrawStakingConfirm = () => toggleWithdrawStakingConfirm(true)
+    const toggleWithdrawStakingConfirm = (e, force = null) => {
+        if (force === null){
+            if (showWithdrawStakeConfirm) showWithdrawStakeConfirm = false
+            else showWithdrawStakeConfirm = true
+        }else{
+            showWithdrawStakeConfirm = force;
+        }
     }
-
-    
 </script>
 
 <style>
@@ -300,10 +313,10 @@
     <Modal toggleModal={toggleStakingConfirm} open={openStakingConfirm}>
         <div slot="main">
             <ConfirmStakingToken 
+                closeConfirm={toggleStakingConfirm}
                 {stakingInfo}
                 {stakingToken} 
                 {yieldToken} 
-                closeConfirm={toggleStakingConfirm} 
                 {stakingAmount}
                 {clearInput} />
         </div>
@@ -314,11 +327,12 @@
     <Modal toggleModal={toggleRemoveStakingConfirm} open={openRemoveStakingConfirm}>
         <div slot="main">
             <ConfirmRemoveStake 
+                closeConfirm={toggleRemoveStakingConfirm}
                 {stakingInfo}
                 {stakingToken} 
                 {yieldToken} 
-                closeConfirm={toggleRemoveStakingConfirm} 
-                stakedAmount={stakingCalcs.stakedAmount}
+                stakedAmount={totalStaked}
+                {currentYield}
                 {clearInput}  />
         </div>
     </Modal>
@@ -328,10 +342,10 @@
     <Modal toggleModal={toggleWithdrawStakingConfirm} open={openWithdrawStakingConfirm}>
         <div slot="main">
             <ConfirmWithdrawStake 
+                closeConfirm={toggleWithdrawStakingConfirm} 
                 {stakingInfo}
                 {stakingToken} 
                 {yieldToken} 
-                closeConfirm={toggleWithdrawStakingConfirm} 
                 {clearInput}
                 {currentYield}  />
         </div>

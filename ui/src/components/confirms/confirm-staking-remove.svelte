@@ -20,6 +20,7 @@
     export let stakingToken;
     export let yieldToken;
     export let stakedAmount;
+    export let currentYield;
     export let closeConfirm;
     export let clearInput;
 
@@ -31,7 +32,7 @@
     const success = () => {
         clearInput();
         finish();
-        closeConfirm();
+        closeConfirm(false);
     }
 
     const error = () => {
@@ -94,7 +95,7 @@
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
                 <TokenLogo tokenMeta={stakingToken} width={logoSize}  margin="0 10px 0 0" />
-                <span>{toBigNumberPrecision(stakedAmount, 8)}</span>
+                <span>{stringToFixed(stakedAmount, 8)}</span>
             </div>
             <span>{stakingToken.token_symbol}</span>
         </div>
@@ -102,12 +103,13 @@
         <div class="flex-row flex-center-spacebetween amount-row">
             <div class="flex-row flex-center-spacebetween">
                 <TokenLogo tokenMeta={yieldToken} width={logoSize}  margin="0.25rem 10px 0 0" />
+                <span>{stringToFixed(currentYield, 8)}</span>
             </div>
             <span>{yieldToken.token_symbol}</span>
         </div>
     </div>
     <p class="text-xsmall sub-text text-primary-dim">
-        ** This will remove your entire stake as well as all earned yield. To only remove your yield use the WITHDRAW button.
+        ** This will remove your entire stake as well as all earned {yieldToken.token_symbol}. To remove only {yieldToken.token_symbol} use the WITHDRAW button.
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="modal-confirm-buttons flex-col">

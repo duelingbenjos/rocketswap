@@ -247,7 +247,7 @@
                     type="text" 
                     bind:value={message} 
                     on:keydown={handleEnterKey}
-                    class="input-message" 
+                    class="input-trollbox-message" 
                     maxlength="256" 
                     placeholder="Enter Message"
                 />

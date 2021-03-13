@@ -642,6 +642,12 @@ export const stakingCalculator = (stakingInfo) => {
 		if (!userYieldInfo?.yield_per_sec) return toBigNumber("0");
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
+		console.log({
+			userYieldInfo,
+			yield_per_sec: userYieldInfo?.yield_per_sec.toString(),
+			elapsed: toBigNumber(new Date() - userYieldInfo.time_updated).dividedBy(1000).toString(),
+			additional: userYieldInfo.yield_per_sec.multipliedBy(toBigNumber(new Date() - userYieldInfo.time_updated).dividedBy(1000)).toString()
+		})
 		return userYieldInfo.yield_per_sec.multipliedBy(toBigNumber(new Date() - userYieldInfo.time_updated).dividedBy(1000))
 	}
 
