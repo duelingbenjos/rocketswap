@@ -21,6 +21,7 @@
     export let yieldToken;
     export let stakingAmount;
     export let closeConfirm;
+    export let clearInput;
 
     let logoSize = "30px"
     let loading = false;
@@ -28,6 +29,7 @@
     $: EmissionRatePerYear = stakingInfo?.EmissionRatePerHour.multipliedBy(24).multipliedBy(365);
 
     const success = () => {
+        clearInput();
         finish();
         closeConfirm();
     }

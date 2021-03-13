@@ -67,21 +67,6 @@ export const getAmmStakeDetails = async (account = undefined) => {
 	})
 }
 
-
-/*
-export const getRswapPrice = async () => {
-	let reserves = await API.getVariable(connectionRequest.contractName, 'reserves', config.ammTokenContract) 
-	if (Array.isArray(reserves)){
-		if (reserves[0].__fixed__) reserves[0] = toBigNumber(reserves[0].__fixed__)
-		else reserves[0] = toBigNumber(reserves[0])
-		if (reserves[1].__fixed__) reserves[1] = toBigNumber(reserves[1].__fixed__)
-		else reserves[1] = toBigNumber(reserves[1])
-		let quote = quoteCalculator({reserves})
-		rswpPrice.set(quote.prices.token)
-		return quote.prices.token
-	}
-}
-*/
 export const removeLpBalances = async () => lpBalances.set({})
 
 export const setBearerToken = (account = undefined) => {

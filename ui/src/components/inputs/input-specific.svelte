@@ -21,6 +21,12 @@
     export let getStampCost
 	export let small = false;
 	export let short = false;
+	
+	export const clearInput = () => {
+		inputValue = null
+		inputElm.value = ""
+		pressedMaxValue = false
+	}
 
 	const dispatch = createEventDispatcher();
 
@@ -62,6 +68,8 @@
 	}
 	
 	const dispatchEvent = (value) => dispatch('input', value)
+
+
 </script>
 
 <style>

@@ -23,6 +23,7 @@
     const { rswpToken } = getContext('rswpContext')
 
     let showFillTankConfirm = false;
+    let clearInput
     
     $: fillAmount = null;
     $: tankPercent = $ammFuelTank_discount?.isGreaterThan(0) ?  $ammFuelTank_discount.plus(-1).multipliedBy(-1) : toBigNumber("0");
@@ -143,7 +144,7 @@
                 <span class="flex-grow">Staked:</span>
                 <span class="weight-600">{stringToFixed($ammFuelTank_stakedAmount, 8)} <strong class="text-shadow text-color-primary">{config.ammTokenSymbol}</strong></span>
             </div>
-            <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} small={true}/>
+            <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} small={true} bind:clearInput/>
             <div class="flex-row flex-center-center buttons">
                 <button class="text-color-white primary" on:click={openFillTankConfirm} disabled={!isfillAmount || same || insufficientRSWP}>
                     {#if isfillAmount}
@@ -171,7 +172,8 @@
                 currentFillAmount={$ammFuelTank_stakedAmount}
                 newFillAmount={fillAmount}
                 {addingMore}
-                {differenceInAmount} />
+                {differenceInAmount}
+                {clearInput} />
         </div>
     </Modal>
 {/if}

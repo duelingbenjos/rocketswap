@@ -25,10 +25,12 @@
 
     export let stakingInfo;
 
+
     let stakingAmount = toBigNumber("0");
     let loading = false;
     let showStakingConfirm = false;
     let showRemoveStakeConfirm = false;
+    let clearInput
 
     $: deposits = $rswpStakingDeposits[stakingInfo?.contract_name] || [];
     $: withdrawAmount = $rswpStakingWithdrawls[stakingInfo?.contract_name] || toBigNumber("0");
@@ -159,7 +161,7 @@
             </div>
 
         </div>
-        <InputSpecific on:input={handleInput} tokenInfo={stakingToken} {getStampCost} small={true}/>
+        <InputSpecific on:input={handleInput} tokenInfo={stakingToken} {getStampCost} small={true} bind:clearInput/>
         <div class="flex-row flex-center-center buttons">
             <button class="primary" on:click={openStakingConfirm} disabled={loading || !validStakingAmount}>STAKE</button>
             <button class="primary outline" on:click={openRemoveStakingConfirm} disabled={loading || !hasStake}>REMOVE STAKE</button>
@@ -175,7 +177,8 @@
                 {stakingToken} 
                 {yieldToken} 
                 closeConfirm={toggleStakingConfirm} 
-                {stakingAmount} />
+                {stakingAmount}
+                {clearInput} />
         </div>
     </Modal>
 {/if}
@@ -188,7 +191,8 @@
                 {stakingToken} 
                 {yieldToken} 
                 closeConfirm={toggleRemoveStakingConfirm} 
-                stakedAmount={stakingCalcs.stakedAmount}  />
+                stakedAmount={stakingCalcs.stakedAmount}
+                {clearInput}  />
         </div>
     </Modal>
 {/if}

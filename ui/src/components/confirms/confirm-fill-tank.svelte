@@ -12,7 +12,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, toBigNumberPrecision } from '../../utils'
+    import { stringToFixed, toBigNumberPrecision, getAmmStakeDetails } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -23,12 +23,16 @@
     export let addingMore;
     export let differenceInAmount;
     export let closeConfirm;
+    export let clearInput;
 
     let logoSize = "25px"
     let loading = false;
 
     const success = () => {
         finish();
+        clearInput();
+        setTimeout(getAmmStakeDetails, 2000)
+        setTimeout(getAmmStakeDetails, 5000)
         closeConfirm();
     }
 
@@ -115,7 +119,11 @@
             </div>
         </div>
         <div class="modal-confirm-buttons flex-col">
-            <Button style="secondary" loading={loading} callback={handleFillTank} text="FILL TANK" />
+            <Button 
+                style="secondary" 
+                loading={loading} 
+                callback={handleFillTank} 
+                text={`${addingMore ? "ADD" : "REMOVE"} ${config.ammTokenSymbol}`} />
         </div>
     </div>
 </div>
