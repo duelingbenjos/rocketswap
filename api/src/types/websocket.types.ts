@@ -44,12 +44,18 @@ export type ClientUpdateType =
 	| TradeUpdateType
 	| StakingMetaUpdateType
 	| UserYieldUpdateType
-	| EpochUpdateType;
+	| EpochUpdateType
+	| ClientStakingUpdateType;
 
 // export interface UserStakingUpdateType extends UpdateType {
 // 	action: "user_staking_update";
 // 	data: UserStakingEntity;
 // }
+
+export interface ClientStakingUpdateType extends UpdateType {
+	action: "client_staking_update";
+	staking_contract: string;
+}
 
 export interface EpochUpdateType extends UpdateType {
 	action: "epoch_update";
@@ -107,7 +113,8 @@ export type UpdateType = {
 		| "staking_panel_update"
 		| "user_staking_update"
 		| "epoch_update"
-		| "user_yield_update";
+		| "user_yield_update"
+		| "client_staking_update";
 };
 
 export interface TradeUpdateType extends UpdateType {
@@ -143,4 +150,8 @@ export function isUserYieldUpdate(client_update: ClientUpdateType): client_updat
 
 export function isEpochUpdate(client_update: ClientUpdateType): client_update is EpochUpdateType {
 	return (client_update as EpochUpdateType).action === "epoch_update";
+}
+
+export function isClientStakingUpdate(client_update: ClientUpdateType): client_update is ClientStakingUpdateType {
+	return (client_update as ClientStakingUpdateType).action === "client_staking_update";
 }
