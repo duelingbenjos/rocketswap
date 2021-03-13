@@ -36,7 +36,7 @@
     $: differenceInAmount = fillAmount ? $ammFuelTank_stakedAmount?.minus(fillAmount) : toBigNumber("0");
     $: same = stringToFixed(newPercentDisplay, 2) ===  stringToFixed(tankPercentDisplay, 2)
     $: insufficientRSWP = fillAmount?.isGreaterThan($rswpBalance) || false;
-
+/*
     $: log = console.log({
         fillAmount: fillAmount?.toString() || fillAmount,
         tankPercent: tankPercent?.toString(),
@@ -49,7 +49,7 @@
         differenceInAmount: differenceInAmount?.toString(),
         same
     })
-
+*/
     const calcNewPercet = (value) => {
         if (!value) return null
         return toBigNumberPrecision((1000000000 * (Math.pow(value, ( 1 / 1000000000.0 )) - 1 ) * 0.05), 4)
