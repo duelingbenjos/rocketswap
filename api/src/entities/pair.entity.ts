@@ -55,9 +55,9 @@ export async function saveReserves(
 	if (reserve_kvp) {
 		// console.log(reserve_kvp)
 		let contract_name = reserve_kvp.key.split(":")[1];
-		console.log(state)
+		// console.log(state)
 		let vk_kvp = state.find((kvp) => {
-			console.log(kvp.key)
+			// console.log(kvp.key)
 			// console.log(`${contract_name}.balances`);
 			return (
 				kvp.key.includes(`${contract_name}.balances`) &&

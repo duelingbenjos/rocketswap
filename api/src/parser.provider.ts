@@ -113,7 +113,8 @@ export class ParserProvider {
 				this.addToActionQue(updateStakingContractMeta, {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate,
-					staking_contract: contract_name
+					staking_contract: contract_name,
+					fn
 				});
 			}
 		} catch (err) {

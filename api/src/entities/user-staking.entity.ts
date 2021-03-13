@@ -18,25 +18,33 @@ export class UserStakingEntity extends BaseEntity {
 	@Column({ nullable: true, type: "simple-json" })
 	deposits: IStakingDeposit[];
 
-	@Column({ nullable: true, type: "simple-json" })
+	@Column({ nullable: true })
 	withdrawals: number;
 
 	@Column({ nullable: true, type: "simple-json" })
-	yield_info: IUserYieldInfo
+	yield_info: IUserYieldInfo;
 }
 
 // current_yield, yield_per_sec, time_updated, epoch_updated
 
 export interface IStakingDeposit {
-	amount: number;
+	amount: { __fixed__: string };
 	starting_epoch: number;
 	time: IContractingTime;
 }
 
-export async function updateUserStakingInfo(args: { deposits: IKvp | undefined; withdrawals: IKvp | undefined; staking_contract: string }) {
-	const { deposits, withdrawals, staking_contract } = args;
+export async function updateUserStakingInfo(args: {
+	deposits: IKvp | undefined;
+	withdrawals: IKvp | undefined;
+	staking_contract: string;
+	fn: string;
+}) {
+	// console.log("UPDATE USER STAKING INFO");
+	// console.log(args);
+	const { deposits, withdrawals, staking_contract, fn } = args;
 	const vk = deposits ? deposits.key.split(":")[1] : withdrawals.key.split(":")[1];
 	let entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
+	// console.log(entity)
 	if (!entity) {
 		entity = new UserStakingEntity();
 		entity.deposits = [];
@@ -45,11 +53,19 @@ export async function updateUserStakingInfo(args: { deposits: IKvp | undefined; 
 		entity.staking_contract = staking_contract;
 	}
 	if (deposits) {
+		// console.log(deposits);
 		entity.deposits = deposits.value;
 	}
 	if (withdrawals) {
-		entity.withdrawals = withdrawals.value;
+		// console.log(withdrawals)
+		entity.withdrawals = withdrawals.value.__fixed__ ? parseFloat(withdrawals.value.__fixed__) : 0;
 	}
+	if (fn === "withdrawTokensAndYield") {
+		entity.withdrawals = 0;
+		entity.deposits = [];
+	}
+
+	// console.log(entity)
 
 	return await entity.save();
 }
@@ -60,24 +76,37 @@ export async function updateUserStakingInfo(args: { deposits: IKvp | undefined; 
 // const epoch_updated = meta_entity.Epoch.index;
 
 export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingEntity; epochs: StakingEpochEntity[] }) {
-	const { meta, user, epochs } = args;
-	const { DevRewardPct } = meta;
-	const { deposits, withdrawals } = user;
+	let { meta, user, epochs } = args;
+	let { DevRewardPct } = meta;
+	let { deposits, withdrawals } = user;
 
 	let harvestable_yield = 0;
 
 	for (let d of deposits) {
+		// console.log(d);
 		harvestable_yield += calculateYield({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,
-			time: d.time,
+			deposit_start_time: d.time,
 			current_epoch_index: meta.Epoch.index,
 			epochs,
 			meta
 		});
 	}
 
+
+	if (harvestable_yield <= 0) {
+		return 0
+	}
+
+	console.log("Harvestable Yield", harvestable_yield);
+	// if (typeof withdrawals === 'object') withdrawals = 0
 	harvestable_yield -= withdrawals;
+
+	// console.log(typeof harvestable_yield, harvestable_yield);
+	// console.log(typeof withdrawals, withdrawals);
+	// console.log(withdrawals);
+	// console.log(typeof DevRewardPct);
 
 	const dev_share = harvestable_yield * DevRewardPct;
 
@@ -97,12 +126,15 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 function calculateYield(args: {
 	starting_epoch_index: number;
 	amount: any;
-	time: IContractingTime;
+	deposit_start_time: IContractingTime;
 	current_epoch_index: number;
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
-	let { starting_epoch_index, amount, time, current_epoch_index, epochs, meta } = args;
+	console.log("CALCULATE YIELD CALLED");
+	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
+
+	// console.log(epochs);
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
 
@@ -112,10 +144,10 @@ function calculateYield(args: {
 		return time;
 	};
 
-	amount = parseFloat(amount);
-
+	amount = parseFloat(amount.__fixed__);
+	// console.log("amount", amount);
 	let this_epoch_index = starting_epoch_index;
-
+	// console.log("EPOCH INDEXES:", this_epoch_index, starting_epoch_index);
 	let y = 0;
 
 	while (this_epoch_index <= current_epoch_index) {
@@ -125,21 +157,29 @@ function calculateYield(args: {
 		let delta = 0;
 
 		if (starting_epoch_index === current_epoch_index) {
-			delta = fitTime(Date.now()) - fitTime(start_time);
+			// console.log(1);
+			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(deposit_start_time));
 		} else if (this_epoch_index === starting_epoch_index) {
-			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(start_time);
+			// console.log(2);
+			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(deposit_start_time));
+			// console.log(next_epoch.time, start_time);
 		} else if (this_epoch_index === current_epoch_index) {
+			// console.log(3);
 			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(this_epoch.time));
 		} else {
+			// console.log(4);
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
 		}
+		const delta_seconds = delta / 1000;
+		// console.log("DELTA", delta_seconds);
 		let pct_share_of_stake = amount / this_epoch.amount_staked;
-		let global_yield_this_epoch = delta * getEmissionRatePerSecond(meta.EmissionRatePerHour);
+		let global_yield_this_epoch = delta_seconds * getEmissionRatePerSecond(meta.EmissionRatePerHour);
 		let deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake;
 
 		y += deposit_yield_this_epoch;
+		this_epoch_index += 1;
 	}
-
+	console.log("CALCULATED YIELD: ", y);
 	return y;
 }
 
