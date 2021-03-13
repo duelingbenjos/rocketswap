@@ -2,6 +2,7 @@
 
 const CURRENCY_SYMBOL = "DTAU"
 const CURRENCY_NAME = "Lamden Testnet Token"
+const AMM_CONTRACT_NAME = 'con_amm_v6'
 const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
 const AMM_TOKEN_STAKING_CONTRACT = "con_staking_dtau_rswp_lst001_4"
@@ -16,7 +17,7 @@ export const connectionRequest = {
   version: '6.0.0', //Change for PROD
   logo: 'assets/images/RS_Logo.png',
   background: 'assets/images/background.jpeg',
-  contractName: 'con_amm_v6', //Change for PROD
+  contractName: AMM_CONTRACT_NAME, //Change for PROD
   networkType: 'testnet'  //Change for PROD
 }
 
@@ -38,6 +39,7 @@ export const config = {
   namesContract: NAMES_CONTRACT, //Change for PROD
   currencySymbol: CURRENCY_SYMBOL, //Change for PROD
   currencyName: CURRENCY_NAME, // Change for PROD
+  ammContractName: AMM_CONTRACT_NAME,
   ammTokenSymbol: AMM_TOKEN_SYMBOL, //Change for PROD
   ammTokenContract: AMM_TOKEN_CONTRACT, // Change for PROD
   ammTokenStakingContract: AMM_TOKEN_STAKING_CONTRACT, // Change for PROD

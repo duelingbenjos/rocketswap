@@ -15,9 +15,12 @@ import {
 	rswpPrice, 
 	rswpBalance,
 	earnFilters,
-	payInRswp } from './store'
+	payInRswp, 
+	walletAddress,
+	ammFuelTank} from './store'
 
 import { ApiService } from './services/api.service'
+import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
 
 let API = new Lamden.Masternode_API({ hosts: [config.masternode] })
 
@@ -28,7 +31,7 @@ export const replaceAll = (string, char, replace) => {
 export const removeTAUBalance = async () => walletBalance.set("0")
 
 export const refreshLpBalances = async (account = undefined) => {
-	if (!account) account = get(lwc_info).walletAddress
+	if (!account) account = get(lwc_info)?.walletAddress
 	if (!account) return {}
 
 	const apiService = ApiService.getInstance();
@@ -40,6 +43,31 @@ export const refreshLpBalances = async (account = undefined) => {
 	lpBalances.set(balances)
 	return balances
 }
+export const getAmmStakeDetails = async (account = undefined) => {
+	if (!account) account = get(lwc_info)?.walletAddress
+	if (!account) return
+	const blockExplorerService = LamdenBlockexplorer_API.getInstance()
+
+	let keyList = [
+		{
+			"contractName": connectionRequest.contractName,
+			"variableName": "staked_amount",
+			"key": `${account}:${config.ammTokenContract}`
+		},
+		{
+			"contractName": connectionRequest.contractName,
+			"variableName": "discount",
+			"key": account
+		}
+	]
+	let res = await blockExplorerService.getKeys(keyList)
+	ammFuelTank.set( {
+		'stakedAmount': res[`${keyList[0].contractName}.${keyList[0].variableName}:${keyList[0].key}`] || null,
+		'discount': res[`${keyList[1].contractName}.${keyList[1].variableName}:${keyList[1].key}`] || null
+	})
+}
+
+
 /*
 export const getRswapPrice = async () => {
 	let reserves = await API.getVariable(connectionRequest.contractName, 'reserves', config.ammTokenContract) 
@@ -261,6 +289,12 @@ export const stripTrailingZero = (value: string): string => {
   } else {
     return value
   }
+}
+
+export const __fixed__ToBigNumber = (value) => {
+	if(!value) return toBigNumber("0")
+	if (value.__fixed__) return toBigNumberPrecision(value.__fixed__, 8)
+	return toBigNumberPrecision(value, 8)
 }
 
 

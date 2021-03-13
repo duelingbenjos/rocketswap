@@ -46,7 +46,7 @@
 	}
 
 	const handleMaxInput = async () => {
-        let adjustedValue = 0;
+        let adjustedValue = balance;
         
         if (tokenInfo.contract_name === "currency"){
             let txTAUCost = stampsToTAU(await getStampCost())
@@ -56,7 +56,7 @@
             }
         }
 
-		inputElm.value = stringToFixed(inputValue, 8)
+		inputElm.value = stringToFixed(adjustedValue, 8)
 		pressedMaxValue = true;
 		dispatchEvent(inputValue)
 	}

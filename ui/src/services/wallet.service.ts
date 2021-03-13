@@ -27,7 +27,8 @@ import {
 	removeBearerToken,
 	hasSavedKeystoreData,
 	getSavedKeystoreData,
-	removeLSValue } from '../utils'
+	removeLSValue,
+	getAmmStakeDetails } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
 
@@ -173,7 +174,8 @@ export class WalletService {
 		await Promise.all([
 			refreshLpBalances(vk),
 			this.getAccountName(vk),
-			setBearerToken(vk)
+			setBearerToken(vk),
+			getAmmStakeDetails(vk)
 		])
 	}
 
@@ -655,6 +657,49 @@ export class WalletService {
 			if (callbacks) callbacks.success()
 		}
 	}
+
+	public async stakeTokensInAMM(contractName, args, newDiscount, addingMore, callbacks = undefined) {
+		let txList = [{contract: contractName, method: "stake"}]
+		if (await this.needsApproval(config.ammTokenContract, args.amount.__fixed__, config.ammContractName)){
+			txList.push({contract: config.ammTokenContract, method: "approve"})
+		}
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			let results = await this.callApprove(config.ammTokenContract, args.amount.__fixed__, config.ammContractName)
+			if (results){
+				this.sendTransaction(
+					contractName, 
+					"stake", 
+					args, 
+					callbacks, 
+					(res) => this.handleStakeTokensInAMM(res, newDiscount, addingMore, callbacks)
+				)
+			}else{
+				if (callbacks) callbacks.error()
+			}
+		}
+	}
+
+	private handleStakeTokensInAMM = (res, newDiscount, addingMore, callbacks = undefined) => {
+		let status = this.txResult(res.data, callbacks)
+		if (status === 'success') {
+			this.toastService.addToast({ 
+				icon: addingMore ? "gaugePlus" : "gaugeMinus",
+				heading: `Fuel Tank Adjusted!`,
+				text: `Your Rocketswap fees discount has been ${addingMore ? "increased" : "lowered"} to ${stringToFixed(newDiscount, 2)}%`, 
+				type: 'success',
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
+			})
+			if (callbacks) callbacks.success()
+		}
+	}
+
+
 
 	private handleTxErrors(errors, callbacks = undefined){
 		errors.forEach(error => {

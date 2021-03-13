@@ -30,7 +30,6 @@ export const trollBoxOpen = writable(null);
 
 export const tokenBalances = writable({})
 export const walletBalance = derived(tokenBalances, ($tokenBalances) => {
-	console.log({tokenBalances: $tokenBalances})
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore
 	return $tokenBalances?.currency ? $tokenBalances.currency : toBigNumber("0")
@@ -79,6 +78,10 @@ export const stakingInfoProcessed = derived(stakingInfo, ($stakingInfo) => {
 export const userStakingInfo = writable(null);
 export const rswpStakingDeposits = derived(userStakingInfo, ($userStakingInfo) => $userStakingInfo?.deposits || {})
 export const rswpStakingWithdrawls = derived(userStakingInfo, ($userStakingInfo) => $userStakingInfo?.withdrawals || {})
+
+export const ammFuelTank = writable({})
+export const ammFuelTank_stakedAmount = derived(ammFuelTank, ($ammFuelTank) => $ammFuelTank?.stakedAmount || toBigNumber("0"))
+export const ammFuelTank_discount = derived(ammFuelTank, ($ammFuelTank) => $ammFuelTank?.discount || toBigNumber("0"))
 
 export const epochs = writable({});
 export const rocketState = writable(0);
