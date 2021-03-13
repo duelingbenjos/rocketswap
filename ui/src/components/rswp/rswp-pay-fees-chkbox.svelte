@@ -4,7 +4,7 @@
     import { setPayInRswp } from '../../utils' 
 
     $: checked = $payInRswp;
-
+    
     const handleCheckChange = () => {
         setPayInRswp(checked)
     }

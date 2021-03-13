@@ -24,7 +24,6 @@ export class LamdenBlockexplorer_API{
     async getKeys(keyList){
         const res = await axios.post(`${this.url}/api/states/history/getKeys`, keyList).catch(err => console.log(err))
         let data = valuesToBigNumber(res.data)
-        console.log(data)
         let keysObj = {} 
         data.map(kvPair => {
             if (kvPair.value?.__fixed__) kvPair.value = kvPair.value?.__fixed__
