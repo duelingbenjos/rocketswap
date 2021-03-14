@@ -182,7 +182,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			});
 			if (blockNum === currBatchMax) {
 				currBlockNum = currBatchMax;
-				timerId = setTimeout(checkForBlocks, 3000);
+				timerId = setTimeout(checkForBlocks, 100);
 			}
 		}
 	};
