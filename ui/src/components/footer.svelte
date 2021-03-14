@@ -33,7 +33,7 @@
 	let openConnectModal = false;
 
 	rocketState.subscribe(val => {
-		if (val == 2) setTimeout(rocketReset, 6000)
+		if (val == 2) setTimeout(rocketReset, 4000)
 	})
 
 	$: makeSmoke = $rocketState == 1 || $rocketState == 2 ? createSmoke() : stopSmoke();
@@ -64,7 +64,7 @@
 	
 	const rocketReset = () => {
 		rocketState.set(3)
-		setTimeout(() => rocketState.set(0), 1000)
+		setTimeout(() => rocketState.set(0), 500)
 	}
 
 	function refreshPage() {
@@ -144,13 +144,14 @@
 		z-index: 100;
 		top: -59px;
 		transform: rotate(0deg);
-		transition: top 3s ease-in;
 	}
 	.blast-off{
-		top: -1000px;
+		transition: top 3s ease-in;
+		top: -2000px;
 	}
 	.rocket-reset{
 		display: none;
+		transition: top 0s;
 		top: -59px;
 	}
 	.connected > a{
