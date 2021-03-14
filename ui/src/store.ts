@@ -23,6 +23,7 @@ export const mainMenuOpen = writable(false);
 export const epochs = writable({});
 export const rocketState = writable(0);
 export const toast_store: Writable<ToastMetaType[]> = writable([])
+export const tabHidden = writable(false);
 
 
 

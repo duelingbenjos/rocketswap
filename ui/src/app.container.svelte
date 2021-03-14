@@ -17,6 +17,7 @@
 
 	// Misc
 	import { initializeStateFromLocalStorage  } from './utils'
+	import { tabHidden } from './store' 
 
 	//TO DO REMOVE THIS!!
 	import { ToastService } from './services/toast.service'
@@ -28,8 +29,6 @@
 		themeToggle,
 		currentThemeName
 	})
-	
-
 	onMount(() => {
 		themeSet();
 		/** Initialise Singleton Instances */
@@ -38,6 +37,11 @@
 		ApiService.getInstance()
 
 		initializeStateFromLocalStorage()
+
+		document.addEventListener("visibilitychange", setTabActive);
+		return () => {
+			document.removeEventListener("visibilitychange", setTabActive);
+		}
 /*
 		toastService.addToast({ 
 			icon: "buyToken",
@@ -89,6 +93,10 @@
 					duration: 7000000
 		})*/
 	})
+
+	const setTabActive = () => {
+		tabHidden.set(document.hidden)
+	}
 
 	function themeToggle() {
 		let body = document.getElementById("theme-toggle")
