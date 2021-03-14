@@ -3,6 +3,7 @@ import type { TokenListType, TokenMetricsType, TokenSelectType } from './types/a
 
 //Services
 import { ApiService } from './services/api.service'
+import { WsService } from './services/ws.service'
 
 import type { ToastMetaType } from './types/toast.types'
 import { toBigNumber, toBigNumberPrecision } from './utils'
@@ -115,6 +116,7 @@ export const tradeUpdates = writable([]);
 
 // POOLS AND LIQUIDITY
 export const lpBalances = writable({})
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const lpPairs = derived(lpBalances, async ($lpBalances, set) => {
@@ -123,8 +125,15 @@ export const lpPairs = derived(lpBalances, async ($lpBalances, set) => {
 		return
 	}
 	const apiService = ApiService.getInstance();
+	const wsService = WsService.getInstance();
 	const contracts = Object.keys($lpBalances).join(',')
 	let pairsRes = await apiService.getPairs(contracts)
-	if (pairsRes) set(Object.keys(pairsRes).map(key => pairsRes[key]))
+	let pairsList = Object.keys(pairsRes).map(key => pairsRes[key])
+	pairsList.map(pair => {
+		wsService.joinTokenMetricsFeed(pair.contract_name)
+	})
+	if (pairsRes) set(pairsList)
 	else set([])
+
+
 })

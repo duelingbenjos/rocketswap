@@ -73,7 +73,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	handleClientUpdate = async (update: ClientUpdateType) => {
 		let contract_name;
-		console.log(update)
+		//console.log(update)
 		switch (update.action) {
 			case "metrics_update":
 				if (isMetricsUpdate(update)) {
@@ -108,15 +108,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 					// this.wss.emit(`epoch_update`, update);
 				}
 				break;
-				case "client_staking_update":
-					if (isClientStakingUpdate(update)) {
-						//console.log("EPOCH_UPDATE", update);
-						setTimeout(async () => {
-							await this.socketService.sendClientStakingUpdates(update.staking_contract);
-						}, 2000);
-						// this.wss.emit(`epoch_update`, update);
-					}
-					break;
+			case "client_staking_update":
+				if (isClientStakingUpdate(update)) {
+					//console.log("EPOCH_UPDATE", update);
+					setTimeout(async () => {
+						await this.socketService.sendClientStakingUpdates(update.staking_contract);
+					}, 2000);
+					// this.wss.emit(`epoch_update`, update);
+				}
+				break;
 			case "user_yield_update":
 				if (isUserYieldUpdate(update)) {
 					//console.log("UPDATE", update);

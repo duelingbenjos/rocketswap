@@ -2,7 +2,7 @@
 const DOMAIN_NAME = "http://localhost:3003"
 const CURRENCY_SYMBOL = "DTAU"
 const CURRENCY_NAME = "Lamden Testnet Token"
-const AMM_CONTRACT_NAME = 'con_amm_v6'
+const AMM_CONTRACT_NAME = 'con_amm_v7'
 const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
 const AMM_TOKEN_STAKING_CONTRACT = "con_staking_dtau_rswp_lst001_4"
@@ -18,7 +18,7 @@ export const contract_blacklist = [
 
 export const connectionRequest = {
   appName: 'RocketSwap',
-  version: '6.0.0', //Change for PROD
+  version: '7.0.0', //Change for PROD
   logo: 'assets/images/RS_Logo.png',
   background: 'assets/images/background.jpeg',
   contractName: AMM_CONTRACT_NAME, //Change for PROD

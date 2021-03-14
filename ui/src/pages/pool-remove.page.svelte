@@ -79,6 +79,9 @@
 			saveStoreValue(lpBalance, balance)
 			lpTokenPercent = $lpTokenPercentInput / 100;
 			lpTokensToBurn = balance.multipliedBy(lpTokenPercent)
+
+			if (lpTokensToBurn.isEqualTo(balance) && lpTokensToBurn.isEqualTo(quoteCalc.totalLP)) lpTokensToBurn = lpTokensToBurn.minus(2)
+
 			saveStoreValue(lpTokenAmount, lpTokensToBurn)
 
 			currentLpSharePercent = stringToFixed(quoteCalc.calcLpPercent(balance).multipliedBy(100), 1)

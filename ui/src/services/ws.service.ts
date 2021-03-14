@@ -1,15 +1,17 @@
 	import socket from 'socket.io-client'
+	import { get } from 'svelte/store'
 	import { 
-	token_metrics_store, 
-	tokenBalances, 
-	ws_id, 
-	trollboxMessages, 
-	tradeUpdates, 
-	tradeHistory, 
-	stakingInfo, 
-	userYieldInfo,
-	epochs,
-	lpBalances } from '../store'
+		token_metrics_store, 
+		tokenBalances, 
+		ws_id, 
+		trollboxMessages, 
+		tradeUpdates, 
+		tradeHistory, 
+		stakingInfo, 
+		userYieldInfo,
+		epochs,
+		lpBalances,
+		lpPairs } from '../store'
 	import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 	import { getBaseUrl, valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision } from '../utils'
 	import { config } from '../config'
@@ -70,7 +72,7 @@
 		if (!this.previously_connected) {
 			this.connection.emit('join_room', `trollbox`)
 			this.previously_connected = true
-			this.joinPriceFeed(config.ammTokenContract)
+			this.joinTokenMetricsFeed(config.ammTokenContract)
 		}
 	}
 	// TRANSACTIONS
@@ -169,16 +171,18 @@
 /* -------------------------
 		CONTRACT FEEDS
 */
-	public joinPriceFeed(contract_name: string) {
+	public joinTokenMetricsFeed(contract_name: string) {
 		if(this.joinedFeeds[`price_feed:${contract_name}`]) return
+		console.log({joinTokenMetricsFeed: contract_name})
 		//console.log('join price feed')
 		this.connection.emit('join_room', `price_feed:${contract_name}`)
-		this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
+		this.connection.on(`price_feed:${contract_name}`, this.handleTokenMetricsFeed)
+
 		this.joinedFeeds[`price_feed:${contract_name}`] = true
 	}
 
-	private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
-		console.log({handleMetricsUpdate: JSON.parse(JSON.stringify(metrics_update))})
+	private handleTokenMetricsFeed = (metrics_update: MetricsUpdateType) => {
+		console.log({handleTokenMetricsFeed: JSON.parse(JSON.stringify(metrics_update))})
 		let { contract_name } = metrics_update
 		const metrics = this.token_metrics
 		metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
@@ -231,7 +235,6 @@
 		this.joinedFeeds[`trade_feed:${contract_name}`] = false
 	}
 
-
 /* -------------------------
 	USER FEEDS
 */
@@ -265,7 +268,6 @@
 
 	// TOKEN BALANCES
 	public joinBalanceFeed(vk: string) {
-		
 		if (this.joinedFeeds[`balance_list:${vk}`]) return
 		
 		this.connection.emit('join_room', `balance_feed:${vk}`)
@@ -297,9 +299,8 @@
 	}
 
 	public joinUserLpBalancesFeed(vk: string){
-		console.log(`joining user_lp_feed:${vk}`)
 		if (this.joinedFeeds[`user_lp_feed:${vk}`]) return
-		
+		console.log({joinUserLpBalancesFeed: vk})
 		this.connection.emit('join_room', `user_lp_feed:${vk}`)
 		this.connection.on(`user_lp_feed:${vk}`, this.handleUserLpBalanceList)
 		this.connection.on(`user_lp_update:${vk}`, this.handleUserLpBalanceUpdate)
@@ -308,10 +309,9 @@
 	}
 
 	private handleUserLpBalanceList(payload){
-		
 		console.log({handleUserLpBalanceList: JSON.parse(JSON.stringify(payload))})
-		//console.log(payload)
 		lpBalances.set(valuesToBigNumber(payload).points)
+		get(lpPairs)
 	}
 
 	private handleUserLpBalanceUpdate(data){

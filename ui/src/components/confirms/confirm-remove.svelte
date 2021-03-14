@@ -100,7 +100,7 @@
         </div>
     </div>
     <p class="text-xsmall sub-text text-primary-dimmer">
-        Output is estimated. If the price changes by more than 0.5% your transaction will revert.
+        ** You are required to leave 1 LP token behind
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row flex-align-center modal-confirm-item">

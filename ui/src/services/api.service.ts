@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { token_list_store, bearerToken } from '../store'
 import { getBaseUrl, valuesToBigNumber, removeLSValue } from '../utils'
-import { config } from '../config'
 import { get } from 'svelte/store'
 
 /** Singleton Api Service */

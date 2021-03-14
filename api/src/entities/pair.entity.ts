@@ -41,6 +41,7 @@ export async function saveReserves(
 	timestamp: number,
 	hash: string
 ) {
+	console.log("saveReserves")
 	// console.log(state);
 	const reserve_kvp = state.find(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "reserves"
