@@ -14,9 +14,10 @@
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils, refreshLpBalances } from '../utils'
 	import { walletIsReady, lwc_info, tokenBalances, lpBalances, saveStoreValue } from '../store'
-	import { connectionRequest } from '../config'
+	import { connectionRequest, config } from '../config'
 
 	//Components
+	import HeadMeta from '../components/head-meta.svelte'
 	import PoolSwapPanel from '../components/panels/pool-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
@@ -42,7 +43,8 @@
   	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
+	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol}` : 'RocketSwap Add Liquidity!';
+	$: pageDescription = $selectedToken ? `Add liquidity to the ${$selectedToken.token_symbol}/${config.currencySymbol} pool!` : 'Add Liquidity!';
 	$: removeHref = $selectedToken ? `/#/pool-remove/${$selectedToken.contract_name}` : false;
 	$: updateStats = updatePageStats($walletIsReady, $tokenLP, $lpBalances, $currencyAmount)
 
@@ -129,9 +131,7 @@
 </style>
 
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page-container">
 	<PoolSwapPanel>

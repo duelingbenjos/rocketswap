@@ -2,6 +2,7 @@
     import { onMount } from 'svelte'
 
     // Components
+    import HeadMeta from '../components/head-meta.svelte'
     import StakingPanel from '../components/panels/staking-panel.svelte'
     import HorizontalStakingPanel from '../components/panels/horizontal-staking-panel.svelte'
     import PageHeader from '../components/misc/page-header.svelte'
@@ -20,6 +21,7 @@
     let innerWidth;
 
     $: pageTitle = 'Rocket Farm'
+    $: pageDescription = "The FASTEST way to earn Crypto!"
     $: filteredList = filterList($stakingInfoProcessed, $earnFilters?.search);
 
     onMount(() => {
@@ -106,9 +108,7 @@
 </style>
 
 
-<svelte:head>
-    <title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page">
     <PageHeader title={pageTitle} />

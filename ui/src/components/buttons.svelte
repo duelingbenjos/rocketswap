@@ -31,7 +31,10 @@
 	$: disabledText = undefined;
 
 
-	const openConfirm = () => open = true;
+	const openConfirm = () => {
+		rocketState.set(3)
+		open = true;
+	}
 	const closeConfirm = (e) => {
 		if ($rocketState == 1) rocketState.set(0)
 		open = false;

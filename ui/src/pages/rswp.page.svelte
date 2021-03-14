@@ -3,6 +3,7 @@
     import { writable } from 'svelte/store'
 
     // Components
+    import HeadMeta from '../components/head-meta.svelte'
     import RSWPBalance from '../components/rswp/rswp-balance.svelte'
     import StakingPanel from '../components/panels/staking-panel.svelte'
     import RSWPDiscountPanel from '../components/panels/rswp-discount-panel.svelte'
@@ -24,7 +25,8 @@
 
     let rswpToken = writable()
 
-    $: pageTitle = 'RocketSwap Token'
+    $: pageTitle = `Get RocketSwap Token (${config.ammTokenSymbol})!`
+    $: pageDescription = `The only place to farm the official (${config.ammTokenSymbol}) token!`
 
     setContext("rswpContext", {
         rswpToken
@@ -79,10 +81,7 @@
     }
 </style>
 
-
-<svelte:head>
-    <title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page">
     <RSWPBalance />

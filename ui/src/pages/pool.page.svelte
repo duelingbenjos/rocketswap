@@ -2,9 +2,11 @@
 	import { setContext } from 'svelte'
 
 	// Components
+	import HeadMeta from '../components/head-meta.svelte'
 	import PoolMain from '../components/pools/pool-main.svelte'
 
-	$: pageTitle = 'RocketSwap Liqidity'
+	$: pageTitle = 'RocketSwap: You Liqidity'
+	$: pageDescription = "View your Rocketswap liquidity pools!"
 
 	setContext("pageContext", {
 		adjustLiquidityRedirect,
@@ -24,8 +26,6 @@
 </script>
 
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <PoolMain />

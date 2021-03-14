@@ -10,6 +10,7 @@
 	const apiService = ApiService.getInstance();
 
 	//Components
+	import HeadMeta from '../components/head-meta.svelte'
 	import PoolRemoveLiquidityPanel from '../components/panels/pool-remove-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
@@ -18,6 +19,7 @@
 	//Misc
 	import { quoteCalculator, stringToFixed, toBigNumber, pageUtils } from '../utils'
 	import { walletIsReady, lwc_info, tokenBalances, saveStoreValue, lpBalances} from '../store'
+	import { config } from '../config'
 
 	let pageStats = writable()
 	let currencyAmount = writable(null)
@@ -42,7 +44,8 @@
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
+	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol} Remove Liquidity` : 'RocketSwap: Remove Liquidity';
+	$: pageDescription = $selectedToken ? `Remove liquidity for ${$selectedToken.token_symbol}/${config.currencySymbol}!` : 'Remove Liquidity!';
 	$: addHref = $selectedToken ? `/#/pool-add/${$selectedToken.contract_name}` : `/#/pool-add/`;
 	$: updateStats = updatePageStats($tokenLP, $walletIsReady, $lpTokenPercentInput)
 
@@ -111,9 +114,7 @@
 </style>
 
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page-container">
 	<PoolRemoveLiquidityPanel>

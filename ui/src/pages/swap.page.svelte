@@ -18,9 +18,10 @@
 	
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
-	import { connectionRequest } from '../config'
+	import { connectionRequest, config } from '../config'
 
 	//Components
+	import HeadMeta from '../components/head-meta.svelte'
 	import SwapPanel from '../components/panels/swap-panel.svelte'
 	import TradeTable from '../components/misc/trade-table.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
@@ -49,7 +50,8 @@
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap';
+	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol}` : 'RocketSwap';
+	$: pageDescription = $selectedToken ? `Swap ${$selectedToken.token_symbol}/${config.currencySymbol}!` : 'The Fastest Swaps in Crypto!';
 	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken, $slippageTolerance, $rswpPrice, $payInRswp)
 
 	selectedToken.subscribe(value => {
@@ -138,9 +140,7 @@
 </style>
 
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page-container">
 	<SwapPanel>

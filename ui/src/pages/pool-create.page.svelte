@@ -12,6 +12,7 @@
 	const walletService = WalletService.getInstance();
 
 	//Components
+	import HeadMeta from '../components/head-meta.svelte'
 	import PoolSwapPanel from '../components/panels/pool-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
@@ -22,7 +23,7 @@
 	//Misc
 	import { quoteCalculator, pageUtils, toBigNumber } from '../utils'
 	import { walletIsReady, tokenBalances, saveStoreValue } from '../store'
-	import { connectionRequest } from '../config'
+	import { connectionRequest, config } from '../config'
 
 	let pageStats = writable({})
 	let currencyAmount = writable(null)
@@ -44,7 +45,8 @@
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap Create ${$selectedToken.token_symbol} Pool` : 'RocketSwap Create Pool';
+	$: pageTitle = $selectedToken ? `RocketSwap: Create ${$selectedToken.token_symbol}/${config.currencySymbol} Pool` : 'RocketSwap Create Liquidity';
+	$: pageDescription = $selectedToken ? `Create the ${$selectedToken.token_symbol}/${config.currencySymbol} liquidity pool!` : 'Create Liquidity!';
 	$: updateStats = updatePageStats($currencyAmount, $tokenAmount)
 
 	selectedToken.subscribe(value => {
@@ -114,10 +116,7 @@
 	}
 </style>
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
-
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page-container">
 	<PoolSwapPanel>
