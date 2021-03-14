@@ -44,7 +44,8 @@
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap Create ${$selectedToken.token_symbol} Pool` : 'RocketSwap Create Pool';
+	$: pageTitle = $selectedToken ? `RocketSwap: Create ${$selectedToken.token_symbol}/${config.currencySymbol} Pool` : 'RocketSwap Create Liquidity';
+	$: pageDescription = $selectedToken ? `Create the ${$selectedToken.token_symbol}/${config.currencySymbol} liquidity pool!` : 'Create Liquidity!';
 	$: updateStats = updatePageStats($currencyAmount, $tokenAmount)
 
 	selectedToken.subscribe(value => {
@@ -116,8 +117,26 @@
 
 <svelte:head>
 	<title>{pageTitle}</title>
-</svelte:head>
 
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content="{pageTitle}" />
+	<meta name="twitter:description" content="{pageDescription}" />
+	<meta name="twitter:site" content="@RSwapOfficial" />
+	<meta name="twitter:creator" content="Lamden Community" />
+	<meta name="twitter:image" content="/assets/images/RS_Logo_192.png" />
+	<meta name="twitter:image:alt" content="/assets/images/RS_Logo_192.png" />
+
+	<meta property="og:url" content="/assets/images/RS_Logo_192.png" />
+	<meta property="og:type" content="article" />
+	<meta property="og:title" content="{pageTitle}" />
+	<meta property="og:image" content="/assets/images/RS_Logo_192.png" />
+	<meta property="og:description" content="{pageDescription}" />
+	<meta property="og:image:url" content="/assets/images/RS_Logo_192.png" />
+	<meta property="og:image:secure_url" content="/assets/images/RS_Logo_192.png" />
+	<meta property="og:image:width" content="192" />
+	<meta property="og:image:height" content="192" />
+	<meta property="og:image:type" content="image/png" />
+</svelte:head>
 
 <div class="page-container">
 	<PoolSwapPanel>
