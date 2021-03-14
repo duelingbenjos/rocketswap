@@ -36,7 +36,7 @@
     $: differenceInAmount = fillAmount ? $ammFuelTank_stakedAmount?.minus(fillAmount) : toBigNumber("0");
     $: same = stringToFixed(newPercentDisplay, 2) ===  stringToFixed(tankPercentDisplay, 2)
     $: insufficientRSWP = fillAmount?.isGreaterThan($rswpBalance) || false;
-
+/*
     $: log = console.log({
         fillAmount: fillAmount?.toString() || fillAmount,
         tankPercent: tankPercent?.toString(),
@@ -49,7 +49,7 @@
         differenceInAmount: differenceInAmount?.toString(),
         same
     })
-
+*/
     const calcNewPercet = (value) => {
         if (!value) return null
         return toBigNumberPrecision((1000000000 * (Math.pow(value, ( 1 / 1000000000.0 )) - 1 ) * 0.05), 4)
@@ -86,8 +86,15 @@
         max-width: 300px;
         height: 364px;
         padding: 20px;
-        background: var(--panel-background-gradient);
+
         margin: 0;
+
+        border-radius: 32px;
+        background: var(--panel-background-gradient);
+
+        box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+        -webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+        -moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
     }
     .header{
         margin-bottom: 0;
@@ -115,6 +122,11 @@
     }
     .text-shadow{
         text-shadow: 1px 1px var(--fuel-tank-text-shadow);
+    }
+    @media screen and (min-width: 430px) {
+        .panel-container{
+            margin: 10px;
+        }
     }
 </style>
 

@@ -17,7 +17,7 @@
 	const walletService = WalletService.getInstance();
 
     // Misc
-    import { userYieldInfo } from "../../store"  
+    import { userYieldInfo, tabHidden } from "../../store"  
     import { toBigNumberPrecision, toBigNumber, stakingCalculator, stringToFixed } from "../../utils"  
 
     setContext('stakingPanelContext', {
@@ -50,12 +50,13 @@
 
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
 
+    
     $: log = console.log({
         startingYield: userYield?.current_yield.toString(),
         additionalYield: additionalYield.toString(),
         currentYield: currentYield.toString()
     })
-
+    
     onDestroy(() => {
        clearInterval(startTimer)
        startTimer = null
@@ -63,11 +64,11 @@
 
     const startUpdater = () => {
         "!!!STARTING TIMER!!!"
-        if (!timer_yieldUpdate) timer_yieldUpdate = setInterval(updateYeild, 5000)
+        if (!timer_yieldUpdate) timer_yieldUpdate = setInterval(updateYeild, 15000)
     }
     
     const updateYeild = () =>{
-        additionalYield = stakingCalcs.calcNewYeild(userYield)
+        if (!$tabHidden) additionalYield = stakingCalcs.calcNewYeild(userYield)
     }
 
     async function getStampCost(contract, method){

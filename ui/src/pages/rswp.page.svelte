@@ -48,7 +48,7 @@
         width: 100%;
         max-width: 1020px;
         margin: 0 auto;
-        padding-bottom: 2rem;
+        padding-bottom: 10rem;
         box-sizing: border-box;
     }
 
@@ -67,7 +67,7 @@
 
     @media screen and (min-width: 430px) {
         .page{
-            padding: 0 20px 4rem 20px;
+            padding: 0 20px 6rem 20px;
         }
     }
 

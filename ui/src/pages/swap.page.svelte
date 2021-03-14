@@ -118,12 +118,12 @@
 		let inputAmount = toBigNumber("0");
 		if ($buy) {
 			if ($currencyAmount) inputAmount = $currencyAmount
-			if (await walletService.needsApproval($walletAddress, "currency", inputAmount)){
+			if (await walletService.needsApproval("currency", inputAmount)){
 				txList.push({contract: "currency", method: "approve"})
 			}
 		}else{
 			if ($tokenAmount) inputAmount = $tokenAmount
-			if (await walletService.needsApproval($walletAddress, contractName, inputAmount)){
+			if (await walletService.needsApproval(contractName, inputAmount)){
 				txList.push({contract: contractName, method: "approve"})
 			}			
 		}

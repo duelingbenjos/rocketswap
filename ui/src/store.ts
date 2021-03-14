@@ -23,6 +23,7 @@ export const mainMenuOpen = writable(false);
 export const epochs = writable({});
 export const rocketState = writable(0);
 export const toast_store: Writable<ToastMetaType[]> = writable([])
+export const tabHidden = writable(false);
 
 
 
@@ -62,12 +63,12 @@ export const stakingInfo = writable([]);
 export const userYieldInfo = writable({});
 
 export const stakingInfoProcessed = derived(stakingInfo, ($stakingInfo) => {
-	return $stakingInfo.map(stakeInfo => {
-		if (!stakeInfo.yield_token && stakeInfo.meta.YIELD_TOKEN === "currency") stakeInfo.yield_token = currencyToken
-		if (!stakeInfo.staking_token && stakeInfo.meta.STAKING_TOKEN === "currency") stakeInfo.staking_token = currencyToken
-		console.log(stakeInfo)
-		return stakeInfo
-	})
+	return $stakingInfo.filter(stakeInfo => stakeInfo.contract_name !==  "con_staking_rswp_doug")
+		.map(stakeInfo => {
+			if (!stakeInfo.yield_token && stakeInfo.meta.YIELD_TOKEN === "currency") stakeInfo.yield_token = currencyToken
+			if (!stakeInfo.staking_token && stakeInfo.meta.STAKING_TOKEN === "currency") stakeInfo.staking_token = currencyToken
+			return stakeInfo
+		})
 })
 
 // RSWP

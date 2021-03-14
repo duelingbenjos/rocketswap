@@ -122,8 +122,8 @@ body {
 	--small-box-background: #2b284b69;
 
 	background-repeat:no-repeat;
-	background: url("assets/images/stars-bg.png"), var(--main-background-solid);
-	background: url("assets/images/stars-bg.png"), var(--main-background-gradient);
+	background: var(--main-background-solid);
+	background: var(--main-background-gradient);
 	background-attachment: fixed;
 
 	color: var(--text-primary-color);
@@ -184,13 +184,6 @@ body.light{
 	--fuel-tank-panel-fuel-bg-color: #9100fffc;
 	--fuel-tank-text-shadow: var(--color-gray-3);
 	--small-box-background: #2b284b00;
-
-	background-repeat:no-repeat;
-	background: var(--main-background-solid);
-	background: var(--main-background-gradient);
-	background-attachment: fixed;
-
-
 }
 
 .text-xsmall{

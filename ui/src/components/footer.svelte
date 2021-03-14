@@ -26,8 +26,6 @@
 	// Bindings
 	let rocketElm;
 
-	active.subscribe(val => console.log({val}))
-
 	let smoke = true;
 	let smokeList = [];
 	let smokeTimer = null;

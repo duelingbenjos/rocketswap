@@ -64,7 +64,6 @@
 */ 
 	// CONNECT
 	private handleConnect(){
-		console.log(this)
 		//console.log(`socket connected to : ${this.base_url}:${this.port}`)
 		if (!this.previously_connected) {
 			this.connection.emit('join_room', `trollbox`)
@@ -160,6 +159,7 @@
 
 	// AUTH 
 	private handleAuthResponse(msg){
+		console.log({handleAuthResponse:msg})
 		localStorage.setItem('auth_token', JSON.stringify(msg))
 		setBearerToken()
 	}
@@ -249,7 +249,7 @@
 		console.log({user_yield_update: update})
 		userYieldInfo.update(currentValue => {
 			Object.keys(update).map(val => {
-				currentValue[val] = valuesToBigNumber(update[val])
+				if(currentValue[val]) currentValue[val] = valuesToBigNumber(update[val])
 			})
 			console.log(currentValue)
 			return currentValue

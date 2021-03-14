@@ -9,7 +9,6 @@
     // Misc
     import { mainMenuOpen } from '../store'
     
-    mainMenuOpen.subscribe(val => console.log({mainMenuOpen: $mainMenuOpen}))
 </script>
 
 <style>

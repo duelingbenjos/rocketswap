@@ -67,7 +67,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = parseInt(process.env.currBlockNum) || 7100;
+		currBlockNum = parseInt(process.env.currBlockNum) || 4000;
 
 		console.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
@@ -182,7 +182,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			});
 			if (blockNum === currBatchMax) {
 				currBlockNum = currBatchMax;
-				timerId = setTimeout(checkForBlocks, 3000);
+				timerId = setTimeout(checkForBlocks, 100);
 			}
 		}
 	};

@@ -15,6 +15,7 @@
 
 <style>
     .container{
+        flex-direction: column;
         box-sizing: border-box;
         color: var(--text-primary-color);
         font-size: var(--text-size-small);
@@ -31,8 +32,12 @@
     }
     @media screen and (min-width: 430px) {
         .container{
-            padding: 0 30px 30px 30px;
-            border-radius: var(--border-radius);
+            flex-direction: row;
+        }
+    }
+    @media screen and (min-width: 650px) {
+        .container{
+            flex-direction: row;
         }
     }
 </style>
@@ -40,7 +45,7 @@
 
 </div>
 <div class="flex-row container">
-    <div class="flex-row">
+    <div class="flex">
         <RocketSwapCircleLogo 
             styles={`width: ${logoSize}; height: ${logoSize}; min-width: ${logoSize}; min-height: ${logoSize};`} 
             margin="0 16px 0 0 "
