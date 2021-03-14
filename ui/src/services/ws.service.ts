@@ -249,7 +249,7 @@
 		console.log({user_yield_update: update})
 		userYieldInfo.update(currentValue => {
 			Object.keys(update).map(val => {
-				currentValue[val] = valuesToBigNumber(update[val])
+				if(currentValue[val]) currentValue[val] = valuesToBigNumber(update[val])
 			})
 			console.log(currentValue)
 			return currentValue
