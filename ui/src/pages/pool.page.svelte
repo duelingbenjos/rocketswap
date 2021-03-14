@@ -20,9 +20,6 @@
 	function removeLiquidityRedirect (contract) {
 		window.location.assign(`/#/pool-remove/${contract}`)
 	}
-
-
-	
 </script>
 
 

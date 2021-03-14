@@ -1,48 +1,27 @@
 import Lamden from 'lamden-js'
 import { config, connectionRequest, stamps } from './config'
-import BigNumber from 'bignumber.js'
 import { get } from 'svelte/store'
 import { 
 	lwc_info, 
 	walletIsReady, 
 	tokenBalances, 
-	walletBalance, 
 	lpBalances, 
 	saveStoreValue, 
 	bearerToken, 
 	lamdenWalletAutoConnect,
 	slippageTolerance,
 	rswpPrice, 
-	rswpBalance,
 	earnFilters,
 	payInRswp, 
-	walletAddress,
 	ammFuelTank} from './store'
 
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
 
-let API = new Lamden.Masternode_API({ hosts: [config.masternode] })
-
 export const replaceAll = (string, char, replace) => {
 	return string.split(char).join(replace)
 }
 
-export const removeTAUBalance = async () => walletBalance.set("0")
-
-export const refreshLpBalances = async (account = undefined) => {
-	if (!account) account = get(lwc_info)?.walletAddress
-	if (!account) return {}
-
-	const apiService = ApiService.getInstance();
-
-	let balances = await apiService.getUserLpBalance(account)
-	if (balances?.points) balances = balances.points
-	else balances = {}
-
-	lpBalances.set(balances)
-	return balances
-}
 export const getAmmStakeDetails = async (account = undefined) => {
 	if (!account) account = get(lwc_info)?.walletAddress
 	if (!account) return
@@ -293,7 +272,7 @@ export const isBigNumber = (value) => Lamden.Encoder.BigNumber.isBigNumber(value
 export const toBigNumberPrecision = (value = null, precision) => {
 	if (value === null) return toBigNumber("0")
 	try{
-		return toBigNumber(stringToFixed(value, precision))
+		return toBigNumber(stringToFixed(toBigNumber(value).toFixed(precision), precision))
 	}catch(e){
 		return toBigNumber("0")
 	}

@@ -3,10 +3,11 @@ import type { TokenListType, TokenMetricsType, TokenSelectType } from './types/a
 
 //Services
 import { ApiService } from './services/api.service'
+import { WsService } from './services/ws.service'
 
 import type { ToastMetaType } from './types/toast.types'
 import { toBigNumber, toBigNumberPrecision } from './utils'
-import { config, currencyToken } from './config'
+import { config, currencyToken, contract_blacklist } from './config'
 import CurrencyLogo from './icons/lamden-logo.svelte'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -63,7 +64,7 @@ export const stakingInfo = writable([]);
 export const userYieldInfo = writable({});
 
 export const stakingInfoProcessed = derived(stakingInfo, ($stakingInfo) => {
-	return $stakingInfo.filter(stakeInfo => stakeInfo.contract_name !==  "con_staking_rswp_doug")
+	return $stakingInfo.filter(stakeInfo => !contract_blacklist.includes(stakeInfo.contract_name))
 		.map(stakeInfo => {
 			if (!stakeInfo.yield_token && stakeInfo.meta.YIELD_TOKEN === "currency") stakeInfo.yield_token = currencyToken
 			if (!stakeInfo.staking_token && stakeInfo.meta.STAKING_TOKEN === "currency") stakeInfo.staking_token = currencyToken
@@ -115,6 +116,7 @@ export const tradeUpdates = writable([]);
 
 // POOLS AND LIQUIDITY
 export const lpBalances = writable({})
+
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const lpPairs = derived(lpBalances, async ($lpBalances, set) => {
@@ -123,8 +125,15 @@ export const lpPairs = derived(lpBalances, async ($lpBalances, set) => {
 		return
 	}
 	const apiService = ApiService.getInstance();
+	const wsService = WsService.getInstance();
 	const contracts = Object.keys($lpBalances).join(',')
 	let pairsRes = await apiService.getPairs(contracts)
-	if (pairsRes) set(Object.keys(pairsRes).map(key => pairsRes[key]))
+	let pairsList = Object.keys(pairsRes).map(key => pairsRes[key])
+	pairsList.map(pair => {
+		wsService.joinTokenMetricsFeed(pair.contract_name)
+	})
+	if (pairsRes) set(pairsList)
 	else set([])
+
+
 })

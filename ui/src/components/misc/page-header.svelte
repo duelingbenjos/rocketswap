@@ -41,7 +41,7 @@
 
 <style>
     .container{
-        border-bottom: 4px dotted var(--color-secondary);
+        border-bottom: 4px dotted #a128fd42;
     }
     .rocket{
         display: none;

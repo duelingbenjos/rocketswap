@@ -12,7 +12,7 @@
 	const walletService = WalletService.getInstance();
 	
 	//Misc
-	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils, refreshLpBalances } from '../utils'
+	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
 	import { walletIsReady, lwc_info, tokenBalances, lpBalances, saveStoreValue } from '../store'
 	import { connectionRequest, config } from '../config'
 
