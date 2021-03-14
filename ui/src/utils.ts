@@ -28,21 +28,6 @@ export const replaceAll = (string, char, replace) => {
 	return string.split(char).join(replace)
 }
 
-export const removeTAUBalance = async () => walletBalance.set("0")
-
-export const refreshLpBalances = async (account = undefined) => {
-	if (!account) account = get(lwc_info)?.walletAddress
-	if (!account) return {}
-
-	const apiService = ApiService.getInstance();
-
-	let balances = await apiService.getUserLpBalance(account)
-	if (balances?.points) balances = balances.points
-	else balances = {}
-
-	lpBalances.set(balances)
-	return balances
-}
 export const getAmmStakeDetails = async (account = undefined) => {
 	if (!account) account = get(lwc_info)?.walletAddress
 	if (!account) return

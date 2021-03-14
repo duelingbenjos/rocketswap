@@ -8,9 +8,10 @@
 	tradeHistory, 
 	stakingInfo, 
 	userYieldInfo,
-	epochs } from '../store'
+	epochs,
+	lpBalances } from '../store'
 	import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
-	import { getBaseUrl, valuesToBigNumber, setBearerToken } from '../utils'
+	import { getBaseUrl, valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision } from '../utils'
 	import { config } from '../config'
 
 	/** Singleton socket.io service */
@@ -57,6 +58,7 @@
 		token_metrics_store.subscribe((metrics) => {
 			this.token_metrics = metrics
 		})
+
 	}
 
 /* -------------------------
@@ -172,11 +174,11 @@
 		//console.log('join price feed')
 		this.connection.emit('join_room', `price_feed:${contract_name}`)
 		this.connection.on(`price_feed:${contract_name}`, this.handleMetricsUpdate)
-
 		this.joinedFeeds[`price_feed:${contract_name}`] = true
 	}
 
 	private handleMetricsUpdate = (metrics_update: MetricsUpdateType) => {
+		console.log({handleMetricsUpdate: JSON.parse(JSON.stringify(metrics_update))})
 		let { contract_name } = metrics_update
 		const metrics = this.token_metrics
 		metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
@@ -263,6 +265,7 @@
 
 	// TOKEN BALANCES
 	public joinBalanceFeed(vk: string) {
+		
 		if (this.joinedFeeds[`balance_list:${vk}`]) return
 		
 		this.connection.emit('join_room', `balance_feed:${vk}`)
@@ -273,11 +276,13 @@
 	}
 
 	private handleBalanceList(payload) {
+		console.log({handleBalanceList: JSON.parse(JSON.stringify(payload))})
 		//console.log(payload)
 		tokenBalances.set(valuesToBigNumber(payload).balances)
 	}
 
 	private handleBalanceUpdate(data) {
+		console.log({handleBalanceUpdate: data})
 		//console.log(data)
 		const { payload } = data
 		tokenBalances.set(valuesToBigNumber(payload).balances)
@@ -289,5 +294,35 @@
 		tokenBalances.set({})
 
 		this.joinedFeeds[`balance_feed:${vk}`] = false
+	}
+
+	public joinUserLpBalancesFeed(vk: string){
+		console.log(`joining user_lp_feed:${vk}`)
+		if (this.joinedFeeds[`user_lp_feed:${vk}`]) return
+		
+		this.connection.emit('join_room', `user_lp_feed:${vk}`)
+		this.connection.on(`user_lp_feed:${vk}`, this.handleUserLpBalanceList)
+		this.connection.on(`user_lp_update:${vk}`, this.handleUserLpBalanceUpdate)
+
+		this.joinedFeeds[`user_lp_feed:${vk}`] = true
+	}
+
+	private handleUserLpBalanceList(payload){
+		
+		console.log({handleUserLpBalanceList: JSON.parse(JSON.stringify(payload))})
+		//console.log(payload)
+		lpBalances.set(valuesToBigNumber(payload).points)
+	}
+
+	private handleUserLpBalanceUpdate(data){
+		console.log({handleUserLpBalanceUpdate: JSON.parse(JSON.stringify(data))})
+		lpBalances.set(valuesToBigNumber(data).points)
+	}
+
+	public leaveUserLpBalanceFeed(vk: string){
+		this.connection.off(`user_lp_feed:${vk}`)
+		this.connection.off(`user_lp_update:${vk}`)
+		lpBalances.set({})
+		this.joinedFeeds[`user_lp_feed:${vk}`] = false
 	}
 }

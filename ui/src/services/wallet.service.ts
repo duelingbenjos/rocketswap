@@ -14,7 +14,6 @@ import {
 	 } from '../store'
 import { get } from 'svelte/store'
 import { 
-	refreshLpBalances, 
 	setBearerToken, 
 	toBigNumber, 
 	stringToFixed, 
@@ -22,8 +21,6 @@ import {
 	createBlockExplorerLink,
 	setLSValue,
 	setLamdenWalletAutoConnectStore,
-	removeLpBalances,
-	removeTAUBalance,
 	removeBearerToken,
 	hasSavedKeystoreData,
 	getSavedKeystoreData,
@@ -142,11 +139,19 @@ export class WalletService {
 	private joinUserFeeds = (vk) => {
 		console.log("JOINING USER FEEDS")
 		this.wsService.joinBalanceFeed(vk)
+		this.wsService.joinUserLpBalancesFeed(vk)
 		this.wsService.joinUserYieldFeed(vk)
 	}
 
+	private leaveUserFeeds = (vk) => {
+		console.log("JOINING USER FEEDS")
+		this.wsService.leaveBalanceFeed(vk)
+		this.wsService.leaveUserLpBalanceFeed(vk)
+		this.wsService.leaveUserYieldFeed(vk)
+	}
+
 	public logout = () => {
-		this.wsService.leaveBalanceFeed(get(walletAddress))
+		this.leaveUserFeeds(get(walletAddress))
 		lwc_info.update(current => {
 			current.walletAddress = ""
 			current.approved = false
@@ -159,7 +164,6 @@ export class WalletService {
 		removeBearerToken()
 		setLSValue("lamden_wallet_autoconnect", false)
 		setLamdenWalletAutoConnectStore()
-		removeLpBalances()
 		
 		this.toastService.addToast({ 
 			icon: "rocketswapLogo",
@@ -172,7 +176,6 @@ export class WalletService {
 
 	private getIntialBalances = async (vk) => {
 		await Promise.all([
-			refreshLpBalances(vk),
 			this.getAccountName(vk),
 			setBearerToken(vk),
 			getAmmStakeDetails(vk)
@@ -777,7 +780,6 @@ export class WalletService {
 		}
 		if (typeof txResults.txBlockResult.status !== 'undefined') {
 			if (txResults.txBlockResult.status === 0) {
-				setInterval(refreshLpBalances, 2000)
 				return 'success'
 			}
 			if (txResults.txBlockResult.status === 1) {

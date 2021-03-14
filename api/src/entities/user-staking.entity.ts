@@ -84,13 +84,13 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 		});
 	}
 
-	console.log("Harvestable Yield", harvestable_yield);
+	//console.log("Harvestable Yield", harvestable_yield);
 	// if (typeof withdrawals === 'object') withdrawals = 0
 	harvestable_yield -= withdrawals;
 
 	const dev_share = harvestable_yield * DevRewardPct;
-	console.log("-==== YIELD AND ALL HERE ====-");
-	console.log(dev_share, harvestable_yield, DevRewardPct);
+	//console.log("-==== YIELD AND ALL HERE ====-");
+	//console.log(dev_share, harvestable_yield, DevRewardPct);
 	return harvestable_yield - dev_share;
 }
 
@@ -102,7 +102,7 @@ function calculateYield(args: {
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
-	console.log("CALCULATE YIELD CALLED");
+	//console.log("CALCULATE YIELD CALLED");
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
 	// console.log(epochs);
@@ -142,7 +142,7 @@ function calculateYield(args: {
 		y += deposit_yield_this_epoch;
 		this_epoch_index += 1;
 	}
-	console.log("CALCULATED YIELD: ", y);
+	//console.log("CALCULATED YIELD: ", y);
 	return y;
 }
 

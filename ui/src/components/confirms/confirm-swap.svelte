@@ -16,7 +16,7 @@
 
     //Misc
     import { rocketState, slippageTolerance } from '../../store'
-    import { stringToFixed, toBigNumber, refreshLpBalances } from '../../utils'
+    import { stringToFixed, toBigNumber } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -64,8 +64,6 @@
 
     const success = () => {
         finish();
-        setTimeout(refreshLpBalances, 2500)
-        setTimeout(refreshLpBalances, 10000)
         setTimeout(() => rocketState.set(2), 500)
         resetPage();
         closeConfirm();

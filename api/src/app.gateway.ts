@@ -31,6 +31,7 @@ import {
 	IProxyTxnReponse,
 	MetricsUpdateType,
 	UserLpUpdateType,
+	isUserLpUpdateType,
 	isEpochUpdate,
 	isUserYieldUpdate,
 	isClientStakingUpdate
@@ -72,6 +73,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	handleClientUpdate = async (update: ClientUpdateType) => {
 		let contract_name;
+		console.log(update)
 		switch (update.action) {
 			case "metrics_update":
 				if (isMetricsUpdate(update)) {
@@ -85,6 +87,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 					this.wss.emit(`balance_update:${update.payload.vk}`, update);
 				}
 				break;
+			case "user_lp_update":
+				if (isUserLpUpdateType(update)){
+					console.log(update)
+					this.wss.emit(`user_lp_update:${update.vk}`, update);
+				}
+				break;
 			case "trade_update":
 				if (isTradeUpdate(update)) {
 					this.wss.emit(`trade_update`, { update });
@@ -93,7 +101,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "epoch_update":
 				if (isEpochUpdate(update)) {
-					console.log("EPOCH_UPDATE", update);
+					//console.log("EPOCH_UPDATE", update);
 					setTimeout(async () => {
 						await this.socketService.sendClientStakingUpdates(update.data.staking_contract);
 					}, 2000);
@@ -102,7 +110,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 				case "client_staking_update":
 					if (isClientStakingUpdate(update)) {
-						console.log("EPOCH_UPDATE", update);
+						//console.log("EPOCH_UPDATE", update);
 						setTimeout(async () => {
 							await this.socketService.sendClientStakingUpdates(update.staking_contract);
 						}, 2000);
@@ -111,7 +119,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 					break;
 			case "user_yield_update":
 				if (isUserYieldUpdate(update)) {
-					console.log("UPDATE", update);
+					//console.log("UPDATE", update);
 					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
 		}
@@ -135,12 +143,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async handleJoinRoom(client: Socket, room: string) {
 		client.join(room);
 		client.emit("joined_room", room);
+		console.log({joined: room})
 		const [prefix, subject] = room.split(":");
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
 				break;
 			case "user_lp_feed":
+				console.log("joining user_lp_feed")
 				this.handleJoinUserLpFeed(subject, client);
 				break;
 			case "balance_feed":
@@ -170,7 +180,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
 		this.socketService.addStakingPanelClient(subject);
 		const yield_list = await this.socketService.getClientYieldList(subject);
-		console.log("called");
+		//console.log("called");
 		client.emit("user_yield_list", yield_list);
 	}
 
@@ -241,7 +251,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	private async handleJoinBalanceFeed(vk: string, client: Socket) {
-		// console.log(`${vk} joined balance feed`);
 		try {
 			let balances: any = await BalanceEntity.findOne(vk);
 			if (!balances)
@@ -261,7 +270,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			const { points } = user_lp_points;
 			const user_lp_action: UserLpUpdateType = {
 				action: "user_lp_update",
-				points
+				points,
+				vk
 			};
 			client.emit(`user_lp_feed:${vk}`, user_lp_action);
 		} catch (err) {

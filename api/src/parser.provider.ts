@@ -136,7 +136,10 @@ export class ParserProvider {
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
 			await savePairLp(state);
-			await saveUserLp(state);
+			await saveUserLp({
+				state,
+				handleClientUpdate: this.socketService.handleClientUpdate
+			});
 			await saveReserves(
 				fn,
 				state,

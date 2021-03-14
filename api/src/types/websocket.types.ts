@@ -41,6 +41,7 @@ export type ClientUpdateType =
 	| PriceUpdateType
 	| MetricsUpdateType
 	| BalanceUpdateType
+	| UserLpUpdateType
 	| TradeUpdateType
 	| StakingMetaUpdateType
 	| UserYieldUpdateType
@@ -87,6 +88,7 @@ export interface PriceUpdateType extends UpdateType {
 export interface UserLpUpdateType extends UpdateType {
 	action: "user_lp_update";
 	points: { [key: string]: string };
+	vk: string;
 }
 
 export interface MetricsUpdateType extends UpdateType {
@@ -134,6 +136,10 @@ export function isMetricsUpdate(client_update: ClientUpdateType): client_update 
 
 export function isBalanceUpdate(client_update: ClientUpdateType): client_update is BalanceUpdateType {
 	return (client_update as BalanceUpdateType).action === "balance_update";
+}
+
+export function isUserLpUpdateType(client_update: ClientUpdateType): client_update is UserLpUpdateType {
+	return (client_update as UserLpUpdateType).action === "user_lp_update";
 }
 
 export function isPriceUpdate(client_update: ClientUpdateType): client_update is PriceUpdateType {
