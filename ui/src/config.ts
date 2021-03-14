@@ -1,5 +1,5 @@
 //Change there for for PROD
-
+const DOMAIN_NAME = "http://localhost:3003"
 const CURRENCY_SYMBOL = "DTAU"
 const CURRENCY_NAME = "Lamden Testnet Token"
 const AMM_CONTRACT_NAME = 'con_amm_v6'
@@ -37,6 +37,7 @@ export const stamps = {
 }
 
 export const config = {
+  domainName: DOMAIN_NAME,
   namesContract: NAMES_CONTRACT, //Change for PROD
   currencySymbol: CURRENCY_SYMBOL, //Change for PROD
   currencyName: CURRENCY_NAME, // Change for PROD
@@ -53,6 +54,11 @@ export const currencyToken = {
   contract_name: "currency",
   token_name: CURRENCY_NAME,
   token_symbol: CURRENCY_SYMBOL
+}
+
+export const site_head_meta = {
+  siteLogo: `${DOMAIN_NAME}/assets/images/RS_Logo_192.png`,
+  imageBig: `${DOMAIN_NAME}/assets/images/rocketswap_card.jpeg`
 }
 
 export const walletDownloadURL = "https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim"
