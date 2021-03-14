@@ -56,8 +56,9 @@ export class SocketService {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			// if (!staking_entities || !staking_entities.length) return;
 			console.log(staking_entities);
-			const payload = staking_entities.reduce(async (accum, user_entity) => {
-				// console.log(user_entity);
+			const payload = staking_entities.reduce(async (accumP, user_entity) => {
+				console.log("USER ENTITY", user_entity.staking_contract);
+				const accum = await accumP
 				if (
 					(!user_entity.yield_info ||
 						!Object.keys(user_entity.yield_info).length ||
@@ -74,9 +75,11 @@ export class SocketService {
 				}
 				accum[user_entity.staking_contract] = user_entity.yield_info;
 				return accum;
-			}, {});
+			}, Promise.resolve({}));
 			return payload;
-		} catch (err) {}
+		} catch (err) {
+			this.logger.error(err)
+		}
 	}
 
 	public async sendClientStakingUpdates(staking_contract: string) {
@@ -125,7 +128,7 @@ export class SocketService {
 					epoch_entities_filtered.push(epoch);
 				}
 			});
-			console.log("EPOCH ENTITIES FILTERED : ", epoch_entities_filtered.length);
+			epoch_entities_filtered.sort((a, b) => a.epoch_index - b.epoch_index);
 
 			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract } });
 

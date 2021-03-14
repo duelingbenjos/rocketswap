@@ -84,10 +84,6 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 		});
 	}
 
-	if (harvestable_yield <= 0) {
-		return 0;
-	}
-
 	console.log("Harvestable Yield", harvestable_yield);
 	// if (typeof withdrawals === 'object') withdrawals = 0
 	harvestable_yield -= withdrawals;
