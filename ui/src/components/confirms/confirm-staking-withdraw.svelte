@@ -14,6 +14,7 @@
 
     //Misc
     import { stringToFixed, toBigNumberPrecision, toBigNumber } from '../../utils'
+    import { config } from '../../config'
 
     //Props
     export let stakingInfo;
@@ -26,9 +27,10 @@
     let logoSize = "30px"
     let loading = false;
 
-    let withdrawAmount = toBigNumber("0");
-
-    $: withdrawAmountOverBalance = withdrawAmount.isGreaterThan(currentYield)
+    $: isAMMTokenFarmContract = config.ammTokenContract === stakingInfo.contract_name
+    $: withdrawAmount = toBigNumber("0");
+    $: withdrawAmountOverBalance = withdrawAmount.isGreaterThan(currentYield);
+    $: withdrawAmountLessFee = isAMMTokenFarmContract ? withdrawAmount?.multipliedBy(0.9) || toBigNumber("0") : withdrawAmount;
 
     const handleAmountInput = (e) => {
         withdrawAmount = e.detail
@@ -77,9 +79,7 @@
         margin: 1rem 0;
         width: 90%;
     }
-    .amount-row{
-        margin: 0.25rem 0;
-    }
+
     .staking-deatils{
         margin: 0 0 1rem 0;
     }
@@ -104,10 +104,19 @@
         </div>
         <InputNumber placeholder="0" on:input={handleAmountInput} margin="0.25rem 0 1rem"/>
     </div>
+    {#if config.ammTokenContract === stakingInfo.contract_name}
+        <p class="text-xsmall sub-text text-primary-dim">
+            ** 10% of the yeild from all {config.ammTokenSymbol} withdrawls goes to the developers of Rocketswap!
+        </p>
+    {/if}
     <div class="flex-col modal-confirm-details-box text-small weight-400">
          <div class="flex-row">
             <span><strong class="symbol-horizontal text-color-secondary">{yieldToken.token_symbol}</strong> Earned:</span>
             <span class="weight-600 flex-grow text-align-right">{stringToFixed(currentYield, 8)}</span>
+        </div>
+        <div class="flex-row">
+            <span><strong class="symbol-horizontal text-color-secondary">{yieldToken.token_symbol}</strong> Get:</span>
+            <span class="weight-600 flex-grow text-align-right">{stringToFixed(withdrawAmountLessFee, 8)}</span>
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button style="secondary" 

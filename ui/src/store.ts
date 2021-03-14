@@ -6,7 +6,7 @@ import { ApiService } from './services/api.service'
 
 import type { ToastMetaType } from './types/toast.types'
 import { toBigNumber, toBigNumberPrecision } from './utils'
-import { config, currencyToken } from './config'
+import { config, currencyToken, contract_blacklist } from './config'
 import CurrencyLogo from './icons/lamden-logo.svelte'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -63,7 +63,7 @@ export const stakingInfo = writable([]);
 export const userYieldInfo = writable({});
 
 export const stakingInfoProcessed = derived(stakingInfo, ($stakingInfo) => {
-	return $stakingInfo.filter(stakeInfo => stakeInfo.contract_name !==  "con_staking_rswp_doug")
+	return $stakingInfo.filter(stakeInfo => !contract_blacklist.includes(stakeInfo.contract_name))
 		.map(stakeInfo => {
 			if (!stakeInfo.yield_token && stakeInfo.meta.YIELD_TOKEN === "currency") stakeInfo.yield_token = currencyToken
 			if (!stakeInfo.staking_token && stakeInfo.meta.STAKING_TOKEN === "currency") stakeInfo.staking_token = currencyToken
