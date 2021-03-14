@@ -63,11 +63,12 @@ export const stakingInfo = writable([]);
 export const userYieldInfo = writable({});
 
 export const stakingInfoProcessed = derived(stakingInfo, ($stakingInfo) => {
-	return $stakingInfo.map(stakeInfo => {
-		if (!stakeInfo.yield_token && stakeInfo.meta.YIELD_TOKEN === "currency") stakeInfo.yield_token = currencyToken
-		if (!stakeInfo.staking_token && stakeInfo.meta.STAKING_TOKEN === "currency") stakeInfo.staking_token = currencyToken
-		return stakeInfo
-	})
+	return $stakingInfo.filter(stakeInfo => stakeInfo.contract_name !==  "con_staking_rswp_doug")
+		.map(stakeInfo => {
+			if (!stakeInfo.yield_token && stakeInfo.meta.YIELD_TOKEN === "currency") stakeInfo.yield_token = currencyToken
+			if (!stakeInfo.staking_token && stakeInfo.meta.STAKING_TOKEN === "currency") stakeInfo.staking_token = currencyToken
+			return stakeInfo
+		})
 })
 
 // RSWP
