@@ -56,7 +56,7 @@ export class SocketService {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			// if (!staking_entities || !staking_entities.length) return;
 			console.log(staking_entities);
-			const payload = staking_entities.reduce(async (accumP, user_entity) => {
+			const payload = await staking_entities.reduce(async (accumP, user_entity) => {
 				console.log("USER ENTITY", user_entity.staking_contract);
 				const accum = await accumP
 				if (
@@ -88,7 +88,7 @@ export class SocketService {
 			const epoch_entities = await StakingEpochEntity.find({ where: { staking_contract }, take: 10000 });
 			console.log(this.staking_panel_clients);
 			for (let vk of this.staking_panel_clients) {
-				const user_entity = await UserStakingEntity.findOne({ where: { vk } });
+				const user_entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
 				console.log(user_entity);
 				if (user_entity) {
 					console.log("sendClientStakingUpdates, user_entity found");

@@ -103,7 +103,9 @@ export class AppController {
 		const { vk } = params;
 		//console.log(vk)
 		try {
-			return await LpPointsEntity.findOneOrFail(vk);
+			const res = await LpPointsEntity.findOne(vk);
+			// console.log(res)
+			return res
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
