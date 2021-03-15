@@ -31,8 +31,6 @@ services:
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
       # - STAKING_CONTRACTS=
-    networks:
-      - rocketswap-network
     ports:
       - 3002:3002
 
