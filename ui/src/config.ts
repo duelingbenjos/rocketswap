@@ -2,7 +2,7 @@
 const DOMAIN_NAME = "http://localhost:3003"
 const CURRENCY_SYMBOL = "DTAU"
 const CURRENCY_NAME = "Lamden Testnet Token"
-const AMM_CONTRACT_NAME = 'con_amm_v7'
+const AMM_CONTRACT_NAME = 'con_amm_v9'
 const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
 const AMM_TOKEN_STAKING_CONTRACT = "con_staking_dtau_rswp_lst001_4"
@@ -18,7 +18,7 @@ export const contract_blacklist = [
 
 export const connectionRequest = {
   appName: 'RocketSwap',
-  version: '7.0.0', //Change for PROD
+  version: '9.0.0', //Change for PROD
   logo: 'assets/images/RS_Logo.png',
   background: 'assets/images/background.jpeg',
   contractName: AMM_CONTRACT_NAME, //Change for PROD
@@ -33,6 +33,7 @@ export const stamps = {
   addStakingTokens: 120,
   withdrawTokensAndYield: 150,
   withdrawYield: 150,
+  stake: 200,
   buy: 200,
   auth: 35,
   approve: 30,
@@ -68,3 +69,9 @@ export const site_head_meta = {
 export const walletDownloadURL = "https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim"
 
 export const genericIcon_base64_svg = GENERIC_ICON
+
+export const ammStakingValues = {
+  log_accuracy: 1000000000,
+  multiplier: 0.1,
+  discount_floor: 1.1118
+}

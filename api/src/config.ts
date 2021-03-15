@@ -1,7 +1,7 @@
 
 export const config = {
   appName: 'Rocketswap',
-  contractName: 'con_amm_v7',
+  contractName: 'con_amm_v9',
   identityContract: 'con_ipseity_5',
   buy: 150,
   currencySymbol: 'dTau',
