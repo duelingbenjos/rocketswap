@@ -58,7 +58,7 @@ export class AppController {
 	@Get("token_list")
 	public async getTokenList() {
 		try {
-			const res = await TokenEntity.find({select:['contract_name','has_market','token_base64_png','token_base64_svg','token_logo_url','token_name','token_symbol']});
+			const res = await TokenEntity.find({select:['contract_name','has_market','token_base64_png','token_base64_svg','token_logo_url','token_name','token_symbol'], where:{token_symbol: true, token_name: true}});
 			return res.map((token) => {
 				return {
 					contract_name: token.contract_name,
