@@ -2,21 +2,21 @@ version: '2'
 services:
 
   ui:
-    build: ./ui
+    build: ../ui
     image: rocketswap-client-ui
     container_name: rocketswap-ui
     ports:
       - 5000:5000
  
   website:
-    build: ./website
+    build: ../website
     image: rocketswap-client-website
     container_name: rocketswap-website
     ports:
       - 80:80
 
   api:
-    build: ./api
+    build: ../api
     image: rocketswap-api
     restart: always
     container_name: rocketswap-api
@@ -37,7 +37,7 @@ services:
       - 3002:3002
 
   docs:
-    build: ./docs
+    build: ../docs
     image: rocketswap-docs
     restart: always
     container_name: rocketswap-docs
