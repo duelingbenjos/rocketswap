@@ -78,6 +78,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			case "metrics_update":
 				if (isMetricsUpdate(update)) {
 					contract_name = update.contract_name;
+					console.log(update)
 					this.wss.emit(`price_feed:${contract_name}`, update);
 					// this.logger.log("price update sent");
 				}

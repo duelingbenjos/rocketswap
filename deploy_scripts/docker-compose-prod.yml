@@ -1,47 +1,32 @@
 version: '2'
 services:
 
-
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - 8081:8081    
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    container_name: rocketswap-mongo
-    network_mode: host
-    volumes: 
-      - ~/mongo/data:/data/db
-
   ui:
-    build: ../ui
+    build: ./ui
     image: rocketswap-client-ui
     container_name: rocketswap-ui
+    networks: 
+      - rocketswap-network
     ports:
       - 5000:5000
  
   website:
-    build: ../website
+    build: ./website
     image: rocketswap-client-website
     container_name: rocketswap-website
+    networks: 
+      - rocketswap-network
     ports:
       - 80:80
 
   api:
-    build: ../api
+    build: ./api
     image: rocketswap-api
     restart: always
     container_name: rocketswap-api
     network_mode: host
     environment:
-      - ROCKETSWAP_DB_HOST=rocketswap-mongo
-      - ROCKETSWAP_DB_PORT=8081
-      - ROCKETSWAP_DB_USERNAME=root
-      - ROCKETSWAP_DB_PASSWORD=example
-      # - ROCKETSWAP_DB_FIRST_RUN=${ROCKETSWAP_DB_FIRST_RUN}
-      - currBlockNum=1
+      - ROCKETSWAP_DB_HOST=127.0.0.1
       - MASTERNODE_URL=https://masternode-01.lamden.io
       - CONTRACT_NAME=con_rocketswap_official_v1
       - IDENTITY_CONTRACT=con_rocket_id_v1
@@ -50,14 +35,18 @@ services:
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
       # - STAKING_CONTRACTS=
+    networks:
+      - rocketswap-network
     ports:
       - 3002:3002
 
   docs:
-    build: ../docs
+    build: ./docs
     image: rocketswap-docs
     restart: always
     container_name: rocketswap-docs
+    networks:
+      - rocketswap-network
     ports:
       - 3000:3000
 

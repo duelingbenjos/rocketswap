@@ -67,7 +67,7 @@ export async function getTokenMetrics(contract_name: string) {
 		// 	id: "DESC"
 		// }
 	});
-	//console.log(pair_entity);
+	console.log(pair_entity);
 	const { price, time, lp, reserves } = pair_entity;
 	return { contract_name, price, time: parseInt(time), reserves, lp };
 }
