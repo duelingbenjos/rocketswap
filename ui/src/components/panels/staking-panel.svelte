@@ -81,7 +81,6 @@
 
     const handleInput = (e) => {
         stakingAmount = toBigNumberPrecision(e.detail, 8)
-        //console.log({e: e.detail, stakingAmount, validStakingAmount})
     }
 
     const openStakingConfirm = () => toggleStakingConfirm(true)

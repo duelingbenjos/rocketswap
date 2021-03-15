@@ -81,7 +81,7 @@ export const getBaseUrl = (url): string => {
   return `${parts[0]}:${parts[1]}`
 }
 
-export const openNewTab = (url) => window.open(url);
+export const openNewTab = (url) => window.open(url, "_blank", {});
 
 export const createBlockExplorerLink = (route, id) => `${config.blockExplorer}/${route}/${id}`
 

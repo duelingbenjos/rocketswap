@@ -15,7 +15,6 @@
     const {  adjustLiquidityRedirect, removeLiquidityRedirect } = getContext("pageContext")
 
     export let pairInfo;
-    console.log({pairInfo})
 
     $: quoteCalc = quoteCalculator(pairInfo)
     $: lpTokens = $lpBalances[pairInfo.contract_name] || toBigNumber("0")

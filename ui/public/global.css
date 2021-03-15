@@ -105,7 +105,7 @@ body {
 	--lamden-logo-color: #FFF;
 	--lamden-logo-border-color: #000;
 
-	--trollbox-message-bg: var(--color-gray-2);
+	--trollbox-message-bg: #200f3a;
 
 	--checkbox-checkmark:  var(--color-secondary);
 	--checkbox-border: var(--text-primary-color);
@@ -171,8 +171,6 @@ body.light{
 
 	--lamden-logo-color: #000;
 	--lamden-logo-border-color: #FFF;
-
-	--trollbox-message-bg: #f7f7f7;
 
 	--checkbox-checkmark: var(--text-primary-color-inverted);
 	--checkbox-border: var(--color-secondary);
@@ -805,6 +803,7 @@ button.close{
 }
 
 .input-message{
+	margin: 0;
 	position: absolute;
 	bottom: 3px;
 	left: 21px;

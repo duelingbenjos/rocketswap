@@ -27,7 +27,6 @@
     }
 
     const handleClick_slippageTolerance = (value) => {
-        console.log({st: $slippageTolerance, value, inputElm: inputElm.value})
         inputElm.value = ""
         inputVal = ""
         setSlippageTolerance(toBigNumber(value))
