@@ -6,9 +6,6 @@
 	//Icons
 	import LamdenLogo from '../../icons/lamden-logo.svelte'
 
-	//Stores
-	import { walletBalance, payInRswp } from '../../store'
-
 	//Services
 	import { WalletService } from '../../services/wallet.service'
 	const walletService = WalletService.getInstance();
@@ -16,6 +13,7 @@
 	//Misc
 	import { config } from '../../config'
 	import { stringToFixed, toBigNumber, determinePrecision, stampsToTAU, toBigNumberPrecision } from '../../utils.js'
+	import { walletBalance, payInRswp, walletAddress } from '../../store'
 
 	//Props
 	export let label
@@ -26,10 +24,15 @@
 	const { currencyAmount, buy, selectedToken, txOkay  } = pageStores
 
 	let inputElm;
-	let pressedMaxValue = false;
-	let txTAUCost = getStampCost().then(res => stampsToTAU(res));
 
+	let pressedMaxValue = false;
+	let txTAUCost = $walletAddress ? getStampCost().then(res => stampsToTAU(res)) : null;
 	let inputValue;
+
+	walletAddress.subscribe(async (value) => {
+		let txCost = await txTAUCost;
+		if (value && !txCost) txTAUCost = getStampCost().then(res => stampsToTAU(res))
+	})
 
 	currencyAmount.subscribe(newCurrencyAmount => {
 		if (!inputValue) {
@@ -49,12 +52,6 @@
 		payInRswp.subscribe(val => {
 			if ($currencyAmount && typeof inputValue !== 'undefined'){
 				if (inputValue > 0) dispatchEvent(inputValue)
-			}
-		})
-		getStampCost().then(res => {
-			if (inputValue) {
-				txTAUCost = stampsToTAU(res)
-				checkCurrencyAmountForStamps()
 			}
 		})
 	})

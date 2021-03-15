@@ -72,7 +72,6 @@ async getPairs(contracts: string) {
 }
 
 async sendMessage(message: string){
-	console.log(get(bearerToken))
 	if (!get(bearerToken)) return false
 		try {
 			const res = await axios.post(`${this.base_url}/api/trollbox/message`, JSON.stringify({message}), {
@@ -81,7 +80,6 @@ async sendMessage(message: string){
 				'Authorization': `Bearer ${get(bearerToken)}`,
 			}
 		})
-		console.log(res)
 		return res
 		} catch (err) {
 			console.log(err)

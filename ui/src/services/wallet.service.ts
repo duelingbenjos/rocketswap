@@ -137,14 +137,12 @@ export class WalletService {
 	}
 
 	private joinUserFeeds = (vk) => {
-		console.log("JOINING USER FEEDS")
 		this.wsService.joinBalanceFeed(vk)
 		this.wsService.joinUserLpBalancesFeed(vk)
 		this.wsService.joinUserYieldFeed(vk)
 	}
 
 	private leaveUserFeeds = (vk) => {
-		console.log("JOINING USER FEEDS")
 		this.wsService.leaveBalanceFeed(vk)
 		this.wsService.leaveUserLpBalanceFeed(vk)
 		this.wsService.leaveUserYieldFeed(vk)
@@ -193,7 +191,6 @@ export class WalletService {
 			return maxStamps + stamps.buffer
 		})
 		.catch(() => {
-			console.log("sending default estimates")
 			let maxStamps = stamps[method]
 			if (!maxStamps) maxStamps = stamps.defaultValue
 			return maxStamps + stamps.buffer
@@ -360,7 +357,6 @@ export class WalletService {
 			txList.push({contract: args.contract, method: "approve"})
 		}
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
-		console.log(totalStampsNeeded)
 		
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
 			let results = await Promise.all([
@@ -418,7 +414,6 @@ export class WalletService {
 			txList.push({contract: args.contract, method: "approve"})
 		}
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
-		console.log({totalStampsNeeded})
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
 			let results = await Promise.all(
 				[
@@ -740,7 +735,6 @@ export class WalletService {
 	private handleTxErrors(errors, callbacks = undefined){
 		errors.forEach(error => {
 			let toastType = 'info'
-			console.log(JSON.stringify(error))
 			if (error.includes("AssertionError('")) {
 				let match = error.match(/AssertionError\('(.*)',\)/)
 				if (match){
@@ -762,7 +756,6 @@ export class WalletService {
 			})
 		})
 		if (callbacks) {
-			console.log("calling error callback! ")
 			callbacks.error(errors)
 		}
 	}
@@ -804,7 +797,6 @@ export class WalletService {
 
 	public needsApproval = async (contract, amount, approvalTo = undefined) => {
 		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract, approvalTo)
-		console.log({contract, amount, approvedAmount})
 		return approvedAmount.isLessThan(amount)
 	}
 

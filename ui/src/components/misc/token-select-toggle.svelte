@@ -37,7 +37,6 @@
     $: selected_contract = $selectedToken?.contract_name;
 
     const openTokenSelect = async () => {
-        console.log("TOKEN SELECT OPEN")
         open = true;
         api_tokens = await getTokenList()
     }
