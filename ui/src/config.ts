@@ -72,6 +72,6 @@ export const genericIcon_base64_svg = GENERIC_ICON
 
 export const ammStakingValues = {
   log_accuracy: 1000000000,
-  multiplier: 0.1,
-  discount_floor: 1.1118
+  multiplier: 0.07,
+  discount_floor: 0.505
 }
