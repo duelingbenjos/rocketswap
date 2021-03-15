@@ -6,7 +6,7 @@ const AMM_CONTRACT_NAME = 'con_rocketswap_official_v1'
 const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
 const AMM_TOKEN_STAKING_CONTRACT = "con_staking_dtau_rswp_lst001_4"
-const AMM_FEE = "0.003"
+const AMM_FEE = "0.005"
 const NAMES_CONTRACT= "con_rocket_id_v1"
 const BLOCKEXPLORER_URL = "https://mainnet.lamden.io"
 const MASTERNODE_URL = "https://masternode-01.lamden.io"
@@ -18,11 +18,11 @@ export const contract_blacklist = [
 
 export const connectionRequest = {
   appName: 'RocketSwap',
-  version: '9.0.0', //Change for PROD
+  version: '1.0.0', //Change for PROD
   logo: 'assets/images/RS_Logo.png',
   background: 'assets/images/background.jpeg',
   contractName: AMM_CONTRACT_NAME, //Change for PROD
-  networkType: 'testnet'  //Change for PROD
+  networkType: 'mainnet'  //Change for PROD
 }
 
 export const stamps = {
@@ -38,7 +38,7 @@ export const stamps = {
   auth: 35,
   approve: 30,
   buffer: 30,
-  currentRatio: 13 //Change for PROD
+  currentRatio: 65 //Change for PROD
 }
 
 export const config = {
