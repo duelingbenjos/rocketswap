@@ -16,7 +16,7 @@ const NETWORK_TYPE = process.env.NETWORK_TYPE;
 let connectionString = `mongodb://127.0.0.1:27017/block-explorer`;
 
 if (DBUSER) {
-	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}/block-explorer?authSource=admin`;
+	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}`;
 } else if (NETWORK_TYPE === 'mainnet') {
 	connectionString = 'mongodb://127.0.0.1/mainnet-blockinfo'
 }
@@ -70,7 +70,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = parseInt(process.env.currBlockNum) || 4000;
+		currBlockNum = parseInt(process.env.currBlockNum) || 8500;
 
 		console.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
