@@ -6,7 +6,7 @@ const http = require("http");
 const mongoose = require("mongoose");
 
 let db = mongoose;
-const MASTERNODE_URL = "https://testnet-master-1.lamden.io";
+const MASTERNODE_URL = process.env.MASTERNODE_URL || "https://testnet-master-1.lamden.io";
 
 /******* MONGO DB CONNECTION INFO **/
 const DBUSER = process.env.ROCKETSWAP_DB_USERNAME;
