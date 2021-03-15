@@ -1,6 +1,7 @@
 export const config = {
+
 	appName: "Rocketswap",
-	contractName: process.env.CONTRACT_NAME || "con_amm_v7",
+	contractName: process.env.CONTRACT_NAME || "con_amm_v9",
 	identityContract: process.env.IDENTITY_CONTRACT || "con_ipseity_5",
 	buy: 150,
 	currencySymbol: process.env.CURRENCY_SYMBOL || "dTau",

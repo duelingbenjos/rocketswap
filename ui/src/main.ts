@@ -22,10 +22,11 @@ routes.set({
     $$component: RSWP,
     $$name: '$RSWP'
   },
+  /*
   '/farm/': {
     $$component: Farm,
     $$name: 'Farm'
-  },
+  },*/
   '/pool-create/': {
     $$component: CreatePool,
     $$name: 'Create Pool',

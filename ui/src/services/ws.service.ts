@@ -209,17 +209,21 @@
 	}
 
 	private handleTradeUpdate(event) {
+		console.log({handleTradeUpdate: JSON.parse(JSON.stringify(event))})
 		console.log({trade_feed: event})
 		//console.log(event)
 		if (event.history) tradeHistory.set(valuesToBigNumber(event.history))
 		else {
-		if (event.action === 'trade_update') {
-			tradeUpdates.update((trades) => {
-			trades.push(valuesToBigNumber(event))
-			//console.log(trades)
-			return trades
-			})
-		}
+			if (event.action === 'trade_update') {
+				tradeUpdates.update((trades) => {
+					console.log({tradesBefore: JSON.parse(JSON.stringify(trades))})
+					trades.push(valuesToBigNumber(event))
+					console.log({tradesAfter: JSON.parse(JSON.stringify(trades))})
+					//console.log(trades)
+					return trades
+				})
+			}
+			console.log({tradeUpdates: JSON.parse(JSON.stringify(get(tradeUpdates)))})
 		}
 	}
 

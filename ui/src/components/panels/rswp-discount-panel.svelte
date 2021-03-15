@@ -18,13 +18,13 @@
     // Misc
     import { stringToFixed, toBigNumber, toBigNumberPrecision } from "../../utils"
     import { ammFuelTank_stakedAmount, ammFuelTank_discount, rswpBalance } from "../../store"  
-    import { config } from "../../config" 
+    import { config, ammStakingValues } from "../../config" 
 
     const { rswpToken } = getContext('rswpContext')
 
     let showFillTankConfirm = false;
     let clearInput
-    
+
     $: fillAmount = null;
     $: tankPercent = $ammFuelTank_discount?.isGreaterThan(0) ?  $ammFuelTank_discount.plus(-1).multipliedBy(-1) : toBigNumber("0");
     $: fuelLevel = tankPercent.multipliedBy(80).plus(20)
@@ -52,7 +52,13 @@
 */
     const calcNewPercet = (value) => {
         if (!value) return null
-        return toBigNumberPrecision((1000000000 * (Math.pow(value, ( 1 / 1000000000.0 )) - 1 ) * 0.05), 4)
+        const {log_accuracy, multiplier, discount_floor} = ammStakingValues
+
+        let discount = toBigNumber(Math.log(value) * multiplier - discount_floor)
+        if (discount.isGreaterThan("0.99")) discount = toBigNumber("0.99")
+        if (discount.isLessThan(0)) discount = toBigNumber("0")
+        discount = toBigNumberPrecision(discount, 4)
+        return discount
     }
 
     async function getStampCost(contract, method){
@@ -71,7 +77,7 @@
     }
 
     const openFillTankConfirm = () => toggleFillTankConfirm(true)
-    const toggleFillTankConfirm = (force = null) => {
+    const toggleFillTankConfirm = (e, force = null) => {
         if (force === null){
             if (showFillTankConfirm) showFillTankConfirm = false
             else showFillTankConfirm = true
