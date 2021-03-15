@@ -173,8 +173,8 @@
 */
 	public joinTokenMetricsFeed(contract_name: string) {
 		if(this.joinedFeeds[`price_feed:${contract_name}`]) return
+		
 		console.log({joinTokenMetricsFeed: contract_name})
-		//console.log('join price feed')
 		this.connection.emit('join_room', `price_feed:${contract_name}`)
 		this.connection.on(`price_feed:${contract_name}`, this.handleTokenMetricsFeed)
 
@@ -190,7 +190,6 @@
 	}
 
 	public leavePriceFeed(contract_name: string) {
-		//console.log('leave price feed')
 		this.connection.emit('leave_room', `price_feed:${contract_name}`)
 		this.connection.off(`price_feed:${contract_name}`)
 
@@ -199,40 +198,32 @@
 
 	public joinTradeFeed(contract_name: string) {
 		if (this.current_trade_feed === contract_name) return
-		//this.leaveTradeFeed()
+
 		this.connection.on(`trade_update:${contract_name}`, this.handleTradeUpdate)
 		this.connection.emit('join_room', `trade_feed:${contract_name}`)
 		this.current_trade_feed = contract_name
 
 		this.joinedFeeds[`trade_feed:${contract_name}`] = true
-		//console.log('joined trade feed : ', contract_name)
 	}
 
 	private handleTradeUpdate(event) {
 		console.log({handleTradeUpdate: JSON.parse(JSON.stringify(event))})
-		console.log({trade_feed: event})
-		//console.log(event)
 		if (event.history) tradeHistory.set(valuesToBigNumber(event.history))
 		else {
 			if (event.action === 'trade_update') {
 				tradeUpdates.update((trades) => {
-					console.log({tradesBefore: JSON.parse(JSON.stringify(trades))})
 					trades.push(valuesToBigNumber(event))
-					console.log({tradesAfter: JSON.parse(JSON.stringify(trades))})
-					//console.log(trades)
 					return trades
 				})
 			}
-			console.log({tradeUpdates: JSON.parse(JSON.stringify(get(tradeUpdates)))})
 		}
 	}
 
 	public leaveTradeFeed() {
 		const contract_name = this.current_trade_feed
 		this.connection.off(`trade_update:${contract_name}`)
-		
 		this.current_trade_feed = ''
-		//console.log('left trade feed : ', contract_name)
+
 		tradeHistory.set([])
 		tradeUpdates.set([])
 
@@ -260,7 +251,6 @@
 			Object.keys(update).map(val => {
 				if(currentValue[val]) currentValue[val] = valuesToBigNumber(update[val])
 			})
-			console.log(currentValue)
 			return currentValue
 		})
 	}
@@ -283,13 +273,11 @@
 
 	private handleBalanceList(payload) {
 		console.log({handleBalanceList: JSON.parse(JSON.stringify(payload))})
-		//console.log(payload)
 		tokenBalances.set(valuesToBigNumber(payload).balances)
 	}
 
 	private handleBalanceUpdate(data) {
 		console.log({handleBalanceUpdate: data})
-		//console.log(data)
 		const { payload } = data
 		tokenBalances.set(valuesToBigNumber(payload).balances)
 	}

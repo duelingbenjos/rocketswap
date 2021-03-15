@@ -18,7 +18,16 @@
 </style>
 
 <div style={`margin: ${margin};`}>
-    <TwitterIcon {width} margin={iconMargin} {color}/>
-    <TelegramIcon {width} margin={iconMargin} {color} {stroke}/>
-    <MediumIcon {width} margin={iconMargin} {color} />
+    <a href="https://twitter.com/RSwapOfficial" rel="noopener noreferrer" target="_blank">
+        <TwitterIcon {width} margin={iconMargin} {color}/>
+    </a>
+    <a href="https://t.me/rocketswap" rel="noopener noreferrer" target="_blank">
+        <TelegramIcon {width} margin={iconMargin} {color} {stroke}/>
+    </a>
+
+    <a href="https://rswp-io.medium.com/" rel="noopener noreferrer" target="_blank">
+        <MediumIcon {width} margin={iconMargin} {color} />
+    </a>
+    
+    
 </div>

@@ -206,7 +206,7 @@
 				<button class="flex flex-center-center" on:click={logout} title="logout">
 					<AntennaIcon width="20px" margin="0 8px 0 0" />
 				</button>
-				<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" >
+				<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" rel="noopener noreferrer" target="_blank" >
 					{formatAccountAddress($walletAddress,4,2)}
 				</a>
 			</div>

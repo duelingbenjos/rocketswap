@@ -50,7 +50,6 @@
 			disabledText = `Wallet Not Connected`
 			return true
 		}
-		console.log()
 		if (!$txOkay) {
 			disabledText = `Insufficient Stamps`
 			return true

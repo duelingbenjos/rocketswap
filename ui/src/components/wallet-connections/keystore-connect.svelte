@@ -258,7 +258,7 @@
         <UserIcon width="15%" margin="-1rem 0 1rem" />
         <p class="text-large text-primary-dim">Select an Account</p>
         <div class="dropdown">
-            <select bind:value={selectedWallet} on:blur={() => console.log(selectedWallet)} bind:this={selectElm}>
+            <select bind:value={selectedWallet} bind:this={selectElm}>
                 {#each ks.wallets as wallet, index}
                     <option value={index}>
                         {createAccountName(wallet)}
