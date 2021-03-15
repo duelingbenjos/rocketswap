@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
 
   ui:
@@ -6,16 +6,12 @@ services:
     image: rocketswap-client-ui
     container_name: rocketswap-ui
     network_mode: host
-    ports:
-      - 5000:5000
- 
+
   website:
     build: ./website
     image: rocketswap-client-website
     container_name: rocketswap-website
     network_mode: host
-    ports:
-      - 80:80
 
   api:
     build: ./api
@@ -33,17 +29,18 @@ services:
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
       # - STAKING_CONTRACTS=
-    ports:
-      - 3002:3002
+
 
   docs:
     build: ./docs
     image: rocketswap-docs
     restart: always
-    network_mode: host
     container_name: rocketswap-docs
-    ports:
-      - 3000:3000
+    network_mode: host
+
 
 volumes:
   rocketswap-volume:
+networks:
+  rocketswap-network:
+    driver: bridge
