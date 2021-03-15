@@ -5,8 +5,6 @@ services:
     build: ../ui
     image: rocketswap-client-ui
     container_name: rocketswap-ui
-    networks: 
-      - rocketswap-network
     ports:
       - 5000:5000
  
@@ -14,8 +12,6 @@ services:
     build: ../website
     image: rocketswap-client-website
     container_name: rocketswap-website
-    networks: 
-      - rocketswap-network
     ports:
       - 80:80
 
@@ -35,8 +31,6 @@ services:
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
       # - STAKING_CONTRACTS=
-    networks:
-      - rocketswap-network
     ports:
       - 3002:3002
 
@@ -45,8 +39,6 @@ services:
     image: rocketswap-docs
     restart: always
     container_name: rocketswap-docs
-    networks:
-      - rocketswap-network
     ports:
       - 3000:3000
 
