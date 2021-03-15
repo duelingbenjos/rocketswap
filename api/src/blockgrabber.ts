@@ -11,11 +11,14 @@ const MASTERNODE_URL = "https://testnet-master-1.lamden.io";
 /******* MONGO DB CONNECTION INFO **/
 const DBUSER = process.env.ROCKETSWAP_DB_USERNAME;
 const DBPWD = process.env.ROCKETSWAP_DB_PASSWORD;
+const NETWORK_TYPE = process.env.NETWORK_TYPE;
 //console.log(DBUSER, DBPWD);
 let connectionString = `mongodb://127.0.0.1:27017/block-explorer`;
 
 if (DBUSER) {
 	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}/block-explorer?authSource=admin`;
+} else if (NETWORK_TYPE === 'mainnet') {
+	connectionString = 'mongodb://127.0.0.1/mainnet-blockinfo'
 }
 
 var wipeOnStartup = false;

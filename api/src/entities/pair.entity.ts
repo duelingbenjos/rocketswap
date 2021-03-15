@@ -1,12 +1,6 @@
 import { IKvp } from "src/types/misc.types";
 import { getVal, isLamdenKey } from "../utils";
-import {
-	Entity,
-	Column,
-	PrimaryColumn,
-	BaseEntity,
-	PrimaryGeneratedColumn
-} from "typeorm";
+import { Entity, Column, PrimaryColumn, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { handleClientUpdateType, TradeUpdateType } from "src/types/websocket.types";
 import { TokenEntity } from "./token.entity";
 import { saveTradeUpdate } from "./trade-history.entity";
@@ -39,43 +33,44 @@ export async function saveReserves(
 	state: IKvp[],
 	handleClientUpdate: handleClientUpdateType,
 	timestamp: number,
-	hash: string
+	hash: string,
+	rswp_token_contract: string
 ) {
-	console.log("saveReserves")
-	// console.log(state);
-	const reserve_kvp = state.find(
-		(kvp) => kvp.key.split(".")[1].split(":")[0] === "reserves"
-	);
-	const price_kvp = state.find(
-		(kvp) => kvp.key.split(".")[1].split(":")[0] === "prices"
-	);
-	const lp_kvp = state.find(
-		(kvp) =>
-			kvp.key.includes("lp_points") && kvp.key.split(":").length === 2
-	);
-	if (reserve_kvp) {
-		// console.log(reserve_kvp)
-		let contract_name = reserve_kvp.key.split(":")[1];
-		// console.log(state)
+	var logger = require("tracer").console({
+		format: "{{timestamp}} <{{line}}> {{message}} (in {{file}}:{{line}})",
+		dateformat: "HH:MM:ss.L"
+	});
+	console.log(state);
+	const reserve_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "reserves");
+	const reserve_kvps = state.filter((kvp) => kvp.key.includes("reserves"));
+	const rswp_reserves = reserve_kvps.find((kvp) => {
+		return kvp.key.includes(rswp_token_contract);
+	});
+	const pair_reserves = reserve_kvps.find((kvp) => !kvp.key.includes(rswp_token_contract));
+
+	logger.info(pair_reserves);
+	logger.info(rswp_reserves);
+	const price_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "prices");
+	const lp_kvp = state.find((kvp) => kvp.key.includes("lp_points") && kvp.key.split(":").length === 2);
+	if (rswp_reserves) {
+		let rswp_reserves_entity = await PairEntity.findOne();
+		if (!rswp_reserves_entity) rswp_reserves_entity = new PairEntity();
+		rswp_reserves_entity.contract_name = rswp_token_contract;
+		rswp_reserves_entity.reserves = [rswp_reserves.value[0].__fixed__, rswp_reserves.value[1].__fixed__];
+	}
+	if (pair_reserves) {
+		let contract_name = pair_reserves.key.split(":")[1];
 		let vk_kvp = state.find((kvp) => {
-			// console.log(kvp.key)
-			// console.log(`${contract_name}.balances`);
-			return (
-				kvp.key.includes(`${contract_name}.balances`) &&
-				isLamdenKey(kvp.key.split(":")[1])
-			);
+			return kvp.key.includes(`${contract_name}.balances`) && isLamdenKey(kvp.key.split(":")[1]);
 		});
-		let vk = 'vk_kvp.key.split(":")[1];'
+		let vk = vk_kvp.key.split(":")[1];
 		let old_currency_reserve: string;
 		let old_token_reserve: string;
-		let reserves: [string, string] = [
-			reserve_kvp.value[0].__fixed__,
-			reserve_kvp.value[1].__fixed__
-		];
+		let reserves: [string, string] = [pair_reserves.value[0].__fixed__, pair_reserves.value[1].__fixed__];
 		let price = getVal(price_kvp);
 		let lp = getVal(lp_kvp);
 
-		let entity = await PairEntity.findOne(reserve_kvp.key.split(":")[1]);
+		let entity = await PairEntity.findOne(pair_reserves.key.split(":")[1]);
 
 		if (!entity) {
 			entity = new PairEntity();
@@ -131,11 +126,7 @@ export async function saveReserves(
 	}
 }
 
-const getAmountExchanged = (
-	fn: string,
-	old_token_reserve: any,
-	reserves: any[]
-) => {
+const getAmountExchanged = (fn: string, old_token_reserve: any, reserves: any[]) => {
 	return fn === "buy"
 		? (parseFloat(old_token_reserve) - parseFloat(reserves[1])).toString()
 		: (parseFloat(reserves[1]) - parseFloat(old_token_reserve)).toString();
@@ -149,18 +140,9 @@ function updateTradeFeed(args: {
 	price: string;
 	handleClientUpdate: handleClientUpdateType;
 	time: number;
-	hash: string
+	hash: string;
 }) {
-	const {
-		type,
-		amount,
-		contract_name,
-		token_symbol,
-		price,
-		handleClientUpdate,
-		time,
-		hash
-	} = args;
+	const { type, amount, contract_name, token_symbol, price, handleClientUpdate, time, hash } = args;
 
 	const payload: TradeUpdateType = {
 		action: "trade_update",
@@ -178,9 +160,7 @@ function updateTradeFeed(args: {
 export async function savePair(state: IKvp[]) {
 	// console.log(state)
 	// { key: "con_amm2.pairs:con_token_test7", value: true },
-	const pair_kvp = state.find(
-		(kvp) => kvp.key.split(".")[1].split(":")[0] === "pairs"
-	);
+	const pair_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "pairs");
 	if (!pair_kvp) return;
 	const contract_name = pair_kvp.key.split(".")[1].split(":")[1];
 	const pair_entity = new PairEntity();
@@ -197,10 +177,7 @@ export async function savePair(state: IKvp[]) {
 }
 
 export async function savePairLp(state: IKvp[]) {
-	const lp_kvp = state.find(
-		(kvp) =>
-			kvp.key.includes("lp_points") && kvp.key.split(":").length === 2
-	);
+	const lp_kvp = state.find((kvp) => kvp.key.includes("lp_points") && kvp.key.split(":").length === 2);
 	if (lp_kvp) {
 		const parts = lp_kvp.key.split(".")[1].split(":");
 		if (parts.length === 2) {

@@ -53,7 +53,7 @@ const db_options: TypeOrmModuleOptions = {
 	imports: [
 		TypeOrmModule.forRoot(db_options),
 		JwtModule.register({
-			secret: "<SECRET KEY>",
+			secret: process.env.SECRET || "<SECRET KEY>",
 			signOptions: {
 				expiresIn: "30d"
 			}
