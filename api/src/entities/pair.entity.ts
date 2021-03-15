@@ -57,73 +57,91 @@ export async function saveReserves(
 		if (!rswp_reserves_entity) rswp_reserves_entity = new PairEntity();
 		rswp_reserves_entity.contract_name = rswp_token_contract;
 		rswp_reserves_entity.reserves = [rswp_reserves.value[0].__fixed__, rswp_reserves.value[1].__fixed__];
+		await rswp_reserves_entity.save();
 	}
 	if (pair_reserves) {
-		let contract_name = pair_reserves.key.split(":")[1];
-		let vk_kvp = state.find((kvp) => {
-			return kvp.key.includes(`${contract_name}.balances`) && isLamdenKey(kvp.key.split(":")[1]);
-		});
-		let vk = vk_kvp.key.split(":")[1];
-		let old_currency_reserve: string;
-		let old_token_reserve: string;
-		let reserves: [string, string] = [pair_reserves.value[0].__fixed__, pair_reserves.value[1].__fixed__];
-		let price = getVal(price_kvp);
-		let lp = getVal(lp_kvp);
+		await updateReserves({ update_reserves: pair_reserves, price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
+	}
+	if (rswp_reserves) {
+		await updateReserves({ update_reserves: rswp_reserves, price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
+	}
+}
 
-		let entity = await PairEntity.findOne(pair_reserves.key.split(":")[1]);
+async function updateReserves(args: {
+	update_reserves: IKvp;
+	price_kvp: IKvp;
+	lp_kvp: IKvp;
+	state: IKvp[];
+	fn: string;
+	handleClientUpdate: handleClientUpdateType;
+	hash: string;
+	timestamp: number;
+}) {
+	const { update_reserves, price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp } = args;
+	let contract_name = update_reserves.key.split(":")[1];
+	let vk_kvp = state.find((kvp) => {
+		return kvp.key.includes(`${contract_name}.balances`) && isLamdenKey(kvp.key.split(":")[1]);
+	});
+	let vk = vk_kvp.key.split(":")[1];
+	let old_currency_reserve: string;
+	let old_token_reserve: string;
+	let reserves: [string, string] = [update_reserves.value[0].__fixed__, update_reserves.value[1].__fixed__];
+	let price = getVal(price_kvp);
+	let lp = getVal(lp_kvp);
 
-		if (!entity) {
-			entity = new PairEntity();
-			entity.contract_name = contract_name;
-			entity.reserves = reserves;
-		} else {
-			if (entity.reserves) {
-				old_currency_reserve = entity.reserves[0];
-				old_token_reserve = entity.reserves[1];
-			}
-			// console.log(entity);
-			if (fn === "buy" || fn === "sell") {
-				let amount_exchanged = getAmountExchanged(fn, old_token_reserve, reserves);
+	let entity = await PairEntity.findOne(update_reserves.key.split(":")[1]);
 
-				updateTradeFeed({
-					contract_name,
-					token_symbol: entity.token_symbol,
-					type: fn,
-					amount: amount_exchanged,
-					price,
-					handleClientUpdate,
-					time: timestamp,
-					hash
-				});
-				saveTradeUpdate({
-					contract_name,
-					token_symbol: entity.token_symbol,
-					type: fn,
-					vk,
-					amount: amount_exchanged,
-					price,
-					time: timestamp,
-					hash
-				});
-			}
+	if (!entity) {
+		entity = new PairEntity();
+		entity.contract_name = contract_name;
+		entity.reserves = reserves;
+	} else {
+		if (entity.reserves) {
+			old_currency_reserve = entity.reserves[0];
+			old_token_reserve = entity.reserves[1];
 		}
 
-		if (price_kvp) entity.price = price;
-		if (lp_kvp) entity.lp = lp;
-		if (reserves) entity.reserves = reserves;
+		if (fn === "buy" || fn === "sell") {
+			let amount_exchanged = getAmountExchanged(fn, old_token_reserve, reserves);
 
-		entity.time = Date.now().toString();
-		await entity.save();
-
-		handleClientUpdate({
-			action: "metrics_update",
-			contract_name,
-			time: parseInt(entity.time),
-			reserves: entity.reserves,
-			lp: entity.lp,
-			price: entity.price
-		});
+			updateTradeFeed({
+				contract_name,
+				token_symbol: entity.token_symbol,
+				type: fn,
+				amount: amount_exchanged,
+				price,
+				handleClientUpdate,
+				time: timestamp,
+				hash
+			});
+			saveTradeUpdate({
+				contract_name,
+				token_symbol: entity.token_symbol,
+				type: fn,
+				vk,
+				amount: amount_exchanged,
+				price,
+				time: timestamp,
+				hash
+			});
+		}
 	}
+
+	if (price_kvp) entity.price = price;
+	if (lp_kvp) entity.lp = lp;
+	if (reserves) entity.reserves = reserves;
+
+	entity.time = Date.now().toString();
+	await entity.save();
+
+	handleClientUpdate({
+		action: "metrics_update",
+		contract_name,
+		time: parseInt(entity.time),
+		reserves: entity.reserves,
+		lp: entity.lp,
+		price: entity.price
+	});
 }
 
 const getAmountExchanged = (fn: string, old_token_reserve: any, reserves: any[]) => {
