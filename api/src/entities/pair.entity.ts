@@ -36,24 +36,18 @@ export async function saveReserves(
 	hash: string,
 	rswp_token_contract: string
 ) {
-	var logger = require("tracer").console({
-		format: "{{timestamp}} <{{line}}> {{message}} (in {{file}}:{{line}})",
-		dateformat: "HH:MM:ss.L"
-	});
+
 	console.log(state);
-	const reserve_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "reserves");
 	const reserve_kvps = state.filter((kvp) => kvp.key.includes("reserves"));
 	const rswp_reserves = reserve_kvps.find((kvp) => {
 		return kvp.key.includes(rswp_token_contract);
 	});
 	const pair_reserves = reserve_kvps.find((kvp) => !kvp.key.includes(rswp_token_contract));
 
-	logger.info(pair_reserves);
-	logger.info(rswp_reserves);
 	const price_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "prices");
 	const lp_kvp = state.find((kvp) => kvp.key.includes("lp_points") && kvp.key.split(":").length === 2);
 	if (rswp_reserves) {
-		let rswp_reserves_entity = await PairEntity.findOne();
+		let rswp_reserves_entity = await PairEntity.findOne(rswp_token_contract);
 		if (!rswp_reserves_entity) rswp_reserves_entity = new PairEntity();
 		rswp_reserves_entity.contract_name = rswp_token_contract;
 		rswp_reserves_entity.reserves = [rswp_reserves.value[0].__fixed__, rswp_reserves.value[1].__fixed__];
@@ -114,7 +108,7 @@ async function updateReserves(args: {
 				time: timestamp,
 				hash
 			});
-			saveTradeUpdate({
+			await saveTradeUpdate({
 				contract_name,
 				token_symbol: entity.token_symbol,
 				type: fn,
