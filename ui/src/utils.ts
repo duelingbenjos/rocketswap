@@ -291,18 +291,24 @@ export const displayBalanceToPrecision = (value, precision) => {
 export function valuesToBigNumber(obj: any) {
   if (typeof obj === 'object') {
     for (let property in obj) {
-      if (property === 'time' || property === 'vk' || property === 'time_updated') {
-        // ignore these values
-      } else if (typeof obj[property] === 'string') {
-        // Check if item is a string
-        if (!isNaN(parseFloat(obj[property]))) {
-			obj[property] = toBigNumberPrecision(obj[property], 8)
+		if (!isBigNumber(obj[property])){
+			if (	property === 'time' || 
+					property === 'vk' || 
+					property === 'time_updated' || 
+					property === 'hash') {
+				// ignore these values
+			} else if (typeof obj[property] === 'string') {
+				// Check if item is a string
+				if (!isNaN(parseFloat(obj[property]))) {
+					obj[property] = toBigNumberPrecision(obj[property], 8)
+				}
+			} else if (typeof obj[property] === 'number') {
+				obj[property] = toBigNumberPrecision(obj[property], 8)
+			} else if (typeof obj[property] === 'object') {
+				valuesToBigNumber(obj[property])
+			}
 		}
-      } else if (typeof obj[property] === 'number') {
-		obj[property] = toBigNumberPrecision(obj[property], 8)
-      } else if (typeof obj[property] === 'object') {
-        valuesToBigNumber(obj[property])
-      }
+
     }
   }
   return obj
