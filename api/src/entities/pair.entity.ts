@@ -36,17 +36,14 @@ export async function saveReserves(
 	hash: string,
 	rswp_token_contract: string
 ) {
-
 	console.log(state);
 	const reserve_kvps = state.filter((kvp) => kvp.key.includes("reserves"));
-	const rswp_reserves = reserve_kvps.find((kvp) => {
-		return kvp.key.includes(rswp_token_contract);
-	});
+	const rswp_reserves = reserve_kvps.find((kvp) => kvp.key.includes(rswp_token_contract));
 	const pair_reserves = reserve_kvps.find((kvp) => !kvp.key.includes(rswp_token_contract));
 
 	const price_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "prices");
 	const lp_kvp = state.find((kvp) => kvp.key.includes("lp_points") && kvp.key.split(":").length === 2);
-	if (rswp_reserves) {
+	if (rswp_reserves && pair_reserves) {
 		let rswp_reserves_entity = await PairEntity.findOne(rswp_token_contract);
 		if (!rswp_reserves_entity) rswp_reserves_entity = new PairEntity();
 		rswp_reserves_entity.contract_name = rswp_token_contract;
@@ -56,7 +53,7 @@ export async function saveReserves(
 	if (pair_reserves) {
 		await updateReserves({ update_reserves: pair_reserves, price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
 	}
-	if (rswp_reserves) {
+	if (rswp_reserves && !pair_reserves) {
 		await updateReserves({ update_reserves: rswp_reserves, price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
 	}
 }
@@ -77,13 +74,12 @@ async function updateReserves(args: {
 		return kvp.key.includes(`${contract_name}.balances`) && isLamdenKey(kvp.key.split(":")[1]);
 	});
 	let vk = vk_kvp.key.split(":")[1];
-	let old_currency_reserve: string;
 	let old_token_reserve: string;
 	let reserves: [string, string] = [update_reserves.value[0].__fixed__, update_reserves.value[1].__fixed__];
 	let price = getVal(price_kvp);
 	let lp = getVal(lp_kvp);
 
-	let entity = await PairEntity.findOne(update_reserves.key.split(":")[1]);
+	let entity = await PairEntity.findOne(contract_name);
 
 	if (!entity) {
 		entity = new PairEntity();
@@ -91,7 +87,6 @@ async function updateReserves(args: {
 		entity.reserves = reserves;
 	} else {
 		if (entity.reserves) {
-			old_currency_reserve = entity.reserves[0];
 			old_token_reserve = entity.reserves[1];
 		}
 
@@ -108,7 +103,7 @@ async function updateReserves(args: {
 				time: timestamp,
 				hash
 			});
-			await saveTradeUpdate({
+			saveTradeUpdate({
 				contract_name,
 				token_symbol: entity.token_symbol,
 				type: fn,
@@ -138,7 +133,8 @@ async function updateReserves(args: {
 	});
 }
 
-const getAmountExchanged = (fn: string, old_token_reserve: any, reserves: any[]) => {
+const getAmountExchanged = (fn: string, old_token_reserve: any, reserves: [any, any]) => {
+	console.log(old_token_reserve, reserves);
 	return fn === "buy"
 		? (parseFloat(old_token_reserve) - parseFloat(reserves[1])).toString()
 		: (parseFloat(reserves[1]) - parseFloat(old_token_reserve)).toString();
