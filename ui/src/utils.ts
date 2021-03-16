@@ -76,11 +76,6 @@ export const stampsToTAU = (stampCost) => {
 	return toBigNumberPrecision(sc.dividedBy(currentRatio), 8)
 }
 
-export const getBaseUrl = (url): string => {
-  const parts = url.split(':')
-  return `${parts[0]}:${parts[1]}`
-}
-
 export const openNewTab = (url) => window.open(url, "_blank", {});
 
 export const createBlockExplorerLink = (route, id) => `${config.blockExplorer}/${route}/${id}`

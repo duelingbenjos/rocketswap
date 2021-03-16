@@ -36,7 +36,6 @@ import {
 	isUserYieldUpdate,
 	isClientStakingUpdate
 } from "./types/websocket.types";
-import { async } from "rxjs";
 
 /**
  * Gateway uses socket.io v2^

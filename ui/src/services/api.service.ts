@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { token_list_store, bearerToken } from '../store'
-import { getBaseUrl, valuesToBigNumber, removeLSValue } from '../utils'
+import { valuesToBigNumber, removeLSValue } from '../utils'
 import { get } from 'svelte/store'
+import { config, getBaseUrl } from '../config'
 
 /** Singleton Api Service */
 export class ApiService {
@@ -10,10 +11,11 @@ public static getInstance() {
 	return ApiService.instance
 }
 private static instance: ApiService
-private base_url = `${getBaseUrl(document.location.href)}:2095`
+private base_url = getBaseUrl()
 
 async getTokenList(filter = []) {
 	try {
+		console.log(this.base_url)
 		let token_list = await axios.get(`${this.base_url}/api/token_list`).then((res) => valuesToBigNumber(res.data))
 	if (filter.includes('no-market')) token_list = token_list.filter((token) => !token.has_market)
 		token_list_store.set(token_list)

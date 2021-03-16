@@ -13,8 +13,8 @@
 		lpBalances,
 		lpPairs } from '../store'
 	import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
-	import { getBaseUrl, valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision } from '../utils'
-	import { config } from '../config'
+	import { valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision } from '../utils'
+	import { config, getBaseUrl } from '../config'
 
 	/** Singleton socket.io service */
 	export class WsService {
@@ -38,9 +38,8 @@
 
 	constructor() {
 		//console.log('WS Service STARTED')
-		this.base_url = getBaseUrl(document.location.href)
-		this.port = 2095
-		this.connection = socket(`${this.base_url}:${this.port}`)
+		this.base_url = getBaseUrl()
+		this.connection = socket(`${this.base_url}`)
 		this.setupEvents()
 		this.setupSubs()
 		this.txCallbacks = {}

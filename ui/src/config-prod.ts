@@ -75,3 +75,7 @@ export const ammStakingValues = {
   multiplier: 0.07,
   discount_floor: 0.505
 }
+
+export const getBaseUrl = (): string => {
+	return 'https://rocketswap.exchange:2053'
+}
