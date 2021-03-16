@@ -14,24 +14,24 @@ const DOCS_URL = "http://0.0.0.0:3000"
 app.use(morgan("dev"));
 
 // Proxy endpoints
-app.use(
-	"/website",
-	createProxyMiddleware({
-		target: WEBSITE_URL,
-		changeOrigin: true,
-		pathRewrite: {
-			[`^/website`]: ""
-		}
-	})
-);
+// app.use(
+// 	"/website",
+// 	createProxyMiddleware({
+// 		target: WEBSITE_URL,
+// 		changeOrigin: true,
+// 		pathRewrite: {
+// 			[`^/website`]: ""
+// 		}
+// 	})
+// );
 
 app.use(
-	"/app",
+	"/",
 	createProxyMiddleware({
 		target: APP_URL,
 		changeOrigin: true,
 		pathRewrite: {
-			[`^/app`]: ""
+			[`^/`]: ""
 		}
 	})
 );
