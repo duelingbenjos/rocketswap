@@ -12,12 +12,6 @@ services:
     image: rocketswap-client-website
     container_name: rocketswap-website
     network_mode: host
-  
-  proxy:
-    build: ./proxy_server
-    image: rocketswap-client-proxy
-    container_name: rocketswap-proxy
-    network_mode: host
 
   api:
     build: ./api
@@ -35,7 +29,6 @@ services:
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
       # - STAKING_CONTRACTS=
-
 
   docs:
     build: ./docs
