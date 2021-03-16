@@ -9,7 +9,7 @@ RUN npm install --quiet
 COPY . .
 RUN npm run build
 
-RUN mv -f src/config-prod.ts src/config.ts 
+RUN mv -f ./src/config-prod.ts ./src/config.ts 
 CMD ["npm", "run", "start"]
 
 EXPOSE 80
