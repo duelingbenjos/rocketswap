@@ -8,29 +8,22 @@ const app = express();
 // Configuration
 const PORT = 3000;
 const HOST = "localhost";
-const API_SERVICE_URL = "https://jsonplaceholder.typicode.com";
+const DOCS_URL = "rocketswap-docs"
 
-console.log("hello wurld");
+
+// Environment
+const MODE = process.env.PROD ? 'PROD' : 'DEV'
+
 app.use(morgan("dev"));
-
-
-// Authorization
-// app.use("", (req, res, next) => {
-// 	if (req.headers.authorization) {
-// 		next();
-// 	} else {
-// 		res.sendStatus(403);
-// 	}
-// });
 
 // Proxy endpoints
 app.use(
-	"/json_placeholder",
+	"/docs",
 	createProxyMiddleware({
-		target: API_SERVICE_URL,
+		target: DOCS_URL,
 		changeOrigin: true,
 		pathRewrite: {
-			[`^/json_placeholder`]: ""
+			[`^/docs`]: ""
 		}
 	})
 );

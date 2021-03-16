@@ -12,6 +12,12 @@ services:
     image: rocketswap-client-website
     container_name: rocketswap-website
     network_mode: host
+  
+  proxy:
+    build: ./proxy
+    image: rocketswap-proxy
+    container_name: rocketswap-proxy
+    network_mode: host
 
   api:
     build: ./api
@@ -37,7 +43,6 @@ services:
     restart: always
     container_name: rocketswap-docs
     network_mode: host
-
 
 volumes:
   rocketswap-volume:
