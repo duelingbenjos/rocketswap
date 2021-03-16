@@ -51,6 +51,6 @@ app.use(
 
 // Start the Proxy
 app.listen(PORT, () => {
-    console.log(`Starting Proxy at ${HOST}:${PORT}`);
+    console.log(`Starting Proxy on port : ${PORT}`);
  });
  
