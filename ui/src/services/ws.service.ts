@@ -39,7 +39,7 @@
 	constructor() {
 		//console.log('WS Service STARTED')
 		this.base_url = getBaseUrl(document.location.href)
-		this.port = 3002
+		this.port = 2095
 		this.connection = socket(`${this.base_url}:${this.port}`)
 		this.setupEvents()
 		this.setupSubs()

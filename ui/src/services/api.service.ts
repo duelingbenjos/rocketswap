@@ -10,7 +10,7 @@ public static getInstance() {
 	return ApiService.instance
 }
 private static instance: ApiService
-private base_url = `${getBaseUrl(document.location.href)}:3002`
+private base_url = `${getBaseUrl(document.location.href)}:2095`
 
 async getTokenList(filter = []) {
 	try {
