@@ -58,7 +58,7 @@ app.use(
 	"/",
 	createProxyMiddleware({
 		target: APP_URL,
-		// changeOrigin: true,
+		changeOrigin: true,
 		pathRewrite: {
 			[`^/`]: ""
 		}
