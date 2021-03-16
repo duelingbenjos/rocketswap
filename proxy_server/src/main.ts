@@ -8,7 +8,7 @@ const app = express();
 // Configuration
 const PORT = 80;
 const HOST = "localhost";
-const DOCS_URL = "localhost:82"
+const DOCS_URL = "http://127.0.0.1:82"
 
 
 // Environment
@@ -17,12 +17,12 @@ app.use(morgan("dev"));
 
 // Proxy endpoints
 app.use(
-	"/docs",
+	"/",
 	createProxyMiddleware({
 		target: DOCS_URL,
 		changeOrigin: true,
 		pathRewrite: {
-			[`^/docs`]: ""
+			[`^/`]: ""
 		}
 	})
 );
