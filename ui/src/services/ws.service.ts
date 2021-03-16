@@ -38,7 +38,7 @@
 
 	constructor() {
 		//console.log('WS Service STARTED')
-		this.base_url = "http://rocketswap.exchange/cxn"
+		this.base_url = getBaseUrl()
 		this.connection = socket(`${this.base_url}`)
 		this.setupEvents()
 		this.setupSubs()
