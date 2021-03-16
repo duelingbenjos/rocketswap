@@ -6,13 +6,12 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 const app = express();
 
 // Configuration
-const PORT = 3000;
+const PORT = 80;
 const HOST = "localhost";
-const DOCS_URL = "rocketswap-docs"
+const DOCS_URL = "rocketswap-docs:81"
 
 
 // Environment
-const MODE = process.env.PROD ? 'PROD' : 'DEV'
 
 app.use(morgan("dev"));
 
