@@ -16,40 +16,6 @@ const API_URL = "http://0.0.0.0:2053";
 
 app.use(morgan("dev"));
 
-// Proxy endpoints
-// app.use(
-// 	"/website",
-// 	createProxyMiddleware({
-// 		target: WEBSITE_URL,
-// 		changeOrigin: true,
-// 		pathRewrite: {
-// 			[`^/website`]: ""
-// 		}
-// 	})
-// );
-
-// app.use(
-// 	"/",
-// 	createProxyMiddleware({
-// 		target: APP_URL,
-// 		changeOrigin: true,
-// 		pathRewrite: {
-// 			[`^/`]: ""
-// 		}
-// 	})
-// );
-
-// app.use(
-// 	"/docs",
-// 	createProxyMiddleware({
-// 		target: DOCS_URL,
-// 		changeOrigin: true,
-// 		pathRewrite: {
-// 			[`^/docs`]: ""
-// 		}
-// 	})
-// );
-
 function createProxyRoute(prefix, target) {
 	return httpProxy(target, {
 		proxyReqPathResolver: (req) => {
@@ -58,9 +24,6 @@ function createProxyRoute(prefix, target) {
 		}
 	});
 }
-
-app.use("/cxn", createProxyRoute("/cxn", API_URL));
-app.use("/", createProxyRoute("/", APP_URL));
 
 app.use(
 	"/cxn",
@@ -73,7 +36,19 @@ app.use(
 	})
 );
 
-// Start the Proxy
+app.use(
+	"/",
+	createProxyMiddleware({
+		target: APP_URL,
+		changeOrigin: true,
+		pathRewrite: {
+			[`^/`]: ""
+		}
+	})
+);
+
+// app.use("/", createProxyRoute("/", APP_URL));
+
 app.listen(PORT, () => {
 	console.log(`Starting Proxy on port : ${PORT}`);
 });
