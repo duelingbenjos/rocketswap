@@ -6,7 +6,7 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 const app = express();
 
 // Configuration
-const PORT = 8080;
+const PORT = 80;
 const HOST = "localhost";
 const DOCS_URL = "rocketswap-docs:81"
 
