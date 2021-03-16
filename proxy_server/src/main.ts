@@ -8,7 +8,7 @@ const app = express();
 // Configuration
 const PORT = 80;
 const HOST = "localhost";
-const DOCS_URL = "rocketswap-docs:81"
+const DOCS_URL = "localhost:82"
 
 
 // Environment
