@@ -17,8 +17,12 @@ const DOCS_URL = "http://0.0.0.0:3000";
 const API_URL = "http://0.0.0.0:2053";
 
 app.use(morgan("dev"));
-app.use(cors({origin: 'http://rocketswap.exchange'}));
-app.use(cors({origin: 'https://rocketswap.exchange'}));
+app.use(cors({origin: '*'}));
+
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	next();
+  });
 
 // app.use(function (req, res, next) {
 
@@ -38,15 +42,6 @@ app.use(cors({origin: 'https://rocketswap.exchange'}));
 //     // Pass to next layer of middleware
 //     next();
 // });
-
-function createProxyRoute(prefix, target) {
-	return httpProxy(target, {
-		proxyReqPathResolver: (req) => {
-			let req_path = require("url").parse(req.url).path;
-			return (prefix + req_path).replace(/\/\//g, "/");
-		}
-	});
-}
 
 app.use(
 	"/cxn",
