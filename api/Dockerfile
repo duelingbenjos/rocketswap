@@ -20,4 +20,4 @@ COPY . .
 
 CMD ["sh", "entypoint.sh"]
 
-EXPOSE 2095
+EXPOSE 2053

@@ -1,6 +1,8 @@
 import express from "express";
 import morgan from "morgan";
 import { createProxyMiddleware } from "http-proxy-middleware";
+// let httpProxy = require("express-http-proxy");
+import httpProxy from "express-http-proxy";
 
 // Create Express Server
 const app = express();
@@ -26,16 +28,16 @@ app.use(morgan("dev"));
 // 	})
 // );
 
-app.use(
-	"/",
-	createProxyMiddleware({
-		target: APP_URL,
-		changeOrigin: true,
-		pathRewrite: {
-			[`^/`]: ""
-		}
-	})
-);
+// app.use(
+// 	"/",
+// 	createProxyMiddleware({
+// 		target: APP_URL,
+// 		changeOrigin: true,
+// 		pathRewrite: {
+// 			[`^/`]: ""
+// 		}
+// 	})
+// );
 
 // app.use(
 // 	"/docs",
@@ -47,6 +49,18 @@ app.use(
 // 		}
 // 	})
 // );
+
+function createProxyRoute(prefix, target) {
+	return httpProxy(target, {
+		proxyReqPathResolver: (req) => {
+			let req_path = require("url").parse(req.url).path;
+			return (prefix + req_path).replace(/\/\//g, "/");
+		}
+	});
+}
+
+app.use("/cxn", createProxyRoute("/cxn", API_URL));
+app.use("/", createProxyRoute("/", APP_URL));
 
 app.use(
 	"/cxn",
