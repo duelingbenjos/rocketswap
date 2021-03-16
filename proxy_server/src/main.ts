@@ -47,7 +47,7 @@ app.use(
 	"/cxn",
 	createProxyMiddleware({
 		target: API_URL,
-		changeOrigin: true,
+		// changeOrigin: true,
 		pathRewrite: {
 			[`^/cxn`]: ""
 		}
@@ -58,7 +58,7 @@ app.use(
 	"/",
 	createProxyMiddleware({
 		target: APP_URL,
-		changeOrigin: true,
+		// changeOrigin: true,
 		pathRewrite: {
 			[`^/`]: ""
 		}
