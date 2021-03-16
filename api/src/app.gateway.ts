@@ -41,7 +41,7 @@ import {
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
  */
-@WebSocketGateway()
+@WebSocketGateway({origin: "*"})
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger("AppGateway");
 
