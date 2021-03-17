@@ -39,7 +39,7 @@
 	constructor() {
 		//console.log('WS Service STARTED')
 		this.base_url = getBaseUrl()
-		this.connection = socket(`${this.base_url}`)
+		this.connection = socket(`${this.base_url}`,{path: this.base_url.includes("rocketswap") || this.base_url.includes("45") ? '/cxn/socket.io' : "/socket.io"})
 		this.setupEvents()
 		this.setupSubs()
 		this.txCallbacks = {}
