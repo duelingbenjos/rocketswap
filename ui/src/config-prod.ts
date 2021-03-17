@@ -77,5 +77,5 @@ export const ammStakingValues = {
 }
 
 export const getBaseUrl = (): string => {
-	return 'https://rocketswap.exchange/cxn'
+	return '/cxn'
 }
