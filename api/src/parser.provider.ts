@@ -46,7 +46,6 @@ export class ParserProvider {
 				const contract_str = getContractCode(state);
 				const token_is_valid = validateTokenContract(contract_str);
 				const submitted_contract_name = getContractName(state);
-
 				if (submitted_contract_name === config.contractName) {
 					this.addToActionQue(updateAmmMeta, {
 						state,

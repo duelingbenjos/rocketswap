@@ -18,23 +18,27 @@ export class StakingEpochEntity extends BaseEntity {
 
 	@Column()
 	staking_contract: string;
+
+	@Column({nullable: true})
+	emission_rate_per_tau: string;
 }
 
 export async function updateEpoch(args: {
 	staking_contract: string;
 	epoch_index: number;
 	amount_staked: any;
+	emission_rate_per_tau: any;
 	time: any;
 	handleClientUpdate: handleClientUpdateType;
 }) {
-	const { handleClientUpdate, amount_staked, time, epoch_index, staking_contract } = args;
+	const { handleClientUpdate, amount_staked, time, epoch_index, staking_contract, emission_rate_per_tau } = args;
 	const entity = new StakingEpochEntity();
-	entity.amount_staked = amount_staked.__fixed__;
+	entity.amount_staked = amount_staked?.__fixed__;
+	entity.emission_rate_per_tau = emission_rate_per_tau?.__fixed__;
 	entity.time = time;
 	entity.epoch_index = epoch_index;
 	entity.staking_contract = staking_contract;
 
 	await entity.save();
 	handleClientUpdate({ action: "epoch_update", data: entity });
-	// return res
 }

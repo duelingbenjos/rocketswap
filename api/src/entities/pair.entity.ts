@@ -36,7 +36,7 @@ export async function saveReserves(
 	hash: string,
 	rswp_token_contract: string
 ) {
-	console.log(state);
+	// console.log(state);
 	const reserve_kvps = state.filter((kvp) => kvp.key.includes("reserves"));
 	const rswp_reserves = reserve_kvps.find((kvp) => kvp.key.includes(rswp_token_contract));
 	const pair_reserves = reserve_kvps.find((kvp) => !kvp.key.includes(rswp_token_contract));
@@ -134,7 +134,7 @@ async function updateReserves(args: {
 }
 
 const getAmountExchanged = (fn: string, old_token_reserve: any, reserves: [any, any]) => {
-	console.log(old_token_reserve, reserves);
+	// console.log(old_token_reserve, reserves);
 	return fn === "buy"
 		? (parseFloat(old_token_reserve) - parseFloat(reserves[1])).toString()
 		: (parseFloat(reserves[1]) - parseFloat(old_token_reserve)).toString();

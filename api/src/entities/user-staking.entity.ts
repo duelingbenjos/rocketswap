@@ -74,7 +74,8 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 	let harvestable_yield = 0;
 
 	for (let d of deposits) {
-		harvestable_yield += calculateYield({
+		let calcFn = meta.meta.type === 'simple_staking' ? calculateSimpleYield : calculateYield
+		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,
 			deposit_start_time: d.time,
@@ -145,6 +146,64 @@ function calculateYield(args: {
 	//console.log("CALCULATED YIELD: ", y);
 	return y;
 }
+
+function calculateSimpleYield(args: {
+	starting_epoch_index: number;
+	amount: any;
+	deposit_start_time: IContractingTime;
+	current_epoch_index: number;
+	epochs: StakingEpochEntity[];
+	meta: StakingMetaEntity;
+}): number {
+	//console.log("CALCULATE YIELD CALLED");
+	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
+
+	// console.log(epochs);
+	let start_time = datetimeToUnix(meta.StartTime);
+	let end_time = datetimeToUnix(meta.EndTime);
+
+	const fitTime = (time: number): number => {
+		if (time < start_time) time = start_time;
+		else if (time > end_time) time = end_time;
+		return time;
+	};
+
+	amount = parseFloat(amount.__fixed__);
+	let this_epoch_index = starting_epoch_index;
+	let y = 0;
+
+	while (this_epoch_index <= current_epoch_index) {
+		let this_epoch = epochs[this_epoch_index];
+		let next_epoch = epochs[this_epoch_index + 1];
+
+		let delta = 0;
+
+		if (starting_epoch_index === current_epoch_index) {
+			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(deposit_start_time));
+		} else if (this_epoch_index === starting_epoch_index) {
+			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(deposit_start_time));
+		} else if (this_epoch_index === current_epoch_index) {
+			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(this_epoch.time));
+		} else {
+			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
+		}
+		const delta_seconds = delta / 1000;
+
+		// rswp_per_tau_per_second = EmissionRatePerTau.get() / 365 / 24 / 60 / 60
+        
+        // y += rswp_per_tau_per_second * amount * delta
+
+        // this_epoch_index += 1
+		let rswp_per_tau_per_second = meta.EmissionRatePerSecond
+
+
+		y += rswp_per_tau_per_second * amount * delta_seconds;
+		this_epoch_index += 1;
+	}
+	//console.log("CALCULATED YIELD: ", y);
+	return y;
+}
+
 
 export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: number) {
 	const emission_rate_per_hour = meta.EmissionRatePerHour;
