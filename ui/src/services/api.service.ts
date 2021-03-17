@@ -11,7 +11,7 @@ public static getInstance() {
 	return ApiService.instance
 }
 private static instance: ApiService
-private base_url = "http://rocketswap.exchange/cxn"
+private base_url = getBaseUrl()
 
 async getTokenList(filter = []) {
 	try {
