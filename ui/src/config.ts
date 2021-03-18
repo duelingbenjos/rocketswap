@@ -76,13 +76,17 @@ export const ammStakingValues = {
   discount_floor: 0.505
 }
 
-export const getBaseUrl = (): string => {
-  const window_location =
-    window.location.hostname.includes('localhostname') ||
-    window.location.hostname.includes('0.0.0.0') ||
-    window.location.hostname.includes('127.0.0.1') ||
-    window.location.hostname.includes('45') // vultr
-  return `http://${window.location.hostname}:2053`
+const isConnectionDirect = (): boolean => {
+  return window.location.hostname.includes('localhostname') ||
+  window.location.hostname.includes('0.0.0.0') ||
+  window.location.hostname.includes('127.0.0.1') ||
+  window.location.hostname.includes('45')
 }
 
-export const ws_options = {}
+export const getBaseUrl = (): string => {
+  return isConnectionDirect()
+    ? `http://${window.location.hostname}:2053`
+    : '/cxn'
+}
+
+export const ws_options = isConnectionDirect() ? {} : {path: '/cxn/socket.io'}
