@@ -64,7 +64,8 @@ app.use(
 		// changeOrigin: true,
 		pathRewrite: {
 			[`^/cxn`]: ""
-		}
+		},
+		ws: true
 	})
 );
 
