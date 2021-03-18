@@ -46,16 +46,16 @@ app.use((req, res, next) => {
 // });
 
 
-app.use(
-	"/socket.io",
-	createProxyMiddleware({
-		target: API_URL,
-		// changeOrigin: true,
-		pathRewrite: {
-			[`^/socket.io`]: ""
-		}
-	})
-);
+// app.use(
+// 	"/socket.io",
+// 	createProxyMiddleware({
+// 		target: API_URL,
+// 		// changeOrigin: true,
+// 		pathRewrite: {
+// 			[`^/socket.io`]: ""
+// 		}
+// 	})
+// );
 
 app.use(
 	"/cxn",

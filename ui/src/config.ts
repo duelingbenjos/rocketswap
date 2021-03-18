@@ -84,6 +84,7 @@ const isConnectionDirect = (): boolean => {
 }
 
 export const getBaseUrl = (): string => {
+  console.log({hostname: window.location.hostname})
   return isConnectionDirect()
     ? `http://${window.location.hostname}:2053`
     : '/cxn'
