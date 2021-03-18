@@ -77,5 +77,5 @@ export const ammStakingValues = {
 }
 
 export const getBaseUrl = (): string => {
-	return document.location.href.includes('0.0.0.0') ? 'http://0.0.0.0:2053' : 'http://localhost:2053'
+	return '/cxn'
 }
