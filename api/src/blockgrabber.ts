@@ -70,7 +70,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = parseInt(process.env.currBlockNum) || 8500;
+		currBlockNum = parseInt(process.env.currBlockNum) || 4000;
 
 		console.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);

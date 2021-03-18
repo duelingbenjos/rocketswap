@@ -582,7 +582,9 @@ export const pageUtils = (pageStores) => {
 				if (!location.pathname.includes(get(selectedToken).contract_name))
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
-				  window.history.pushState("", "", `/#/${route}${get(selectedToken).contract_name}`);
+				  //window.history.pushState("", "", `/#/${route}${get(selectedToken).contract_name}`);
+				  window.history.replaceState("", "", `/#/${route}${get(selectedToken).contract_name}`);
+				  location.hash = `/${route}${get(selectedToken).contract_name}`
 			  }
 		}else{
 			window.history.pushState("", "", `/#/${route}`);
