@@ -77,7 +77,7 @@ export const ammStakingValues = {
 }
 
 const isConnectionDirect = (): boolean => {
-  return window.location.hostname.includes('localhostname') ||
+  return window.location.hostname.includes('localhost') ||
   window.location.hostname.includes('0.0.0.0') ||
   window.location.hostname.includes('127.0.0.1') ||
   window.location.hostname.includes('45')
