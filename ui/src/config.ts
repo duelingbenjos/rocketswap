@@ -1,7 +1,7 @@
 //Change there for for PROD
-const DOMAIN_NAME = "http://localhost:3003"
-const CURRENCY_SYMBOL = "DTAU"
-const CURRENCY_NAME = "Lamden Testnet Token"
+const DOMAIN_NAME = 'http://localhost:3003'
+const CURRENCY_SYMBOL = 'DTAU'
+const CURRENCY_NAME = 'Lamden Testnet Token'
 const AMM_CONTRACT_NAME = 'con_amm_v9'
 const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
@@ -22,7 +22,7 @@ export const connectionRequest = {
   logo: 'assets/images/RS_Logo.png',
   background: 'assets/images/background.jpeg',
   contractName: AMM_CONTRACT_NAME, //Change for PROD
-  networkType: 'testnet'  //Change for PROD
+  networkType: 'testnet' //Change for PROD
 }
 
 export const stamps = {
@@ -52,11 +52,11 @@ export const config = {
   ammTokenStakingContract: AMM_TOKEN_STAKING_CONTRACT, // Change for PROD
   ammFee: AMM_FEE, //Change for PROD
   blockExplorer: BLOCKEXPLORER_URL, //Change for PROD
-  masternode: MASTERNODE_URL, //Change for PROD
+  masternode: MASTERNODE_URL //Change for PROD
 }
 
 export const currencyToken = {
-  contract_name: "currency",
+  contract_name: 'currency',
   token_name: CURRENCY_NAME,
   token_symbol: CURRENCY_SYMBOL
 }
@@ -66,7 +66,7 @@ export const site_head_meta = {
   imageBig: `${DOMAIN_NAME}/assets/images/rocketswap_card.jpeg`
 }
 
-export const walletDownloadURL = "https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim"
+export const walletDownloadURL = 'https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim'
 
 export const genericIcon_base64_svg = GENERIC_ICON
 
@@ -77,7 +77,12 @@ export const ammStakingValues = {
 }
 
 export const getBaseUrl = (): string => {
-	return '/'
+  const window_location =
+    window.location.hostname.includes('localhostname') ||
+    window.location.hostname.includes('0.0.0.0') ||
+    window.location.hostname.includes('127.0.0.1') ||
+    window.location.hostname.includes('45') // vultr
+  return `http://${window.location.hostname}:2053`
 }
 
 export const ws_options = {}

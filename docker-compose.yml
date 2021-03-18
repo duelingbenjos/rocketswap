@@ -19,6 +19,12 @@ services:
     image: rocketswap-client-ui
     container_name: rocketswap-ui
     network_mode: host
+
+  proxy:
+    build: ./proxy_server
+    image: rocketswap-client-proxy
+    container_name: rocketswap-proxy
+    network_mode: host
  
   website:
     build: ./website
