@@ -39,6 +39,8 @@
 	constructor() {
 		//console.log('WS Service STARTED')
 		this.base_url = getBaseUrl()
+		console.log(this.base_url)
+		console.log(ws_options)
 		this.connection = socket.connect(this.base_url, ws_options)
 		this.setupEvents()
 		this.setupSubs()
