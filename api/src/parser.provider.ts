@@ -16,16 +16,16 @@ import { updateStakingContractMeta } from "./entities/staking-meta.entity";
 
 @Injectable()
 export class ParserProvider {
+	public static amm_meta_entity
 	constructor(private readonly socketService: SocketService, private readonly authService: AuthService) {}
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
 	private action_que_processing: boolean;
 	private logger: Logger = new Logger("ParserProvider");
-	private amm_meta_entity: AmmMetaEntity;
 
 	async onModuleInit() {
 		this.updateTokenList();
-		this.amm_meta_entity = await AmmMetaEntity.findOne();
+		ParserProvider.amm_meta_entity = await AmmMetaEntity.findOne();
 	}
 
 	/** This method is passed to the blockgrabber as a callback and checks
@@ -119,7 +119,7 @@ export class ParserProvider {
 				state,
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
-			await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp, hash, this.amm_meta_entity.TOKEN_CONTRACT);
+			await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp, hash, ParserProvider.amm_meta_entity.TOKEN_CONTRACT);
 			await savePrice(state, this.socketService.handleClientUpdate);
 			await updateAmmMeta({
 				state,
@@ -171,7 +171,7 @@ export class ParserProvider {
 
 	private refreshAmmMeta = async () => {
 		const amm_meta_entity = await AmmMetaEntity.findOne();
-		this.amm_meta_entity = amm_meta_entity;
+		ParserProvider.amm_meta_entity = amm_meta_entity;
 	};
 }
 

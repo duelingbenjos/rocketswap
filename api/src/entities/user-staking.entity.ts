@@ -42,7 +42,7 @@ export async function updateUserStakingInfo(args: {
 }) {
 	const { deposits, withdrawals, staking_contract, fn, handleClientUpdate } = args;
 	const vk = deposits ? deposits.key.split(":")[1] : withdrawals.key.split(":")[1];
-	let entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
+	let entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } })
 	if (!entity) {
 		entity = new UserStakingEntity();
 		entity.deposits = [];
@@ -55,14 +55,14 @@ export async function updateUserStakingInfo(args: {
 	}
 	if (withdrawals) {
 		entity.withdrawals = withdrawals.value.__fixed__ ? parseFloat(withdrawals.value.__fixed__) : 0;
-		handleClientUpdate({action: "client_staking_update", staking_contract})
+		
 	}
 	if (fn === "withdrawTokensAndYield") {
 		entity.withdrawals = 0;
 		entity.deposits = [];
 		entity.yield_info = null;
 	}
-
+	handleClientUpdate({action: "client_staking_update", staking_contract})
 	return await entity.save();
 }
 
@@ -74,7 +74,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 	let harvestable_yield = 0;
 
 	for (let d of deposits) {
-		let calcFn = meta.meta.type === 'simple_staking' ? calculateSimpleYield : calculateYield
+		let calcFn = meta.meta.type === 'staking_simple' ? calculateSimpleYield : calculateYield
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,
@@ -155,7 +155,7 @@ function calculateSimpleYield(args: {
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
-	//console.log("CALCULATE YIELD CALLED");
+	console.log("CALCULATE SIMPLE YIELD CALLED");
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
 	// console.log(epochs);
@@ -205,12 +205,17 @@ function calculateSimpleYield(args: {
 }
 
 
-export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: number) {
-	const emission_rate_per_hour = meta.EmissionRatePerHour;
-	const total_emission_rate_per_second = getEmissionRatePerSecond(emission_rate_per_hour);
-	const share_of_pool = total_staked / meta.StakedBalance;
-	const user_emission_rate_per_second = share_of_pool * total_emission_rate_per_second;
-	return user_emission_rate_per_second;
+export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: number, user_entity: UserStakingEntity) {
+	if (meta.meta.type === "staking_simple") {
+		const deposit_total = user_entity.deposits.reduce((accum, dep) => { return accum += parseFloat(dep.amount.__fixed__)}, 0)
+		return deposit_total * meta.EmissionRatePerSecond
+	} else {
+		const emission_rate_per_hour = meta.EmissionRatePerHour;
+		const total_emission_rate_per_second = getEmissionRatePerSecond(emission_rate_per_hour);
+		const share_of_pool = total_staked / meta.StakedBalance;
+		const user_emission_rate_per_second = share_of_pool * total_emission_rate_per_second;
+		return user_emission_rate_per_second;
+	}
 }
 
 function getEmissionRatePerSecond(emission_rate_per_hour: number) {

@@ -197,8 +197,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 		})
 		client.emit('staking_panel', await Promise.all(response))
-		const epoch_data = await StakingEpochEntity.find();
-		client.emit("epoch_data", epoch_data);
 	}
 
 	private async handleJoinTrollBox(client: Socket) {

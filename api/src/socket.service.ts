@@ -139,7 +139,7 @@ export class SocketService {
 			//console.log(total_staked);
 			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities_filtered });
 			//console.log("current yield", current_yield);
-			const yield_per_sec = getUserYieldPerSecond(meta_entity, total_staked);
+			const yield_per_sec = getUserYieldPerSecond(meta_entity, total_staked, user_entity);
 			const time_updated = Date.now();
 			const epoch_updated = meta_entity.Epoch.index;
 

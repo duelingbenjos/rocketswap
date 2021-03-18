@@ -4,6 +4,8 @@ import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
 import { updateUserStakingInfo } from "./user-staking.entity";
 import { updateEpoch } from "./staking-epoch.entity";
+import { PairEntity } from "./pair.entity";
+import { ParserProvider } from "../parser.provider";
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -49,6 +51,10 @@ export class StakingMetaEntity extends BaseEntity {
 		staked: number;
 		time: IContractingTime;
 	};
+
+	@Column({nullable: true})
+	ROI_yearly: number
+
 }
 
 export const updateStakingContractMeta = async (args: {
@@ -93,9 +99,6 @@ export const updateStakingContractMeta = async (args: {
 				case `${staking_contract}.meta:YIELD_TOKEN`:
 					entity["meta"] = updateMetaProperty(entity.meta, "YIELD_TOKEN", getVal(kvp));
 					break;
-				case `${staking_contract}.meta:STAKING_TOKEN`:
-					entity["meta_STAKING_TOKEN"] = getVal(kvp);
-					break;
 				case `${staking_contract}.EmissionRatePerHour`:
 					entity["EmissionRatePerHour"] = getVal(kvp);
 					break;
@@ -116,6 +119,10 @@ export const updateStakingContractMeta = async (args: {
 					break;
 				case `${staking_contract}.EmissionRatePerTauYearly`:
 					entity["EmissionRatePerTauYearly"] = getVal(kvp);
+					entity["EmissionRatePerHour"] = ((parseFloat(getVal(kvp)) / 365 )/ 24);
+					
+					const ROI = await calculateROI(entity["EmissionRatePerHour"])
+					if (ROI) entity.ROI_yearly = ROI
 					break;
 				case `${staking_contract}.EmissionRatePerSecond`:
 					entity["EmissionRatePerSecond"] = getVal(kvp);
@@ -151,6 +158,14 @@ export const updateStakingContractMeta = async (args: {
 		console.error(err);
 	}
 };
+
+export const calculateROI = async (yearly_emission_rate: number) => {
+	const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity.TOKEN_CONTRACT)
+	if (rswp_entity && rswp_entity.price) {
+		return (parseFloat(rswp_entity.price) * yearly_emission_rate) * 100
+	}
+	return false
+}
 
 const updateMetaProperty = (metadata: any, key: string, value: string) => {
 	if (!metadata) metadata = {};
