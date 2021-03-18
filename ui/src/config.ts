@@ -77,5 +77,7 @@ export const ammStakingValues = {
 }
 
 export const getBaseUrl = (): string => {
-	return '/cxn'
+	return '/'
 }
+
+export const ws_options = {}

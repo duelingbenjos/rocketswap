@@ -79,3 +79,5 @@ export const ammStakingValues = {
 export const getBaseUrl = (): string => {
 	return '/cxn'
 }
+
+export const ws_options = {path: '/cxn/socket.io'}
