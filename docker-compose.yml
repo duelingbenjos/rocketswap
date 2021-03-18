@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
 
   mongo:
@@ -10,29 +10,21 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
     container_name: rocketswap-mongo
-    networks: 
-      - rocketswap-network
+    network_mode: host
     volumes: 
       - ~/mongo/data:/data/db
-
 
   ui:
     build: ./ui
     image: rocketswap-client-ui
     container_name: rocketswap-ui
-    networks: 
-      - rocketswap-network
-    ports:
-      - 5000:5000
+    network_mode: host
  
   website:
     build: ./website
     image: rocketswap-client-website
     container_name: rocketswap-website
-    networks: 
-      - rocketswap-network
-    ports:
-      - 80:80
+    network_mode: host
 
   api:
     build: ./api
@@ -40,26 +32,20 @@ services:
     restart: always
     container_name: rocketswap-api
     environment:
-      - ROCKETSWAP_DB_HOST=rocketswap-mongo
+      - ROCKETSWAP_DB_HOST=127.0.0.1
       - ROCKETSWAP_DB_PORT=8081
       - ROCKETSWAP_DB_USERNAME=root
       - ROCKETSWAP_DB_PASSWORD=example
       - ROCKETSWAP_DB_FIRST_RUN=${ROCKETSWAP_DB_FIRST_RUN}
       - currBlockNum=1
-    networks:
-      - rocketswap-network
-    ports:
-      - 3002:3002
+    network_mode: host
 
   docs:
     build: ./docs
     image: rocketswap-docs
     restart: always
     container_name: rocketswap-docs
-    networks:
-      - rocketswap-network
-    ports:
-      - 3000:3000
+    network_mode: host
 
 volumes:
   rocketswap-volume:
