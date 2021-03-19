@@ -41,6 +41,8 @@
 		document.addEventListener("visibilitychange", setTabActive);
 		return () => {
 			document.removeEventListener("visibilitychange", setTabActive);
+			txBitApiService.killTimer()
+			coinPaprikaApiService.killTimer()
 		}
 /*
 		toastService.addToast({ 
