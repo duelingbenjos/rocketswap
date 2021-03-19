@@ -18,7 +18,7 @@
 	const walletService = WalletService.getInstance();
 
 	// Misc
-	import { mainMenuOpen, rswpPrice, walletAddress } from '../store'
+	import { mainMenuOpen, rswpPriceUSD, walletAddress, tauUSDPrice } from '../store'
 	import { config } from '../config'
 	import { stringToFixed } from '../utils'
 
@@ -88,9 +88,14 @@
 	.mobile-link {
 		margin: 0.5rem auto;
 	}
-	.price{
+	.prices{
+		margin: -0.2rem 0 0;
+	}
+	.powered-by{
 		display: none;
-		margin: 0;
+	}
+	.rocketswap-logo{
+		margin-bottom: -0.5rem;
 	}
 	.rocket{
 		margin: 0 auto 2rem;
@@ -144,11 +149,18 @@
 		}
 
     }
+	/* When page width is greater than 475px (tablets) */
+	 @media screen and (min-width: 475px) {
+		.powered-by{
+			display: block;
+			position: relative;
+    		top: 7px;
+		}
+    }
+
+	
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
-		.price{
-			display: block;
-		}
 		.socials{
 			display: block;
 		}
@@ -164,11 +176,18 @@
 
 <div class="header flex-row">
 	<div class="logo-container">
-		<RocketSwap />
-		<PoweredByLamden margin="-5px 0 0 0"/>
-		<p class="price text-xsmall">
-			{`${config.ammTokenSymbol} = ${stringToFixed($rswpPrice ,2)} ${config.currencySymbol}`}
-		</p>
+		<div class="flex-row">
+			<div class="rocketswap-logo">
+				<RocketSwap />
+			</div>
+			<div class="powered-by">
+				<PoweredByLamden margin="0 0 0 8px"/>
+			</div>
+		</div>
+		<span class="prices text-xsmall">
+			<strong class="text-color-highlight">{config.currencySymbol}</strong>{`: $${stringToFixed($tauUSDPrice, 3)} USD | `}
+			<strong class="text-color-highlight">{config.ammTokenSymbol}</strong>{`: $${stringToFixed($rswpPriceUSD, 3)} USD`}
+		</span>
 	</div>
 
 
@@ -219,7 +238,7 @@
     		</div>
 		</div>
 	</MainMenu>
-	<div class="socials">
+	<div class="flex-row socials">
 		<Socials width="25px" margin="1rem 0" iconMargin="0 2px"/>
     </div>
 </div>

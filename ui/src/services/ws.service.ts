@@ -11,7 +11,8 @@
 		userYieldInfo,
 		epochs,
 		lpBalances,
-		lpPairs } from '../store'
+		lpPairs,
+		tauUSDPrice } from '../store'
 	import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 	import { valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision } from '../utils'
 	import { config, getBaseUrl, ws_options } from '../config'
@@ -72,6 +73,7 @@
 			this.connection.emit('join_room', `trollbox`)
 			this.previously_connected = true
 			this.joinTokenMetricsFeed(config.ammTokenContract)
+			this.joinTauUsdFeed()
 		}
 	}
 	// TRANSACTIONS
@@ -165,6 +167,22 @@
 		console.log({handleAuthResponse:msg})
 		localStorage.setItem('auth_token', JSON.stringify(msg))
 		setBearerToken()
+	}
+
+	// TAU USD FEED
+	public joinTauUsdFeed() {
+		if (this.joinedFeeds[`tau_usd_price`]) return
+		
+		this.connection.emit('join_room', `tau_usd_price`)
+		this.connection.on(`tau_usd_price`, this.handleTauUsdFeed)
+
+		this.joinedFeeds[`tau_usd_price`] = true
+	}
+
+	private handleTauUsdFeed(msg){
+		console.log({handleTauUsdFeed: msg})
+		localStorage.setItem('tau_usd_price', JSON.stringify(msg.current_price))
+		tauUSDPrice.set(toBigNumber(msg.current_price))
 	}
 
 /* -------------------------

@@ -19,6 +19,7 @@ import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { UserStakingEntity } from "./entities/user-staking.entity";
+import { TauMarketEntity } from "./entities/tau-market.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
 import { TransactionService } from "./transaction.service";
@@ -37,6 +38,7 @@ import {
 	isClientStakingUpdate
 } from "./types/websocket.types";
 
+import { CoinGeckoAPIService } from './services/coingecko.service'
 /**
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
@@ -61,6 +63,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
 		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 		this.socketService.handleProxyTxnResponse = this.handleTxnResponse;
+		new CoinGeckoAPIService(this.socketService)
 	}
 
 	handleNewBlock = async (block: BlockDTO) => {
@@ -122,6 +125,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 					//console.log("UPDATE", update);
 					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
+			case "tau_usd_price":
+				if (isUserYieldUpdate(update)) {
+					//console.log("UPDATE", update);
+					this.wss.emit(`tau_usd_price`, update.data);
+				}	
 		}
 	};
 
@@ -169,6 +177,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			case "user_yield_feed":
 				this.handleJoinUserYieldFeed(subject, client);
 				break;
+			case "tau_usd_price":
+				this.handleJoinTauUsdPrice(client);
+				break;
 		}
 	}
 
@@ -182,6 +193,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		const yield_list = await this.socketService.getClientYieldList(subject);
 		//console.log("called");
 		client.emit("user_yield_list", yield_list);
+	}
+
+	private async handleJoinTauUsdPrice(client: Socket) {
+		let entity = await TauMarketEntity.findOne({info_type: "usd_price"});
+		client.emit('tau_usd_price', {current_price: entity.value})
 	}
 
 	private async handleJoinStakingPanel(client: Socket) {
