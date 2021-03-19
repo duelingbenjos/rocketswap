@@ -5,10 +5,7 @@
 
 
 	//Components
-	import TokenSelect from './token-select-toggle.svelte'
-
-	//Icons
-	import Base64Svg from '../../icons/base64_svg.svelte'
+	import TokenSelect from '../misc/token-select-toggle.svelte'
 
 	//Misc
 	import { config } from '../../config'
@@ -20,16 +17,26 @@
 
 	const dispatch = createEventDispatcher();
 	
-	let { pageStores } = getContext('pageContext')
+	let { pageStores, showMax } = getContext('pageContext')
 	const { selectedToken, tokenAmount, buy } = pageStores
 
 	let inputElm;
 	let pressedMaxValue = false;
 
 	$: tokenBalance = $selectedToken ? $tokenBalances[$selectedToken.contract_name] : toBigNumber("0.0")
-	$: inputValue = $tokenAmount;
+	let inputValue;
 
-	tokenBalances.subscribe(val => console.log(val))
+	tokenAmount.subscribe(newTokenAmount => {
+		if (!inputValue) {
+			inputValue = newTokenAmount
+			return
+		}
+		if (newTokenAmount?.isEqualTo(inputValue)) return
+		else{
+			inputValue = newTokenAmount
+			pressedMaxValue = false;
+		}
+	})
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -38,8 +45,8 @@
 		}else{
 			let value = toBigNumber(e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1'))
 			if (determinePrecision(value) > 8){
-				value = toBigNumber(stringToFixed(value.toString(), 8))
-				inputElm.value = value.toString()
+				value = toBigNumber(stringToFixed(value, 8))
+				inputElm.value = stringToFixed(value, 8)
 			}
 			pressedMaxValue = false
 			dispatchEvent(value)
@@ -48,7 +55,7 @@
 
 	const handleMaxInput = () => {
 		inputValue = tokenBalance
-		inputElm.value = inputValue.toString()
+		inputElm.value = stringToFixed(inputValue, 8)
 		pressedMaxValue = true
 		dispatchEvent(inputValue)
 	}
@@ -64,11 +71,14 @@
 <div class="input-container flex-col"
 	 in:scale="{{duration: 300, delay: 0, opacity: 0.0, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
-		<div class="input-label">{label}</div>
+		<div class="input-label text-primary">
+			{label}
+		</div>
 		<div class="input-balance">
 			{#if $selectedToken}
-				Balance: 
-				<span class="number text-small">{stringToFixed(tokenBalance, 8)}</span>
+				<span class="number text-small">
+					{`Balance: ${stringToFixed(tokenBalance, 8)}`}
+				</span>
 			{/if}
 		</div>
 	</div>
@@ -76,13 +86,13 @@
 		<input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			value={inputValue?.toString() || ""}
+			value={inputValue ? stringToFixed(inputValue, 8) : ""}
 			bind:this={inputElm} 
 			on:input={handleInputChange}
 			disabled={!$selectedToken} 
 		/>
 		<div class="input-controls">
-			{#if $buy === false && $selectedToken && !pressedMaxValue}
+			{#if ($buy === false && $selectedToken && !pressedMaxValue) || (showMax &&  !pressedMaxValue && $selectedToken)}
 				<button disabled={!$selectedToken} on:click={handleMaxInput} class="primary small">MAX</button>
 			{/if}
 			<TokenSelect on:selected={handleTokenSelect} />

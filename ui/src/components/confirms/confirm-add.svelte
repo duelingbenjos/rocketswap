@@ -14,7 +14,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, refreshLpBalances } from '../../utils'
+    import { stringToFixed } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -27,8 +27,6 @@
 
     const success = () => {
         finish();
-        setTimeout(refreshLpBalances, 2500)
-        setTimeout(refreshLpBalances, 10000)
         resetPage();
         closeConfirm();
     }
@@ -46,7 +44,7 @@
         loading = true;
         walletService.addLiquidity({
             'contract': $selectedToken.contract_name,
-            'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)}
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 30)}
         }, $selectedToken, $tokenAmount, $currencyAmount, { success, error })
     }
 
@@ -55,10 +53,12 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .modal-sub-box{
-        width: 345px;
+        width: 100vw;
+        max-width: 380px;
     }
     .sub-text{
         margin: 0.5rem 0;
@@ -76,23 +76,20 @@
             <CloseIcon />
         </button>
     </div>
-    <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 4)}</p>
+    <p class="text-xxlarge text-bold lp-amount margin-0">{stringToFixed($pageStats.lpToMint, 8)}</p>
     <p class="text-large margin-0 text-primary-dim">{`${$selectedToken.token_symbol} / ${config.currencySymbol} Pool Tokens`}</p>
-    <p class="text-xsmall sub-text text-primary-dimmer">
-        Output is estimated. If the price changes by more than 0.5% your transaction will revert.
-    </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number">{stringToFixed($currencyAmount, 12)}</p>
+            <p class="number number-span">{stringToFixed($currencyAmount, 8)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
-            <p class="number">{stringToFixed($tokenAmount, 12)}</p>
+            <p class="number number-span">{stringToFixed($tokenAmount, 8)}</p>
         </div>
         <ConfirmRates 
-            currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 4)}
-            tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 4)}
+            currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 8)}
+            tokenPrice={stringToFixed($pageStats.quoteCalc.prices.token, 8)}
             {$selectedToken}
         />
         <ShareChange />

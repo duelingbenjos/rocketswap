@@ -1,11 +1,12 @@
 <script>
-    import { onMount } from 'svelte'
     export let width = "20px"
     export let color = "var(--color-secondary)"
     export let direction = "up"
     export let shake = false;
+    export let shakeRight = false;
     export let fire = true;
     export let blastOff = false;
+    export let styles = "";
 
     //Bindings
     let rocket
@@ -30,6 +31,9 @@
 	.shake{
         animation: shake 0.5s ease-in-out infinite;
     }
+    .shake-right{
+        animation: shake-right 0.5s ease-in-out infinite;
+    }
     .blast-off{
         animation: fire 1s ease-in-out infinite;
     }
@@ -42,6 +46,12 @@
         66% { transform: rotate(323deg); }
         100% { transform: rotate(324deg); }
     }
+    @keyframes shake-right {
+        0% { transform: rotate(53deg);}
+        33% { transform: rotate(52deg); }
+        66% { transform: rotate(53deg); }
+        100% { transform: rotate(54deg); }
+    }
     @keyframes fire {
         0% { fill: red;}
         33% { fill:yellow; }
@@ -52,7 +62,8 @@
 
 <svg {width}  fill={color} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"
     class:shake={shake}
-    style={`transform: rotate(${directions[direction]}deg);`}>
+    class:shake-right={shakeRight}
+    style={`transform: rotate(${directions[direction]}deg); ${styles}`}>
     <path 
         class:no-fire={!fire} 
         class:blast-off={blastOff} 

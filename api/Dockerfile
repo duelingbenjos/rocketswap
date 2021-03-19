@@ -10,7 +10,7 @@ then\n\
     echo "Building Database..." \n\
 fi \n\
 echo "Starting API..."\n\
-npm run dev \n'\
+npm run start:dev:reset \n'\
 > entypoint.sh
 
 COPY package.json .
@@ -20,4 +20,4 @@ COPY . .
 
 CMD ["sh", "entypoint.sh"]
 
-EXPOSE 3002
+EXPOSE 2053

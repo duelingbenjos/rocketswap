@@ -14,14 +14,15 @@
 	const ws = WsService.getInstance()
 
 	//Stores
-	import { tokenBalances, walletIsReady, saveStoreValue, walletAddress  } from '../store'
+	import { tokenBalances, walletIsReady, saveStoreValue, walletAddress, slippageTolerance, rswpPrice, payInRswp  } from '../store'
 	
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
-	import { connectionRequest } from '../config'
+	import { connectionRequest, config } from '../config'
 
 	//Components
-	import SwapPanel from '../components/swap-panel.svelte'
+	import HeadMeta from '../components/head-meta.svelte'
+	import SwapPanel from '../components/panels/swap-panel.svelte'
 	import TradeTable from '../components/misc/trade-table.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
@@ -34,20 +35,24 @@
 	let selectedToken = writable()
 	let tokenLP = writable()
 	let buy = writable(true)
+	let txOkay = writable(true)
 
 	let pageStores = {
 		currencyAmount,
 		tokenAmount,
 		selectedToken,
 		buy,
-		tokenLP
+		tokenLP,
+		payInRswp,
+		txOkay
 	}
 
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap';
-	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken)
+	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol}` : 'RocketSwap';
+	$: pageDescription = $selectedToken ? `Swap ${$selectedToken.token_symbol}/${config.currencySymbol}!` : 'The Fastest Swaps in Crypto!';
+	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken, $slippageTolerance, $rswpPrice, $payInRswp)
 
 	selectedToken.subscribe(value => {
 		if (value) {
@@ -86,6 +91,21 @@
 		let quote;
 		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount)      
 		else quote = quoteCalc.calcSellPrice($tokenAmount)
+/*
+		console.log("SWAP PAGE - UPDATE_PAGE_STATS")
+		console.log({
+			fee: quote.fee.toPrecision(8),
+			new_price_currency: quote.newPrices.currency.toPrecision(8),
+			new_price_token: quote.newPrices.token.toPrecision(8),
+			new_reserves_currency:  quote.newPrices.reserves[0].toPrecision(8),
+			new_reserves_token:  quote.newPrices.reserves[1].toPrecision(8),
+			price_currency: quoteCalc.prices.currency.toPrecision(8),
+			price_token: quoteCalc.prices.token.toPrecision(8),
+			reserves_currency:  quoteCalc.prices.reserves[0].toPrecision(8),
+			reserves_token:  quoteCalc.prices.reserves[1].toPrecision(8),
+			tokensPurchased: quote.tokensPurchased.toPrecision(8),
+			tokensPurchasedLessFee: quote.tokensPurchasedLessFee.toPrecision(8)
+		})*/
 		
 		pageStats.set({
 			quoteCalc,
@@ -100,12 +120,12 @@
 		let inputAmount = toBigNumber("0");
 		if ($buy) {
 			if ($currencyAmount) inputAmount = $currencyAmount
-			if (await walletService.needsApproval($walletAddress, "currency", inputAmount)){
+			if (await walletService.needsApproval("currency", inputAmount)){
 				txList.push({contract: "currency", method: "approve"})
 			}
 		}else{
 			if ($tokenAmount) inputAmount = $tokenAmount
-			if (await walletService.needsApproval($walletAddress, contractName, inputAmount)){
+			if (await walletService.needsApproval(contractName, inputAmount)){
 				txList.push({contract: contractName, method: "approve"})
 			}			
 		}
@@ -120,9 +140,7 @@
 </style>
 
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page-container">
 	<SwapPanel>

@@ -5,7 +5,7 @@
     import Button from '../button.svelte';
 
     //Icons
-    import Base64SvgLogo from '../../icons/base64_svg.svelte'
+    import TokenLogo from '../../icons/token-logo.svelte'
     import LamdenLogo from '../../icons/lamden-logo.svelte'
     import DirectionalArrow from '../../icons/directional-arrow.svelte'
     import CloseIcon from '../../icons/close.svelte';
@@ -15,24 +15,23 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { rocketState } from '../../store'
-    import { stringToFixed, toBigNumber, refreshLpBalances } from '../../utils'
+    import { rocketState, slippageTolerance } from '../../store'
+    import { stringToFixed, toBigNumber } from '../../utils'
     import { config } from '../../config'
 
     //Props
     export let closeConfirm;
 
     const { pageStats, resetPage, pageStores } = getContext('pageContext')
-    const { selectedToken, currencyAmount, tokenAmount, buy  } = pageStores
-
+    const { selectedToken, currencyAmount, tokenAmount, buy, payInRswp  } = pageStores
 
     let logoSize = "30px"
-    let minimumReceived = toBigNumber("0.0")
-    
-    $: minimumReceivedString = stringToFixed(minimumReceived.toString(), 4)
-    $: slots = createSlots($buy, $currencyAmount, $tokenAmount)
-    $: receivedSymbol = buy ? $selectedToken.token_symbol : config.currencySymbol
+
+    $: minimumReceived = $buy ? $payInRswp ? $pageStats.minimumTokens : $pageStats.minimumTokensLessFee : $payInRswp ? $pageStats.minimumCurrency : $pageStats.minimumCurrencyLessFee;
+    $: slots = createSlots($buy, $currencyAmount, $tokenAmount, $payInRswp)
+    $: receivedSymbol = $buy ? $selectedToken.token_symbol : config.currencySymbol
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
+    $: percentOfTolerance = slippage.dividedBy($slippageTolerance)
     $: slippageWarning = slippage.isGreaterThan(5)
 
     onMount(() => {
@@ -44,21 +43,19 @@
             {
                 logoComponent: LamdenLogo,
                 symbol: config.currencySymbol,
-                amount: stringToFixed($currencyAmount, 12)
+                amount: stringToFixed($currencyAmount, 8)
             },
             {
-                logoComponent: Base64SvgLogo,
+                logoComponent: TokenLogo,
                 symbol: $selectedToken.token_symbol,
-                amount: stringToFixed($tokenAmount, 12)
+                amount: stringToFixed($tokenAmount, 8)
             },
         ]
-        if (!$buy) {
-            minimumReceived = $pageStats.currencyPurchasedLessFee
-            slotArray[0].amount = stringToFixed(minimumReceived, 12)
-            slotArray.reverse();
+        if ($buy) {
+            slotArray[1].amount = stringToFixed($payInRswp ? $pageStats.tokensPurchased : $pageStats.tokensPurchasedLessFee, 8)
         }else{
-            minimumReceived = $pageStats.tokensPurchasedLessFee
-            slotArray[1].amount = stringToFixed(minimumReceived, 12)
+            slotArray[0].amount = stringToFixed($payInRswp ? $pageStats.currencyPurchased : $pageStats.currencyPurchasedLessFee, 8)
+            slotArray.reverse(); 
         }
         return slotArray;
     }
@@ -67,8 +64,6 @@
 
     const success = () => {
         finish();
-        setTimeout(refreshLpBalances, 2500)
-        setTimeout(refreshLpBalances, 10000)
         setTimeout(() => rocketState.set(2), 500)
         resetPage();
         closeConfirm();
@@ -86,8 +81,10 @@
         if (!$currencyAmount) return
         loading = true;
         walletService.swapBuy({
-        'contract': $selectedToken.contract_name,
-        'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)}
+            'contract': $selectedToken.contract_name,
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 8)},
+            'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
+            'token_fees': false
         }, $selectedToken, $currencyAmount, { success, error })
     }
 
@@ -95,8 +92,10 @@
         if (!$tokenAmount) return
         loading = true;
         walletService.swapSell({
-        'contract': $selectedToken.contract_name,
-        'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
+            'contract': $selectedToken.contract_name,
+            'token_amount': {'__fixed__': stringToFixed($tokenAmount, 8)},
+            'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
+            'token_fees': false
         }, $selectedToken, $tokenAmount, { success, error })
     }
 </script>
@@ -104,7 +103,8 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .sub-text{
         margin: 1rem 0;
@@ -134,7 +134,7 @@
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[0].logoComponent} 
-                    string={$selectedToken.token_base64_svg}
+                    tokenMeta={$selectedToken}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />
@@ -147,7 +147,7 @@
             <div class="flex-row flex-center-spacebetween">
                 <svelte:component 
                     this={slots[1].logoComponent}
-                    string={$selectedToken.token_base64_svg}
+                    tokenMeta={$selectedToken}
                     width={logoSize} 
                     margin="0 10px 0 0"
                 />
@@ -157,42 +157,48 @@
         </div>
     </div>
     <p class="text-xsmall sub-text text-primary-dim">
-        ** Output is estimated. <!--You will receive at least {minimumReceivedString} {receivedSymbol} or the transaction will revert.-->
+        ** Output is estimated. You will receive at least {stringToFixed(minimumReceived, 8)} {receivedSymbol} or the transaction will revert.
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Price</p>
             {#if $buy}
                 <div class="flex-row flex-align-center">
-                    <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
+                    <span class="number number-span margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
                     <span>{`${$selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
                 </div>
             {:else}
                 <div class="flex-row flex-align-center">
-                    <span class="number margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
+                    <span class="number number-span margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
                     <span>{`${config.currencySymbol} per ${$selectedToken.token_symbol}`}</span>
                 </div>
             {/if}
         </div>
-        <!--
-        <div class="flex-row modal-confirm-item">
-            <p>Minimum Recieved</p>
-            <p class="text-bold">{minimumReceivedString} {receivedSymbol}</p>
-        </div>
-        -->
+
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Price Impacted</p>
             <p  class="number" 
-                class:text-warning={slippage.isLessThan(5)}
-                class:text-error={slippage.isGreaterThanOrEqualTo(5)}
-            >
+                class:text-warning={slippage.isFinite() && percentOfTolerance.isGreaterThanOrEqualTo(0.75)}
+                class:text-error={slippage.isFinite() && slippage.isGreaterThanOrEqualTo($slippageTolerance)}>
                 {`${stringToFixed(slippage, 2)}%`}
             </p>
         </div>
         <div class="flex-row flex-align-center modal-confirm-item">
-            <p class="text-primary-dim">Liquidity Provider Fee</p>
+            <p class="text-primary-dim">Fee</p>
             <div class="flex-row flex-align-center">
-                <span class="number margin-r-3">{stringToFixed($pageStats.fee, 8)}</span>
+                {#if $payInRswp}
+                    <span class="number margin-r-3 number-span">{stringToFixed($pageStats.rswpFee, 8)}</span>
+                    <span>{config.ammTokenSymbol}</span>
+                {:else}
+                    <span class="number margin-r-3 number-span">{stringToFixed($pageStats.fee, 8)}</span>
+                    <span>{receivedSymbol}</span>
+                {/if}
+            </div>
+        </div>
+        <div class="flex-row modal-confirm-item">
+            <p class="text-bold text-primary-dim">Minimum Recieved</p>
+            <div class="flex-row flex-align-center">
+                <span class="number margin-r-3 number-span">{stringToFixed(minimumReceived, 8)}</span>
                 <span>{receivedSymbol}</span>
             </div>
         </div>

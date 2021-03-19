@@ -8,7 +8,8 @@ import con_basic_token
 STAKING_TOKEN = currency
 YIELD_TOKEN = con_basic_token
 
-# State Variables
+
+# State
 
 Owner = Variable()
 DevRewardWallet = Variable()
@@ -18,14 +19,14 @@ StartTime = Variable()
 EndTime = Variable()
 OpenForBusiness = Variable()  # If false, users will be unable to join the pool
 
-# State
-
 Users = Hash(default_value=False)
 Deposits = Hash(default_value=False)
 Withdrawals = Hash(default_value=0)
 CurrentEpochIndex = Variable()
 Epochs = Hash(default_value=False)
 StakedBalance = Variable()  # The total amount of farming token in the vault.
+meta = Hash(default_value=False)
+
 
 @construct
 def seed():
@@ -38,13 +39,23 @@ def seed():
         "staked": 0
     }
 
-    EmissionRatePerHour.set(136.98) # 1200000 RSWP per year = 10% of supply
+    meta['version'] = 0.01
+    meta['type'] = 'staking'  # staking || lp_farming
+    meta['STAKING_TOKEN'] = 'currency'
+    meta['YIELD_TOKEN'] = 'con_basic_token'
+
+    # EmissionRatePerHour.set(6849) # value for yield farming
+
+    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(0.1)
 
-    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0)) # The datetime from which you want to allow staking.
-    EndTime.set(datetime.datetime(year=2050, month=1, day=1, hour=0)) # The datetime at which you want staking to finish.
+    # The datetime from which you want to allow staking.
+    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
+    # The datetime at which you want staking to finish.
+    EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
 
     OpenForBusiness.set(True)
+
 
 @export
 def addStakingTokens(amount: float):
@@ -69,11 +80,15 @@ def addStakingTokens(amount: float):
 
     # Create a record of the user's deposit
 
-    Deposits[user].append({
+    deposits = Deposits[user]
+
+    deposits.append({
         'starting_epoch': new_epoch_idx,
         'time': now,
         'amount': amount
     })
+
+    Deposits[user] = deposits
 
 
 @export
@@ -174,11 +189,13 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         if starting_epoch_index == current_epoch_index:
             delta = fitTimeToRange(now) - fitTimeToRange(start_time)
         elif this_epoch_index == starting_epoch_index:
-            delta = fitTimeToRange(next_epoch['time']) - fitTimeToRange(start_time)
+            delta = fitTimeToRange(
+                next_epoch['time']) - fitTimeToRange(start_time)
         elif this_epoch_index == current_epoch_index:
             delta = fitTimeToRange(now) - fitTimeToRange(this_epoch['time'])
         else:
-            delta = fitTimeToRange(next_epoch['time']) - fitTimeToRange(this_epoch['time'])
+            delta = fitTimeToRange(
+                next_epoch['time']) - fitTimeToRange(this_epoch['time'])
 
         pct_share_of_stake = amount / this_epoch['staked']
         # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
@@ -274,6 +291,12 @@ def setEndTime(year: int, month: int, day: int, hour: int):
     assertOwner()
     time = datetime.datetime(year, month, day, hour)
     EndTime.set(time)
+
+
+# @export
+# def updateMeta(field: str, value: str):
+#     assertOwner()
+#     meta[field] = value
 
 
 def assertOwner():

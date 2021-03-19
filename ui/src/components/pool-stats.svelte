@@ -91,19 +91,19 @@
         {#if tokenSymbol}
             {#if statList.includes("ratios")}
                 <div class="stat">
-                    <p class="number"><strong >{tokenRatio}</strong></p>
+                    <p class="number number-span"><strong >{tokenRatio}</strong></p>
                     <p>{`${config.currencySymbol} per ${tokenSymbol}`}</p>
                 </div>
 
                 <div class="stat">
-                    <p class="number"><strong>{currencyRatio}</strong></p>
+                    <p class="number number-span"><strong>{currencyRatio}</strong></p>
                     <p>{`${tokenSymbol} per ${config.currencySymbol}`}</p>
                 </div>
             {/if}
 
             {#if statList.includes("poolShare") && $walletIsReady}
                 <div class="stat">
-                    <p class="number"><strong>{$pageStats?.newLpSharePercent}%</strong></p>
+                    <p class="number number-span"><strong>{$pageStats?.newLpSharePercent}%</strong></p>
                     <p>New share</p>
                 </div>
             {/if}

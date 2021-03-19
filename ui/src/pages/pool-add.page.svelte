@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   	import { onMount, setContext } from 'svelte'
   	import { writable } from 'svelte/store'
 
@@ -12,12 +12,13 @@
 	const walletService = WalletService.getInstance();
 	
 	//Misc
-	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils, refreshLpBalances } from '../utils'
+	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
 	import { walletIsReady, lwc_info, tokenBalances, lpBalances, saveStoreValue } from '../store'
-	import { connectionRequest } from '../config'
+	import { connectionRequest, config } from '../config'
 
 	//Components
-	import PoolSwapPanel from '../components/pool-liquidity-panel.svelte'
+	import HeadMeta from '../components/head-meta.svelte'
+	import PoolSwapPanel from '../components/panels/pool-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
@@ -28,19 +29,22 @@
 	let selectedToken = writable()
 	let tokenLP = writable()
 	let lpBalance = writable()
+	let txOkay = writable(true)
 
 	let pageStores = {
 		currencyAmount,
 		tokenAmount,
 		selectedToken,
 		tokenLP,
-		lpBalance
+		lpBalance,
+		txOkay
 	}
 
   	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
+	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol}` : 'RocketSwap Add Liquidity!';
+	$: pageDescription = $selectedToken ? `Add liquidity to the ${$selectedToken.token_symbol}/${config.currencySymbol} pool!` : 'Add Liquidity!';
 	$: removeHref = $selectedToken ? `/#/pool-remove/${$selectedToken.contract_name}` : false;
 	$: updateStats = updatePageStats($walletIsReady, $tokenLP, $lpBalances, $currencyAmount)
 
@@ -62,7 +66,8 @@
 		resetPage: () => pageUtilites.resetPage(contractName, [currencyAmount, tokenAmount]),
 		pageStores,
 		saveStoreValue,
-		getStampCost
+		getStampCost,
+		showMax: true
 	});
 
 	onMount(() => {
@@ -99,8 +104,8 @@
 		let txList = [{contract: connectionRequest.contractName, method: "add_liquidity"}]
 		let inputCurrencyAmount = toBigNumber("0");
 		let inputTokenAmount = toBigNumber("0");
-		if ($currencyAmount) inputAmount = $currencyAmount
-		if ($tokenAmount) inputAmount = $tokenAmount
+		if ($currencyAmount) inputCurrencyAmount = $currencyAmount
+		if ($tokenAmount) inputCurrencyAmount = $tokenAmount
 		if (await walletService.needsApproval('currency', inputCurrencyAmount)){
 			txList.push({contract: 'currency', method: "approve"})
 		}
@@ -126,9 +131,7 @@
 </style>
 
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page-container">
 	<PoolSwapPanel>

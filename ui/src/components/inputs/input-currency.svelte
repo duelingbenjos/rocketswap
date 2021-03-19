@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { createEventDispatcher, afterUpdate, getContext } from 'svelte'
+	import { createEventDispatcher, afterUpdate, getContext, onMount } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
 	//Icons
 	import LamdenLogo from '../../icons/lamden-logo.svelte'
-
-	//Stores
-	import { walletBalance } from '../../store'
 
 	//Services
 	import { WalletService } from '../../services/wallet.service'
@@ -15,7 +12,8 @@
 
 	//Misc
 	import { config } from '../../config'
-	import { stringToFixed, toBigNumber, determinePrecision, stampsToTAU } from '../../utils.js'
+	import { stringToFixed, toBigNumber, determinePrecision, stampsToTAU, toBigNumberPrecision } from '../../utils.js'
+	import { walletBalance, payInRswp, walletAddress } from '../../store'
 
 	//Props
 	export let label
@@ -23,12 +21,41 @@
 	const dispatch = createEventDispatcher();
 
 	const { pageStores, getStampCost } = getContext('pageContext')
-	const { currencyAmount, buy, selectedToken } = pageStores
+	const { currencyAmount, buy, selectedToken, txOkay  } = pageStores
 
 	let inputElm;
-	let pressedMaxValue = false;
 
-	$: inputValue = $currencyAmount;
+	let pressedMaxValue = false;
+	let txTAUCost = $walletAddress ? getStampCost().then(res => stampsToTAU(res)) : null;
+	let inputValue;
+
+	walletAddress.subscribe(async (value) => {
+		let txCost = await txTAUCost;
+		if (value && !txCost) txTAUCost = getStampCost().then(res => stampsToTAU(res))
+	})
+
+	currencyAmount.subscribe(newCurrencyAmount => {
+		if (!inputValue) {
+			inputValue = newCurrencyAmount
+			checkCurrencyAmountForStamps()
+			return
+		}
+		if (newCurrencyAmount?.isEqualTo(inputValue)) return
+		else{
+			checkCurrencyAmountForStamps()
+			inputValue = newCurrencyAmount
+			pressedMaxValue = false;
+		}
+	})
+
+	onMount(() => {
+		payInRswp.subscribe(val => {
+			if ($currencyAmount && typeof inputValue !== 'undefined'){
+				if (inputValue > 0) dispatchEvent(inputValue)
+			}
+		})
+	})
+
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -36,25 +63,39 @@
 			inputElm.value = validateValue
 		}else{
 			let value = toBigNumber(e.target.value)
+			checkCurrencyAmountForStamps()
 			if (determinePrecision(value) > 8){
-				value = toBigNumber(stringToFixed(value.toString(), 8))
-				inputElm.value = value.toString()
+				value = toBigNumber(stringToFixed(value, 8))
+				inputElm.value = stringToFixed(value, 8)
+
 			}
 			pressedMaxValue = false;
 			dispatchEvent(value)
 		}
 	}
 
+	async function checkCurrencyAmountForStamps() {
+		let txCost = await txTAUCost;
+
+		if(!$currencyAmount){
+			txOkay.set(true)
+		}else{
+			if ($currencyAmount.plus(txCost).isGreaterThan($walletBalance)) txOkay.set(false)
+			else txOkay.set(true)
+		}
+	}
+
 	const handleMaxInput = async () => {
 		let adjustedValue = 0;
-		let txTAUCost = stampsToTAU(await getStampCost())
-		if ($walletBalance.isGreaterThan(txTAUCost)){
-			adjustedValue = $walletBalance.minus(toBigNumber(txTAUCost))
+		let txCost = await txTAUCost;
+		if ($walletBalance.isGreaterThan(txCost)){
+			adjustedValue = $walletBalance.minus(txCost)
 		}
 		inputValue = toBigNumber(stringToFixed(adjustedValue, 8))
-		inputElm.value = stringToFixed(inputValue.toString(), 8)
+		inputElm.value = stringToFixed(inputValue, 8)
 		pressedMaxValue = true;
 		dispatchEvent(inputValue)
+		checkCurrencyAmountForStamps()
 	}
 	
 	const dispatchEvent = (value) => dispatch('input', value)
@@ -72,7 +113,7 @@
 <div class="input-container flex-col"
 	 in:scale="{{duration: 300, delay: 0, opacity: 0.5, start: 0.6, easing: quintOut}}">
 	<div class="input-row-1 flex-row">
-		<div class="input-label">
+		<div class="input-label text-primary">
 			{label}
 		</div>
 		<span class="number text-small">
@@ -83,7 +124,7 @@
 	    <input 
 			class="input-amount-value number"
 			placeholder="0.0" 
-			value={inputValue ? inputValue.isNaN() ? "" : inputValue?.toString() : ""} 
+			value={inputValue ? inputValue.isNaN() ? "" : stringToFixed(inputValue, 8) : ""} 
 			bind:this={inputElm}
 			on:input={handleInputChange}
         />
@@ -92,11 +133,14 @@
 			{#if ($buy === true || typeof $buy === 'undefined') && !pressedMaxValue && $selectedToken}
 				<button on:click={handleMaxInput} class="primary small">MAX</button> 
 			{/if}
-			<LamdenLogo width="23px" margin="0 3px 0 0" color="white"/>
+			<LamdenLogo width="23px" margin="0 3px 0 0" />
 			<span class="input-token-label text-xlarge"> {config.currencySymbol} </span>
 		</div>
 	</div>
 	{#if pressedMaxValue}
-		<p class="tx-fee-label text-xsmall text-primary-dim">** adjusted for tx fees</p>
+		<p class="input-message text-xsmall text-primary-dim">** adjusted for tx fees</p>
+	{/if}
+	{#if !$txOkay}
+		<p class="input-message text-xsmall text-error">** cannot cover tx fees</p>
 	{/if}
 </div>

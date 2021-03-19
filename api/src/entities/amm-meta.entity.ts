@@ -75,7 +75,6 @@ export const updateAmmMeta = async (args: {
 
 	let entity = await AmmMetaEntity.findOne();
 	if (!entity) entity = new AmmMetaEntity();
-	console.log(state)
 	state.forEach((kvp) => {
 		switch (kvp.key) {
 			case `${config.contractName}.state:FEE_PERCENTAGE`:

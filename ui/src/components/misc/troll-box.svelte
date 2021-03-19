@@ -41,8 +41,17 @@
 
     const createUserColors = (list) => {
         list.map(message => {
-            if (!userColors[message.sender]) userColors[message.sender] = Math.floor(Math.random()*15777215).toString(16)
+            if (!userColors[message.sender]) userColors[message.sender] = getRandomColor()
         })
+    }
+
+    function getRandomColor() {
+        var letters = 'BCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * letters.length)];
+        }
+        return color;
     }
 
     const saveBoxState = () => {
@@ -86,14 +95,12 @@
     }
 
     const error = (errors) => {
-        console.log(errors)
         sending = false
     }
 
     const handleSendMessage = async () => {
         if (!message) return
         let res = await apiService.sendMessage(message)
-        console.log(res)
         message = ""
         if (!res) handleLogin()
     }
@@ -216,8 +223,8 @@
         </div>
         <div bind:this={msgBox} class="box-messages flex-grow">
             {#each $trollboxMessages as message}
-                <div class="message" style={`color: #${userColors[message.sender]}`}>
-                    <strong style={`color: #${userColors[message.sender]}`}>{`${message.sender}: `}</strong>
+                <div class="message" style={`color: ${userColors[message.sender]}`}>
+                    <strong style={`color: ${userColors[message.sender]}`}>{`${message.sender}: `}</strong>
                     {`${message.message}`}
                 </div>
             {/each}
@@ -247,7 +254,7 @@
                     type="text" 
                     bind:value={message} 
                     on:keydown={handleEnterKey}
-                    class="input-message" 
+                    class="input-trollbox-message" 
                     maxlength="256" 
                     placeholder="Enter Message"
                 />

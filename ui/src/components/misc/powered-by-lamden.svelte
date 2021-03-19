@@ -26,7 +26,7 @@
         margin-left: 10px;
     }
 </style>
-<div class="wrapper flex-row flex-center-center" style={`margin: ${margin};`} on:click={() => openNewTab('https://www.lamden.io') }>
+<div class="wrapper flex-row flex-align-center" style={`margin: ${margin};`} on:click={() => openNewTab('https://www.lamden.io') }>
     <span class="text-primary text-xsmall weight-400">Powered by Lamden</span>
     <div class="powered-by-lamden-logo">
         <div class="background-icon">

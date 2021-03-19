@@ -20,8 +20,12 @@ import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
-import { TransactionService } from './transaction.service';
+import { TransactionService } from "./transaction.service";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
+import { StakingMetaEntity } from "./entities/staking-meta.entity";
+import { UserStakingEntity } from "./entities/user-staking.entity";
+import { StakingEpochEntity } from "./entities/staking-epoch.entity";
+import { TauMarketEntity } from "./entities/tau-market.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -37,7 +41,11 @@ const db_options: TypeOrmModuleOptions = {
 		NameEntity,
 		RefreshTokenEntity,
 		ChatHistoryEntity,
-		AmmMetaEntity
+		AmmMetaEntity,
+		StakingMetaEntity,
+		UserStakingEntity,
+		StakingEpochEntity,
+		TauMarketEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true
@@ -47,7 +55,7 @@ const db_options: TypeOrmModuleOptions = {
 	imports: [
 		TypeOrmModule.forRoot(db_options),
 		JwtModule.register({
-			secret: "<SECRET KEY>",
+			secret: process.env.SECRET || "<SECRET KEY>",
 			signOptions: {
 				expiresIn: "30d"
 			}
@@ -64,7 +72,8 @@ const db_options: TypeOrmModuleOptions = {
 		JwtStrategy,
 		AuthService,
 		Logger,
-		TransactionService
+		TransactionService,
+		StakingEpochEntity
 	]
 })
 export class AppModule {}

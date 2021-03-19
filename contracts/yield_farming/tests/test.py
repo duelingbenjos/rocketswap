@@ -458,8 +458,9 @@ class MyTestCase(unittest.TestCase):
 
         start_time = self.contract.StartTime.get()
         end_time = self.contract.EndTime.get()
-        
-        self.assertEqual(Datetime(year=2021, month=1, day=1, hour=1), start_time)
+
+        self.assertEqual(Datetime(year=2021, month=1,
+                                  day=1, hour=1), start_time)
         self.assertEqual(Datetime(year=2021, month=1, day=1, hour=1), end_time)
 
     def test_08_start_time(self):
@@ -469,8 +470,8 @@ class MyTestCase(unittest.TestCase):
         # self.contract.setStartTime(year=2021, month=1, day=1, hour=1)
         # self.contract.setEndTime(year=2023, month=1, day=1, hour=1)
 
-        self.contract.setEmissionRatePerHour(environment=env_1,amount=100)
-        self.contract.setDevRewardPct(environment=env_1,amount=0)
+        self.contract.setEmissionRatePerHour(environment=env_1, amount=100)
+        self.contract.setDevRewardPct(environment=env_1, amount=0)
 
         self.contract.addStakingTokens(
             environment=env_1, signer="bob", amount=10)
@@ -508,9 +509,12 @@ class MyTestCase(unittest.TestCase):
 
         self.contract.withdrawYield(
             environment=env_2, signer="bob", amount=1009299299299)
-        self.contract.withdrawYield(environment=env_2, signer="janis", amount = 100000000)
-        self.contract.withdrawYield(environment=env_2, signer="murray", amount = 100000000)
-        self.contract.withdrawYield(environment=env_2, signer="pete", amount = 100000000)
+        self.contract.withdrawYield(
+            environment=env_2, signer="janis", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_2, signer="murray", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_2, signer="pete", amount=100000000)
 
         self.contract.withdrawTokensAndYield(environment=env_2, signer="bob")
         self.contract.withdrawTokensAndYield(environment=env_2, signer="janis")
@@ -518,10 +522,46 @@ class MyTestCase(unittest.TestCase):
             environment=env_2, signer="murray")
         self.contract.withdrawTokensAndYield(environment=env_2, signer="pete")
 
-        self.assertEqual(self.basic_token.balances['bob'], 25)    
-        self.assertEqual(self.basic_token.balances['janis'], 25)    
-        self.assertEqual(self.basic_token.balances['murray'], 25)    
-        self.assertEqual(self.basic_token.balances['pete'], 25)    
+        self.assertEqual(self.basic_token.balances['bob'], 25)
+        self.assertEqual(self.basic_token.balances['janis'], 25)
+        self.assertEqual(self.basic_token.balances['murray'], 25)
+        self.assertEqual(self.basic_token.balances['pete'], 25)
+
+    def test_10_addStakingTokens_check_len_should_pass(self):
+
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+
+        deposits = self.contract.Deposits['bob']
+        self.assertEqual(len(deposits), 2)
+
+    def test_11_addStakingTokens_check_len_should_fail(self):
+
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+
+        deposits = self.contract.Deposits['bob']
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+
+        with self.assertRaises(AssertionError):
+            self.assertEqual(len(deposits), 2)
+
+    def test_12_addStakingTokens_withdrawTokensAndYield_check_len_should_pass(self):
+
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+
+        self.contract.withdrawTokensAndYield(signer="bob")
+        deposits = self.contract.Deposits['bob']
+        self.assertEqual(deposits, False)
+
 
 
 if __name__ == '__main__':

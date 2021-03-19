@@ -3,6 +3,7 @@ export class BlockDTO {
 	fn: string;
 	contract: string;
 	timestamp: number;
+	hash: string;
 }
 
 export interface IKvp {
@@ -12,4 +13,8 @@ export interface IKvp {
 
 export interface handleNewBlock {
 	(block: BlockDTO): Promise<void>;
+}
+
+export interface IContractingTime {
+	__time__: [number, number, number, number, number, number];
 }

@@ -2,11 +2,13 @@
     export let width = "24px";
     export let margin = "0 5px";
     export let reverseColors = false;
+
+    $: height = width
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" 
     xmlns:xlink="http://www.w3.org/1999/xlink" 
-    xml:space="preserve" {width}
+    xml:space="preserve" {width} {height}
     viewBox="0 0 3571 3571" 
     version="1.1" 
     style={`margin: ${margin}; 

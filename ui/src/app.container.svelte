@@ -14,7 +14,11 @@
 	import { WalletService } from './services/wallet.service'
 	import { ApiService } from './services/api.service'
 	import { WsService } from './services/ws.service'
-	
+
+	// Misc
+	import { initializeStateFromLocalStorage  } from './utils'
+	import { tabHidden } from './store' 
+
 	//TO DO REMOVE THIS!!
 	import { ToastService } from './services/toast.service'
 	const toastService = ToastService.getInstance()
@@ -25,8 +29,6 @@
 		themeToggle,
 		currentThemeName
 	})
-	
-
 	onMount(() => {
 		themeSet();
 		/** Initialise Singleton Instances */
@@ -34,8 +36,15 @@
 		WalletService.getInstance()
 		ApiService.getInstance()
 
-		// TO DO REMOVE THIS!! 
-		/*
+		initializeStateFromLocalStorage()
+
+		document.addEventListener("visibilitychange", setTabActive);
+		return () => {
+			document.removeEventListener("visibilitychange", setTabActive);
+			txBitApiService.killTimer()
+			coinPaprikaApiService.killTimer()
+		}
+/*
 		toastService.addToast({ 
 			icon: "buyToken",
 					heading: `TESTING TOAST!`,
@@ -84,9 +93,12 @@
 			icon: "popout"
 			},
 					duration: 7000000
-		})
-		*/
+		})*/
 	})
+
+	const setTabActive = () => {
+		tabHidden.set(document.hidden)
+	}
 
 	function themeToggle() {
 		let body = document.getElementById("theme-toggle")
@@ -116,28 +128,6 @@
 </script>
 
 <style>
-	.bg-gradient {
-		position: absolute;
-		height: 100%;
-		width: 100%;
-		background-image: var(--main-background-gradient);
-
-		overflow-y: scroll;
-	}
-
-	.bg-solid {
-		position: absolute;
-		height: 100%;
-		width: 100%;
-		background-color: var(--main-background-solid);
-	}
-
-	.flex {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
 	main {
 		height: 100%;
 		width: 100%;
@@ -150,13 +140,9 @@
 </style>
 
 <main>
-	<div class="bg-solid">
-		<div class="bg-gradient flex">
-			<Header />
-			<Router />
-			<ToastsContainer />
-		</div>
-	</div>
+	<Header />
+	<Router />
+	<ToastsContainer />
 </main>
 <Footer />
 <TrollBoxButton />

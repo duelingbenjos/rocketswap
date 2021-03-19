@@ -7,7 +7,7 @@
 
     //Icons
     import LamdenLogo from '../../icons/lamden-logo.svelte';
-    import Base64SvgLogo from '../../icons/base64_svg.svelte';
+    import TokenLogo from '../../icons/token-logo.svelte'
     import CloseIcon from '../../icons/close.svelte';
 
     //Services
@@ -15,7 +15,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, refreshLpBalances } from '../../utils'
+    import { stringToFixed } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -28,8 +28,6 @@
 
     const success = () => {
         finish();
-        setTimeout(refreshLpBalances, 2500)
-        setTimeout(refreshLpBalances, 10000)
         resetPage();
         closeConfirm();
     }
@@ -47,8 +45,8 @@
     loading = true;
     walletService.createMarket({
       'contract': $selectedToken.contract_name,
-      'currency_amount': {'__fixed__': stringToFixed($currencyAmount.toString(), 30)},
-      'token_amount': {'__fixed__': stringToFixed($tokenAmount.toString(), 30)}
+      'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 30)},
+      'token_amount': {'__fixed__': stringToFixed($tokenAmount, 30)}
     }, $selectedToken, $tokenAmount, $currencyAmount, { success, error })
   }
 
@@ -57,10 +55,12 @@
 
 <style>
     .modal-style{
-        max-width: 330px;
+        width: 100vw;
+        max-width: 400px;
     }
     .modal-sub-box{
-        width: 345px;
+        width: 100vw;
+        max-width: 380px;
     }
     .pair-display{
         margin: 1rem 0 1.5rem;
@@ -89,17 +89,17 @@
         <LamdenLogo width="27px"  margin="0 5px 0 0"/>
         <span>{`${config.currencySymbol}`}</span>
         <span class="separator">/</span>
-        <Base64SvgLogo string={$selectedToken.token_base64_svg} width="29px"  margin="0 5px 0 0"/>
+        <TokenLogo tokenMeta={$selectedToken} width="29px"  margin="0 5px 0 0"/>
         <span>{`${$selectedToken.token_symbol}`}</span>
     </div>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number">{stringToFixed($currencyAmount, 8)}</p>
+            <p class="number number-span">{stringToFixed($currencyAmount, 8)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
-            <p class="number">{stringToFixed($tokenAmount, 8)}</p>
+            <p class="number number-span">{stringToFixed($tokenAmount, 8)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 8)}
@@ -108,7 +108,7 @@
         />
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Share of Pool</p>
-            <p class="number">100%</p>
+            <p class="number number-span">100%</p>
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button style="primary full" loading={loading} callback={createMarket} text="Confirm Create Pair" />

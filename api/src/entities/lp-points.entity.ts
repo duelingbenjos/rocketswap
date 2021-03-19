@@ -7,6 +7,7 @@ import {
 	BaseEntity,
 	PrimaryGeneratedColumn
 } from "typeorm";
+import { handleClientUpdateType } from "../types/websocket.types";
 
 /** This entity is created / updated when the LP points balance of an address changes. */
 
@@ -22,7 +23,11 @@ export class LpPointsEntity extends BaseEntity {
 	time: string = Date.now().toString();
 }
 
-export async function saveUserLp(state: IKvp[]) {
+export async function saveUserLp(args: {
+		state: IKvp[];
+		handleClientUpdate: handleClientUpdateType;
+	}) {
+	const { state, handleClientUpdate } = args;
 	// [{key:"con_amm2.lp_points:con_token_test7:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def",value: 100}]
 	// { key: "con_amm2.lp_points:con_token_test7", value: 100 }
 	const lp_kvp = state.filter(
@@ -41,6 +46,11 @@ export async function saveUserLp(state: IKvp[]) {
 			const value = getVal(kvp);
 			entity.points[contract_name] = value
 			await entity.save();
+			handleClientUpdate({
+				action: "user_lp_update",
+				points: entity.points,
+				vk: entity.vk
+			});
 		} else if (parts.length === 2) {
 			let entity = await LpPointsEntity.findOne(parts[0].split(".")[0]);
 			if (!entity) {
@@ -51,6 +61,11 @@ export async function saveUserLp(state: IKvp[]) {
 			const value = getVal(kvp);
 			entity.points[contract_name] = value
 			await entity.save();
+			handleClientUpdate({
+				action: "user_lp_update",
+				points: entity.points,
+				vk: entity.vk
+			});
 		}
 	}
 }

@@ -1,29 +1,31 @@
-	@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap');
-	@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200;300;400;500;600;700;800&display=swap');
 
-	html,
-	body {
+html{
+	width: 100%;
+	height: 100%;
+},
+body {
 	position: relative;
 	font-size: 1em;
 	font-weight: 300;
 	width: 100%;
-	height: 100%;
-	background-color: #f5f7f9;
 }
 
-	body {
+body {
 	
 	margin: 0;
 	/* padding: 8px; */
 	box-sizing: border-box;
 	font-family: 'Mukta';
-	overflow: hidden;
+	/*overflow: hidden;*/
 
 	--color-primary-light: #e4fff8;
 	--color-primary: #24ffbd;
-	--color-primary-dark: #b8dfff;
+	--color-primary-dark: #28b389;
 
-	--color-secondary: #9100ff;
+	--color-secondary-light: #dcaeff;
+	--color-secondary: #a128fd;
 	--color-secondary-dark: #3c2052;
 
 	--color-white: #FFF;
@@ -33,6 +35,7 @@
 	--color-gray-3: #aaaaaa;
 	--color-gray-4: #888888;
 	--color-gray-5: #5e5e5e;
+	--color-gray-8: #464646;
 
 	--success-color-light: #f2fffc;
 	--success-color: var(--color-primary);
@@ -57,6 +60,9 @@
 	--text-primary-color-inverted-dim: #120e4a;
 	--text-primary-color-inverted-dimmer: #120e4a;
 
+	--text-color-highlight: var(--color-primary);
+
+	--text-size-tiny: 0.6em; 
 	--text-size-xsmall: 0.7em; 
 	--text-size-small: 0.9em;
 	--text-size-large: 1.2em;
@@ -76,7 +82,7 @@
 	--box-border-color: #ffffff26;
 	--border-radius: 16px;
 
-	--main-background-solid: rgb(81, 0, 128);
+	--main-background-solid: rgb(63, 24, 136);
 	--main-background-gradient: linear-gradient(533deg, rgb(63, 24, 136) 0%, #130535 80%);
 
 	--panel-background-gradient: linear-gradient(5deg, rgb(56, 49, 83) 0%, rgb(76, 77, 136) 90%);
@@ -84,7 +90,7 @@
 	--modal-background-primary: #312a43;
 	--modal-background-secondary: #e400ff12;
 	--modal-text-color: var(--text-primary-color);
-	--modal-wallet-setup-background: linear-gradient(333deg, var(--color-secondary-dark) 10%, var(--modal-background-primary) 50%);
+	--modal-wallet-setup-background: linear-gradient(333deg, #441769 10%, #7300cf 50%);
 	
 	--msg-box-background: #2b284b;
 
@@ -99,17 +105,33 @@
 	--lamden-logo-color: #FFF;
 	--lamden-logo-border-color: #000;
 
-	--trollbox-message-bg: var(--color-gray-2);
+	--trollbox-message-bg: #200f3a;
 
 	--checkbox-checkmark:  var(--color-secondary);
 	--checkbox-border: var(--text-primary-color);
 	--checkbox-bg:  var(--text-primary-color);
 	--checkbox-bg-dim:  var(--text-primary-color-dim);
 
+	--component-logo-border: black;
+	--component-logo-bg: white;
+
+	--staking-pannel-header-symbols-text-shadow: var(--color-secondary-dark);
+	--pool-pannel-header-percent-text-shadow: var(--color-secondary-dark);
+	--fuel-tank-panel-fuel-bg-color: #a128fd57;
+	--fuel-tank-text-shadow: var(--color-gray-8);
+	--small-box-background: #2b284b69;
+
+	background-repeat:no-repeat;
+	background: var(--main-background-solid);
+	background: var(--main-background-gradient);
+	background-attachment: fixed;
+
 	color: var(--text-primary-color);
 }
 
-	body.light{
+body.light{
+	--color-secondary: #9100ff;
+
 	--text-primary-color: #120e4a;
 	--text-primary-color-dim: #120e4aba;
 	--text-primary-color-dimmer: #120e4a80;
@@ -117,6 +139,8 @@
 	--text-primary-color-inverted: #fff;
 	--text-primary-color-inverted-dim: #fff;
 	--text-primary-color-inverted-dimmer: #fff;
+
+	--text-color-highlight: var(--color-secondary);
 
 	--color-gray-1: #f2f2f2;
 	--color-gray-2: #d6d6d6;
@@ -148,16 +172,17 @@
 	--lamden-logo-color: #000;
 	--lamden-logo-border-color: #FFF;
 
-	--trollbox-message-bg: #f7f7f7;
-
 	--checkbox-checkmark: var(--text-primary-color-inverted);
 	--checkbox-border: var(--color-secondary);
 	--checkbox-bg:  var(--color-secondary);
 	--checkbox-bg-dim:  #fff;
 
-	color: var(--text-primary-color);
+	--staking-pannel-header-symbols-text-shadow: var(--color-primary-light);
+	--pool-pannel-header-percent-text-shadow: var(--color-gray-5);
+	--fuel-tank-panel-fuel-bg-color: #9100fffc;
+	--fuel-tank-text-shadow: var(--color-gray-3);
+	--small-box-background: #2b284b00;
 }
-
 
 .text-xsmall{
 	font-size: var(--text-size-xsmall);
@@ -210,6 +235,12 @@
 .text-color-primary-dark{
 	color: var(--color-primary-dark);
 }
+.text-color-secondary{
+	color: var(--color-secondary);
+}
+.text-color-highlight{
+	color: var(--text-color-highlight);
+}
 .text-primary{
 	color: var(--text-primary-color);
 }
@@ -247,6 +278,18 @@
 	color: var(--color-gray-5);
 }
 
+.text-align-left{
+	text-align: left;
+}
+
+.text-align-right{
+	text-align: right;
+}
+
+.text-align-end{
+	text-align: end;
+}
+
 .weight-200{
 	font-weight: 200;
 }
@@ -258,6 +301,11 @@
 .weight-600{
 	font-weight: 600;
 }
+
+.weight-800{
+	font-weight: 800;
+}
+
 
 .margin-0{
 	margin: 0;
@@ -309,9 +357,24 @@
 	justify-content: center;
 }
 
+.flex-start-center{
+	align-items: flex-start;
+	justify-content: center;
+}
+
 .flex-center-spacebetween{
 	align-items: center;
 	justify-content: space-between;
+}
+
+.flex-center-spaceevenly{
+	align-items: center;
+	justify-content: space-evenly;
+}
+
+.flex-start-end{
+	align-items: flex-start;
+	justify-content: flex-end;
 }
 
 .flex-center-end{
@@ -319,16 +382,44 @@
 	justify-content: flex-end;
 }
 
+.flex-end-end{
+	align-items: flex-end;
+	justify-content: flex-end;
+}
+
 .flex-align-center{
 	align-items: center;
 }
 
+.flex-align-start{
+	align-items: flex-start;
+}
+
+.flex-align-end{
+	align-items: flex-end;
+}
+
+.flex-justify-end{
+	justify-content: flex-end;
+}
+
+.flex-justify-spaceevenly{
+	justify-content: space-evenly;
+}
+
+.flex-justify-spacearound{
+	justify-content: space-around;
+}
 
 .number{
 	font-family: 'Roboto Mono', monospace;
 	font-size: 0.9em;
 	position: relative;
-	top: -0.05em;
+    top: 0.1rem;
+}
+
+.number-span{
+	top: -0.05rem;
 }
 
 .number-reg{
@@ -547,6 +638,7 @@ button.primary, input[type="submit"].primary {
 	padding: 3px 10px;
 
 	min-width: fit-content;
+	width: max-content;
 }
 
 button.primary:not(:disabled):hover, input[type="submit"].primary:not(:disabled):hover{
@@ -617,7 +709,7 @@ button.select-token{
 	align-items: center;
 	border: 1px solid var(--color-primary);
 	border-radius: var(--button-border-radius);
-	padding: 0 3px;
+	padding: 0 4px 0 3px;
 	line-height: 1.1;
 	min-width: max-content;
 	min-width: -webkit-max-content;
@@ -676,12 +768,19 @@ button.close{
 	box-sizing: border-box;
 }
 
+.input-container.small{
+	height: 75px;
+}
+
 .input-row-1 {
 	font-weight: 400;
 	justify-content: space-between;
 	margin-bottom: 0.5rem;
 	color: var(--text-primary-color-dim);
 	font-size: var(--text-size-small);
+}
+.input-row-1.small{
+	margin-bottom: 0rem;
 }
 
 .input-label{
@@ -699,12 +798,19 @@ button.close{
 	justify-content: space-between;
 	margin-bottom: 5px;
 }
+.input-row-2.small {
+	margin-bottom: 0px;
+}
 
-.tx-fee-label{
+.input-message{
 	margin: 0;
 	position: absolute;
 	bottom: 3px;
 	left: 21px;
+}
+
+.input-trollbox-message{
+	margin: 0;
 }
 
 .input-controls{
@@ -728,6 +834,16 @@ input.input-amount-value::placeholder {
 	border: none;
 }
 
+.input-amount-value.small {
+	width: 100%;
+	color: var(--text-primary-color);
+	font-size: unset;
+	padding: 0px;
+	background: none;
+	border: none;
+}
+
+
 .input-token-label{
 	border: 0px;
 	padding: 0;
@@ -736,6 +852,10 @@ input.input-amount-value::placeholder {
 	letter-spacing: 0.02em;
 	min-width: max-content;
 	min-width: -webkit-max-content;
+}
+
+.input-token-label.small{
+	font-size: var(--text-size-large);
 }
 
 .text-link {
@@ -894,15 +1014,15 @@ div[slot="main-centered"]{
 		width: 50%;
 	}
 	.panel-container {
-			margin: 0 auto;
-			padding: 30px;
-			border-radius: 32px;
-			max-width: 430px;
-			background: var(--panel-background-gradient);
+		margin: 0 auto;
+		padding: 30px;
+		border-radius: 32px;
+		max-width: 430px;
+		background: var(--panel-background-gradient);
 
-			box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
-			-webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
-			-moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		-webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		-moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
 	}
 	.modal{
 		padding-top: 0;

@@ -10,7 +10,8 @@
 	const apiService = ApiService.getInstance();
 
 	//Components
-	import PoolRemoveLiquidityPanel from '../components/pool-remove-liquidity-panel.svelte'
+	import HeadMeta from '../components/head-meta.svelte'
+	import PoolRemoveLiquidityPanel from '../components/panels/pool-remove-liquidity-panel.svelte'
 	import PoolStats from '../components/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
@@ -18,6 +19,7 @@
 	//Misc
 	import { quoteCalculator, stringToFixed, toBigNumber, pageUtils } from '../utils'
 	import { walletIsReady, lwc_info, tokenBalances, saveStoreValue, lpBalances} from '../store'
+	import { config } from '../config'
 
 	let pageStats = writable()
 	let currencyAmount = writable(null)
@@ -27,6 +29,7 @@
 	let lpBalance = writable()
 	let lpTokenAmount = writable()
 	let lpTokenPercentInput = writable(0)
+	let txOkay = writable(true)
 
 	let pageStores = {
 		currencyAmount,
@@ -34,13 +37,15 @@
 		selectedToken,
 		tokenLP,
 		lpTokenPercentInput,
-		lpTokenAmount
+		lpTokenAmount,
+		txOkay
 	}
 
 	let pageUtilites = pageUtils(pageStores)
 
 	$: contractName = $params.contract
-	$: pageTitle = $selectedToken ? `RocketSwap TAU/${$selectedToken.token_symbol}` : 'RocketSwap Add Liquidity';
+	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol} Remove Liquidity` : 'RocketSwap: Remove Liquidity';
+	$: pageDescription = $selectedToken ? `Remove liquidity for ${$selectedToken.token_symbol}/${config.currencySymbol}!` : 'Remove Liquidity!';
 	$: addHref = $selectedToken ? `/#/pool-add/${$selectedToken.contract_name}` : `/#/pool-add/`;
 	$: updateStats = updatePageStats($tokenLP, $walletIsReady, $lpTokenPercentInput)
 
@@ -74,6 +79,9 @@
 			saveStoreValue(lpBalance, balance)
 			lpTokenPercent = $lpTokenPercentInput / 100;
 			lpTokensToBurn = balance.multipliedBy(lpTokenPercent)
+
+			if (lpTokensToBurn.isEqualTo(balance) && lpTokensToBurn.isEqualTo(quoteCalc.totalLP)) lpTokensToBurn = lpTokensToBurn.minus(2)
+
 			saveStoreValue(lpTokenAmount, lpTokensToBurn)
 
 			currentLpSharePercent = stringToFixed(quoteCalc.calcLpPercent(balance).multipliedBy(100), 1)
@@ -109,9 +117,7 @@
 </style>
 
 
-<svelte:head>
-	<title>{pageTitle}</title>
-</svelte:head>
+<HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page-container">
 	<PoolRemoveLiquidityPanel>

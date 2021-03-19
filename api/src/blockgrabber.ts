@@ -6,23 +6,26 @@ const http = require("http");
 const mongoose = require("mongoose");
 
 let db = mongoose;
-const MASTERNODE_URL = "https://testnet-master-1.lamden.io";
+const MASTERNODE_URL = process.env.MASTERNODE_URL || "https://testnet-master-1.lamden.io";
 
 /******* MONGO DB CONNECTION INFO **/
 const DBUSER = process.env.ROCKETSWAP_DB_USERNAME;
 const DBPWD = process.env.ROCKETSWAP_DB_PASSWORD;
+const NETWORK_TYPE = process.env.NETWORK_TYPE;
 //console.log(DBUSER, DBPWD);
 let connectionString = `mongodb://127.0.0.1:27017/block-explorer`;
 
 if (DBUSER) {
-	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}/block-explorer?authSource=admin`;
+	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}`;
+} else if (NETWORK_TYPE === 'mainnet') {
+	connectionString = 'mongodb://127.0.0.1/mainnet-blockinfo'
 }
 
 var wipeOnStartup = false;
 if (typeof process.env.WIPE !== "undefined") {
 	if (process.env.WIPE === "yes") wipeOnStartup = true;
 }
-var reloadAPI = true;
+var reloadAPI = false;
 if (typeof process.env.RE_LOAD_API !== "undefined") {
 	if (process.env.RE_LOAD_API === "yes") reloadAPI = true;
 }
@@ -67,7 +70,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = 7100;
+		currBlockNum = parseInt(process.env.currBlockNum) || 4000;
 
 		console.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
@@ -106,12 +109,13 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			typeof blockInfo.number !== "undefined"
 		) {
 			let hasBlockInDB = false
-			let block = await models.Blocks.findOne({blockNum: blockInfo.number})
+			let blockNum = blockInfo.number.__fixed__ ? parseInt(blockInfo.number.__fixed__) : blockInfo.number;
+			let block = await models.Blocks.findOne({blockNum})
 			if (!block){
 				console.log("Block doesn't exists, adding new BLOCK model")
 				block = new models.Blocks({
 					rawBlock: JSON.stringify(blockInfo),
-					blockNum: blockInfo.number,
+					blockNum,
 					hash: blockInfo.hash,
 					previous: blockInfo.previous,
 					numOfSubBlocks: 0,
@@ -124,7 +128,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			}
 
 			console.log(
-				"processing block " + blockInfo.number + " - ",
+				"processing block " + blockNum + " - ",
 				block.hash
 			);
 
@@ -134,7 +138,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 					block.numOfSubBlocks = block.numOfSubBlocks + 1;
 					let subblockTxList = [];
 					let subblock = new models.Subblocks({
-						blockNum: blockInfo.number,
+						blockNum,
 						inputHash: sb.input_hash,
 						merkleLeaves: JSON.stringify(sb.merkle_leaves),
 						prevBlockHash: sb.previous,
@@ -146,26 +150,30 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 
 					sb.signatures.forEach((sig) => {
 						new models.SubblockSigs({
-							blockNum: blockInfo.number,
+							blockNum,
 							subBlockNum: sb.subblock,
 							signature: sig.signature,
 							signer: sig.signer
 						}).save();
 					});
 					// console.log(sb.transactions);
-					(async function loop() {for (let tx of sb.transactions) {
-						sb.numOfTransactions = sb.numOfTransactions + 1;
-						block.numOfTransactions = block.numOfTransactions + 1;
-						blockTxList.push(tx.hash);
-						subblockTxList.push(tx.hash);
-					await handleNewBlock({
-							state: tx.state,
-							fn: tx.transaction.payload.function,
-							contract: tx.transaction.payload.contract,
-							timestamp: tx.transaction.metadata.timestamp
-						});
-
-					}})()
+					(async function loop() {
+						for (let tx of sb.transactions) {
+							sb.numOfTransactions = sb.numOfTransactions + 1;
+							block.numOfTransactions =
+								block.numOfTransactions + 1;
+							blockTxList.push(tx.hash);
+							subblockTxList.push(tx.hash);
+							// console.log('METADATA', tx.transaction.metadata)
+							await handleNewBlock({
+								state: tx.state,
+								fn: tx.transaction.payload.function,
+								contract: tx.transaction.payload.contract,
+								timestamp: tx.transaction.metadata.timestamp,
+								hash: tx.hash
+							});
+						}
+					})();
 					subblock.transactions = JSON.stringify(subblockTxList);
 					subblock.save();
 				});
@@ -173,11 +181,11 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			block.transactions = JSON.stringify(blockTxList);
 			block.save(function(err) {
 				if (err) console.log(err);
-				console.log("saved " + blockInfo.number);
+				console.log("saved " + blockNum);
 			});
-			if (blockInfo.number === currBatchMax) {
+			if (blockNum === currBatchMax) {
 				currBlockNum = currBatchMax;
-				timerId = setTimeout(checkForBlocks, 3000);
+				timerId = setTimeout(checkForBlocks, 100);
 			}
 		}
 	};
@@ -206,10 +214,17 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 
 	const checkForBlocks = async () => {
 		console.log("checking")
-		let response: any = await getLatestBlock_MN();
-
+		let response = await getLatestBlock_MN();
+		
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
 		if (!response.error) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			lastestBlockNum = response.number;
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			if (lastestBlockNum.__fixed__) lastestBlockNum = parseInt(lastestBlockNum.__fixed__)
 			if (lastestBlockNum < currBlockNum || wipeOnStartup || reloadAPI) {
 				await wipeDB();
 				wipeOnStartup = false;
@@ -220,7 +235,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 				if (lastestBlockNum === currBlockNum) {
 					if (alreadyCheckedCount < maxCheckCount)
 						alreadyCheckedCount = alreadyCheckedCount + 1;
-					checkNextIn = 1500 * alreadyCheckedCount;
+					checkNextIn = 200 * alreadyCheckedCount;
 					timerId = setTimeout(checkForBlocks, checkNextIn);
 				}
 

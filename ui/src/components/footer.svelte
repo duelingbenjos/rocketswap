@@ -1,6 +1,7 @@
 <script type="ts">
 	import { onDestroy } from 'svelte'
 	import { fade } from 'svelte/transition';
+	import { active } from 'svelte-hash-router'
 
 	// Misc
 	import { walletBalance, rocketState, keystore, walletAddress } from '../store'
@@ -32,11 +33,7 @@
 	let openConnectModal = false;
 
 	rocketState.subscribe(val => {
-		if (val == 2) setTimeout(rocketReset, 6000)
-	})
-
-	walletAddress.subscribe(val => {
-		console.log(val)
+		if (val == 2) setTimeout(rocketReset, 4000)
 	})
 
 	$: makeSmoke = $rocketState == 1 || $rocketState == 2 ? createSmoke() : stopSmoke();
@@ -67,7 +64,7 @@
 	
 	const rocketReset = () => {
 		rocketState.set(3)
-		setTimeout(() => rocketState.set(0), 1000)
+		setTimeout(() => rocketState.set(0), 500)
 	}
 
 	function refreshPage() {
@@ -112,6 +109,10 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
+
+		box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
+		-webkit-box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
+		-moz-box-shadow: -1px 10px 25px 0px rgba(0, 0, 0, 0.5);
 		
 	}
 	.balance {
@@ -143,13 +144,14 @@
 		z-index: 100;
 		top: -59px;
 		transform: rotate(0deg);
-		transition: top 3s ease-in;
 	}
 	.blast-off{
-		top: -1000px;
+		transition: top 3s ease-in;
+		top: -2000px;
 	}
 	.rocket-reset{
 		display: none;
+		transition: top 0s;
 		top: -59px;
 	}
 	.connected > a{
@@ -175,12 +177,7 @@
     }
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
-		.footer{
-			bottom: 35px;
-		}
-        .wallet-info{
-            margin-left: 48px;
-        }
+
     }
 </style>
 
@@ -188,26 +185,28 @@
 <div class="footer">
 	<div class="wallet-info">
 		{#if $walletAddress}
-			<div bind:this={rocketElm} 
-					in:fade="{{delay: 0, duration: 500}}"
-					class="rocket" 
-					class:blast-off={$rocketState == 2}
-					class:rocket-reset={$rocketState == 3}>
-				<Rocket 
-					width="75px" 
-					color="var(--success-color)" 
-					direction="up" 
-					shake={$rocketState == 1} 
-					fire={$rocketState == 2}
-					blastOff={$rocketState == 2}
-				/>
-			</div>
+			{#if $active.$$component.name === "Swap_page"}
+				<div bind:this={rocketElm} 
+						in:fade="{{delay: 0, duration: 500}}"
+						class="rocket" 
+						class:blast-off={$rocketState == 2}
+						class:rocket-reset={$rocketState == 3}>
+					<Rocket 
+						width="75px" 
+						color="var(--success-color)" 
+						direction="up" 
+						shake={$rocketState == 1} 
+						fire={$rocketState == 2}
+						blastOff={$rocketState == 2}
+					/>
+				</div>
+			{/if}
 			<div class="balance text-size">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
 			<div class="flex-row flex-center-center primary connected text-size">
 				<button class="flex flex-center-center" on:click={logout} title="logout">
 					<AntennaIcon width="20px" margin="0 8px 0 0" />
 				</button>
-				<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" >
+				<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" rel="noopener noreferrer" target="_blank" >
 					{formatAccountAddress($walletAddress,4,2)}
 				</a>
 			</div>
@@ -227,7 +226,7 @@
 		{#if walletService.keystore}
 			<KeystoreLogin />
 		{:else}
-			<ChooseWallet {toggleModal}/>
+			<ChooseWallet />
 		{/if}
 	</div>
 </Modal>

@@ -2,10 +2,10 @@
 	import { getContext } from 'svelte'
 
 	//Components
-	import InputLpTokens from './misc/input-lp-tokens.svelte'
-	import Buttons from './buttons.svelte'
-	import Ratios from './misc/ratios.svelte'
-	import TokensToReceive from './misc/tokens-to-recieve.svelte'
+	import InputLpTokens from '../inputs/input-lp-tokens.svelte'
+	import Buttons from '../buttons.svelte'
+	import Ratios from '../misc/ratios.svelte'
+	import TokensToReceive from '../misc/tokens-to-recieve.svelte'
 
 	const { pageStores, saveStoreValue } = getContext('pageContext')
 	const { lpTokenPercentInput } = pageStores
