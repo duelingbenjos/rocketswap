@@ -28,12 +28,8 @@ export const getNewJoiner = (state, prev_state): string => {
 export function validateTokenContract(contract: string): boolean {
 	const required_fields = [
 		"def transfer",
-		"def balance_of",
-		"def allowance",
 		"def approve",
-		"def transfer_from",
-		"token_name = Variable",
-		"token_symbol = Variable"
+		"def transfer_from"
 	];
 	let missing = required_fields.map((field) => contract.includes(field));
 	let missing_idx = missing.findIndex((field) => field === false);
@@ -51,7 +47,6 @@ export function validateTokenContract(contract: string): boolean {
 // 	return missing_idx > -1 ? false : true;
 // }
 
-
 export function getKey(state: IKvp[], idx_1: number, idx_2: number) {
 	return state[idx_1].key.split(":")[idx_2];
 }
@@ -65,14 +60,16 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 	} else {
 		val = (state as IKvp)?.value;
 	}
-	val = new BigNumber(val?.__fixed__ || val)
-	if (val.isNaN()) return "0"
-	return val.toString()
+	val = val?.__fixed__ || val;
+	if (typeof val === "number") {
+		return val.toString();
+	} else {
+		return val;
+	}
 }
 
 export function getContractName(state: IKvp[]) {
 	let code_entry = getContractEntry(state);
-	//console.log(code_entry);
 	if (code_entry) {
 		let code_key = code_entry.key;
 		let contract_name = code_key.split(".")[0];
@@ -93,7 +90,7 @@ export function getContractCode(state: IKvp[]) {
 	return entry ? entry.value : "";
 }
 
-export function decideLogo(token: TokenEntity): {type:string, data:string} {
+export function decideLogo(token: TokenEntity): { type: string; data: string } {
 	/**
 	 * Returns an image in this order of preference
 	 * 1. SVG
@@ -101,19 +98,17 @@ export function decideLogo(token: TokenEntity): {type:string, data:string} {
 	 * 3. URL
 	 */
 	let obj = {
-		type: '',
-		data: ''
-	}
+		type: "",
+		data: ""
+	};
 	if (token.token_base64_svg) {
-		obj.type = 'svg',
-		obj.data = token.token_base64_svg
+		(obj.type = "svg"), (obj.data = token.token_base64_svg);
 	} else if (token.token_base64_png) {
-		obj.type = 'png',
-		obj.data = token.token_base64_png
+		(obj.type = "png"), (obj.data = token.token_base64_png);
 	} else {
-		obj.type = 'url'
-		obj.data = token.token_logo_url
+		obj.type = "url";
+		obj.data = token.token_logo_url;
 	}
-	
-	return obj
+
+	return obj;
 }

@@ -13,7 +13,7 @@ const connectionRequest = {
   appName: 'RocketSwap',
   version: '1.0.0',
   logo: 'images/logo.png',
-  contractName: 'con_amm2',
+  contractName: 'con_amm_3',
   identityContract: 'con_ipseity_5',
   currencySymbol: 'dTau',
   // domainName: "https://demoapp.lamden.io",

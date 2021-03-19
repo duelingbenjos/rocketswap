@@ -2,6 +2,7 @@ import socket from 'socket.io-client'
 import { token_metrics_store, tokenBalances, ws_id, trollboxMessages, tradeUpdates, tradeHistory } from '../store'
 import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 import { getBaseUrl, valuesToBigNumber, setBearerToken } from '../utils'
+import * as LamdenJs from 'lamden-js'
 
 /** Singleton socket.io service */
 export class WsService {
@@ -18,6 +19,7 @@ export class WsService {
   private port: number
   private current_trade_feed: string
   private previously_connected = false
+  private txCallbacks: any;
 
   connection: SocketIOClient.Socket
 
@@ -28,10 +30,10 @@ export class WsService {
     this.connection = socket(`${this.base_url}:${this.port}`)
     this.setupEvents()
     this.setupSubs()
+    this.txCallbacks = {};
   }
 
   setupEvents = () => {
-    // console.log('setup events')
     this.connection.on('connect', () => {
       console.log(`socket connected to : ${this.base_url}:${this.port}`)
       if (!this.previously_connected) {
@@ -65,6 +67,7 @@ export class WsService {
       setBearerToken()
     })
     this.connection.on(`trollbox_authcode`, this.handleTrollboxAuthCode)
+    this.connection.on('proxy_txn_res', (payload) => this.handleProxyTxnResponse(payload, this.txCallbacks))
   }
 
   setupSubs = () => {
@@ -93,10 +96,10 @@ export class WsService {
 
   private handleTradeUpdate(event) {
     console.log(event)
-    if (event.history) tradeHistory.set( valuesToBigNumber(event.history))
-    else{
-      if (event.action === "trade_update"){
-        tradeUpdates.update(trades => {
+    if (event.history) tradeHistory.set(valuesToBigNumber(event.history))
+    else {
+      if (event.action === 'trade_update') {
+        tradeUpdates.update((trades) => {
           trades.push(valuesToBigNumber(event))
           console.log(trades)
           return trades
@@ -114,6 +117,20 @@ export class WsService {
   private handleTrollboxAuthCode(payload) {
     console.log(payload)
     ws_id.set(payload)
+  }
+
+  private handleProxyTxnResponse(payload, txCallbacks) {
+    if (payload?.uid) txCallbacks[payload.uid]({data: payload})
+    else {
+      if (payload?.error) txCallbacks[payload.uid]({data: {error: payload?.error}})
+    }
+  }
+
+  public sendProxyTxn(tx, callback) {
+    console.log(this.txCallbacks)
+    this.txCallbacks[tx.payload.uid] = callback
+    console.log(this.txCallbacks)
+    this.connection.emit('send_transaction', tx)
   }
 
   private handleTrollboxHistory(payload: any[]) {}

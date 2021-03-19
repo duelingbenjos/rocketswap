@@ -27,4 +27,6 @@ export const config = {
   masternode: MASTERNODE_URL, //Change for PROD
 }
 
+export const walletDownloadURL = "https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim"
+
 export const genericIcon_base64_svg = GENERIC_ICON

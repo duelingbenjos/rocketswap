@@ -14,7 +14,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, refreshLpBalances, refreshTAUBalance } from '../../utils'
+    import { stringToFixed, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -39,8 +39,6 @@
 
     const finish = () => {
         loading = false;
-        setTimeout(refreshTAUBalance, 2500)
-        setTimeout(refreshTAUBalance, 10000)
     }
 
     const addLiquidity = () => {
@@ -57,13 +55,18 @@
 
 <style>
     .modal-style{
-        width: 290px;
+        max-width: 330px;
     }
     .modal-sub-box{
         width: 345px;
     }
     .sub-text{
         margin: 0.5rem 0;
+    }
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            margin-top: 8rem;
+        }
     }
 </style>
 <div class="modal-style">

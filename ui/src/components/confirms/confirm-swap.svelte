@@ -16,7 +16,7 @@
 
     //Misc
     import { rocketState } from '../../store'
-    import { stringToFixed, toBigNumber, refreshTAUBalance, refreshLpBalances } from '../../utils'
+    import { stringToFixed, toBigNumber, refreshLpBalances } from '../../utils'
     import { config } from '../../config'
 
     //Props
@@ -80,8 +80,6 @@
 
     const finish = () => {
         loading = false;
-        setTimeout(refreshTAUBalance, 2500)
-        setTimeout(refreshTAUBalance, 10000)
     }
 
     const swapBuy = () => {
@@ -106,7 +104,7 @@
 
 <style>
     .modal-style{
-        width: 330px;
+        max-width: 330px;
     }
     .sub-text{
         margin: 1rem 0;
@@ -115,6 +113,12 @@
 
     .modal-confirm-details-box{
         padding-top: 1rem;
+    }
+
+    @media screen and (min-width: 430px) {
+        .modal-style{
+            margin-top: 8rem;
+        }
     }
 </style>
 

@@ -1,6 +1,5 @@
 <script>
     export let trade;
-    console.log(trade)
 
     //Icons
     import RocketswapLogo from '../../icons/rocketswap-logo.svelte'

@@ -3,7 +3,7 @@ import { getVal } from "../utils";
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { Server } from "socket.io";
 import {
-	handleClientUpdate,
+	handleClientUpdateType,
 	MetricsUpdateType
 } from "src/types/websocket.types";
 import { PairEntity } from "./pair.entity";
@@ -27,7 +27,7 @@ export class PriceEntity extends BaseEntity {
 
 export async function savePrice(
 	state: IKvp[],
-	handleClientUpdate: handleClientUpdate
+	handleClientUpdate: handleClientUpdateType
 ) {
 	// [{ key: "con_amm2.prices:con_token_test7", value: { __fixed__: "1" } },]
 	const price_kvp = state.find(

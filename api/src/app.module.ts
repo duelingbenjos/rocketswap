@@ -14,12 +14,14 @@ import { NameEntity } from "./entities/name.entity";
 import { TrollboxController } from "./authentication/trollbox.controller";
 import { RefreshTokensRepository } from "./authentication/refresh-token.repository";
 import { TokensService } from "./authentication/tokens.service";
-import { JwtModule, JwtService } from "@nestjs/jwt";
+import { JwtModule } from "@nestjs/jwt";
 import { JWTGuard } from "./authentication/jwt.guard";
 import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
+import { TransactionService } from './transaction.service';
+import { AmmMetaEntity } from "./entities/amm-meta.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -34,7 +36,8 @@ const db_options: TypeOrmModuleOptions = {
 		TradeHistoryEntity,
 		NameEntity,
 		RefreshTokenEntity,
-		ChatHistoryEntity
+		ChatHistoryEntity,
+		AmmMetaEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true
@@ -46,7 +49,7 @@ const db_options: TypeOrmModuleOptions = {
 		JwtModule.register({
 			secret: "<SECRET KEY>",
 			signOptions: {
-				expiresIn: "1m"
+				expiresIn: "30d"
 			}
 		})
 	],
@@ -60,7 +63,8 @@ const db_options: TypeOrmModuleOptions = {
 		JWTGuard,
 		JwtStrategy,
 		AuthService,
-		Logger
+		Logger,
+		TransactionService
 	]
 })
 export class AppModule {}

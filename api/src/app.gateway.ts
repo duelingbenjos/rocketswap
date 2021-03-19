@@ -17,12 +17,14 @@ import { getTokenMetrics } from "./entities/price.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
+import { TransactionService } from "./transaction.service";
 import { BlockDTO } from "./types/misc.types";
 import {
 	ClientUpdateType,
 	isBalanceUpdate,
 	isMetricsUpdate,
 	isTradeUpdate,
+	IProxyTxnReponse,
 	MetricsUpdateType,
 	UserLpUpdateType
 } from "./types/websocket.types";
@@ -40,7 +42,8 @@ export class AppGateway
 
 	constructor(
 		private readonly parser: ParserProvider,
-		private readonly socketService: SocketService
+		private readonly socketService: SocketService,
+		private readonly txnService: TransactionService
 	) {
 		startBlockgrabber(this.handleNewBlock);
 	}
@@ -50,6 +53,8 @@ export class AppGateway
 		this.socketService.handleClientUpdate = this.handleClientUpdate;
 		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
 		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
+		this.socketService.handleProxyTxnResponse = this.handleTxnResponse;
+
 	}
 
 	handleNewBlock = async (block: BlockDTO) => {
@@ -118,6 +123,11 @@ export class AppGateway
 		}
 	}
 
+	@SubscribeMessage("send_transaction")
+	async handleClientTransaction(client: Socket, txn: any) {
+		this.txnService.broadcastTxn(client.id, txn)
+	}
+
 	private async handleJoinTrollBox(client: Socket) {
 		client.emit("trollbox_authcode", client.id);
 		try {
@@ -154,6 +164,11 @@ export class AppGateway
 			this.logger.error(err);
 		}
 	};
+
+	public handleTxnResponse = (args: IProxyTxnReponse) => {
+		const {payload, socket_id} = args
+		this.wss.to(socket_id).emit("proxy_txn_res", payload)
+	}
 
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
 		try {
