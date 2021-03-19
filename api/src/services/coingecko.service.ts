@@ -5,7 +5,7 @@ import { SocketService } from "src/socket.service";
 /** Singleton Service */
 
 export class CoinGeckoAPIService {
-    private baseUrl = "https://api.coingecko.com/api/v3/"
+    private baseUrl = "https://api.coingecko.com/api/v3"
     private timeInterval = 30000 // 30 seconds
     private timer = null;
 
