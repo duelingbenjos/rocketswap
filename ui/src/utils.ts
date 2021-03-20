@@ -635,9 +635,11 @@ export const stakingCalculator = (stakingInfo) => {
 		return userYieldInfo.yield_per_sec.multipliedBy(toBigNumber(new Date() - userYieldInfo.time_updated).dividedBy(1000))
 	}
 
+	/** Simple Staking ROI */
 	const calcEmissionRatePerYear = () => {
 		if (!stakingInfo?.EmissionRatePerHour) return toBigNumber("0")
-		return stakingInfo?.EmissionRatePerHour.multipliedBy(24).multipliedBy(365);
+		// return stakingInfo?.EmissionRatePerHour.multipliedBy(24).multipliedBy(365);
+		return stakingInfo?.ROI_yearly
 	}
 
 	return {

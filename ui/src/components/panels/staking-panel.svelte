@@ -213,8 +213,8 @@
             <div class="flex-row">
                 <span class="flex-grow">APY:</span>
                 <div class="flex-col flex-align-end ">
-                    <span class="weight-600">{stringToFixed(stakingCalcs.emissionRatePerYear, 8)}</span>
-                    <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span>
+                    <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
+                    <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
                 </div>
             </div>
 
