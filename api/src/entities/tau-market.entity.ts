@@ -27,13 +27,13 @@ export async function saveUSDPrice (args : {
         entity = new TauMarketEntity();
         entity.info_type = "usd_price";
     }
-	entity.value = price;
-    await entity.save();
-
-    const payload: TauUsdPriceUpdateType = {
-        action: "tau_usd_price",
-        price
-    };
-    
-    handleClientUpdate(payload)
+		if (price !== entity.value) {
+			entity.value = price
+			await entity.save();
+			const payload: TauUsdPriceUpdateType = {
+					action: "tau_usd_price",
+					price
+			};
+			handleClientUpdate(payload)
+		}
 };

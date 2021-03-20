@@ -5,7 +5,7 @@ import { LpPointsEntity } from "./entities/lp-points.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
-import { decideLogo } from "./utils";
+import { decideLogo } from "./utils/utils";
 
 @Controller("api")
 export class AppController {

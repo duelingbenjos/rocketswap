@@ -8,8 +8,6 @@ import {
 	handleClientUpdateType,
 	handleTrollboxMsg,
 	handleProxyTxnResponse,
-	EpochUpdateType,
-	IUserYieldInfo,
 	IUserYieldPayload
 } from "./types/websocket.types";
 
@@ -55,9 +53,9 @@ export class SocketService {
 		try {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			// if (!staking_entities || !staking_entities.length) return;
-			console.log(staking_entities);
+			// console.log(staking_entities);
 			const payload = await staking_entities.reduce(async (accumP, user_entity) => {
-				console.log("USER ENTITY", user_entity.staking_contract);
+				// console.log("USER ENTITY", user_entity.staking_contract);
 				const accum = await accumP
 				if (
 					(!user_entity.yield_info ||
@@ -89,7 +87,7 @@ export class SocketService {
 			//console.log(this.staking_panel_clients);
 			for (let vk of this.staking_panel_clients) {
 				const user_entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
-				console.log(user_entity);
+				// console.log(user_entity);
 				if (user_entity) {
 					//console.log("sendClientStakingUpdates, user_entity found");
 					const user_yield_payload: IUserYieldPayload = await this.updateClientStakingMetrics(

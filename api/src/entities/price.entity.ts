@@ -1,10 +1,8 @@
 import { IKvp } from "src/types/misc.types";
-import { getVal } from "../utils";
+import { getVal } from "../utils/utils";
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
-import { Server } from "socket.io";
 import {
 	handleClientUpdateType,
-	MetricsUpdateType
 } from "src/types/websocket.types";
 import { PairEntity } from "./pair.entity";
 
@@ -29,7 +27,7 @@ export async function savePrice(
 	state: IKvp[],
 	handleClientUpdate: handleClientUpdateType
 ) {
-	// [{ key: "con_amm2.prices:con_token_test7", value: { __fixed__: "1" } },]
+
 	const price_kvp = state.find(
 		(kvp) => kvp.key.split(".")[1].split(":")[0] === "prices"
 	);
@@ -56,6 +54,7 @@ export async function savePrice(
 		lp,
 		reserves
 	});
+	
 
 	return await Promise.all([price_entity.save(), pair_entity.save()]);
 }
@@ -63,9 +62,7 @@ export async function savePrice(
 export async function getTokenMetrics(contract_name: string) {
 	const pair_entity = await PairEntity.findOneOrFail({
 		where: { contract_name }
-		// order: {
-		// 	id: "DESC"
-		// }
+
 	});
 	console.log(pair_entity);
 	const { price, time, lp, reserves } = pair_entity;

@@ -37,6 +37,7 @@ import {
 	isUserYieldUpdate,
 	isClientStakingUpdate
 } from "./types/websocket.types";
+import {log} from './utils/logger'
 
 import { CoinGeckoAPIService } from './services/coingecko.service'
 /**
@@ -75,12 +76,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	handleClientUpdate = async (update: ClientUpdateType) => {
 		let contract_name;
-		//console.log(update)
+		//log.log(update)
 		switch (update.action) {
 			case "metrics_update":
 				if (isMetricsUpdate(update)) {
 					contract_name = update.contract_name;
-					console.log(update)
+					// log.log(update)
 					this.wss.emit(`price_feed:${contract_name}`, update);
 					// this.logger.log("price update sent");
 				}
@@ -92,7 +93,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "user_lp_update":
 				if (isUserLpUpdateType(update)){
-					console.log(update)
+					// log.log(update)
 					this.wss.emit(`user_lp_update:${update.vk}`, update);
 				}
 				break;
@@ -104,7 +105,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "epoch_update":
 				if (isEpochUpdate(update)) {
-					//console.log("EPOCH_UPDATE", update);
+					log.log("EPOCH_UPDATE", update);
 					setTimeout(async () => {
 						await this.socketService.sendClientStakingUpdates(update.data.staking_contract);
 					}, 2000);
@@ -113,7 +114,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "client_staking_update":
 				if (isClientStakingUpdate(update)) {
-					//console.log("EPOCH_UPDATE", update);
+					// log.log("EPOCH_UPDATE", update);
 					setTimeout(async () => {
 						await this.socketService.sendClientStakingUpdates(update.staking_contract);
 					}, 2000);
@@ -122,12 +123,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "user_yield_update":
 				if (isUserYieldUpdate(update)) {
-					//console.log("UPDATE", update);
+					log.log("UPDATE", update);
 					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
 			case "tau_usd_price":
 				if (isUserYieldUpdate(update)) {
-					//console.log("UPDATE", update);
+					log.log("UPDATE", update);
 					this.wss.emit(`tau_usd_price`, update.data);
 				}	
 		}
@@ -151,14 +152,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async handleJoinRoom(client: Socket, room: string) {
 		client.join(room);
 		client.emit("joined_room", room);
-		console.log({joined: room})
+		log.log({joined: room})
 		const [prefix, subject] = room.split(":");
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
 				break;
 			case "user_lp_feed":
-				console.log("joining user_lp_feed")
+				log.log("joining user_lp_feed")
 				this.handleJoinUserLpFeed(subject, client);
 				break;
 			case "balance_feed":
@@ -191,7 +192,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
 		this.socketService.addStakingPanelClient(subject);
 		const yield_list = await this.socketService.getClientYieldList(subject);
-		//console.log("called");
+		//log.log("called");
 		client.emit("user_yield_list", yield_list);
 	}
 

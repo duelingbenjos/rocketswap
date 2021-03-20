@@ -1,6 +1,6 @@
 import mongoose_models from "./mongoose.models";
 import { handleNewBlock } from "./types/misc.types";
-
+import {log} from './utils/logger'
 const https = require("https");
 const http = require("http");
 const mongoose = require("mongoose");
@@ -12,7 +12,7 @@ const MASTERNODE_URL = process.env.MASTERNODE_URL || "https://testnet-master-1.l
 const DBUSER = process.env.ROCKETSWAP_DB_USERNAME;
 const DBPWD = process.env.ROCKETSWAP_DB_PASSWORD;
 const NETWORK_TYPE = process.env.NETWORK_TYPE;
-//console.log(DBUSER, DBPWD);
+//log.log(DBUSER, DBPWD);
 let connectionString = `mongodb://127.0.0.1:27017/block-explorer`;
 
 if (DBUSER) {
@@ -43,25 +43,25 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 	let timerId;
 
 	const wipeDB = async (force = false) => {
-		console.log("-----WIPING DATABASE-----");
+		log.log("-----WIPING DATABASE-----");
 		if (wipeOnStartup || force){
-			await db.models.Blocks.deleteMany({}).then((res) => console.log(res));
-			console.log("Blocks DB wiped");
+			await db.models.Blocks.deleteMany({}).then((res) => log.log(res));
+			log.log("Blocks DB wiped");
 		}
 		await db.models.Subblocks.deleteMany({}).then((res) =>
-			console.log(res)
+			log.log(res)
 		);
-		console.log("Subblocks DB wiped");
+		log.log("Subblocks DB wiped");
 		await db.models.SubblockSigs.deleteMany({}).then((res) =>
-			console.log(res)
+			log.log(res)
 		);
-		console.log("SubblockSigs DB wiped");
-		await db.models.State.deleteMany({}).then((res) => console.log(res));
-		console.log("State DB wiped");
+		log.log("SubblockSigs DB wiped");
+		await db.models.State.deleteMany({}).then((res) => log.log(res));
+		log.log("State DB wiped");
 		await db.models.Transactions.deleteMany({}).then((res) =>
-			console.log(res)
+			log.log(res)
 		);
-		console.log("Transactions DB wiped");
+		log.log("Transactions DB wiped");
 
 		/*
 		NO TOKEN CONTRACTS EXIST BELOW BLOCK 2345
@@ -72,7 +72,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		*/
 		currBlockNum = parseInt(process.env.currBlockNum) || 4000;
 
-		console.log("Set currBlockNum = 0");
+		log.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
 	};
 
@@ -88,7 +88,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 					});
 					resp.on("end", () => {
 						try {
-							// console.log(data);
+							// log.log(data);
 							resolve(JSON.parse(data));
 						} catch (err) {
 							console.error("Error: " + err);
@@ -112,7 +112,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			let blockNum = blockInfo.number.__fixed__ ? parseInt(blockInfo.number.__fixed__) : blockInfo.number;
 			let block = await models.Blocks.findOne({blockNum})
 			if (!block){
-				console.log("Block doesn't exists, adding new BLOCK model")
+				log.log("Block doesn't exists, adding new BLOCK model")
 				block = new models.Blocks({
 					rawBlock: JSON.stringify(blockInfo),
 					blockNum,
@@ -124,10 +124,10 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 				});
 			}else{
 				hasBlockInDB = true
-				console.log("Block already exists, not adding BLOCK model")
+				log.log("Block already exists, not adding BLOCK model")
 			}
 
-			console.log(
+			log.log(
 				"processing block " + blockNum + " - ",
 				block.hash
 			);
@@ -156,7 +156,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 							signer: sig.signer
 						}).save();
 					});
-					// console.log(sb.transactions);
+					// log.log(sb.transactions);
 					(async function loop() {
 						for (let tx of sb.transactions) {
 							sb.numOfTransactions = sb.numOfTransactions + 1;
@@ -164,7 +164,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 								block.numOfTransactions + 1;
 							blockTxList.push(tx.hash);
 							subblockTxList.push(tx.hash);
-							// console.log('METADATA', tx.transaction.metadata)
+							// log.log('METADATA', tx.transaction.metadata)
 							await handleNewBlock({
 								state: tx.state,
 								fn: tx.transaction.payload.function,
@@ -180,8 +180,8 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			}
 			block.transactions = JSON.stringify(blockTxList);
 			block.save(function(err) {
-				if (err) console.log(err);
-				console.log("saved " + blockNum);
+				if (err) log.log(err);
+				log.log("saved " + blockNum);
 			});
 			if (blockNum === currBatchMax) {
 				currBlockNum = currBatchMax;
@@ -213,7 +213,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 	};
 
 	const checkForBlocks = async () => {
-		console.log("checking")
+		log.log("checking")
 		let response = await getLatestBlock_MN();
 		
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -230,8 +230,8 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 				wipeOnStartup = false;
 				reloadAPI = false;
 			} else {
-				// console.log("lastestBlockNum: " + lastestBlockNum);
-				// console.log("currBlockNum: " + currBlockNum);
+				// log.log("lastestBlockNum: " + lastestBlockNum);
+				// log.log("currBlockNum: " + currBlockNum);
 				if (lastestBlockNum === currBlockNum) {
 					if (alreadyCheckedCount < maxCheckCount)
 						alreadyCheckedCount = alreadyCheckedCount + 1;
@@ -254,7 +254,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 							blockData = JSON.parse(blockInfo.rawBlock)
 						}else{
 							const timedelay = blocksToGetCount * 500;
-							console.log(
+							log.log(
 								"getting block: " +
 									i +
 									" with delay of " +
@@ -279,7 +279,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			}
 		} else {
 			/*
-			console.log(
+			log.log(
 				"Could not contact masternode, trying again in 10 seconds"
 			);*/
 			timerId = setTimeout(checkForBlocks, 10000);
@@ -291,7 +291,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		.then(async (res) => {
 			if (res) currBlockNum = res.blockNum ? res.blockNum : 0;
 			else currBlockNum = 0;
-			//console.log("wipeOnStartup", wipeOnStartup);
+			//log.log("wipeOnStartup", wipeOnStartup);
 			timerId = setTimeout(checkForBlocks, 0);
 		});
 };
@@ -301,9 +301,9 @@ export default (handleNewBlock: handleNewBlock) => {
 		connectionString,
 		{ useNewUrlParser: true, useUnifiedTopology: true },
 		(error) => {
-			if (error) console.log(error);
+			if (error) log.log(error);
 			else {
-				//console.log("connection successful");
+				//log.log("connection successful");
 				databaseLoader(mongoose_models, handleNewBlock);
 			}
 		}

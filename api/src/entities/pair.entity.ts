@@ -1,5 +1,5 @@
 import { IKvp } from "src/types/misc.types";
-import { getVal, isLamdenKey } from "../utils";
+import { getVal, isLamdenKey } from "../utils/utils";
 import { Entity, Column, PrimaryColumn, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { handleClientUpdateType, TradeUpdateType } from "src/types/websocket.types";
 import { TokenEntity } from "./token.entity";

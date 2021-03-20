@@ -143,7 +143,7 @@ function calculateYield(args: {
 		y += deposit_yield_this_epoch;
 		this_epoch_index += 1;
 	}
-	//console.log("CALCULATED YIELD: ", y);
+	// console.log("CALCULATED YIELD: ", y);
 	return y;
 }
 
@@ -155,8 +155,10 @@ function calculateSimpleYield(args: {
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
-	console.log("CALCULATE SIMPLE YIELD CALLED");
+	// console.log("CALCULATE SIMPLE YIELD CALLED");
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
+	// console.log(amount)
+	// console.log(epochs)
 
 	// console.log(epochs);
 	let start_time = datetimeToUnix(meta.StartTime);
@@ -175,7 +177,7 @@ function calculateSimpleYield(args: {
 	while (this_epoch_index <= current_epoch_index) {
 		let this_epoch = epochs[this_epoch_index];
 		let next_epoch = epochs[this_epoch_index + 1];
-
+		// console.log(this_epoch_index, current_epoch_index)
 		let delta = 0;
 
 		if (starting_epoch_index === current_epoch_index) {
@@ -194,13 +196,13 @@ function calculateSimpleYield(args: {
         // y += rswp_per_tau_per_second * amount * delta
 
         // this_epoch_index += 1
-		let rswp_per_tau_per_second = meta.EmissionRatePerSecond
+		let rswp_per_tau_per_second = parseFloat(epochs[this_epoch_index].emission_rate_per_tau) / 365 / 24 / 60 / 60
 
 
 		y += rswp_per_tau_per_second * amount * delta_seconds;
 		this_epoch_index += 1;
 	}
-	//console.log("CALCULATED YIELD: ", y);
+	// console.log("CALCULATED SIMPLE YIELD: ", y);
 	return y;
 }
 
@@ -208,7 +210,9 @@ function calculateSimpleYield(args: {
 export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: number, user_entity: UserStakingEntity) {
 	if (meta.meta.type === "staking_simple") {
 		const deposit_total = user_entity.deposits.reduce((accum, dep) => { return accum += parseFloat(dep.amount.__fixed__)}, 0)
-		return deposit_total * meta.EmissionRatePerSecond
+		const total = deposit_total * meta.EmissionRatePerSecond
+		let dev_fee = total * meta.DevRewardPct
+		return total - dev_fee
 	} else {
 		const emission_rate_per_hour = meta.EmissionRatePerHour;
 		const total_emission_rate_per_second = getEmissionRatePerSecond(emission_rate_per_hour);

@@ -1,8 +1,7 @@
-import { getVal, getContractName } from "../utils";
+import { getContractName } from "../utils/utils";
 import {
 	Entity,
 	Column,
-	PrimaryColumn,
 	BaseEntity,
 	PrimaryGeneratedColumn
 } from "typeorm";

@@ -1,11 +1,12 @@
 import { IContractingTime, IKvp } from "src/types/misc.types";
-import { getVal } from "../utils";
+import { getVal } from "../utils/utils";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
 import { updateUserStakingInfo } from "./user-staking.entity";
 import { updateEpoch } from "./staking-epoch.entity";
 import { PairEntity } from "./pair.entity";
 import { ParserProvider } from "../parser.provider";
+import {log} from '../utils/logger'
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -66,9 +67,8 @@ export const updateStakingContractMeta = async (args: {
 	// console.log({ updateStakingContractMeta: args });
 	try {
 		const { state, handleClientUpdate, staking_contract, fn } = args;
-		console.log(state)
 		let entity = await StakingMetaEntity.findOne(staking_contract);
-		console.log({ STAKING_CONTRACT: staking_contract });
+		log.log({ STAKING_CONTRACT: staking_contract });
 		if (!entity) {
 			entity = new StakingMetaEntity();
 			entity.contract_name = staking_contract;
@@ -121,7 +121,7 @@ export const updateStakingContractMeta = async (args: {
 					entity["EmissionRatePerTauYearly"] = getVal(kvp);
 					entity["EmissionRatePerHour"] = ((parseFloat(getVal(kvp)) / 365 )/ 24);
 					
-					const ROI = await calculateROI(entity["EmissionRatePerHour"])
+					const ROI = await calculateROI(entity["EmissionRatePerTauYearly"])
 					if (ROI) entity.ROI_yearly = ROI
 					break;
 				case `${staking_contract}.EmissionRatePerSecond`:
@@ -159,10 +159,22 @@ export const updateStakingContractMeta = async (args: {
 	}
 };
 
+export const updateROI = async () => {
+	const rswp_token_name = ParserProvider.amm_meta_entity.TOKEN_CONTRACT
+	const meta_entity = await StakingMetaEntity.findOne(rswp_token_name)
+	if (meta_entity) {
+		const ROI = await calculateROI(meta_entity.EmissionRatePerTauYearly)
+		if (ROI) meta_entity.ROI_yearly = ROI
+		await meta_entity.save()
+	}
+} 
+
 export const calculateROI = async (yearly_emission_rate: number) => {
 	const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity.TOKEN_CONTRACT)
 	if (rswp_entity && rswp_entity.price) {
-		return (parseFloat(rswp_entity.price) * yearly_emission_rate) * 100
+
+		const apy = Math.round((parseFloat(rswp_entity.price) * yearly_emission_rate) * 100)
+		return apy
 	}
 	return false
 }

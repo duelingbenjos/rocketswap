@@ -1,6 +1,7 @@
 import axios from "axios";
 import { saveUSDPrice, TauMarketEntity } from '../entities/tau-market.entity'
-import { SocketService } from "src/socket.service";
+import { SocketService } from "../socket.service";
+import {log} from '../utils/logger'
 
 /** Singleton Service */
 
@@ -18,6 +19,7 @@ export class CoinGeckoAPIService {
     }
 
     private async getTauUSDPrice(){
+			try {
         let tickerData: any = await this.getExchangeTickers('txbit', 'lamden')
         tickerData.data.tickers.map(async (ticker) => {
             if (ticker.market.name === "Txbit") {
@@ -27,8 +29,12 @@ export class CoinGeckoAPIService {
                     handleClientUpdate: this.socketService.handleClientUpdate
                 })
                 let entity = await TauMarketEntity.findOne({info_type: "usd_price"})
-                console.log(entity)
+                // console.log(entity)
             }
         })
+			} catch (err) {
+				log.console.error();
+				(err)
+			}
     }
 }

@@ -1,5 +1,5 @@
 import { IKvp } from "src/types/misc.types";
-import { getVal } from "../utils";
+import { getVal } from "../utils/utils";
 import {
 	Entity,
 	Column,
