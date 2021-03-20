@@ -6,8 +6,8 @@ import {log} from '../utils/logger'
 /** Singleton Service */
 
 export class CoinGeckoAPIService {
-    private baseUrl = "https://api.coingecko.com/api/v3/"
-    private timeInterval = 30000 // 30 seconds
+    private baseUrl = "https://api.coingecko.com/api/v3"
+    private timeInterval = 60000 // 30 seconds
     private timer = null;
 
 	constructor(private readonly socketService: SocketService) {
@@ -21,7 +21,7 @@ export class CoinGeckoAPIService {
     private async getTauUSDPrice(){
 			try {
         let tickerData: any = await this.getExchangeTickers('txbit', 'lamden')
-        tickerData.data.tickers.map(async (ticker) => {
+        tickerData?.data?.tickers.map(async (ticker) => {
             if (ticker.market.name === "Txbit") {
                 let UsdPrice = ticker.converted_last.usd.toString()
                 await saveUSDPrice({
