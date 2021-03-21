@@ -208,14 +208,23 @@ function calculateSimpleYield(args: {
 export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: number, user_entity: UserStakingEntity) {
 	if (meta.meta.type === "staking_simple") {
 		const deposit_total = user_entity.deposits.reduce((accum, dep) => { return accum += parseFloat(dep.amount.__fixed__)}, 0)
-		return deposit_total * meta.EmissionRatePerSecond
+		return stakingTimeWindowIsActive(meta) ? deposit_total * meta.EmissionRatePerSecond : 0
 	} else {
-		const emission_rate_per_hour = meta.EmissionRatePerHour;
+		const emission_rate_per_hour =  meta.EmissionRatePerHour;
 		const total_emission_rate_per_second = getEmissionRatePerSecond(emission_rate_per_hour);
 		const share_of_pool = total_staked / meta.StakedBalance;
 		const user_emission_rate_per_second = share_of_pool * total_emission_rate_per_second;
-		return user_emission_rate_per_second;
+		return stakingTimeWindowIsActive(meta) ? user_emission_rate_per_second : 0
 	}
+}
+
+const stakingTimeWindowIsActive = (meta:StakingMetaEntity): boolean => {
+	let {StartTime, EndTime} = meta
+	let start_time = datetimeToUnix(StartTime)
+	let end_time = datetimeToUnix(EndTime)
+	let time = Date.now()
+
+	return time > start_time && time < end_time
 }
 
 function getEmissionRatePerSecond(emission_rate_per_hour: number) {
