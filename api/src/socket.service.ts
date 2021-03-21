@@ -55,9 +55,7 @@ export class SocketService {
 		try {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			// if (!staking_entities || !staking_entities.length) return;
-			console.log(staking_entities);
 			const payload = await staking_entities.reduce(async (accumP, user_entity) => {
-				console.log("USER ENTITY", user_entity.staking_contract);
 				const accum = await accumP
 				if (
 					(!user_entity.yield_info ||

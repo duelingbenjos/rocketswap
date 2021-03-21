@@ -85,13 +85,9 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 		});
 	}
 
-	//console.log("Harvestable Yield", harvestable_yield);
-	// if (typeof withdrawals === 'object') withdrawals = 0
 	harvestable_yield -= withdrawals;
 
 	const dev_share = harvestable_yield * DevRewardPct;
-	//console.log("-==== YIELD AND ALL HERE ====-");
-	//console.log(dev_share, harvestable_yield, DevRewardPct);
 	return harvestable_yield - dev_share;
 }
 
@@ -103,10 +99,8 @@ function calculateYield(args: {
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
-	//console.log("CALCULATE YIELD CALLED");
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
-	// console.log(epochs);
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
 
@@ -143,7 +137,6 @@ function calculateYield(args: {
 		y += deposit_yield_this_epoch;
 		this_epoch_index += 1;
 	}
-	//console.log("CALCULATED YIELD: ", y);
 	return y;
 }
 
@@ -155,10 +148,8 @@ function calculateSimpleYield(args: {
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
-	console.log("CALCULATE SIMPLE YIELD CALLED");
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
-	// console.log(epochs);
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
 
@@ -189,18 +180,12 @@ function calculateSimpleYield(args: {
 		}
 		const delta_seconds = delta / 1000;
 
-		// rswp_per_tau_per_second = EmissionRatePerTau.get() / 365 / 24 / 60 / 60
-        
-        // y += rswp_per_tau_per_second * amount * delta
-
-        // this_epoch_index += 1
 		let rswp_per_tau_per_second = meta.EmissionRatePerSecond
 
 
 		y += rswp_per_tau_per_second * amount * delta_seconds;
 		this_epoch_index += 1;
 	}
-	//console.log("CALCULATED YIELD: ", y);
 	return y;
 }
 
