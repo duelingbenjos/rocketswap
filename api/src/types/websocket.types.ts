@@ -46,7 +46,8 @@ export type ClientUpdateType =
 	| StakingMetaUpdateType
 	| UserYieldUpdateType
 	| EpochUpdateType
-	| ClientStakingUpdateType;
+	| ClientStakingUpdateType
+	| TauUsdPriceUpdateType;
 
 // export interface UserStakingUpdateType extends UpdateType {
 // 	action: "user_staking_update";
@@ -105,6 +106,11 @@ export interface BalanceUpdateType extends UpdateType {
 	payload: any;
 }
 
+export interface TauUsdPriceUpdateType extends UpdateType {
+	action: "tau_usd_price";
+	price: string;
+}
+
 export type UpdateType = {
 	action:
 		| "metrics_update"
@@ -116,7 +122,8 @@ export type UpdateType = {
 		| "user_staking_update"
 		| "epoch_update"
 		| "user_yield_update"
-		| "client_staking_update";
+		| "client_staking_update"
+		| "tau_usd_price";
 };
 
 export interface TradeUpdateType extends UpdateType {
@@ -136,6 +143,10 @@ export function isMetricsUpdate(client_update: ClientUpdateType): client_update 
 
 export function isBalanceUpdate(client_update: ClientUpdateType): client_update is BalanceUpdateType {
 	return (client_update as BalanceUpdateType).action === "balance_update";
+}
+
+export function isTauUsdPriceUpdate(client_update: ClientUpdateType): client_update is TauUsdPriceUpdateType {
+	return (client_update as TauUsdPriceUpdateType).action === "tau_usd_price";
 }
 
 export function isUserLpUpdateType(client_update: ClientUpdateType): client_update is UserLpUpdateType {

@@ -25,6 +25,7 @@ import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { UserStakingEntity } from "./entities/user-staking.entity";
 import { StakingEpochEntity } from "./entities/staking-epoch.entity";
+import { TauMarketEntity } from "./entities/tau-market.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -43,7 +44,8 @@ const db_options: TypeOrmModuleOptions = {
 		AmmMetaEntity,
 		StakingMetaEntity,
 		UserStakingEntity,
-		StakingEpochEntity
+		StakingEpochEntity,
+		TauMarketEntity
 	],
 	synchronize: true,
 	autoLoadEntities: true

@@ -26,7 +26,8 @@ export const rocketState = writable(0);
 export const toast_store: Writable<ToastMetaType[]> = writable([])
 export const tabHidden = writable(false);
 
-
+// EXCHANGE PRICES
+export const tauUSDPrice = writable(null);
 
 // WALLET
 export const ws_id: Writable<string> = writable('')
@@ -85,7 +86,6 @@ export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProces
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
 
-
 export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => {
 	let currentPrice = toBigNumber("0")
 	let rswpMetrics = $token_metrics_store[config.ammTokenContract]
@@ -93,6 +93,11 @@ export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => 
 		currentPrice = toBigNumberPrecision(rswpMetrics.price, 8)
 	}
 	return  currentPrice
+})
+
+export const rswpPriceUSD = derived(([rswpPrice, tauUSDPrice]), ([$rswpPrice, $tauUSDPrice]) => {
+	if ($rswpPrice.isGreaterThan(0) && $tauUSDPrice) return $rswpPrice.multipliedBy($tauUSDPrice)
+	else toBigNumber("0")
 })
 
 // AMM

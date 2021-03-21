@@ -6,7 +6,7 @@
     import RocketSwapCircleLogo from '../../icons/rocketswap-circle-logo.svelte'
 
     //Misc
-    import { rswpBalance, rswpPrice } from '../../store'
+    import { rswpBalance, rswpPriceUSD } from '../../store'
     import { displayBalanceToPrecision } from '../../utils'
     import { config } from '../../config'
 
@@ -52,7 +52,7 @@
         />
         <div class="flex-col rswp-balance-info text-large">
             <p class="text-color-highlight weight-600">{`${displayBalanceToPrecision($rswpBalance, 8)} ${config.ammTokenSymbol}`}</p>
-            <p class="text-primary-dim">{`(${displayBalanceToPrecision($rswpBalance.dividedBy($rswpPrice), 8)} ${config.currencySymbol})`}</p>
+            <p class="text-primary-dim">{`$${displayBalanceToPrecision($rswpBalance.multipliedBy($rswpPriceUSD), 2)} USD`}</p>
         </div>
     </div>
     <div class="flex flex-grow">

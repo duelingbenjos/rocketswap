@@ -1,6 +1,6 @@
-import { IKvp } from "./types/misc.types";
+import { IKvp } from "../types/misc.types";
 import BigNumber from "bignumber.js";
-import { TokenEntity } from "./entities/token.entity";
+import { TokenEntity } from "../entities/token.entity";
 
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;

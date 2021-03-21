@@ -96,7 +96,7 @@
                         styles="min-width: 20px;"
                     /> 
                     <span>
-                        {config.currencySymbol} below to earn RSWP over time.
+                        Stake {config.currencySymbol} below to earn RSWP over time.
                     </span>
                 </div>
 

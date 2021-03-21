@@ -2,7 +2,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { IKvp } from "./types/misc.types";
 import { config, staking_contracts } from "./config";
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity";
-import { getContractCode, getContractName, validateTokenContract } from "./utils";
+import { getContractCode, getContractName, validateTokenContract } from "./utils/utils";
 import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";

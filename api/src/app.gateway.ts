@@ -19,6 +19,7 @@ import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { UserStakingEntity } from "./entities/user-staking.entity";
+import { TauMarketEntity } from "./entities/tau-market.entity";
 import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./socket.service";
 import { TransactionService } from "./transaction.service";
@@ -36,7 +37,9 @@ import {
 	isUserYieldUpdate,
 	isClientStakingUpdate
 } from "./types/websocket.types";
+import {log} from './utils/logger'
 
+import { CoinGeckoAPIService } from './services/coingecko.service'
 /**
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
@@ -61,6 +64,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
 		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 		this.socketService.handleProxyTxnResponse = this.handleTxnResponse;
+		new CoinGeckoAPIService(this.socketService)
 	}
 
 	handleNewBlock = async (block: BlockDTO) => {
@@ -72,12 +76,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	handleClientUpdate = async (update: ClientUpdateType) => {
 		let contract_name;
-		//console.log(update)
+		//log.log(update)
 		switch (update.action) {
 			case "metrics_update":
 				if (isMetricsUpdate(update)) {
 					contract_name = update.contract_name;
-					console.log(update)
+					// log.log(update)
 					this.wss.emit(`price_feed:${contract_name}`, update);
 					// this.logger.log("price update sent");
 				}
@@ -89,7 +93,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "user_lp_update":
 				if (isUserLpUpdateType(update)){
-					console.log(update)
+					// log.log(update)
 					this.wss.emit(`user_lp_update:${update.vk}`, update);
 				}
 				break;
@@ -101,7 +105,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "epoch_update":
 				if (isEpochUpdate(update)) {
-					//console.log("EPOCH_UPDATE", update);
+					log.log("EPOCH_UPDATE", update);
 					setTimeout(async () => {
 						await this.socketService.sendClientStakingUpdates(update.data.staking_contract);
 					}, 2000);
@@ -110,7 +114,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "client_staking_update":
 				if (isClientStakingUpdate(update)) {
-					//console.log("EPOCH_UPDATE", update);
+					// log.log("EPOCH_UPDATE", update);
 					setTimeout(async () => {
 						await this.socketService.sendClientStakingUpdates(update.staking_contract);
 					}, 2000);
@@ -119,9 +123,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "user_yield_update":
 				if (isUserYieldUpdate(update)) {
-					//console.log("UPDATE", update);
+					log.log("UPDATE", update);
 					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
+			case "tau_usd_price":
+				if (isUserYieldUpdate(update)) {
+					log.log("UPDATE", update);
+					this.wss.emit(`tau_usd_price`, update.data);
+				}	
 		}
 	};
 
@@ -143,14 +152,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async handleJoinRoom(client: Socket, room: string) {
 		client.join(room);
 		client.emit("joined_room", room);
-		console.log({joined: room})
+		log.log({joined: room})
 		const [prefix, subject] = room.split(":");
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
 				break;
 			case "user_lp_feed":
-				console.log("joining user_lp_feed")
+				log.log("joining user_lp_feed")
 				this.handleJoinUserLpFeed(subject, client);
 				break;
 			case "balance_feed":
@@ -169,6 +178,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			case "user_yield_feed":
 				this.handleJoinUserYieldFeed(subject, client);
 				break;
+			case "tau_usd_price":
+				this.handleJoinTauUsdPrice(client);
+				break;
 		}
 	}
 
@@ -180,8 +192,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
 		this.socketService.addStakingPanelClient(subject);
 		const yield_list = await this.socketService.getClientYieldList(subject);
-		//console.log("called");
+		//log.log("called");
 		client.emit("user_yield_list", yield_list);
+	}
+
+	private async handleJoinTauUsdPrice(client: Socket) {
+		let entity = await TauMarketEntity.findOne({info_type: "usd_price"});
+		client.emit('tau_usd_price', {current_price: entity.value})
 	}
 
 	private async handleJoinStakingPanel(client: Socket) {

@@ -1,5 +1,5 @@
 import { IKvp } from "../types/misc.types";
-import { getVal } from "../utils";
+import { getVal } from "../utils/utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
 

@@ -1,5 +1,3 @@
-import { IKvp } from "src/types/misc.types";
-import { getVal } from "../utils";
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 
 /** An instance of this entity is created after each time the buy / sell function is successfully called */
