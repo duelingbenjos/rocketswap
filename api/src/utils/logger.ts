@@ -2,7 +2,7 @@ var clc = require('cli-color');
 
 var conf = {
 	filters : {
-		// log : clc.white.bgBlue,
+		log : clc.green.bgBlack,
 		trace : clc.magenta,
 		debug : clc.cyan,
 		info : clc.green,
