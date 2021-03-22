@@ -7,6 +7,9 @@
     //Misc
     import { stringToFixed } from '../../utils'
     import { config } from '../../config'
+    import { tauUSDPrice } from '../../store'
+
+    tauUSDPrice.subscribe(val => console.log(val))
 
     const timeDelta = (timestamp) => {
         let seconds = Math.floor((Date.now() - timestamp * 1000) / 1000);
@@ -45,15 +48,10 @@
         margin: 0;
         min-width: max-content;
     }
-    .trade > .price {
+    .trade > .alignment{
         text-align: end;
-        margin: 0 20px;
-    }
-    .trade > .timedelta{
-        justify-self: flex-end;
-        text-align: end;
-        width: 110px;
-        margin: 0 20px;
+        margin-right: 15px;
+        width: 20%;
     }
     .trade > .icon{
         margin-left: 20px;
@@ -70,7 +68,8 @@
 
         />
     </div>
-    <p >{`${stringToFixed(trade.amount, 4)} ${trade.token_symbol}`}</p>
-    <p class="price flex-grow">{`${stringToFixed(trade.price, 4)} ${config.currencySymbol}`}</p>
-    <p class="timedelta ">{timeDelta(trade.time)}</p>
+    <p class="alignment">{`${stringToFixed(trade.amount, 4)} ${trade.token_symbol}`}</p>
+    <p class="alignment">{`$${$tauUSDPrice ? stringToFixed($tauUSDPrice.multipliedBy(trade.price), 2) : "0.0" } USD`}</p>
+    <p class="alignment flex-grow">{`${stringToFixed(trade.price, 4)} ${config.currencySymbol}`}</p>
+    <p class="timedelta alignment">{timeDelta(trade.time)}</p>
 </div>
