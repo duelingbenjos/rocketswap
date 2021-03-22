@@ -164,10 +164,10 @@ export const updateROI = async () => {
 	log.debug("UPDATE ROI CALLED")
 	for (let contract_name of staking_contracts) {
 		const meta_entity = await StakingMetaEntity.findOne(contract_name)
-		log.debug({meta_entity})
+		// log.debug({meta_entity})
 		if (meta_entity) {
 			const ROI = await calculateROI(meta_entity.EmissionRatePerTauYearly)
-			log.debug({ROI})
+			// log.debug({ROI})
 			if (ROI) meta_entity.ROI_yearly = ROI
 			await meta_entity.save()
 		}
