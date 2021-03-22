@@ -5,7 +5,6 @@ const fs = require("fs")
 
 let options: NestApplicationOptions = {}
 
-console.log("PROCESS.ENV.CONTEXT", process.env.CONTEXT)
 if (process.env.CONTEXT === 'remote') {
   options.httpsOptions = {
     key: fs.readFileSync("src/certs/key.pem"),

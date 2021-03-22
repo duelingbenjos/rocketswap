@@ -87,7 +87,7 @@ export class SocketService {
 			//console.log(this.staking_panel_clients);
 			for (let vk of this.staking_panel_clients) {
 				const user_entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
-				console.log(user_entity);
+				// console.log(user_entity);
 				if (user_entity) {
 					//console.log("sendClientStakingUpdates, user_entity found");
 					const user_yield_payload: IUserYieldPayload = await this.updateClientStakingMetrics(

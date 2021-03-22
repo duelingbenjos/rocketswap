@@ -5,6 +5,8 @@ import {
 	handleClientUpdateType,
 } from "src/types/websocket.types";
 import { PairEntity } from "./pair.entity";
+import { ParserProvider } from "../parser.provider";
+import { updateROI } from "./staking-meta.entity";
 
 /** An instance of this entity is created after each action on the AMM that changes the price variable. */
 
@@ -33,6 +35,7 @@ export async function savePrice(
 	);
 	//console.log(price_kvp)
 	if (!price_kvp) return;
+
 	const contract_name = price_kvp.key.split(".")[1].split(":")[1];
 
 	const price_entity = new PriceEntity();
@@ -56,7 +59,9 @@ export async function savePrice(
 	});
 	
 
-	return await Promise.all([price_entity.save(), pair_entity.save()]);
+	await Promise.all([price_entity.save(), pair_entity.save()]);
+
+	if (contract_name === ParserProvider.amm_meta_entity.TOKEN_CONTRACT) await updateROI()
 }
 
 export async function getTokenMetrics(contract_name: string) {
@@ -64,7 +69,7 @@ export async function getTokenMetrics(contract_name: string) {
 		where: { contract_name }
 
 	});
-	console.log(pair_entity);
+	// console.log(pair_entity);
 	const { price, time, lp, reserves } = pair_entity;
 	return { contract_name, price, time: parseInt(time), reserves, lp };
 }

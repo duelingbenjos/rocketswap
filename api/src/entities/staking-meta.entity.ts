@@ -7,6 +7,7 @@ import { updateEpoch } from "./staking-epoch.entity";
 import { PairEntity } from "./pair.entity";
 import { ParserProvider } from "../parser.provider";
 import {log} from '../utils/logger'
+import { staking_contracts } from "../config";
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -160,12 +161,16 @@ export const updateStakingContractMeta = async (args: {
 };
 
 export const updateROI = async () => {
-	const rswp_token_name = ParserProvider.amm_meta_entity.TOKEN_CONTRACT
-	const meta_entity = await StakingMetaEntity.findOne(rswp_token_name)
-	if (meta_entity) {
-		const ROI = await calculateROI(meta_entity.EmissionRatePerTauYearly)
-		if (ROI) meta_entity.ROI_yearly = ROI
-		await meta_entity.save()
+	log.debug("UPDATE ROI CALLED")
+	for (let contract_name of staking_contracts) {
+		const meta_entity = await StakingMetaEntity.findOne(contract_name)
+		log.debug({meta_entity})
+		if (meta_entity) {
+			const ROI = await calculateROI(meta_entity.EmissionRatePerTauYearly)
+			log.debug({ROI})
+			if (ROI) meta_entity.ROI_yearly = ROI
+			await meta_entity.save()
+		}
 	}
 } 
 

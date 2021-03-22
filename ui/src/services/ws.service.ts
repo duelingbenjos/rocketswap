@@ -15,7 +15,7 @@
 		tauUSDPrice } from '../store'
 	import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
 	import { valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision } from '../utils'
-	import { config, getBaseUrl, ws_options } from '../config'
+	import { config, getBaseUrl } from '../config'
 
 	/** Singleton socket.io service */
 	export class WsService {
@@ -41,7 +41,6 @@
 		//console.log('WS Service STARTED')
 		this.base_url = getBaseUrl()
 		console.log(this.base_url)
-		console.log(ws_options)
 		this.connection = socket.connect(this.base_url)
 		this.setupEvents()
 		this.setupSubs()

@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 app.use(
-	"/docs/",
+	"/docs#",
 	createProxyMiddleware({
 		target: DOCS_URL,
 		changeOrigin: false,
@@ -37,12 +37,23 @@ app.use(
 );
 
 app.use(
+	"/docs",
+	createProxyMiddleware({
+		target: DOCS_URL,
+		changeOrigin: false,
+		pathRewrite: {
+			[`^/docs/`]: ""
+		}
+	})
+);
+
+app.use(
 	"/website/",
 	createProxyMiddleware({
 		target: WEBSITE_URL,
 		changeOrigin: true,
 		pathRewrite: {
-			[`^/website`]: ""
+			[`^/website/`]: ""
 		}
 	})
 );
