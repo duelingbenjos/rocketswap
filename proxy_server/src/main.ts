@@ -55,7 +55,7 @@ const apiProxy = createProxyMiddleware({
 	ws: true
 });
 
-app.use("/cxn");
+app.use("/cxn", apiProxy);
 
 app.use(
 	"/",
@@ -72,4 +72,4 @@ const server = app.listen(PORT, () => {
 	console.log(`Starting Proxy on port : ${PORT}`);
 });
 
-// server.on("upgrade", apiProxy.upgrade);
+server.on("upgrade", apiProxy.upgrade);
