@@ -2,14 +2,14 @@ import express from "express";
 import morgan from "morgan";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import cors from "cors";
-// let httpProxy = require("express-http-proxy");
-import httpProxy from "express-http-proxy";
+import https from "https";
+import http from "http";
+import fs from "fs";
 
 // Create Express Server
 const app = express();
 
 // Configuration
-const PORT = 80;
 const WEBSITE_URL = "http://0.0.0.0:82";
 const APP_URL = "http://0.0.0.0:5000";
 const DOCS_URL = "http://0.0.0.0:3000";
@@ -26,7 +26,7 @@ app.use((req, res, next) => {
 });
 
 app.use(
-	"/docs",
+	"/docs/",
 	createProxyMiddleware({
 		target: DOCS_URL,
 		changeOrigin: false,
@@ -37,7 +37,7 @@ app.use(
 );
 
 app.use(
-	"/website",
+	"/website/",
 	createProxyMiddleware({
 		target: WEBSITE_URL,
 		changeOrigin: true,
@@ -47,30 +47,30 @@ app.use(
 	})
 );
 
-const apiProxy = createProxyMiddleware({
-	target: API_URL,
-	changeOrigin: true,
-	pathRewrite: {
-		[`^/cxn`]: ""
-	},
-	ws: true
-});
-
-app.use("/cxn", apiProxy);
-
 app.use(
 	"/",
 	createProxyMiddleware({
 		target: APP_URL,
-		// changeOrigin: true,
+		changeOrigin: true,
 		pathRewrite: {
 			[`^/`]: ""
 		}
 	})
 );
 
-const server = app.listen(PORT, () => {
-	console.log(`Starting Proxy on port : ${PORT}`);
+const httpServer = http.createServer(app);
+const httpsServer = https.createServer(
+	{
+		key: fs.readFileSync("./certs/key.pem"),
+		cert: fs.readFileSync(".certs/pub.pem")
+	},
+	app
+);
+
+httpServer.listen(80, () => {
+	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 
-server.on("upgrade", apiProxy.upgrade);
+httpsServer.listen(443, () => {
+	console.log(`Starting HTTPS Proxy on port : ${443}`);
+});
