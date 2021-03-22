@@ -39,7 +39,7 @@ app.use(
 app.use(
 	"/website",
 	createProxyMiddleware({
-		target: DOCS_URL,
+		target: WEBSITE_URL,
 		changeOrigin: true,
 		pathRewrite: {
 			[`^/website`]: ""
@@ -48,7 +48,7 @@ app.use(
 );
 const apiProxy = createProxyMiddleware({
 	target: API_URL,
-	changeOrigin: true,
+	// changeOrigin: true,
 	pathRewrite: {
 		[`^/cxn`]: ""
 	},
@@ -61,7 +61,7 @@ app.use(
 	"/",
 	createProxyMiddleware({
 		target: APP_URL,
-		changeOrigin: true,
+		// changeOrigin: true,
 		pathRewrite: {
 			[`^/`]: ""
 		}
