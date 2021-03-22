@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import fs from 'fs'
 import { NestApplicationOptions } from '@nestjs/common';
+const fs = require("fs")
 
 let options: NestApplicationOptions = {}
 
