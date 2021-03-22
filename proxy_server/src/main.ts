@@ -61,8 +61,8 @@ app.use(
 const httpServer = http.createServer(app);
 const httpsServer = https.createServer(
 	{
-		key: fs.readFileSync("certs/key.pem"),
-		cert: fs.readFileSync("certs/pub.pem")
+		key: fs.readFileSync("src/certs/key.pem"),
+		cert: fs.readFileSync("src/certs/pub.pem")
 	},
 	app
 );
