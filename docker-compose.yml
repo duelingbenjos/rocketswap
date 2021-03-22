@@ -19,7 +19,8 @@ services:
     image: rocketswap-client-ui
     container_name: rocketswap-ui
     network_mode: host
-
+    ports:
+      - 5000:80    
   # proxy:
   #   build: ./proxy_server
   #   image: rocketswap-client-proxy
