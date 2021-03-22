@@ -5,10 +5,13 @@ import { NestApplicationOptions } from '@nestjs/common';
 
 let options: NestApplicationOptions = {}
 
-options.httpsOptions = process.env.CONTEXT === 'remote' ? 	{
-  key: fs.readFileSync("src/certs/key.pem"),
-  cert: fs.readFileSync("src/certs/pub.pem")
-} : {}
+console.log("PROCESS.ENV.CONTEXT", process.env.CONTEXT)
+if (process.env.CONTEXT === 'remote') {
+  options.httpsOptions = {
+    key: fs.readFileSync("src/certs/key.pem"),
+    cert: fs.readFileSync("src/certs/pub.pem")
+  }
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, options);
