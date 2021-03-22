@@ -88,6 +88,9 @@ const isConnectionDirect = (): boolean => {
 }
 
 export const getBaseUrl = (): string => {
-  console.log({ hostname: window.location.hostname })
-  return isConnectionDirect() ? `http://${window.location.hostname}:2053` : `https://${window.location.hostname}:2053`
+  // console.log({ hostname: window.location.hostname })
+  // return isConnectionDirect() ? `http://${window.location.hostname}:2053` : '/cxn'
+  return `${window.location.protocol}//${window.location.hostname}:2053`
 }
+
+export const ws_options = isConnectionDirect() ? {} : { path: '/cxn/socket.io' }

@@ -42,7 +42,7 @@ app.use(
 		target: DOCS_URL,
 		changeOrigin: false,
 		pathRewrite: {
-			[`^/docs/`]: ""
+			[`^/docs`]: ""
 		}
 	})
 );
