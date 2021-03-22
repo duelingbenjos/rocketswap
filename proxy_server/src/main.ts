@@ -29,7 +29,7 @@ app.use(
 	"/docs",
 	createProxyMiddleware({
 		target: DOCS_URL,
-		changeOrigin: true,
+		changeOrigin: false,
 		pathRewrite: {
 			[`^/docs`]: ""
 		}
