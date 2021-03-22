@@ -46,9 +46,10 @@ app.use(
 		}
 	})
 );
+
 const apiProxy = createProxyMiddleware({
 	target: API_URL,
-	// changeOrigin: true,
+	changeOrigin: true,
 	pathRewrite: {
 		[`^/cxn`]: ""
 	},
