@@ -32,8 +32,7 @@ app.use(
 		changeOrigin: true,
 		pathRewrite: {
 			[`^/docs`]: ""
-		},
-		ws: true
+		}
 	})
 );
 
@@ -44,22 +43,19 @@ app.use(
 		changeOrigin: true,
 		pathRewrite: {
 			[`^/website`]: ""
-		},
-		ws: true
+		}
 	})
 );
+const apiProxy = createProxyMiddleware({
+	target: API_URL,
+	changeOrigin: true,
+	pathRewrite: {
+		[`^/cxn`]: ""
+	},
+	ws: true
+});
 
-app.use(
-	"/cxn",
-	createProxyMiddleware({
-		target: API_URL,
-		changeOrigin: true,
-		pathRewrite: {
-			[`^/cxn`]: ""
-		},
-		ws: true
-	})
-);
+app.use("/cxn");
 
 app.use(
 	"/",
@@ -72,6 +68,8 @@ app.use(
 	})
 );
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
 	console.log(`Starting Proxy on port : ${PORT}`);
 });
+
+server.on("upgrade", apiProxy.upgrade);
