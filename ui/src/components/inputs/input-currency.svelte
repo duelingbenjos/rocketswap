@@ -50,7 +50,7 @@
 
 	onMount(() => {
 		payInRswp.subscribe(val => {
-			if ($currencyAmount && typeof inputValue !== 'undefined'){
+			if ($currencyAmount && typeof inputValue !== 'undefined' && $buy){
 				if (inputValue > 0) dispatchEvent(inputValue)
 			}
 		})

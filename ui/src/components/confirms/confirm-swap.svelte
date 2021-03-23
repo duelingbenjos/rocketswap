@@ -163,21 +163,15 @@
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Price</p>
             {#if $buy}
-                <div class="flex-row flex-align-center">
-                    <span class="number number-span margin-r-3">{stringToFixed($pageStats.newPrices.currency, 8)}</span>
-                    <span>{`${$selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
-                </div>
+                <span>{`${stringToFixed($pageStats.newPrices.currency, 8)} ${$selectedToken.token_symbol} per ${config.currencySymbol}`}</span>
             {:else}
-                <div class="flex-row flex-align-center">
-                    <span class="number number-span margin-r-3">{stringToFixed($pageStats.newPrices.token, 8)}</span>
-                    <span>{`${config.currencySymbol} per ${$selectedToken.token_symbol}`}</span>
-                </div>
+                <span>{`${stringToFixed($pageStats.newPrices.token, 8)} ${config.currencySymbol} per ${$selectedToken.token_symbol}`}</span>
             {/if}
         </div>
 
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Price Impacted</p>
-            <p  class="number" 
+            <p 
                 class:text-warning={slippage.isFinite() && percentOfTolerance.isGreaterThanOrEqualTo(0.75)}
                 class:text-error={slippage.isFinite() && slippage.isGreaterThanOrEqualTo($slippageTolerance)}>
                 {`${stringToFixed(slippage, 2)}%`}
@@ -185,22 +179,15 @@
         </div>
         <div class="flex-row flex-align-center modal-confirm-item">
             <p class="text-primary-dim">Fee</p>
-            <div class="flex-row flex-align-center">
-                {#if $payInRswp}
-                    <span class="number margin-r-3 number-span">{stringToFixed($pageStats.rswpFee, 8)}</span>
-                    <span>{config.ammTokenSymbol}</span>
-                {:else}
-                    <span class="number margin-r-3 number-span">{stringToFixed($pageStats.fee, 8)}</span>
-                    <span>{receivedSymbol}</span>
-                {/if}
-            </div>
+            {#if $payInRswp}
+                <span>{`${stringToFixed($pageStats.rswpFee, 8)} ${config.ammTokenSymbol}`}</span>
+            {:else}
+                <span>{`${stringToFixed($pageStats.fee, 8)} ${receivedSymbol}`}</span>
+            {/if}
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-bold text-primary-dim">Minimum Recieved</p>
-            <div class="flex-row flex-align-center">
-                <span class="number margin-r-3 number-span">{stringToFixed(minimumReceived, 8)}</span>
-                <span>{receivedSymbol}</span>
-            </div>
+            <span>{`${stringToFixed(minimumReceived, 8)} ${receivedSymbol}`}</span>
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button style="secondary" loading={loading} callback={$buy ? swapBuy : swapSell} text="LAUNCH" />

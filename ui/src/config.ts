@@ -7,6 +7,7 @@ const AMM_TOKEN_CONTRACT = 'con_rswp_lst001'
 const AMM_TOKEN_SYMBOL = 'RSWP'
 const AMM_TOKEN_STAKING_CONTRACT = 'con_simple_staking_rswp'
 const AMM_FEE = '0.003'
+const AMM_TOKEN_DISCOUNT = '0.75'
 const NAMES_CONTRACT = 'con_ipseity_5'
 const BLOCKEXPLORER_URL = 'https://testnet.lamden.io'
 const MASTERNODE_URL = 'https://testnet-master-1.lamden.io'
@@ -50,6 +51,7 @@ export const config = {
   ammContractName: AMM_CONTRACT_NAME,
   ammTokenSymbol: AMM_TOKEN_SYMBOL, //Change for PROD
   ammTokenContract: AMM_TOKEN_CONTRACT, // Change for PROD
+  ammTokenDiscount: AMM_TOKEN_DISCOUNT,
   ammTokenStakingContract: AMM_TOKEN_STAKING_CONTRACT, // Change for PROD
   ammFee: AMM_FEE, //Change for PROD
   blockExplorer: BLOCKEXPLORER_URL, //Change for PROD

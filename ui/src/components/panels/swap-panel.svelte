@@ -30,28 +30,15 @@
 	}
 
 	function handleCurrencyChange(e){
-		if (e.detail.toString() === "NaN" || e.detail.isEqualTo(0)) saveStoreValue(currencyAmount, null)
+		if (!e.detail) return
+		if (e.detail.toString() === "NaN" || e.detail === 0) saveStoreValue(currencyAmount, null)
 		else{
 			saveStoreValue(currencyAmount, e.detail)
 			if ($selectedToken && $tokenLP) {
 				let quoteCalc = quoteCalculator($tokenLP)
 				let quote = quoteCalc.calcBuyPrice($currencyAmount)
-				/*
-				console.log("SWAP PANEL - HANDLE_CURRECNY_CHANGE")
-				console.log({
-					fee: quote.fee.toString(),
-					new_price_currency: quote.newPrices.currency.toString(),
-					new_price_token: quote.newPrices.token.toString(),
-					new_reserves_currency:  quote.newPrices.reserves[0].toString(),
-					new_reserves_token:  quote.newPrices.reserves[1].toString(),
-					price_currency: quoteCalc.prices.currency.toString(),
-					price_token: quoteCalc.prices.token.toString(),
-					reserves_currency:  quoteCalc.prices.reserves[0].toString(),
-					reserves_token:  quoteCalc.prices.reserves[1].toString(),
-					tokensPurchased: quote.tokensPurchased.toString(),
-					tokensPurchasedLessFee: quote.tokensPurchasedLessFee.toString()
-				})*/
-				if ($payInRswp){
+
+				if ($payInRswp && $buy){
 					if (quote.tokensPurchased.isGreaterThan(0)){
 						saveStoreValue(tokenAmount, toBigNumber(stringToFixed(quote.tokensPurchased, 8)))
 					}else{
@@ -69,6 +56,7 @@
 	}
 
 	function handleTokenChange(e) {
+		if (!e.detail) return
 		if (!e.detail.tokenAmount || e.detail.tokenAmount?.toString() === "NaN" || e.detail.tokenAmount.isEqualTo(0)) saveStoreValue(tokenAmount, null)
 		else saveStoreValue(tokenAmount, e.detail.tokenAmount)
 
@@ -77,10 +65,27 @@
 		if ($tokenLP && $tokenAmount){
 			let quoteCalc = quoteCalculator($tokenLP)
 			let quote = quoteCalc.calcSellPrice($tokenAmount)
-			if ($payInRswp){
-				saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchased, 8)))
+
+			console.log({
+				payInRswp: $payInRswp,
+				buy: $buy,
+				currencyPurchased: quote.currencyPurchased.toString(),
+				currencyPurchasedLessFee: quote.currencyPurchasedLessFee.toString()
+			})
+
+			if ($payInRswp && !$buy){
+				if (quote.currencyPurchased.isGreaterThan(0)){
+					saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchased, 8)))
+				}else{
+					saveStoreValue(currencyAmount, toBigNumber("0"))
+				}
 			}else{
-				saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchasedLessFee, 8)))
+				if (quote.currencyPurchasedLessFee.isGreaterThan(0)){
+					console.log("WE DOING THIS?!?!")
+					saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchasedLessFee, 8)))
+				}else{
+					saveStoreValue(currencyAmount, toBigNumber("0"))
+				}
 			}
 		}
 	}
