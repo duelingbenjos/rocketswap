@@ -137,10 +137,10 @@
 			<span class="input-token-label text-xlarge"> {config.currencySymbol} </span>
 		</div>
 	</div>
-	{#if pressedMaxValue}
+	{#if pressedMaxValue && $buy}
 		<p class="input-message text-xsmall text-primary-dim">** adjusted for tx fees</p>
 	{/if}
-	{#if !$txOkay}
+	{#if !$txOkay && $buy}
 		<p class="input-message text-xsmall text-error">** cannot cover tx fees</p>
 	{/if}
 </div>

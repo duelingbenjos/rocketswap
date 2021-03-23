@@ -23,7 +23,7 @@
 	export let buttonText;
 
 	const { pageStats, pageStores } = getContext('pageContext');
-	const { selectedToken, currencyAmount, tokenAmount, lpTokenAmount, buy, txOkay } = pageStores
+	const { selectedToken, currencyAmount, tokenAmount, lpTokenAmount, buy, txOkay, priceImpactTooHigh } = pageStores
 
 	let open = false;
 
@@ -50,8 +50,13 @@
 			disabledText = `Wallet Not Connected`
 			return true
 		}
-		if (!$txOkay) {
+		if (!$txOkay && $buy) {
 			disabledText = `Insufficient Stamps`
+			return true
+		}
+
+		if($priceImpactTooHigh) {
+			disabledText = `Slippage Exceeded`
 			return true
 		}
 
