@@ -36,20 +36,7 @@
     $: differenceInAmount = fillAmount ? $ammFuelTank_stakedAmount?.minus(fillAmount) : toBigNumber("0");
     $: same = stringToFixed(newPercentDisplay, 2) ===  stringToFixed(tankPercentDisplay, 2)
     $: insufficientRSWP = fillAmount?.isGreaterThan($rswpBalance) || false;
-/*
-    $: log = console.log({
-        fillAmount: fillAmount?.toString() || fillAmount,
-        tankPercent: tankPercent?.toString(),
-        fuelLevel: fuelLevel?.toString(),
-        tankPercentDisplay: tankPercentDisplay?.toString(),
-        isfillAmount,
-        newPercent: newPercent?.toString(),
-        newPercentDisplay: newPercentDisplay?.toString(),
-        addingMore,
-        differenceInAmount: differenceInAmount?.toString(),
-        same
-    })
-*/
+
     const calcNewPercet = (value) => {
         if (!value) return null
         const {log_accuracy, multiplier, discount_floor} = ammStakingValues
