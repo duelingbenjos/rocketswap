@@ -8,10 +8,22 @@
     // Misc
     import { stringToFixed, quoteCalculator, toBigNumber, setPayInRswp} from '../../utils' 
     import { config } from '../../config'
-    import { slippageTolerance, rswpPrice, payInRswp } from '../../store'
+    import { slippageTolerance, rswpPrice, payInRswp, rswpPriceUSD } from '../../store'
 
     const { pageStats, pageStores } = getContext('pageContext');
     const { selectedToken, buy, currencyAmount, tokenAmount, tokenLP } = pageStores
+
+    pageStats.subscribe(currVal => {
+        console.log(currVal)
+        if (currVal){
+                const { fee, rswpFee, tokensPurchased } = currVal
+                console.log({
+                    fee: fee ? fee.toString() : "0",
+                    rswpFee: rswpFee ? rswpFee.toString() : "0",
+                    tokensPurchased: tokensPurchased ? tokensPurchased.toString() : "0"
+                })
+        }
+    })
 
     let openChangeSlippage = false;
 
@@ -21,6 +33,7 @@
     $: slippageDisplay = slippage.isFinite() ? stringToFixed(slippage, 2) :  "0.0";
     $: feeDisplay = isNaN($pageStats?.fee) ? "0.0" : $pageStats?.fee;
     $: rswpFeeDisplay = isNaN($pageStats?.rswpFee) ? "0.0" : $pageStats?.rswpFee;
+    $: rswpFeeUsdDisplay = isNaN($pageStats?.rswpFee) ? "0.0" : $pageStats?.rswpFee.multipliedBy($rswpPriceUSD);
     $: percentOfTolerance = slippage.dividedBy($slippageTolerance)
     $: minimumReceived = $buy ? $payInRswp ? $pageStats.minimumTokens : $pageStats.minimumTokensLessFee : $payInRswp ? $pageStats.minimumCurrency : $pageStats.minimumCurrencyLessFee;
     $: checked = $payInRswp
@@ -50,6 +63,9 @@
     .fee{
         display: flex;
         flex-direction: row;
+    }
+    .usd-price{
+        margin-left: 4px;
     }
     label.pay-in-rswp{
         color: var(--text-color-highlight);
@@ -85,11 +101,11 @@
     <div class="flex-row flex-align-center">
         <span class="text-primary-dim">Price</span>
         <div class="flex-row flex-align-center">
-            <span class="number margin-r-3 number-span">
+            <span class="margin-r-3">
                 {stringToFixed(pricePaid, 8)}
             </span>
             {#if $buy}
-                <span>{` ${tokenSymbol} per  ${config.currencySymbol}`}</span>
+                <span>{` ${tokenSymbol} per ${config.currencySymbol}`}</span>
             {:else}
                 <span>{`${config.currencySymbol} per ${tokenSymbol}`}</span>
             {/if}
@@ -97,7 +113,7 @@
     </div>
     <div class="flex-row flex-align-center ">
         <span class="text-primary-dim">Price Impact</span>
-        <span class="number"
+        <span
               class:text-warning={slippage.isFinite() && percentOfTolerance.isGreaterThanOrEqualTo(0.75)}
               class:text-error={slippage.isFinite() && slippage.isGreaterThanOrEqualTo($slippageTolerance)}>
                 {`${slippageDisplay}%`}
@@ -108,11 +124,13 @@
         <div class="flex-col" >
             <div class="fee flex-center-end">
                 {#if $payInRswp}
-                    <span class="number margin-r-3 number-span">{stringToFixed(rswpFeeDisplay, 8)}</span>
+                    <span class="margin-r-3 ">{stringToFixed(rswpFeeDisplay, 8)}</span>
                     <span>{config.ammTokenSymbol}</span>
+                    <span class="usd-price text-primary-dim">{`($${stringToFixed(rswpFeeUsdDisplay, 4)} USD)`}</span>
                 {:else}
-                    <span class="number margin-r-3 number-span">{stringToFixed(feeDisplay, 8)}</span>
+                    <span class="margin-r-3 ">{stringToFixed(feeDisplay, 8)}</span>
                     <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>
+                    
                 {/if}
             </div>
             <label class="flex-row chk-container text-primary-dim" class:pay-in-rswp={$payInRswp} id="chk-all">
@@ -136,7 +154,7 @@
     <div class="flex-row flex-align-center ">
         <span class="text-primary-dim">Guaranteed Minimum</span>
         <div class="flex-row flex-align-center">
-            <span class="number margin-r-3 number-span">
+            <span class="margin-r-3">
                 {stringToFixed(minimumReceived, 8)}
             </span>
             <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>

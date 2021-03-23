@@ -83,6 +83,7 @@ export const rswpBalance = derived(tokenBalances, ($tokenBalances) => {
 })
 
 export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
+	console.log({stakingInfoProcessed: $stakingInfoProcessed})
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
 
@@ -93,6 +94,10 @@ export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => 
 		currentPrice = toBigNumberPrecision(rswpMetrics.price, 8)
 	}
 	return  currentPrice
+})
+
+export const rswpMetrics = derived(token_metrics_store, ($token_metrics_store) => {
+	return  $token_metrics_store[config.ammTokenContract] || null
 })
 
 export const rswpPriceUSD = derived(([rswpPrice, tauUSDPrice]), ([$rswpPrice, $tauUSDPrice]) => {

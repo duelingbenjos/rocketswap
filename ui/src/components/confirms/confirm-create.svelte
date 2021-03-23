@@ -95,11 +95,11 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">TAU Deposited</p>
-            <p class="number number-span">{stringToFixed($currencyAmount, 8)}</p>
+            <p>{stringToFixed($currencyAmount, 8)}</p>
         </div>
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">{`${$selectedToken.token_symbol} Deposited`}</p>
-            <p class="number number-span">{stringToFixed($tokenAmount, 8)}</p>
+            <p>{stringToFixed($tokenAmount, 8)}</p>
         </div>
         <ConfirmRates 
             currencyPrice={stringToFixed($pageStats.quoteCalc.prices.currency, 8)}
@@ -108,7 +108,7 @@
         />
         <div class="flex-row modal-confirm-item">
             <p class="text-primary-dim">Share of Pool</p>
-            <p class="number number-span">100%</p>
+            <p>100%</p>
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button style="primary full" loading={loading} callback={createMarket} text="Confirm Create Pair" />
