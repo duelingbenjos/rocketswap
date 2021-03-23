@@ -13,6 +13,7 @@
     export let placeholder = "";
     export let styles = "";
     export let margin = "unset";
+    export let startingValue = 0;
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -35,6 +36,7 @@
     <input class="primaryInput"
         bind:this={inputElm}
         on:input={handleInputChange}
+        value={startingValue}
         {placeholder}
     />
 </label>

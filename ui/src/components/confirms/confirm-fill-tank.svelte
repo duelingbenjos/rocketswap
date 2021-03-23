@@ -61,7 +61,6 @@
 
 <style>
     .modal-style{
-        width: 100vw;
         max-width:350px;
     }
     .modal-confirm-header{
@@ -75,6 +74,7 @@
     }
     @media screen and (min-width: 430px) {
         .modal-style{
+            width: 100vw;
             margin-top: 8rem;
         }
     }

@@ -131,6 +131,8 @@
 	main {
 		height: 100%;
 		width: 100%;
+		max-width: 2040px;
+		margin: 0 auto;
 	}
 
 	@media screen and (min-width: 650px) {
