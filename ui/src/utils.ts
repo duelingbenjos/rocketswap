@@ -415,8 +415,7 @@ export const quoteCalculator = (tokenInfo) => {
 		}
 		let fee = toBigNumberPrecision(currencyPurchased.multipliedBy(feePercent), 8)
 		let currencyPurchasedLessFee = toBigNumberPrecision(currencyPurchased.minus(fee), 8)
-		console.log({currencyPurchased: currencyPurchased.toString()})
-		console.log({currencyPurchasedLessFee: currencyPurchasedLessFee.toString()})
+
 		let pricePaid = currencyPurchased.isGreaterThan(0) ? currencyPurchased.dividedBy(tokenAmount) : false
 
 		return {
@@ -452,25 +451,14 @@ export const quoteCalculator = (tokenInfo) => {
 				minimumCurrencyLessFee: toBigNumber("0.0")
 			}
 		}
+		
 		let slipTolDec = slipTol.dividedBy(100)
 		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
 		let maxSlippagePrice = toBigNumberPrecision(prices.token.multipliedBy(slipTolDecInverted), 8)
 		let minimumCurrency = toBigNumberPrecision(tokenAmount.multipliedBy(maxSlippagePrice), 8)
 		let fee = toBigNumberPrecision(minimumCurrency.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let minimumCurrencyLessFee = toBigNumberPrecision(minimumCurrency.minus(fee), 8)
-		/*
-		console.log({
-			slipTol: slipTol.toString(),
-			slipTolDec: slipTolDec.toString(),
-			slipTolDecInverted: slipTolDecInverted.toString(),
-			tokenAmount: tokenAmount.toString(),
-			prices_currency: prices.currency.toString(),
-			prices_token: prices.token.toString(),
-			maxSlippagePrice: maxSlippagePrice.toString(),
-			tokensPurchased: maxSlippagePrice.toString(),
-			fee: fee.toString(),
-			minimumTokens: minimumCurrency.toString()
-		})*/
+
 		return {
 			minimumCurrency,
 			minimumCurrencyLessFee,
@@ -491,19 +479,7 @@ export const quoteCalculator = (tokenInfo) => {
 		let minimumTokens = toBigNumberPrecision(currencyAmount.multipliedBy(maxSlippagePrice), 8)
 		let fee = toBigNumberPrecision(minimumTokens.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let minimumTokensLessFee = toBigNumberPrecision(minimumTokens.minus(fee), 8)
-		/*
-		console.log({
-			slipTol: slipTol.toString(),
-			slipTolDec: slipTolDec.toString(),
-			slipTolDecInverted: slipTolDecInverted.toString(),
-			currencyAmount: currencyAmount.toString(),
-			prices_currency: prices.currency.toString(),
-			prices_token: prices.token.toString(),
-			maxSlippagePrice: maxSlippagePrice.toString(),
-			minimumTokens: minimumTokens.toString(),
-			fee: fee.toString(),
-			minimumTokensLessFee: minimumTokensLessFee.toString()
-		})*/
+
 		return {
 			minimumTokensLessFee,
 			minimumTokens

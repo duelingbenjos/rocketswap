@@ -83,7 +83,6 @@ export const rswpBalance = derived(tokenBalances, ($tokenBalances) => {
 })
 
 export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
-	console.log({stakingInfoProcessed: $stakingInfoProcessed})
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
 

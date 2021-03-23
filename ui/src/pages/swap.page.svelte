@@ -92,8 +92,6 @@
 		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount)      
 		else quote = quoteCalc.calcSellPrice($tokenAmount)
 
-		console.log("RECALC!!!")
-		
 		pageStats.set({
 			quoteCalc,
 			...quote

@@ -14,14 +14,8 @@
     const { selectedToken, buy, currencyAmount, tokenAmount, tokenLP } = pageStores
 
     pageStats.subscribe(currVal => {
-        console.log(currVal)
         if (currVal){
                 const { fee, rswpFee, tokensPurchased } = currVal
-                console.log({
-                    fee: fee ? fee.toString() : "0",
-                    rswpFee: rswpFee ? rswpFee.toString() : "0",
-                    tokensPurchased: tokensPurchased ? tokensPurchased.toString() : "0"
-                })
         }
     })
 

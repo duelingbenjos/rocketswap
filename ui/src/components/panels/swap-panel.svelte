@@ -66,13 +66,6 @@
 			let quoteCalc = quoteCalculator($tokenLP)
 			let quote = quoteCalc.calcSellPrice($tokenAmount)
 
-			console.log({
-				payInRswp: $payInRswp,
-				buy: $buy,
-				currencyPurchased: quote.currencyPurchased.toString(),
-				currencyPurchasedLessFee: quote.currencyPurchasedLessFee.toString()
-			})
-
 			if ($payInRswp && !$buy){
 				if (quote.currencyPurchased.isGreaterThan(0)){
 					saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchased, 8)))
@@ -81,7 +74,6 @@
 				}
 			}else{
 				if (quote.currencyPurchasedLessFee.isGreaterThan(0)){
-					console.log("WE DOING THIS?!?!")
 					saveStoreValue(currencyAmount, toBigNumber(stringToFixed(quote.currencyPurchasedLessFee, 8)))
 				}else{
 					saveStoreValue(currencyAmount, toBigNumber("0"))
