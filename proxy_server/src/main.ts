@@ -47,16 +47,16 @@ app.use(
 	})
 );
 
-app.use(
-	"/website/",
-	createProxyMiddleware({
-		target: WEBSITE_URL,
-		changeOrigin: true,
-		pathRewrite: {
-			[`^/website/`]: ""
-		}
-	})
-);
+// app.use(
+// 	"/website/",
+// 	createProxyMiddleware({
+// 		target: WEBSITE_URL,
+// 		changeOrigin: true,
+// 		pathRewrite: {
+// 			[`^/website/`]: ""
+// 		}
+// 	})
+// );
 
 app.use(
 	"/",
