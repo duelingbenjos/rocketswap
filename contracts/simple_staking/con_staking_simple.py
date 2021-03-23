@@ -196,13 +196,38 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
             delta = fitTimeToRange(
                 next_epoch['time']) - fitTimeToRange(this_epoch['time'])
 
-        rswp_per_tau_per_second = getEmissionRatePerSecond(this_epoch['emission_rate_per_tau'])
+        rswp_per_tau_per_second = getEmissionRatePerSecond(
+            this_epoch['emission_rate_per_tau'])
 
         y += rswp_per_tau_per_second * amount * delta.seconds
 
         this_epoch_index += 1
 
     return y
+
+# This is only to be called in emergencies - the user will forgo their yield when calling this FN.
+
+@export
+def emergencyReturnStake():
+
+    user = ctx.caller
+    deposits = Deposits[user]
+
+    assert Deposits[user] is not False, "This account has no deposits to return."
+
+    stake_to_return = 0
+
+    for d in deposits:
+        stake_to_return += d['amount']
+
+    STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
+    Deposits[user] = False
+    Withdrawals[user] = 0
+
+    # Remove token amount from Staked
+    new_staked_amount = StakedBalance.get() - stake_to_return
+    StakedBalance.set(new_staked_amount)
+
 
 
 def fitTimeToRange(time: Any):

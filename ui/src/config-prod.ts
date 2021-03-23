@@ -1,11 +1,11 @@
 //Change there for for PROD
-const DOMAIN_NAME = "http://45.63.90.114:5000/"
+const DOMAIN_NAME = "https://rocketswap.exchange/"
 const CURRENCY_SYMBOL = "TAU"
 const CURRENCY_NAME = "Lamden Token"
 const AMM_CONTRACT_NAME = 'con_rocketswap_official_v1'
 const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
-const AMM_TOKEN_STAKING_CONTRACT = "con_staking_dtau_rswp_lst001_4"
+const AMM_TOKEN_STAKING_CONTRACT = "con_simple_staking_tau_rswp_001"
 const AMM_FEE = "0.005"
 const AMM_TOKEN_DISCOUNT = '0.75'
 const NAMES_CONTRACT= "con_rocket_id_v1"
@@ -78,21 +78,6 @@ export const ammStakingValues = {
   discount_floor: 0.505
 }
 
-
-const isConnectionDirect = (): boolean => {
-  const res = window.location.hostname.includes('localhost') ||
-  window.location.hostname.includes('0.0.0.0') ||
-  window.location.hostname.includes('127.0.0.1') ||
-  window.location.hostname.includes('45')
-  console.log(res)
-  return res
-}
-
 export const getBaseUrl = (): string => {
-  console.log({hostname: window.location.hostname})
-  return isConnectionDirect()
-    ? `http://${window.location.hostname}:2053`
-    : '/cxn'
+  return `${window.location.protocol}//${window.location.hostname}:2053`
 }
-
-export const ws_options = isConnectionDirect() ? {} : {path: '/cxn/socket.io'}
