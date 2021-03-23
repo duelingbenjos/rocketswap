@@ -6,6 +6,7 @@ import { PairEntity } from "./entities/pair.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
+import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
 @Controller("api")
@@ -26,6 +27,7 @@ export class AppController {
 	@Get("staking_meta")
 	public async getStakingMeta() {
 		try {
+			log.log(process.env.STAKING_CONTRACTS)
 			return await StakingMetaEntity.find()
 		} catch (err) {
 			throw new HttpException(err, 500);
