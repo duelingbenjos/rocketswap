@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, getContext } from 'svelte'
+	import { createEventDispatcher, getContext, onMount } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
@@ -10,7 +10,7 @@
 	//Misc
 	import { config } from '../../config'
 	import { stringToFixed, toBigNumber, determinePrecision } from '../../utils.js'
-	import { tokenBalances } from '../../store'
+	import { tokenBalances, payInRswp } from '../../store'
 
 	//Props
 	export let label
@@ -36,6 +36,14 @@
 			inputValue = newTokenAmount
 			pressedMaxValue = false;
 		}
+	})
+
+	onMount(() => {
+		payInRswp.subscribe(val => {
+			if ($tokenAmount && typeof inputValue !== 'undefined' && !$buy){
+				if (inputValue > 0) dispatchEvent(inputValue)
+			}
+		})
 	})
 
 	const handleInputChange = (e) => {

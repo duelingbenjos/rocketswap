@@ -17,17 +17,10 @@
     <p class="text-primary-dim">Rates</p>
     <div class="flex-col rates">
         <div class="rate flex-row flex-align-center">
-            <span class="number number-span">1</span>
-            <span >TAU</span>
-            <span class="equals">= </span>
-            <span class="number number-span">{stringToFixed(currencyPrice, 8)}</span>
-            <span >{$selectedToken.token_symbol}</span>
+            <span >{`1 TAU = ${stringToFixed(currencyPrice, 8)} ${$selectedToken.token_symbol}`}</span>
         </div>
         <div class="rate flex-row flex-align-center">
-            <span class="number number-span">1</span>
-            <span class="equals">{$selectedToken.token_symbol} = </span>
-            <span class="number number-span">{stringToFixed(tokenPrice, 8)}</span>
-            <span>TAU</span>
+            <span >{`1 ${$selectedToken.token_symbol} = ${stringToFixed(tokenPrice, 8)} TAU`}</span>
         </div>
     </div>
 </div>

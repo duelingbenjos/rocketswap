@@ -50,14 +50,6 @@
 
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
 
-    /*
-    $: log = console.log({
-        contract_name: stakingInfo?.contract_name,
-        startingYield: userYield?.current_yield.toString(),
-        additionalYield: additionalYield.toString(),
-        currentYield: currentYield.toString()
-    })*/
-    
     onDestroy(() => {
        clearInterval(startTimer)
        startTimer = null

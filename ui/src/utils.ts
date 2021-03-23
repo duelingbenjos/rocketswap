@@ -13,7 +13,9 @@ import {
 	rswpPrice, 
 	earnFilters,
 	payInRswp, 
-	ammFuelTank} from './store'
+	ammFuelTank,
+	ammFuelTank_discount,
+	rswpMetrics} from './store'
 
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
@@ -375,14 +377,23 @@ export const quoteCalculator = (tokenInfo) => {
 		let newCurrencyReserve = currencyReserves.plus(currencyAmount)
 		let newTokenReserve = toBigNumberPrecision(k.dividedBy(newCurrencyReserve), 8)
 		let tokensPurchased = toBigNumberPrecision(tokenReserves.minus(newTokenReserve), 8)
-		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(toBigNumber(config.ammFee)), 8)
+		let feePercent = toBigNumber(config.ammFee)
+		//console.log(feePercent.toString())
+		let userAmmStakingDiscount = get(ammFuelTank_discount)
+		//console.log({userAmmStakingDiscount: userAmmStakingDiscount.toString()})
+		if (userAmmStakingDiscount.isGreaterThan(0)){
+			feePercent = feePercent.multipliedBy(userAmmStakingDiscount)
+		}
+		
+		let fee = toBigNumberPrecision(tokensPurchased.multipliedBy(feePercent), 8)
+		//console.log({fee: fee.toString()})
 		let tokensPurchasedLessFee = toBigNumberPrecision(tokensPurchased.minus(fee), 8)
 		let pricePaid = tokensPurchased.isGreaterThan(0) ? tokensPurchased.dividedBy(currencyAmount) : false
 
 		return {
 			tokensPurchased,
 			fee,
-			rswpFee: calcFeeInRswp_FromTokenFee(fee),
+			rswpFee: calcFeeInRswp_FromTokenFee(fee, feePercent),
 			tokensPurchasedLessFee,
 			pricePaid,
 			...calcMinimumTokens(currencyAmount),
@@ -396,14 +407,21 @@ export const quoteCalculator = (tokenInfo) => {
 		let newTokenReserve = toBigNumberPrecision(tokenReserves.plus(tokenAmount), 8)
 		let newCurrencyReserve = toBigNumberPrecision(k.dividedBy(newTokenReserve), 8)
 		let currencyPurchased = toBigNumberPrecision(currencyReserves.minus(newCurrencyReserve), 8)
-		let fee = toBigNumberPrecision(currencyPurchased.multipliedBy(toBigNumber(config.ammFee)), 8)
+		let userAmmStakingDiscount = get(ammFuelTank_discount)
+		
+		let feePercent = toBigNumber(config.ammFee)
+		if (userAmmStakingDiscount.isGreaterThan(0)){
+			feePercent = feePercent.multipliedBy(userAmmStakingDiscount)
+		}
+		let fee = toBigNumberPrecision(currencyPurchased.multipliedBy(feePercent), 8)
 		let currencyPurchasedLessFee = toBigNumberPrecision(currencyPurchased.minus(fee), 8)
+
 		let pricePaid = currencyPurchased.isGreaterThan(0) ? currencyPurchased.dividedBy(tokenAmount) : false
 
 		return {
 			currencyPurchased,
 			fee,
-			rswpFee: calcFeeInRswp_FromCurrencyFee(fee),
+			rswpFee: calcFeeInRswp_FromCurrencyFee(fee, feePercent),
 			currencyPurchasedLessFee,
 			pricePaid,
 			...calcMinimumCurrency(tokenAmount),
@@ -433,25 +451,14 @@ export const quoteCalculator = (tokenInfo) => {
 				minimumCurrencyLessFee: toBigNumber("0.0")
 			}
 		}
+		
 		let slipTolDec = slipTol.dividedBy(100)
 		let slipTolDecInverted = toBigNumber(1).minus(slipTolDec)
 		let maxSlippagePrice = toBigNumberPrecision(prices.token.multipliedBy(slipTolDecInverted), 8)
 		let minimumCurrency = toBigNumberPrecision(tokenAmount.multipliedBy(maxSlippagePrice), 8)
 		let fee = toBigNumberPrecision(minimumCurrency.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let minimumCurrencyLessFee = toBigNumberPrecision(minimumCurrency.minus(fee), 8)
-		/*
-		console.log({
-			slipTol: slipTol.toString(),
-			slipTolDec: slipTolDec.toString(),
-			slipTolDecInverted: slipTolDecInverted.toString(),
-			tokenAmount: tokenAmount.toString(),
-			prices_currency: prices.currency.toString(),
-			prices_token: prices.token.toString(),
-			maxSlippagePrice: maxSlippagePrice.toString(),
-			tokensPurchased: maxSlippagePrice.toString(),
-			fee: fee.toString(),
-			minimumTokens: minimumCurrency.toString()
-		})*/
+
 		return {
 			minimumCurrency,
 			minimumCurrencyLessFee,
@@ -472,66 +479,85 @@ export const quoteCalculator = (tokenInfo) => {
 		let minimumTokens = toBigNumberPrecision(currencyAmount.multipliedBy(maxSlippagePrice), 8)
 		let fee = toBigNumberPrecision(minimumTokens.multipliedBy(toBigNumber(config.ammFee)), 8)
 		let minimumTokensLessFee = toBigNumberPrecision(minimumTokens.minus(fee), 8)
-		/*
-		console.log({
-			slipTol: slipTol.toString(),
-			slipTolDec: slipTolDec.toString(),
-			slipTolDecInverted: slipTolDecInverted.toString(),
-			currencyAmount: currencyAmount.toString(),
-			prices_currency: prices.currency.toString(),
-			prices_token: prices.token.toString(),
-			maxSlippagePrice: maxSlippagePrice.toString(),
-			minimumTokens: minimumTokens.toString(),
-			fee: fee.toString(),
-			minimumTokensLessFee: minimumTokensLessFee.toString()
-		})*/
+
 		return {
 			minimumTokensLessFee,
 			minimumTokens
 		}
 	}
 
-	const calcFeeInRswp_FromCurrencyFee = (amount) => {
-		let rswpAmount = get(rswpPrice).multipliedBy(amount)
-		/*
-		console.log({
-			'rswpPrice': get(rswpPrice).toString(),
-			rswpAmount: rswpAmount.toString()
-		})
-		*/
-		return rswpAmount
-		// fee is usually 0.3%
-		// fee paid in RSWP is the value of the TOKEN or currency in RSWAP
+	const calcFeeInRswp_FromCurrencyFee = (feeAmount, feePercent) => {
+		let rswpPairInfo = get(rswpMetrics)
+		if (!rswpPairInfo) return
 
-		// get the amount of the fee in tokens
+		let tokenDiscount = toBigNumber(config.ammTokenDiscount)
+		//console.log({tokenDiscount: tokenDiscount.toString()})
 
+		feeAmount = feeAmount.multipliedBy(tokenDiscount)
+		//console.log({feeAmount: feeAmount.toString()})
+
+
+		let rswpCurrencyReserves = toBigNumber(rswpPairInfo.reserves[0])
+		let rswpTokenReserves = toBigNumber(rswpPairInfo.reserves[1])
+
+		let rswpK = rswpCurrencyReserves.multipliedBy(rswpTokenReserves)
+		let rswpNewCurrencyReserve = rswpCurrencyReserves.plus(feeAmount)
+		rswpNewCurrencyReserve = rswpNewCurrencyReserve.plus(feeAmount.multipliedBy(feePercent))
+		let rswpNewTokenReserve = rswpK.dividedBy(rswpNewCurrencyReserve)
+
+		return rswpTokenReserves.minus(rswpNewTokenReserve)
 	}
-	const calcFeeInRswp_FromTokenFee = (amount) => {
-		let tokenFeeToCurrency = prices.token.multipliedBy(amount)
-		let rswpAmount = get(rswpPrice).multipliedBy(tokenFeeToCurrency)
-		/*
-		console.log({
-			'rswpPrice': get(rswpPrice).toString(),
-			tokenFeeToCurrency: tokenFeeToCurrency.toString(),
-			rswpAmount: rswpAmount.toString()
-		})*/
-		return rswpAmount
-		// fee is usually 0.3%
-		// fee paid in RSWP is the value of the TOKEN or currency in RSWAP
+	const calcFeeInRswp_FromTokenFee = (feeAmount, feePercent) => {
+		//console.log({feeAmount: feeAmount.toString()})
+		//console.log({feePercent: feePercent.toString()})
+		let rswpPairInfo = get(rswpMetrics)
+		if (!rswpPairInfo) return
+
+		let tokenDiscount = toBigNumber(config.ammTokenDiscount)
+		//console.log({tokenDiscount: tokenDiscount.toString()})
+
+		feeAmount = feeAmount.multipliedBy(tokenDiscount)
+		//console.log({feeAmount: feeAmount.toString()})
+
+		let k = toBigNumberPrecision(currencyReserves.multipliedBy(tokenReserves), 8)
+		//console.log({k: k.toString()})
+
+		let newTokenReserve = tokenReserves.plus(feeAmount)
+		//console.log({newTokenReserve: newTokenReserve.toString()})
+
+		let newCurrencyReserve = toBigNumberPrecision(k.dividedBy(newTokenReserve), 8)
+		//console.log({newCurrencyReserve: newCurrencyReserve.toString()})
+
+		let currencyPurchased = toBigNumberPrecision(currencyReserves.minus(newCurrencyReserve), 8)
+		//console.log({currencyPurchased: currencyPurchased.toString()})
+
+		currencyPurchased = currencyPurchased.plus(toBigNumberPrecision(currencyPurchased.multipliedBy(feePercent), 8))
+		//console.log({currencyPurchased: currencyPurchased.toString()})
+
+
+		let rswpCurrencyReserves = toBigNumber(rswpPairInfo.reserves[0])
+		let rswpTokenReserves = toBigNumber(rswpPairInfo.reserves[1])
+
+		let rswpK = rswpCurrencyReserves.multipliedBy(rswpTokenReserves)
+		let rswpNewCurrencyReserve = rswpCurrencyReserves.plus(currencyPurchased)
+		rswpNewCurrencyReserve = rswpNewCurrencyReserve.plus(currencyPurchased.multipliedBy(feePercent))
+		let rswpNewTokenReserve = rswpK.dividedBy(rswpNewCurrencyReserve)
+
+		return rswpTokenReserves.minus(rswpNewTokenReserve)
 	}
 
 	return {
 		prices,
 		currencyReserves,
 		tokenReserves,
-			toBigNumber,
-			isBigNumber,
-			calcCurrencyValue,
-			calcTokenValue,
-			calcLpPercent,
-			calcTokenValueInCurrency,
-			calcNewShare, calcNewShare_removeTokens,
-			calcPointsPerCurrency,
+		toBigNumber,
+		isBigNumber,
+		calcCurrencyValue,
+		calcTokenValue,
+		calcLpPercent,
+		calcTokenValueInCurrency,
+		calcNewShare, calcNewShare_removeTokens,
+		calcPointsPerCurrency,
 		calcNewLpMintAmount, calcInitialLpMintAmount,
 		calcAmountsFromLpTokens,
 		calcBuyPrice, calcSellPrice,

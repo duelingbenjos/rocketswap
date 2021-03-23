@@ -55,7 +55,6 @@
 
 <style>
     .modal-style{
-        width: 100vw;
         max-width: 400px;
     }
     .sub-text{
@@ -71,6 +70,7 @@
 
     @media screen and (min-width: 430px) {
         .modal-style{
+            width: 100vw;
             margin-top: 8rem;
         }
     }
@@ -84,7 +84,7 @@
     </div>
     <div class="flex-col text-large to-receive">
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span class="number-reg">{stringToFixed($pageStats.amounts.token, 8)}</span>
+            <span>{stringToFixed($pageStats.amounts.token, 8)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span>{$selectedToken.token_symbol}</span>
                 <TokenLogo tokenMeta={$selectedToken} width="30px" margin={"0 0 0 10px"}/>
@@ -92,7 +92,7 @@
         </div>
         <PlusSign width="18px" margin="0" />
         <div class="flex-row flex-center-spacebetween amount-row">
-            <span class="number-reg">{stringToFixed($pageStats.amounts.currency, 8)}</span>
+            <span>{stringToFixed($pageStats.amounts.currency, 8)}</span>
             <div class="flex-row flex-center-spacebetween">
                 <span >{config.currencySymbol}</span>
                 <LamdenLogo width={'30px'} margin={"0 0 0 10px"}/>
@@ -105,7 +105,7 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row flex-align-center modal-confirm-item">
             <p class="text-primary-dim">{`Pool Tokens Burned`}</p>
-            <p class="number number-span">{stringToFixed($lpTokenAmount, 4)}</p>
+            <p>{stringToFixed($lpTokenAmount, 4)}</p>
         </div>
         <ShareChange />
         <div class="modal-confirm-buttons flex-col">

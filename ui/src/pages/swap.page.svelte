@@ -91,22 +91,7 @@
 		let quote;
 		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount)      
 		else quote = quoteCalc.calcSellPrice($tokenAmount)
-/*
-		console.log("SWAP PAGE - UPDATE_PAGE_STATS")
-		console.log({
-			fee: quote.fee.toPrecision(8),
-			new_price_currency: quote.newPrices.currency.toPrecision(8),
-			new_price_token: quote.newPrices.token.toPrecision(8),
-			new_reserves_currency:  quote.newPrices.reserves[0].toPrecision(8),
-			new_reserves_token:  quote.newPrices.reserves[1].toPrecision(8),
-			price_currency: quoteCalc.prices.currency.toPrecision(8),
-			price_token: quoteCalc.prices.token.toPrecision(8),
-			reserves_currency:  quoteCalc.prices.reserves[0].toPrecision(8),
-			reserves_token:  quoteCalc.prices.reserves[1].toPrecision(8),
-			tokensPurchased: quote.tokensPurchased.toPrecision(8),
-			tokensPurchasedLessFee: quote.tokensPurchasedLessFee.toPrecision(8)
-		})*/
-		
+
 		pageStats.set({
 			quoteCalc,
 			...quote

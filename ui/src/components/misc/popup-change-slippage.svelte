@@ -22,7 +22,13 @@
 		if (validateValue !== e.target.value) {
 			inputElm.value = validateValue
 		}else{
-			setSlippageTolerance(toBigNumber(validateValue))
+            let slippageTol = toBigNumber(validateValue)
+            if (slippageTol.isGreaterThan(49)) {
+                inputElm.value = "49"
+                inputVal = "49"
+                slippageTol = toBigNumber(49)
+            }
+			setSlippageTolerance(slippageTol)
 		}
     }
 

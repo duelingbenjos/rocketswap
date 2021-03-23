@@ -95,6 +95,10 @@ export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => 
 	return  currentPrice
 })
 
+export const rswpMetrics = derived(token_metrics_store, ($token_metrics_store) => {
+	return  $token_metrics_store[config.ammTokenContract] || null
+})
+
 export const rswpPriceUSD = derived(([rswpPrice, tauUSDPrice]), ([$rswpPrice, $tauUSDPrice]) => {
 	if ($rswpPrice.isGreaterThan(0) && $tauUSDPrice) return $rswpPrice.multipliedBy($tauUSDPrice)
 	else toBigNumber("0")

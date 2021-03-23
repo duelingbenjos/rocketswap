@@ -28,7 +28,7 @@
     let loading = false;
 
     $: isAMMTokenFarmContract = config.ammTokenContract === stakingInfo.contract_name
-    $: withdrawAmount = toBigNumber("0");
+    $: withdrawAmount = currentYield;
     $: withdrawAmountOverBalance = withdrawAmount.isGreaterThan(currentYield);
     $: withdrawAmountLessFee = isAMMTokenFarmContract ? withdrawAmount?.multipliedBy(0.9) || toBigNumber("0") : withdrawAmount;
 
@@ -66,7 +66,6 @@
 
 <style>
     .modal-style{
-        width: 100vw;
         max-width:350px;
     }
     .modal-confirm-header{
@@ -85,6 +84,7 @@
     }
     @media screen and (min-width: 430px) {
         .modal-style{
+            width: 100vw;
             margin-top: 8rem;
         }
     }
@@ -102,7 +102,7 @@
             <TokenLogo tokenMeta={yieldToken} width={logoSize}  margin="0 10px 0 0" />
             {yieldToken.token_symbol}
         </div>
-        <InputNumber placeholder="0" on:input={handleAmountInput} margin="0.25rem 0 1rem"/>
+        <InputNumber placeholder="0" on:input={handleAmountInput} startingValue={stringToFixed(currentYield, 8)} margin="0.25rem 0 1rem"/>
     </div>
     {#if config.ammTokenContract === stakingInfo.contract_name}
         <p class="text-xsmall sub-text text-primary-dim">
@@ -115,8 +115,8 @@
             <span class="weight-600 flex-grow text-align-right">{stringToFixed(currentYield, 8)}</span>
         </div>
         <div class="flex-row">
-            <span><strong class="symbol-horizontal text-color-secondary">{yieldToken.token_symbol}</strong> Get:</span>
-            <span class="weight-600 flex-grow text-align-right">{stringToFixed(withdrawAmountLessFee, 8)}</span>
+            <span>Get:</span>
+            <span class="weight-600 flex-grow text-align-right">{stringToFixed(withdrawAmountLessFee, 8)} <strong class="symbol-horizontal text-color-secondary">{yieldToken.token_symbol}</strong></span>
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button style="secondary" 
