@@ -28,7 +28,11 @@ export class AppController {
 	public async getStakingMeta() {
 		try {
 			log.log(process.env.STAKING_CONTRACTS)
-			return await StakingMetaEntity.find()
+			const ents = await StakingMetaEntity.find()
+			return {
+				env: process.env.STAKING_CONTRACTS,
+				ents
+			}
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
