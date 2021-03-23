@@ -34,6 +34,7 @@ services:
       - CURRENCY_SYMBOL=TAU
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
+      - CONTEXT=remote
       - STAKING_CONTRACTS=con_simple_staking_tau_rswp_001
 
   docs:
