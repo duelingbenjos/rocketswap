@@ -77,16 +77,6 @@ export const ammStakingValues = {
   discount_floor: 0.505
 }
 
-// const isConnectionDirect = (): boolean => {
-//   const res =
-//     window.location.hostname.includes('localhost') ||
-//     window.location.hostname.includes('0.0.0.0') ||
-//     window.location.hostname.includes('127.0.0.1') ||
-//     window.location.hostname.includes('45')
-//   console.log(res)
-//   return res
-// }
-
 export const getBaseUrl = (): string => {
   return `${window.location.protocol}//${window.location.hostname}:2053`
 }
