@@ -3,6 +3,7 @@ import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { PairEntity } from "./entities/pair.entity";
+import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { decideLogo } from "./utils/utils";
@@ -17,6 +18,15 @@ export class AppController {
 			const amm_meta_entity = await AmmMetaEntity.findOne()
 			if (!amm_meta_entity) throw "AMM Meta Entity does not exist"
 			return amm_meta_entity
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
+	@Get("staking_meta")
+	public async getStakingMeta() {
+		try {
+			return await StakingMetaEntity.find()
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
