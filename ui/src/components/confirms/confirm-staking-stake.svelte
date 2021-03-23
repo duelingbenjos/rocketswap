@@ -13,7 +13,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { stringToFixed, toBigNumberPrecision } from '../../utils'
+    import { stringToFixed, toBigNumberPrecision, stakingCalculator } from '../../utils'
 
     //Props
     export let stakingInfo;
@@ -27,6 +27,8 @@
     let loading = false;
 
     $: EmissionRatePerYear = stakingInfo?.EmissionRatePerHour.multipliedBy(24).multipliedBy(365);
+    $: stakingCalcs = stakingCalculator(stakingInfo);
+
 
     const success = () => {
         clearInput();
@@ -116,8 +118,8 @@
         <div class="flex-row">
             <span class="flex-grow text-primary-dim">APY:</span>
             <div class="flex-col flex-align-end ">
-                <span class="weight-600">{EmissionRatePerYear}</span>
-                <span class="text-primary-dimmer">{stakingInfo.EmissionRatePerHour}/hour</span>
+                <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
+                <!-- <span class="text-primary-dimmer">{stakingInfo.EmissionRatePerHour}/hour</span> -->
             </div>
         </div>
         <div class="modal-confirm-buttons flex-col">
