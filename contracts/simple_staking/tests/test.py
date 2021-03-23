@@ -444,6 +444,23 @@ class MyTestCase(unittest.TestCase):
         deposits = self.contract.Deposits['bob']
         self.assertEqual(deposits, False)
 
+    def test_16_emergencyReturnStake(self):
+
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+
+        self.contract.emergencyReturnStake(signer="bob")
+        deposits = self.contract.Deposits['bob']
+        self.assertEqual(deposits, False)
+
+        bob_balance = self.currency.balances["bob"]
+        self.assertEqual(bob_balance, 1000)
+
+        with self.assertRaises(AssertionError):
+            self.assertEqual(bob_balance, 0)
+
 
 if __name__ == '__main__':
     unittest.main()

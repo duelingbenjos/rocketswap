@@ -1,13 +1,12 @@
 # Imports
 
 import currency
-import con_basic_token
+import con_rswp_lst001
 
 # Setup Tokens
 
 STAKING_TOKEN = currency
-YIELD_TOKEN = con_basic_token
-
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
@@ -19,7 +18,6 @@ StartTime = Variable()
 EndTime = Variable()
 OpenForBusiness = Variable()  # If false, users will be unable to join the pool
 
-Users = Hash(default_value=False)
 Deposits = Hash(default_value=False)
 Withdrawals = Hash(default_value=0)
 CurrentEpochIndex = Variable()
@@ -37,7 +35,7 @@ def seed():
     DevRewardWallet.set(ctx.caller)
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
-    EmissionRatePerTauYearly.set(5)
+    EmissionRatePerTauYearly.set(10)
 
     Epochs[0] = {
         "time": now,
@@ -47,17 +45,17 @@ def seed():
         getEmissionRatePerSecond(EmissionRatePerTauYearly.get()))
 
     meta['version'] = '0.0.1'
-    meta['type'] = 'staking_simple'  # staking || lp_farming
+    meta['type'] = 'staking_simple'  # staking || lp_farming || simple_staking
     meta['STAKING_TOKEN'] = 'currency'
-    meta['YIELD_TOKEN'] = 'con_basic_token'
+    meta['YIELD_TOKEN'] = 'con_rswp_lst001'
 
     DevRewardPct.set(0.1)
 
     # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
+    StartTime.set(datetime.datetime(year=2021, month=3, day=24, hour=22))
     # The datetime at which you want staking to finish.
     # Participants will stop accruing interest after this time.
-    EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
+    EndTime.set(datetime.datetime(year=2022, month=3, day=24, hour=22))
 
     OpenForBusiness.set(True)
 
@@ -205,25 +203,6 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
 
     return y
 
-# This is only to be called in emergencies - the user will forgo their yield when calling this FN.
-
-@export
-def emergencyReturnStake():
-
-    user = ctx.caller
-    deposits = Deposits[user]
-
-    assert Deposits[user] is not False, "This account has no deposits to return."
-
-    stake_to_return = 0
-
-    for d in deposits:
-        stake_to_return += d['amount']
-
-    STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
-    Deposits[user] = False
-    Withdrawals[user] = 0
-
 
 def fitTimeToRange(time: Any):
     if time < StartTime.get():
@@ -261,6 +240,24 @@ def incrementEpoch(emission_rate_per_tau: float):
     }
     return new_epoch_idx
 
+# This is only to be called in emergencies - the user will forgo their yield when calling this FN.
+
+@export
+def emergencyReturnStake():
+
+    user = ctx.caller
+    deposits = Deposits[user]
+
+    assert Deposits[user] is not False, "This account has no deposits to return."
+
+    stake_to_return = 0
+
+    for d in deposits:
+        stake_to_return += d['amount']
+
+    STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
+    Deposits[user] = False
+    Withdrawals[user] = 0
 
 @export
 def setOwner(vk: str):
