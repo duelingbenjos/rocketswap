@@ -125,7 +125,7 @@
                         styles="min-width: 20px;" 
                     /> 
                     <span>
-                        Instant 30% discount on fees when paying in RSWP.
+                        Instant 25% discount on fees when paying in RSWP.
                     </span>
                 </div>
 
@@ -137,7 +137,7 @@
                         styles="min-width: 20px;" 
                     /> 
                     <span>
-                        Additional discount on fees depending on how much RSWP is in your Fuel Tank
+                        Additional discount on fees depending on how much RSWP is in your Fuel Tank.
                     </span>
                 </div>
             </div>
