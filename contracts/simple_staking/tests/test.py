@@ -445,15 +445,25 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(deposits, False)
 
     def test_16_emergencyReturnStake(self):
+        env_1 = {'now': Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {'now': Datetime(year=2021, month=1, day=1, hour=3)}
 
         self.contract.addStakingTokens(
+            environment=env_1,
             signer="bob", amount=10)
         self.contract.addStakingTokens(
+            environment=env_1,
             signer="bob", amount=10)
+
+        self.contract.withdrawYield(
+            environment=env_2, signer="bob", amount=1500)
 
         self.contract.emergencyReturnStake(signer="bob")
         deposits = self.contract.Deposits['bob']
         self.assertEqual(deposits, False)
+
+        withdrawals = self.contract.Withdrawals['bob']
+        self.assertEqual(withdrawals, 0)
 
         bob_balance = self.currency.balances["bob"]
         self.assertEqual(bob_balance, 1000)
