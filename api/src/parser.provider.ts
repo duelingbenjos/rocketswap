@@ -119,7 +119,7 @@ export class ParserProvider {
 				state,
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
-			await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp, hash, ParserProvider.amm_meta_entity.TOKEN_CONTRACT);
+			await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp, hash, ParserProvider.amm_meta_entity?.TOKEN_CONTRACT);
 			await savePrice(state, this.socketService.handleClientUpdate);
 			await updateAmmMeta({
 				state,

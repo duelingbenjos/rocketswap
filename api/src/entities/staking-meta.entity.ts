@@ -175,13 +175,13 @@ export const updateROI = async () => {
 } 
 
 export const calculateROI = async (yearly_emission_rate: number) => {
-	const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity.TOKEN_CONTRACT)
+	const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity?.TOKEN_CONTRACT)
 	if (rswp_entity && rswp_entity.price) {
 
 		const apy = Math.round((parseFloat(rswp_entity.price) * yearly_emission_rate) * 100)
 		return apy
 	}
-	return false
+	// return false
 }
 
 const updateMetaProperty = (metadata: any, key: string, value: string) => {

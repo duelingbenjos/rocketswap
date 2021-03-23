@@ -61,7 +61,7 @@ export async function savePrice(
 
 	await Promise.all([price_entity.save(), pair_entity.save()]);
 
-	if (contract_name === ParserProvider.amm_meta_entity.TOKEN_CONTRACT) await updateROI()
+	if (contract_name === ParserProvider.amm_meta_entity?.TOKEN_CONTRACT) await updateROI()
 }
 
 export async function getTokenMetrics(contract_name: string) {
