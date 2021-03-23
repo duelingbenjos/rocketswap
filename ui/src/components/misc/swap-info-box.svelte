@@ -124,7 +124,6 @@
                 {:else}
                     <span class="margin-r-3 ">{stringToFixed(feeDisplay, 8)}</span>
                     <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>
-                    
                 {/if}
             </div>
             <label class="flex-row chk-container text-primary-dim" class:pay-in-rswp={$payInRswp} id="chk-all">
