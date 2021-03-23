@@ -458,7 +458,7 @@ class MyTestCase(unittest.TestCase):
         self.contract.withdrawYield(
             environment=env_2, signer="bob", amount=1500)
 
-        self.contract.emergencyReturnStake(signer="bob")
+        self.contract.emergencyReturnStake(environment=env_2, signer="bob")
         deposits = self.contract.Deposits['bob']
         self.assertEqual(deposits, False)
 

@@ -224,6 +224,11 @@ def emergencyReturnStake():
     Deposits[user] = False
     Withdrawals[user] = 0
 
+    # Remove token amount from Staked
+    new_staked_amount = StakedBalance.get() - stake_to_return
+    StakedBalance.set(new_staked_amount)
+
+
 
 def fitTimeToRange(time: Any):
     if time < StartTime.get():
