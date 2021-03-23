@@ -9,6 +9,7 @@
     // Components
     import InputSpecific from '../inputs/input-specific.svelte'
     import ConfirmFillTank from '../confirms/confirm-fill-tank.svelte'
+    import ConfirmEmptyTank from '../confirms/confirm-empty-tank.svelte'
     import Modal from '../misc/modal.svelte'
 
     //Services
@@ -22,7 +23,10 @@
 
     const { rswpToken } = getContext('rswpContext')
 
+    const minimumStakeRequired = toBigNumber(1361)
+
     let showFillTankConfirm = false;
+    let showRemoveAllStakeConfirm = false;
     let clearInput
 
     $: fillAmount = null;
@@ -32,10 +36,12 @@
     $: isfillAmount = fillAmount?.isGreaterThan(0);
     $: newPercent = calcNewPercet(fillAmount);
     $: newPercentDisplay = newPercent?.multipliedBy(100);
+    $: hasStake = $ammFuelTank_stakedAmount.isGreaterThan(1);
     $: addingMore = $ammFuelTank_stakedAmount?.isLessThan(fillAmount);
     $: differenceInAmount = fillAmount ? $ammFuelTank_stakedAmount?.minus(fillAmount) : toBigNumber("0");
     $: same = stringToFixed(newPercentDisplay, 2) ===  stringToFixed(tankPercentDisplay, 2)
     $: insufficientRSWP = fillAmount?.isGreaterThan($rswpBalance) || false;
+    $: minimumStakeMet = fillAmount?.isGreaterThanOrEqualTo(minimumStakeRequired);
 
     const calcNewPercet = (value) => {
         if (!value) return null
@@ -72,6 +78,16 @@
             showFillTankConfirm = force;
         }
     }
+
+    const openRemoveAllStakeConfirm = () => toggleRemoveAllStakeConfirm(true)
+    const toggleRemoveAllStakeConfirm = (e, force = null) => {
+        if (force === null){
+            if (showRemoveAllStakeConfirm) showRemoveAllStakeConfirm = false
+            else showRemoveAllStakeConfirm = true
+        }else{
+            showRemoveAllStakeConfirm = force;
+        }
+    }
 </script>
 
 <style>
@@ -100,14 +116,23 @@
         top: 12px;
         left: 25px;
     }
+    .discount-row{
+        margin: 0 0 -0.5rem;
+    }
     .buttons{
         margin-top: 1rem;
     }
     .buttons > button{
         margin: 0 4px;
     }
+    button.small{
+        margin: 0 0 0.25rem;
+    }
     .text-massive{
         margin: 0rem auto 0;
+    }
+    .min-stake-msg{
+        margin: 3px 0 0 0;
     }
     .staked{
         margin-bottom: 0;
@@ -139,32 +164,43 @@
                 </div>
             </div>
         </div>
-        <span>Current Trade Fee Discount:</span>  
-        <span 
-            class="text-massive weight-600" 
-            class:text-error={fillAmount && !addingMore && !same}
-            class:text-success={fillAmount && addingMore && !same}>
-            {stringToFixed(newPercentDisplay ? newPercentDisplay : tankPercentDisplay, 2)}%
-        </span>
+        <div class="flex-row flex-align-center discount-row">
+            <span class="flex-grow">Trade Fee Discount:</span>  
+            <span 
+                class="text-massive weight-600" 
+                class:text-error={fillAmount && !addingMore && !same}
+                class:text-success={fillAmount && addingMore && !same}>
+                {stringToFixed(newPercentDisplay ? newPercentDisplay : tankPercentDisplay, 2)}%
+            </span>
+        </div>
+
 
         <div class="flex-grow flex-col flex-justify-spacearound">
             <div class="staked flex-row">
                 <span class="flex-grow">Staked:</span>
                 <span class="weight-600">{stringToFixed($ammFuelTank_stakedAmount, 8)} <strong class="text-shadow text-color-primary">{config.ammTokenSymbol}</strong></span>
             </div>
+            <div class="flex flex-justify-end">
+                <button class="primary small" on:click={openRemoveAllStakeConfirm} disabled={!hasStake}>remove all</button>
+            </div>
             <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} small={true} bind:clearInput/>
-            <div class="flex-row flex-center-center buttons">
+            <div class="flex-col flex-center-center buttons">
                 <button class="text-color-white primary" on:click={openFillTankConfirm} disabled={!isfillAmount || same || insufficientRSWP}>
                     {#if isfillAmount}
                         {#if insufficientRSWP}
                             {`Insufficient ${config.ammTokenSymbol} Balance`}
                         {:else}
-                            {addingMore ? 'Add' : 'Remove'} {stringToFixed(differenceInAmount.absoluteValue(), 8)} {config.ammTokenSymbol}
+                            {#if minimumStakeMet}
+                                {addingMore ? 'Add' : 'Remove'} {stringToFixed(differenceInAmount.absoluteValue(), 8)} {config.ammTokenSymbol}
+                            {:else}
+                                {`Minimum Stake 1361 RSWP`}
+                            {/if}
                         {/if}
                     {:else}
                         Enter Fuel Amount
                     {/if}
                 </button>
+                <p class="min-stake-msg text-xsmall text-color-white">Minimum Stake is 1361 RSWP</p>
             </div>
         </div>
     </div>
@@ -181,6 +217,22 @@
                 newFillAmount={fillAmount}
                 {addingMore}
                 {differenceInAmount}
+                {clearInput} />
+        </div>
+    </Modal>
+{/if}
+
+{#if showRemoveAllStakeConfirm}
+    <Modal toggleModal={toggleRemoveAllStakeConfirm} open={openRemoveAllStakeConfirm}>
+        <div slot="main">
+            <ConfirmEmptyTank
+                closeConfirm={toggleRemoveAllStakeConfirm} 
+                currentDiscount={tankPercentDisplay}
+                newDiscount={toBigNumber("0.0")}
+                currentFillAmount={$ammFuelTank_stakedAmount}
+                newFillAmount={toBigNumber("1")}
+                addingMore={false}
+                differenceInAmount={$ammFuelTank_stakedAmount.minus(1)}
                 {clearInput} />
         </div>
     </Modal>
