@@ -2,7 +2,7 @@
 const DOMAIN_NAME = "https://rocketswap.exchange"
 const CURRENCY_SYMBOL = "TAU"
 const CURRENCY_NAME = "Lamden Token"
-const AMM_CONTRACT_NAME = 'con_rocketswap_official_v1'
+const AMM_CONTRACT_NAME = 'con_rocketswap_official_v1_1'
 const AMM_TOKEN_CONTRACT = "con_rswp_lst001"
 const AMM_TOKEN_SYMBOL = "RSWP"
 const AMM_TOKEN_STAKING_CONTRACT = "con_simple_staking_tau_rswp_001"
@@ -19,7 +19,7 @@ export const contract_blacklist = [
 
 export const connectionRequest = {
   appName: 'RocketSwap',
-  version: '1.0.0', //Change for PROD
+  version: '1.0.1', //Change for PROD
   logo: 'assets/images/RS_Logo.png',
   background: 'assets/images/background.jpeg',
   contractName: AMM_CONTRACT_NAME, //Change for PROD
