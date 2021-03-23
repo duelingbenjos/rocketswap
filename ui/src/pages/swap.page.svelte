@@ -36,6 +36,7 @@
 	let tokenLP = writable()
 	let buy = writable(true)
 	let txOkay = writable(true)
+	let priceImpactTooHigh = writable(false)
 
 	let pageStores = {
 		currencyAmount,
@@ -44,7 +45,8 @@
 		buy,
 		tokenLP,
 		payInRswp,
-		txOkay
+		txOkay,
+		priceImpactTooHigh
 	}
 
 	let pageUtilites = pageUtils(pageStores)
@@ -92,6 +94,12 @@
 		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount)      
 		else quote = quoteCalc.calcSellPrice($tokenAmount)
 
+		let slippage = $buy ?  quote.currencySlippage : quote.tokenSlippage;
+		console.log({slippage})
+		if (slippage){
+			priceImpactTooHigh.set(slippage.isGreaterThan($slippageTolerance))
+		}
+		console.log("recalc")
 		pageStats.set({
 			quoteCalc,
 			...quote

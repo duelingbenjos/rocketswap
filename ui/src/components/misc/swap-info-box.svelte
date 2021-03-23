@@ -111,7 +111,7 @@
         </div>
     </div>
     <div class="flex-row flex-align-center ">
-        <span class="text-primary-dim">Price Impact</span>
+        <span class="text-primary-dim">Price Impact (slippage)</span>
         <span
               class:text-warning={slippage.isFinite() && percentOfTolerance.isGreaterThanOrEqualTo(0.75)}
               class:text-error={slippage.isFinite() && slippage.isGreaterThanOrEqualTo($slippageTolerance)}>
