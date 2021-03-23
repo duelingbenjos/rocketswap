@@ -33,6 +33,10 @@
 	const logout = () => {
 		walletService.logout()
 	}
+
+	onMount(() => {
+		console.log(window.location)
+	})
 </script>
 
 
@@ -150,7 +154,7 @@
 
     }
 	/* When page width is greater than 475px (tablets) */
-	 @media screen and (min-width: 475px) {
+	 @media screen and (min-width: 830px) {
 		.powered-by{
 			display: block;
 			position: relative;
@@ -200,6 +204,10 @@
 					</a> 
 				{/if}
 			{/each}
+			<a href="{`${window.location.protocol}//${config.docs_subdomain}.${window.location.hostname}`}" on:click={handleLinkClick}
+				rel="noopener noreferrer" target="_blank"> 
+				{"Docs"} 
+			</a> 
 		</div>
 		<LightDark />
 	</div>
@@ -225,6 +233,13 @@
 					</div>
 				{/if}
 			{/each}
+				<div class="mobile-link flex-row flex-center-center">
+					<a  class="text-xxlarge weight-400"
+						href="{`${window.location.protocol}//${config.docs_subdomain}.${window.location.hostname}`}" on:click={handleLinkClick}
+						rel="noopener noreferrer" target="_blank"> 
+						{"Docs"} 
+					</a> 
+				</div>
 			{#if $walletAddress}
 				<button class="logout flex flex-center-center primary outline " on:click={logout} title="logout">
 						<AntennaIcon width="20px" margin="0 8px 0 0" /> Logout
