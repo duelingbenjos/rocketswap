@@ -231,7 +231,7 @@
 				</button>
 			{/if}
 			<div class="light-dark-button">
-				<LightDark margin="0 auto"/>
+				<LightDark margin="1rem auto"/>
 			</div>
 			<div class="flex flex-grow flex-align-end">
         		<Socials width="30px" margin="2rem auto"  color="white" stroke="black" iconMargin="0 8px"/>

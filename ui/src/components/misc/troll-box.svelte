@@ -211,6 +211,19 @@
         }
     }
 
+    /* When page width is greater than 430px (tablets) */
+    @media screen and (min-width: 2040px) {
+        .troll-box{
+			left: calc(50% + 1020px);
+    		transform: translate(-50%, 0px);
+            max-width: 650px;
+		}
+        .box-is-open{
+            height: 550px;
+            opacity: 1;
+        }
+    }
+
 </style>
 
 <div class="troll-box" class:box-is-open={$trollBoxOpen} class:half-opacity={!$trollBoxOpen}>

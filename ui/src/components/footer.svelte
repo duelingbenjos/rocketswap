@@ -101,7 +101,7 @@
 		position: relative;
 		min-height: 35px;
 		min-width: 150px;
-		padding-right: 10px;
+		padding: 0 10px;
 		padding-bottom: 6px;
 		background-color: var(--color-secondary);
 		border-radius: var(--border-radius);
@@ -116,9 +116,8 @@
 		
 	}
 	.balance {
-		padding-left: 8px;
 		width: 100%;
-    	text-align: center;
+    	text-align: left;
 	}
 
 	.wallet-message {
@@ -129,12 +128,15 @@
 		margin-left: 10px;
 	}
 	button.not-connected{
+		align-self: center;
 		padding: 7px 10px;
+		margin-left: 0;
 	}
 	.connected{
 		background: var(--color-primary);
 		padding: 3px 10px;
 		color: var(--color-gray-5);
+		margin-left: 0;
 	}
 	.text-size {
 		font-size: var(--text-size-small);
@@ -164,6 +166,7 @@
     @media screen and (min-width: 430px) {
         .wallet-info{
 			min-width: 230px;
+			padding-right: 10px;
 			padding: 0 0 0 12px;
 			flex-direction: row;
 			align-items: center;
@@ -174,10 +177,19 @@
 		.connected{
 			padding: 2px 10px;
 		}
+		.balance {
+			padding: 0 8px;
+			text-align: center;
+		}
     }
-	/* When page width is greater than 650px (tablets) */
-    @media screen and (min-width: 650px) {
 
+	/* When page width is greater than 430px (tablets) */
+    @media screen and (min-width: 2040px) {
+        .footer{
+			left: 50%;
+    		transform: translate(-50%, 0px);
+			max-width: 2040px;
+		}
     }
 </style>
 

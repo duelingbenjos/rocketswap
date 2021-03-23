@@ -21,7 +21,7 @@
 
     let openChangeSlippage = false;
 
-    $: tokenSymbol = $selectedToken?.token_symbol || "???";
+    $: tokenSymbol = $selectedToken?.token_symbol || "";
     $: pricePaid = $pageStats.pricePaid ? $pageStats.pricePaid : $buy ? $pageStats?.newPrices?.currency : $pageStats?.newPrices?.token;
     $: slippage = $buy ?  $pageStats.currencySlippage : $pageStats.tokenSlippage;
     $: slippageDisplay = slippage.isFinite() ? stringToFixed(slippage, 2) :  "0.0";
@@ -95,13 +95,18 @@
     <div class="flex-row flex-align-center">
         <span class="text-primary-dim">Price</span>
         <div class="flex-row flex-align-center">
-            <span class="margin-r-3">
-                {stringToFixed(pricePaid, 8)}
-            </span>
-            {#if $buy}
-                <span>{` ${tokenSymbol} per ${config.currencySymbol}`}</span>
+
+            {#if !minimumReceived.isNaN()}
+                <span class="margin-r-3">
+                    {stringToFixed(pricePaid, 8)}
+                </span>
+                {#if $buy}
+                    <span>{`${tokenSymbol} per ${config.currencySymbol}`}</span>
+                {:else}
+                    <span>{`${config.currencySymbol} per ${tokenSymbol}`}</span>
+                {/if}
             {:else}
-                <span>{`${config.currencySymbol} per ${tokenSymbol}`}</span>
+                select a token
             {/if}
         </div>
     </div>
@@ -148,14 +153,14 @@
         <span class="text-primary-dim">Guaranteed Minimum</span>
         <div class="flex-row flex-align-center">
             <span class="margin-r-3">
-                {stringToFixed(minimumReceived, 8)}
+                {minimumReceived.isNaN() ? "" : stringToFixed(minimumReceived, 8)}
             </span>
-            <span>{$buy ?  tokenSymbol : config.currencySymbol}</span>
+            <span>{minimumReceived.isNaN() ? "" : $buy ?  tokenSymbol : config.currencySymbol}</span>
         </div>
     </div>
 </div>
 
-<Modal toggleModal={toggleChangeSlippageModal} open={openChangeSlippage}>
+<Modal toggleModal={toggleChangeSlippageModal} open={openChangeSlippage} zIndex={104}>
     <div slot="main-centered">
         <PopupChangeSlippage toggleModal={toggleChangeSlippageModal}/>
     </div>

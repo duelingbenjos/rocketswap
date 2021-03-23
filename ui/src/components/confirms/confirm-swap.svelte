@@ -103,7 +103,6 @@
 
 <style>
     .modal-style{
-        width: 100vw;
         max-width: 400px;
     }
     .sub-text{
@@ -117,6 +116,7 @@
 
     @media screen and (min-width: 430px) {
         .modal-style{
+            width: 100vw;
             margin-top: 8rem;
         }
     }

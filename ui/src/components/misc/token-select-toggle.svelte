@@ -150,7 +150,6 @@
         height: 100vh;
         max-height: calc(100vh * 0.7);
         max-width: 400px;
-        width: 100vh;
     }
     .chevron{
         position: relative;
@@ -161,6 +160,7 @@
     /* When page width is greater than 430px and less than 650px (phones) */
     @media screen and (min-width: 430px) {
         .modal-style{
+            width: 100vw;
             margin-top: 4rem;
         }
     }
