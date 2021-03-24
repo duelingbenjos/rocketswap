@@ -108,7 +108,7 @@
                         styles="min-width: 20px;"  
                     /> 
                     <span>
-                        Buy RWSP from the RSWP/{config.currencySymbol} pairing.
+                        Buy RSWP from the RSWP/{config.currencySymbol} pairing.
                     </span>
                 </div>
                 <button class="primary buy-button" on:click={gotoBuyRSWP}>Buy {config.ammTokenSymbol}!</button>
