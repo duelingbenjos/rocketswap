@@ -197,7 +197,6 @@
 <div class="footer">
 	<div class="wallet-info">
 		{#if $walletAddress}
-			{#if $active.$$component.name === "Swap_page"}
 				<div bind:this={rocketElm} 
 						in:fade="{{delay: 0, duration: 500}}"
 						class="rocket" 
@@ -212,7 +211,6 @@
 						blastOff={$rocketState == 2}
 					/>
 				</div>
-			{/if}
 			<div class="balance text-size">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
 			<div class="flex-row flex-center-center primary connected text-size">
 				<button class="flex flex-center-center" on:click={logout} title="logout">
