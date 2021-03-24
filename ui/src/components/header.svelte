@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import { routes, active } from 'svelte-hash-router'
 
 	// Components
@@ -33,10 +33,6 @@
 	const logout = () => {
 		walletService.logout()
 	}
-
-	onMount(() => {
-		console.log(window.location)
-	})
 </script>
 
 

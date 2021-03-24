@@ -1,5 +1,5 @@
 <script type="ts">
-	import { onDestroy } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import { fade } from 'svelte/transition';
 	import { active } from 'svelte-hash-router'
 
@@ -35,6 +35,8 @@
 	rocketState.subscribe(val => {
 		if (val == 2) setTimeout(rocketReset, 4000)
 	})
+
+	onMount(() => console.log({active: $active}))
 
 	$: makeSmoke = $rocketState == 1 || $rocketState == 2 ? createSmoke() : stopSmoke();
 
