@@ -100,8 +100,9 @@
 
     const handleSendMessage = async () => {
         if (!message) return
-        let res = await apiService.sendMessage(message)
+        const msg = JSON.parse(JSON.stringify(message))
         message = ""
+        let res = await apiService.sendMessage(msg)
         if (!res) handleLogin()
     }
 
