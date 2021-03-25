@@ -41,6 +41,10 @@ export async function saveReserves(
 	const rswp_reserves = reserve_kvps.find((kvp) => kvp.key.includes(rswp_token_contract));
 	const pair_reserves = reserve_kvps.find((kvp) => !kvp.key.includes(rswp_token_contract));
 
+	const prices_kvps = state.filter((kvp) => kvp.key.includes("prices"))
+	const rswp_price_kvp = prices_kvps.find(kvp => kvp.key.includes(rswp_token_contract))
+	const pair_price_kvp = prices_kvps.find(kvp => !kvp.key.includes(rswp_token_contract))
+
 	const price_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "prices");
 	const lp_kvp = state.find((kvp) => kvp.key.includes("lp_points") && kvp.key.split(":").length === 2);
 	if (rswp_reserves && pair_reserves) {
@@ -51,10 +55,10 @@ export async function saveReserves(
 		await rswp_reserves_entity.save();
 	}
 	if (pair_reserves) {
-		await updateReserves({ update_reserves: pair_reserves, price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
+		await updateReserves({ update_reserves: pair_reserves, price_kvp: pair_price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
 	}
 	if (rswp_reserves && !pair_reserves) {
-		await updateReserves({ update_reserves: rswp_reserves, price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
+		await updateReserves({ update_reserves: rswp_reserves, price_kvp: rswp_price_kvp, lp_kvp, state, fn, handleClientUpdate, hash, timestamp });
 	}
 }
 
