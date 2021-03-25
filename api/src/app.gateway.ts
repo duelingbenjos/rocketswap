@@ -106,7 +106,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "epoch_update":
 				if (isEpochUpdate(update)) {
-					log.log("EPOCH_UPDATE", update);
+					// log.log("EPOCH_UPDATE", update);
 					setTimeout(async () => {
 						await this.socketService.sendClientStakingUpdates(update.data.staking_contract);
 					}, 2000);
@@ -124,12 +124,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				break;
 			case "user_yield_update":
 				if (isUserYieldUpdate(update)) {
-					log.log("UPDATE", update);
+					// log.log("UPDATE", update);
 					this.wss.emit(`user_yield_update:${update.vk}`, update.data);
 				}
 			case "tau_usd_price":
 				if (isTauUsdPriceUpdate(update)) {
-					log.log("UPDATE", update);
+					// log.log("UPDATE", update);
 					this.wss.emit(`tau_usd_price`, update);
 				}	
 		}
