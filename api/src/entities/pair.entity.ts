@@ -45,7 +45,6 @@ export async function saveReserves(
 	const rswp_price_kvp = prices_kvps.find(kvp => kvp.key.includes(rswp_token_contract))
 	const pair_price_kvp = prices_kvps.find(kvp => !kvp.key.includes(rswp_token_contract))
 
-	const price_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "prices");
 	const lp_kvp = state.find((kvp) => kvp.key.includes("lp_points") && kvp.key.split(":").length === 2);
 	if (rswp_reserves && pair_reserves) {
 		let rswp_reserves_entity = await PairEntity.findOne(rswp_token_contract);
