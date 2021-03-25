@@ -121,6 +121,8 @@ body {
 	--fuel-tank-text-shadow: var(--color-gray-8);
 	--small-box-background: #2b284b69;
 
+	--price-color-buy: var(--color-primary);
+
 	background-repeat:no-repeat;
 	background: var(--main-background-solid);
 	background: var(--main-background-gradient);
@@ -182,6 +184,7 @@ body.light{
 	--fuel-tank-panel-fuel-bg-color: #9100fffc;
 	--fuel-tank-text-shadow: var(--color-gray-3);
 	--small-box-background: #2b284b00;
+	--price-color-buy: var(--color-primary-dark);
 }
 
 .text-xsmall{
