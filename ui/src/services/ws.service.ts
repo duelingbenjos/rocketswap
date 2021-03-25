@@ -181,8 +181,15 @@
 
 	private handleTauUsdFeed(msg){
 		console.log({handleTauUsdFeed: msg})
-		localStorage.setItem('tau_usd_price', JSON.stringify(msg.current_price))
-		tauUSDPrice.set(toBigNumber(msg.current_price))
+		if (msg.current_price){
+			localStorage.setItem('tau_usd_price', JSON.stringify(msg.current_price))
+			tauUSDPrice.set(toBigNumber(msg.current_price))
+		}
+		if (msg.price){
+			localStorage.setItem('tau_usd_price_UPDATE', JSON.stringify(msg.price))
+			tauUSDPrice.set(toBigNumber(msg.price))
+		}
+
 	}
 
 /* -------------------------
