@@ -2,22 +2,24 @@
     import { onMount, getContext } from 'svelte'
 
     //Services
-    import { ApiService } from '../services/api.service'
+    import { ApiService } from '../../services/api.service'
     const apiService = ApiService.getInstance();
     
     //Stores
-    import { walletIsReady, lwc_info } from '../store'
+    import { walletIsReady, lwc_info } from '../../store'
 
     //Misc
-    import { config } from '../config'
-    import { stringToFixed, quoteCalculator, toBigNumber } from '../utils'
+    import { config } from '../../config'
+    import { stringToFixed, quoteCalculator, toBigNumber } from '../../utils'
 
     //Props
     export let statList = []
     export let title
 
 	const { pageStats, pageStores } = getContext('pageContext')
-	const { currencyAmount, tokenAmount, selectedToken, tokenLP, lpBalance  } = pageStores
+    const { currencyAmount, tokenAmount, selectedToken, tokenLP, lpBalance  } = pageStores
+    
+    pageStats.subscribe(currentValue => console.log({pageStats: currentValue}))
 
     $: tokenSymbol = $selectedToken ? $selectedToken.token_symbol : undefined;
     $: tokenContract = $selectedToken ? $selectedToken.contract_name : undefined;
