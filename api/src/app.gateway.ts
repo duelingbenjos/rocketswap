@@ -55,9 +55,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		private readonly parser: ParserProvider,
 		private readonly socketService: SocketService,
 		private readonly txnService: TransactionService
-	) {
-		startBlockgrabber(this.handleNewBlock);
-	}
+	) {}
 
 	afterInit(server: Server) {
 		this.logger.log(`Websocket Initialised`);
@@ -67,13 +65,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.socketService.handleProxyTxnResponse = this.handleTxnResponse;
 		new CoinGeckoAPIService(this.socketService)
 	}
-
-	handleNewBlock = async (block: BlockDTO) => {
-		// const { state, fn, contract, timestamp } = block;
-		await this.parser.parseBlock({
-			block
-		});
-	};
 
 	handleClientUpdate = async (update: ClientUpdateType) => {
 		let contract_name;

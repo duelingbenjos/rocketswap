@@ -1,4 +1,5 @@
 import mongoose_models from "./mongoose.models";
+import { ParserProvider } from "./parser.provider";
 import { handleNewBlock } from "./types/misc.types";
 import {log} from './utils/logger'
 const https = require("https");
@@ -30,14 +31,14 @@ if (typeof process.env.RE_LOAD_API !== "undefined") {
 	if (process.env.RE_LOAD_API === "yes") reloadAPI = true;
 }
 
-const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
+const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boolean) => {
 	let currBlockNum = 1;
 	let checkNextIn = 0;
 	let maxCheckCount = 10;
 	let alreadyCheckedCount = 0;
 	const route_getBlockNum = "/blocks?num=";
 	const route_getLastestBlock = "/latest_block";
-	let lastestBlockNum = 0;
+	let lastestBlockNum: any = 0;
 	let currBatchMax = 0;
 	let batchAmount = 25;
 	let timerId;
@@ -91,13 +92,13 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 							// log.log(data);
 							resolve(JSON.parse(data));
 						} catch (err) {
-							console.error("Error: " + err);
+							log.error("Error: " + err);
 							resolve({ error: err.message });
 						}
 					});
 				})
 				.on("error", (err) => {
-					console.error("Error: " + err.message);
+					log.error("Error: " + err.message);
 					resolve({ error: err.message });
 				});
 		});
@@ -182,10 +183,11 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 			block.save(function(err) {
 				if (err) log.log(err);
 				log.log("saved " + blockNum);
+				updateLastChecked()
 			});
 			if (blockNum === currBatchMax) {
 				currBlockNum = currBatchMax;
-				timerId = setTimeout(checkForBlocks, 5);
+				timerId = setTimeout(checkForBlocks, 100);
 			}
 		}
 	};
@@ -214,18 +216,13 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 
 	const checkForBlocks = async () => {
 		log.log("checking")
-		let response = await getLatestBlock_MN();
-		
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
+		updateLastChecked()
+		let response: any = await getLatestBlock_MN();
+
 		if (!response.error) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
 			lastestBlockNum = response.number;
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
 			if (lastestBlockNum.__fixed__) lastestBlockNum = parseInt(lastestBlockNum.__fixed__)
-			if (lastestBlockNum < currBlockNum || wipeOnStartup || reloadAPI) {
+			if ((lastestBlockNum < currBlockNum || wipeOnStartup || reloadAPI) && !bypass_wipe) {
 				await wipeDB();
 				wipeOnStartup = false;
 				reloadAPI = false;
@@ -263,6 +260,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 							);	
 							blockData = getBlock_MN(i, timedelay)
 							blocksToGetCount = blocksToGetCount + 1
+							if (i === currBatchMax) updateLastChecked(timedelay)
 						}
 						to_fetch.push(blockData);
 					}
@@ -296,7 +294,11 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock) => {
 		});
 };
 
-export default (handleNewBlock: handleNewBlock) => {
+function updateLastChecked(time_delta:number = 0) {
+	ParserProvider.updateLastChecked(time_delta)
+}
+
+export default (handleNewBlock: handleNewBlock, bypass_wipe: boolean = false) => {
 	db.connect(
 		connectionString,
 		{ useNewUrlParser: true, useUnifiedTopology: true },
@@ -304,7 +306,7 @@ export default (handleNewBlock: handleNewBlock) => {
 			if (error) log.log(error);
 			else {
 				//log.log("connection successful");
-				databaseLoader(mongoose_models, handleNewBlock);
+				databaseLoader(mongoose_models, handleNewBlock, bypass_wipe);
 			}
 		}
 	);

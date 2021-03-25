@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { IKvp } from "./types/misc.types";
+import { BlockDTO, IKvp } from "./types/misc.types";
 import { config, staking_contracts } from "./config";
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity";
 import { getContractCode, getContractName, validateTokenContract } from "./utils/utils";
@@ -13,9 +13,12 @@ import { setName } from "./entities/name.entity";
 import { AuthService } from "./authentication/trollbox.service";
 import { AmmMetaEntity, updateAmmMeta } from "./entities/amm-meta.entity";
 import { updateStakingContractMeta } from "./entities/staking-meta.entity";
+import startBlockgrabber from "./blockgrabber";
+import { log } from "./utils/logger";
 
 @Injectable()
 export class ParserProvider {
+	private static blockgrabber_last_update = Date.now()
 	public static amm_meta_entity
 	constructor(private readonly socketService: SocketService, private readonly authService: AuthService) {}
 	private token_contract_list: string[];
@@ -23,10 +26,31 @@ export class ParserProvider {
 	private action_que_processing: boolean;
 	private logger: Logger = new Logger("ParserProvider");
 
+	public static updateLastChecked = (time_delta: number = 0) => {
+		ParserProvider.blockgrabber_last_update = time_delta + Date.now()
+		// log.log(`Updating last checked ... with time_delta of : ${time_delta}`)
+	}
+
 	async onModuleInit() {
 		this.updateTokenList();
 		ParserProvider.amm_meta_entity = await AmmMetaEntity.findOne();
+
+		startBlockgrabber(this.handleNewBlock);
+
+		setInterval(()=>{
+			if (Date.now() - ParserProvider.blockgrabber_last_update > 10000 ) {
+				log.warn("no response from blockgrabber in 60 seconds => starting it up again")
+				startBlockgrabber(this.handleNewBlock, true)
+			}
+		},40000)
 	}
+
+	public handleNewBlock = async (block: BlockDTO) => {
+		// const { state, fn, contract, timestamp } = block;
+		await this.parseBlock({
+			block
+		});
+	};
 
 	/** This method is passed to the blockgrabber as a callback and checks
 	 * if we're interested in the contents of the block.
