@@ -161,7 +161,7 @@ export const updateStakingContractMeta = async (args: {
 };
 
 export const updateROI = async () => {
-	log.debug("UPDATE ROI CALLED")
+	// log.debug("UPDATE ROI CALLED")
 	for (let contract_name of staking_contracts) {
 		const meta_entity = await StakingMetaEntity.findOne(contract_name)
 		// log.debug({meta_entity})
