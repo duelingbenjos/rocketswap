@@ -95,9 +95,10 @@
 		top: -12px;
 		right: 20px;
 		justify-content: flex-end;
+		text-shadow: 1px 1px #c7c7c7;
 	}
 	.buy{
-		color: var(--success-color);
+		color: var(--price-color-buy);
 	}
 	.sell{
 		color: var(--error-color);
@@ -129,7 +130,7 @@
 				direction={$lastTradeType === "buy" ? "up" : "down"} 
 				width="12px" 
 				margin="0 0 -2px 4px"
-				color={$lastTradeType === "buy" ? "var(--success-color)" : "var(--error-color)"}
+				color={$lastTradeType === "buy" ? "var(--price-color-buy)" : "var(--error-color)"}
 			/>
 		</div>
 	{/if}
