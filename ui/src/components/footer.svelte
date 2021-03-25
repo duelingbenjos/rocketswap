@@ -1,5 +1,5 @@
 <script type="ts">
-	import { onDestroy } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import { fade } from 'svelte/transition';
 	import { active } from 'svelte-hash-router'
 
@@ -35,6 +35,8 @@
 	rocketState.subscribe(val => {
 		if (val == 2) setTimeout(rocketReset, 4000)
 	})
+
+	onMount(() => console.log({active: $active}))
 
 	$: makeSmoke = $rocketState == 1 || $rocketState == 2 ? createSmoke() : stopSmoke();
 
@@ -197,7 +199,6 @@
 <div class="footer">
 	<div class="wallet-info">
 		{#if $walletAddress}
-			{#if $active.$$component.name === "Swap_page"}
 				<div bind:this={rocketElm} 
 						in:fade="{{delay: 0, duration: 500}}"
 						class="rocket" 
@@ -212,7 +213,6 @@
 						blastOff={$rocketState == 2}
 					/>
 				</div>
-			{/if}
 			<div class="balance text-size">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
 			<div class="flex-row flex-center-center primary connected text-size">
 				<button class="flex flex-center-center" on:click={logout} title="logout">

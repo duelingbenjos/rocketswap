@@ -14,7 +14,7 @@
 	//Components
 	import HeadMeta from '../components/head-meta.svelte'
 	import PoolSwapPanel from '../components/panels/pool-liquidity-panel.svelte'
-	import PoolStats from '../components/pool-stats.svelte'
+	import PoolStats from '../components/pools/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 
 	//Icons

@@ -14,7 +14,17 @@
 	const ws = WsService.getInstance()
 
 	//Stores
-	import { tokenBalances, walletIsReady, saveStoreValue, walletAddress, slippageTolerance, rswpPrice, payInRswp  } from '../store'
+	import { 
+		tokenBalances, 
+		walletIsReady, 
+		saveStoreValue, 
+		walletAddress, 
+		slippageTolerance, 
+		rswpPrice, 
+		payInRswp, 
+		tauUSDPrice,
+		tradeHistory, 
+		tradeUpdates  } from '../store'
 	
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
@@ -25,7 +35,7 @@
 	import SwapPanel from '../components/panels/swap-panel.svelte'
 	import TradeTable from '../components/misc/trade-table.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
-	import PoolStats from '../components/pool-stats.svelte'
+	import PoolStats from '../components/pools/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
 
@@ -37,6 +47,8 @@
 	let buy = writable(true)
 	let txOkay = writable(true)
 	let priceImpactTooHigh = writable(false)
+	let currentPrice = writable(toBigNumber(0))
+	let lastTradeType = writable("buy")
 
 	let pageStores = {
 		currencyAmount,
@@ -46,7 +58,9 @@
 		tokenLP,
 		payInRswp,
 		txOkay,
-		priceImpactTooHigh
+		priceImpactTooHigh,
+		currentPrice,
+		lastTradeType
 	}
 
 	let pageUtilites = pageUtils(pageStores)
@@ -61,6 +75,22 @@
 			joinTradeFeed_UpdateWindow(value.contract_name)
 		}
 	})
+
+	tradeHistory.subscribe(currentValue => {
+        console.log({tradeHistory: currentValue})
+        if (!currentValue) return
+        if (currentValue.length === 0) return
+        lastTradeType.set(currentValue[0].type)
+    })
+
+    tradeUpdates.subscribe(currentValue => {
+        console.log({tradeUpdates: currentValue})
+        if (!currentValue) return
+        if (currentValue.length === 0) return
+        lastTradeType.set(currentValue[currentValue.length - 1].type)
+	})
+	
+	lastTradeType.subscribe(currentValue => console.log({lastTradeType: currentValue}))
 
 	setContext('pageContext', {
 		getTokenList: async () => await apiService.getMarketList(),
@@ -91,15 +121,17 @@
 	const updatePageStats = async () => {
 		let quoteCalc = quoteCalculator($tokenLP)
 		let quote;
-		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount)      
-		else quote = quoteCalc.calcSellPrice($tokenAmount)
+
+		if ($buy) quote = quoteCalc.calcBuyPrice($currencyAmount || toBigNumber(0))      
+		else quote = quoteCalc.calcSellPrice($tokenAmount || toBigNumber(0))
 
 		let slippage = $buy ?  quote.currencySlippage : quote.tokenSlippage;
-		console.log({slippage})
 		if (slippage){
 			priceImpactTooHigh.set(slippage.isGreaterThan($slippageTolerance))
 		}
-		console.log("recalc")
+		if ($selectedToken){
+			currentPrice.set(quote.prices.token.multipliedBy($tauUSDPrice))
+		}
 		pageStats.set({
 			quoteCalc,
 			...quote

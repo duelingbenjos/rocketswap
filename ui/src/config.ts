@@ -29,17 +29,17 @@ export const connectionRequest = {
 
 export const stamps = {
   defaultValue: 50,
-  create_market: 110,
+  create_market: 120,
   add_liquidity: 85,
   remove_liquidity: 80,
   addStakingTokens: 120,
   withdrawTokensAndYield: 150,
   withdrawYield: 150,
   stake: 200,
-  buy: 200,
+  buy: 105,
   auth: 35,
   approve: 30,
-  buffer: 30,
+  buffer: 40,
   currentRatio: 13 //Change for PROD
 }
 

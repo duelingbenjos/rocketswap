@@ -100,8 +100,9 @@
 
     const handleSendMessage = async () => {
         if (!message) return
-        let res = await apiService.sendMessage(message)
+        const msg = JSON.parse(JSON.stringify(message))
         message = ""
+        let res = await apiService.sendMessage(msg)
         if (!res) handleLogin()
     }
 
@@ -215,7 +216,7 @@
     @media screen and (min-width: 2040px) {
         .troll-box{
 			left: calc(50% + 1020px);
-    		transform: translate(-50%, 0px);
+    		transform: translate(-100%, 0px);
             max-width: 650px;
 		}
         .box-is-open{

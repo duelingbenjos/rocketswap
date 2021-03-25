@@ -100,7 +100,7 @@
         
     </div>
     <p class="text-size-small">
-        Since the swap will untimatly take place in the smart contract there could be changes in the price after your transaction is submitted.
+        Since the swap will ultimately take place in the smart contract there could be changes in the price after your transaction is submitted.
     </p>
     <ul class="text-size-small text-primary-dim">
         <li>

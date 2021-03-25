@@ -5,7 +5,7 @@
 	import HeadMeta from '../components/head-meta.svelte'
 	import PoolMain from '../components/pools/pool-main.svelte'
 
-	$: pageTitle = 'RocketSwap: You Liqidity'
+	$: pageTitle = 'RocketSwap: Your Liquidity'
 	$: pageDescription = "View your Rocketswap liquidity pools!"
 
 	setContext("pageContext", {

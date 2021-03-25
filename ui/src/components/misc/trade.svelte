@@ -61,7 +61,7 @@
     <div class="icon flex flex-center-center">
         <RocketswapLogo 
             width="20px" 
-            color={trade.type === "buy" ? "var(--success-color)" : "var(--error-color)"} 
+            color={trade.type === "buy" ? "var(--price-color-buy)" : "var(--error-color)"} 
             reverse={trade.type === "sell" ? true : false}
 
         />

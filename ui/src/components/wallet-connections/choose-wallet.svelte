@@ -125,7 +125,7 @@
                     {/if}
                 </div>
                 <p class="text-primary-dim text-small">
-                    The Lamden Wallet is a Chrome broswer plugin used to securly store your Lamden Accounts. You can install it from the
+                    The Lamden Wallet is a Chrome browser plugin used to securely store your Lamden Accounts. You can install it from the
                     <a href="{walletDownloadURL}" rel="noopener noreferrer" target="_blank"> Chrome Webstore</a>
                 </p>
             </div>
