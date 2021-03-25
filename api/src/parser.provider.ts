@@ -37,12 +37,12 @@ export class ParserProvider {
 
 		startBlockgrabber(this.handleNewBlock);
 
-		setInterval(()=>{
-			if (Date.now() - ParserProvider.blockgrabber_last_update > 10000 ) {
-				log.warn("no response from blockgrabber in 60 seconds => starting it up again")
-				startBlockgrabber(this.handleNewBlock, true)
-			}
-		},40000)
+		// setInterval(()=>{
+		// 	if (Date.now() - ParserProvider.blockgrabber_last_update > 10000 ) {
+		// 		log.warn("no response from blockgrabber in 60 seconds => starting it up again")
+		// 		startBlockgrabber(this.handleNewBlock, true)
+		// 	}
+		// },40000)
 	}
 
 	public handleNewBlock = async (block: BlockDTO) => {
