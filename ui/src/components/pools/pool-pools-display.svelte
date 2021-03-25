@@ -19,9 +19,7 @@
 <div class="flex-row flex-justify-spaceevenly">
     {#if $lpPairs?.length > 0}
             {#each $lpPairs as pairInfo}
-                {#if $lpBalances[pairInfo.contract_name].isGreaterThan(2)}
-                    <PoolPanel {pairInfo} />
-                {/if}
+                <PoolPanel {pairInfo} />
             {/each}
     {:else}
         {#if $walletIsReady}

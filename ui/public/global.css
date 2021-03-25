@@ -976,6 +976,7 @@ div[slot="main-centered"]{
 }
 
 .panel-container {
+	position: relative;
 	margin: 0;
 	box-sizing: border-box;
 	padding: 15px;
