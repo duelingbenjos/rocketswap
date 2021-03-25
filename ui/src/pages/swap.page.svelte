@@ -87,8 +87,10 @@
         console.log({tradeUpdates: currentValue})
         if (!currentValue) return
         if (currentValue.length === 0) return
-        lastTradeType.set(currentValue[0].type)
-    })
+        lastTradeType.set(currentValue[currentValue.length - 1].type)
+	})
+	
+	lastTradeType.subscribe(currentValue => console.log({lastTradeType: currentValue}))
 
 	setContext('pageContext', {
 		getTokenList: async () => await apiService.getMarketList(),
