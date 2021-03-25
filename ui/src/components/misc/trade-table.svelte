@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte'
+    import { onMount, getContext } from 'svelte'
     import { fade } from 'svelte/transition';
 
     //Components
@@ -8,21 +8,9 @@
     //Misc
     import { tradeHistory, tradeUpdates } from '../../store'
 
-    onMount(() => {
-        //setInterval(pushTrades, 10000)
-    })
-    const pushTrades = () => {
-        tradeUpdates.update(trades => {
-            trades.push({
-                type: "buy",
-                amount: "27306.5924",
-                token_symbol: "LAMA",
-                price: "0.0038",
-                time: 1613077744
-            })
-            return trades
-        })
-    }
+    const { pageStores } = getContext('pageContext')
+    const { lastTradeType } = pageStores
+
 </script>
 
 <style>

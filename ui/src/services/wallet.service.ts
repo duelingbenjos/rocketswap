@@ -383,7 +383,7 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			let lpPoints = "0";
-			res.data.txBlockResult.state.forEach(stateChange => {
+			res?.data?.txBlockResult?.state?.forEach(stateChange => {
 				if (stateChange.key === `${connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`){
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
@@ -440,7 +440,7 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			let lpPoints = '0'
-			res.data.txBlockResult.state.forEach((stateChange) => {
+			res?.data?.txBlockResult?.state?.forEach((stateChange) => {
 				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`) {
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
@@ -476,7 +476,7 @@ export class WalletService {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			let lpPoints = "0";
-			res.data.txBlockResult.state.forEach(stateChange => {
+			res?.data?.txBlockResult?.state?.forEach(stateChange => {
 				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`){
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
@@ -733,28 +733,44 @@ export class WalletService {
 
 
 	private handleTxErrors(errors, callbacks = undefined){
-		errors.forEach(error => {
-			let toastType = 'info'
-			if (error.includes("AssertionError('")) {
-				let match = error.match(/AssertionError\('(.*)',\)/)
-				if (match){
-					error = match[1]
-					toastType = 'error'
-				}else return
-			}
-			if (error.includes('AssertionError("')) {
-				let match = error.match(/AssertionError\("(.*)",\)/)
-				if (match){
-					error = match[1]
-					toastType = 'error'
-				}else return
-			}
-			this.toastService.addToast({
-				heading: 'Transaction Error.',
-				type: toastType === 'info' ? 'info' : 'error',
-				text: error
+		if (Array.isArray(errors)){
+			errors.forEach(error => {
+				let toastType = 'info'
+				if (error.includes("AssertionError('")) {
+					let match = error.match(/AssertionError\('(.*)',\)/)
+					if (match){
+						error = match[1]
+						toastType = 'error'
+					}else return
+				}
+				if (error.includes('AssertionError("')) {
+					let match = error.match(/AssertionError\("(.*)",\)/)
+					if (match){
+						error = match[1]
+						toastType = 'error'
+					}else return
+				}
+				this.toastService.addToast({
+					heading: 'Transaction Error',
+					type: toastType === 'info' ? 'info' : 'error',
+					text: error
+				})
 			})
-		})
+		}else{
+			if (typeof errors === 'string'){
+				this.toastService.addToast({
+					heading: 'Transaction Error',
+					type: 'error',
+					text: errors
+				})	
+			}else{
+				this.toastService.addToast({
+					heading: 'Unknown Transaction Error',
+					type: 'error',
+					text: 'Something happened and we couldn\'t get the status of your transaction.'
+				})
+			}
+		}
 		if (callbacks) {
 			callbacks.error(errors)
 		}

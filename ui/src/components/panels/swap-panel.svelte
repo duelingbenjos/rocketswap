@@ -11,7 +11,7 @@
 	import { quoteCalculator, toBigNumber, stringToFixed } from '../../utils'
 
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
-	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP, payInRswp } = pageStores
+	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP, payInRswp, currentPrice, lastTradeType } = pageStores
 
 	let slots = [
 		{
@@ -90,10 +90,49 @@
 		text-align: center;
 		padding: 5px 0;
 	}
+	.price{
+		position: absolute;
+		top: -12px;
+		right: 20px;
+		justify-content: flex-end;
+	}
+	.buy{
+		color: var(--success-color);
+	}
+	.sell{
+		color: var(--error-color);
+	}
+
+	@media screen and (min-width: 430px) {
+		.price{
+			position: absolute;
+			top: unset;
+			right: unset;
+			bottom: 0;
+			left: 0px;
+			width: 100%;
+			text-align: center;
+			justify-content: center;
+		}
+	}
 
 </style>
 
 <div class="panel-container">
+	{#if $selectedToken && !$currentPrice.isNaN()}
+		<div 
+			class="flex-row flex-center-center price weight-600"
+			class:buy={$lastTradeType === "buy"}
+			class:sell={$lastTradeType !== "buy"}>
+			{`$${stringToFixed($currentPrice, 4)} USD`}
+			<DirectionalArrow 
+				direction={$lastTradeType === "buy" ? "up" : "down"} 
+				width="12px" 
+				margin="0 0 -2px 4px"
+				color={$lastTradeType === "buy" ? "var(--success-color)" : "var(--error-color)"}
+			/>
+		</div>
+	{/if}
 	<slot name="header"></slot>
 	<svelte:component 
 		label={'From'}

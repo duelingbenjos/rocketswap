@@ -56,6 +56,12 @@
         margin: 1rem 0;
         
     }
+    a{
+        text-decoration: underline;
+    }
+    a:hover{
+        color: var(--color-primary);
+    }
     .percent{
         position: relative;
         top: -2px;
@@ -85,7 +91,7 @@
     <div class="flex-row header">
         <TokenLogo tokenMeta={pairInfo} width={'45px'} margin={"0 12px 0 0"}/>
         <div class="flex-col text-large identity">
-            <span>{pairInfo.token_symbol || "none"}</span>
+            <a href="{`/#/${pairInfo.contract_name}`}">{pairInfo.token_symbol || "none"}</a>
             <span class="text-primary-dimmer">{pairInfo.token_name || "none"}</span>
         </div> 
         <div class="flex-row flex-start-end flex-grow">
@@ -102,6 +108,9 @@
         <div class="flex-row">
             <span class="text-primary-dim weight-600">{config.currencySymbol}</span>
             <strong class="flex-grow">{`${stringToFixed(pairInfo.reserves[0].multipliedBy(poolPercent), 8)} `}</strong>
+        </div>
+        <div class="flex-row flex-justify-end">
+            <span class="text-primary-dim">{`${stringToFixed(lpTokens, 8)} LP`}</span>
         </div>
     </div>
     <hr>
