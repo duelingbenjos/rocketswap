@@ -182,8 +182,7 @@ function calculateSimpleYield(args: {
 		}
 		const delta_seconds = delta / 1000;
 
-		let rswp_per_tau_per_second = meta.EmissionRatePerSecond
-
+		let rswp_per_tau_per_second = getEmissionRatePerSecond(parseFloat(this_epoch.emission_rate_per_tau))
 
 		y += rswp_per_tau_per_second * amount * delta_seconds;
 		this_epoch_index += 1;
