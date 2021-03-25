@@ -35,7 +35,7 @@
 	import SwapPanel from '../components/panels/swap-panel.svelte'
 	import TradeTable from '../components/misc/trade-table.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
-	import PoolStats from '../components/pool-stats.svelte'
+	import PoolStats from '../components/pools/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
 
