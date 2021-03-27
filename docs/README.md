@@ -90,9 +90,7 @@ Rocketswap fees are set at 0.5% of the token cost for the trade.  This can be of
 |Buy|TAU ➡ TOKEN| RSWP|
 |Sell|TOKEN ➡ TAU| RSWP|
 
-Paying fees in RSWP automatically attracts a 25% discount.  This results in fees reducing to 0.375% of the tokens traded charged as the transaction fee.  Again, 20% of the RSWP is sent to the Lamden burn address. 
-
- The remaining 80% is added to the liquidity pool.  
+Paying fees in RSWP automatically attracts a 25% discount.  This results in fees reducing to 0.375% of the tokens traded charged as the transaction fee.  Again, 20% of the RSWP is sent to the Lamden burn address. The remaining 80% is added to the liquidity pool.  
 
 #### Scenario 3 - Fees paid in RSWP and staking RSWP
 
@@ -101,9 +99,7 @@ Paying fees in RSWP automatically attracts a 25% discount.  This results in fees
 |Buy|TAU ➡ TOKEN| RSWP|
 |Sell|TOKEN ➡ TAU| RSWP|
 
-As above, paying fees in RSWP automatically attracts a 25% discount.  However with additional staking, bonus **Trade Fee Discounts** apply based on the formula below.  There is a theoretical upper limit to 
-
-discounts set at 99% within the contract however in practice this is not achievable.
+As above, paying fees in RSWP automatically attracts a 25% discount.  However with additional staking, bonus **Trade Fee Discounts** apply based on the formula below.  There is a theoretical upper limit to discounts set at 99% within the contract however in practice this is not achievable.
 
 #### log<sub>e</sub>({RSWP Stake}) * 0.07 - 0.505
 
@@ -120,7 +116,7 @@ Using the scenarios above, the resultant fees are visualised below compared to t
 |3|34500 RSWP Staked|<img src="Scenario4.png" height=30 width=170></img> |
 |3|100k RSWP Staked|<img src="Scenario5.png" height=30 width=155></img> |
 
-A Lamden transaction fee to perform the necessary contract actions is also charged, generally around 65 Stamps (1 TAU) however is based on network traffic.
+A Lamden transaction fee to perform the necessary contract actions is also charged, generally around 65 Stamps (1 TAU) however is based on network traffic at the time the transaction is processed.
 
 
 ### How do I create a token?
