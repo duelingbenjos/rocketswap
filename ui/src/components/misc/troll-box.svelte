@@ -180,8 +180,8 @@ import { unixToLocalTimestamp } from '../../utils';
     }
     .box-messages{
         box-sizing: border-box;
-        margin: 0 5px;
-        padding: 2px 10px;
+        margin: 0 2px 0px 5px;
+        padding: 2px 10px 2px 2px;
         border: 1px solid var(--text-primary-color-dim);
         overflow-y: scroll;
         background: var(--trollbox-message-bg);
@@ -189,6 +189,17 @@ import { unixToLocalTimestamp } from '../../utils';
     .message{
         line-height: 1.3;
         margin-bottom: 6px;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .timestamp {
+        width: 60px;
+        text-align: center;
+    }
+
+    .message-body {
+        margin-left: 3px;
     }
 
     /* When page width is greater than 900px (tablets) */
@@ -242,8 +253,13 @@ import { unixToLocalTimestamp } from '../../utils';
         <div bind:this={msgBox} class="box-messages flex-grow">
             {#each $trollboxMessages as message}
                 <div class="message" style={`color: ${userColors[message.sender]}`}>
-                    {unixToLocalTimestamp(message.timestamp)} <strong style={`color: ${userColors[message.sender]}`}>{`${message.sender}: `}</strong>
-                    {`${message.message}`}
+                    [<div class="timestamp">
+                        {unixToLocalTimestamp(message.timestamp)}
+                    </div>]
+                    <div class="message-body">
+                        <strong style={`color: ${userColors[message.sender]}`}>{`${message.sender}: `}</strong>
+                        {`${message.message}`}
+                    </div>
                 </div>
             {/each}
         </div>
