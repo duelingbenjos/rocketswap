@@ -113,7 +113,7 @@ discounts set at 99% within the contract however in practice this is not achieva
 NOTE: *Based on this formula, the minimum staking amount is 1361 RSWP.*
 <img src="RSWPfeeformula.png" height=341 width=857></img>
 
-Based on the scenarios above, here are the results compared to the baseline:
+Using the scenarios above, the resultant fees are visualised below compared to the baseline:
 
 |Scenario|Description|Visualised Fee|
 |:---:|:---:|:---|
