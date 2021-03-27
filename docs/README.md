@@ -72,7 +72,7 @@ We have created a number of walk-throughs for first time users of Rocketswap tha
 
 ### What Rocketswap fees apply?
 
-Rocketswap fees are set at 0.5% of the token cost for the trade.  This however can be offset by a number of mechanisms to reduce fees through using and/or staking the Rocketswap token, RSWP. These actions are 
+Rocketswap fees are set at 0.5% of the token cost for the trade.  This can be offset by a number of mechanisms to reduce fees through using and/or staking the Rocketswap token, RSWP. These actions are 
 
 cumulative and can result in significant savings for market participants.
 
