@@ -125,11 +125,13 @@
 				fill="#fff"
 			/>
 		</svg>
-		<a
+		<br>
+		<b>... BRB ...</b> 
+		<!-- <a
 			style="padding-top: 20px;"
 			target="_blank"
 			href="http://45.63.40.194:5000/">testnet</a
-		>
+		> -->
 	</div>
 	<canvas
 		id="canvas"
