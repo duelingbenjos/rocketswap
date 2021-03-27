@@ -98,7 +98,9 @@ Paying fees in RSWP automatically attracts a 25% discount.  This results in fees
 As above, paying fees in RSWP automatically attracts a 25% discount.  However with additional staking, bonus **Trade Fee Discounts** apply based on the formula below.  There is a theoretical upper limit to 
 
 discounts set at 99% within the contract however in practice this is not achievable.
-####log<sub>e</sub>({RSWP Stake}) * 0.07 - 0.505
+
+#### log<sub>e</sub>({RSWP Stake}) * 0.07 - 0.505
+
 NOTE: *Based on this formula, the minimum staking amount is 1361 RSWP.*
 <img src="RSWPfeeformula.png" height=341 width=857></img>
 
