@@ -7,11 +7,11 @@
 
 [Rocketswap](https://rocketswap.exchange) is a community developed AMM (Automated Market Maker) which resides on the [Lamden Blockchain](https://www.lamden.io).
 
-The Rocketswap application can be found [here](https://rocketswap.exchange)
+The Rocketswap application can be found here @ https://rocketswap.exchange
 
 ### What is an Automated Market Maker ?
 
-The Automated Market Maker is a system for exchanging assets which was popularized first by Uniswap and differs from traditional exchange systems in a few fundamental ways.
+An Automated Market Maker is a system for exchanging assets which was popularized first by Uniswap and differs from traditional exchange systems in a few fundamental ways.
 
 AMM's have two types of users :
 
@@ -27,6 +27,10 @@ We are a small team of engineers, with 40+ years of experience, committed to pus
 We built Rocketswap to strengthen and foster a growing Lamden ecosystem. 
 
 Rocketswap will achieve this goal by creating positive feedback loops across projects, allowing all Lamden assets to find fair market value.
+
+### How can I contact the Rocketswap Team ?
+
+Contact us on [Telegram](https://t.me/rocketswap)
 
 ### What is Lamden ?
 
@@ -49,10 +53,6 @@ Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a hig
 ### How can I get Mainnet TAU?
 Mainnet TAU is available at Txbit
 
-### How can I contact the Rocketswap Team ?
-
-Contact us on [Telegram](https://t.me/rocketswap)
-
 ## Using the Application
 
 ### What do I need to use Rocketswap ?
@@ -60,6 +60,60 @@ Contact us on [Telegram](https://t.me/rocketswap)
 To use [Rocketswap](www.rswp.io) you will need :
 * The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
 * Some Mainnet TAU tokens (see the above section for more info)
+
+### Rocketswap Fees
+
+Rocketswap fees are set at 0.5% of the token cost for the trade.  This however can be offset by a number of mechanisms to reduce fees through using and/or staking the Rocketswap token, RSWP. These actions are 
+
+cumulative and can result in significant savings for market participants.
+
+Below are some scenarios to explain the benefits:
+#### Scenario 1 - The baseline, 0.5% transaction cost
+
+|Action|Description|Fee Paid in|
+|:---:|:---:|:---:|
+|Buy|TAU ➡ TOKEN| TOKEN|
+|Sell|TOKEN ➡ TAU| TAU|
+
+0.5% of the tokens traded are charged as the transaction fee. This fee, has 20% internally converted to RSWP and sent to the Lamden burn address.  The remaining 80% is added to the liquidity pool.  
+
+#### Scenario 2 - Fees paid in RSWP
+
+|Action|Description|Fee Paid in|
+|:---:|:---:|:---:|
+|Buy|TAU ➡ TOKEN| RSWP|
+|Sell|TOKEN ➡ TAU| RSWP|
+
+Paying fees in RSWP automatically attracts a 25% discount.  This results in fees reducing to 0.375% of the tokens traded charged as the transaction fee.  Again, 20% of the RSWP is sent to the Lamden burn address. 
+
+ The remaining 80% is added to the liquidity pool.  
+
+#### Scenario 3 - Fees paid in RSWP and staking RSWP
+
+|Action|Description|Fee Paid in|
+|:---:|:---:|:---:|
+|Buy|TAU ➡ TOKEN| RSWP|
+|Sell|TOKEN ➡ TAU| RSWP|
+
+As above, paying fees in RSWP automatically attracts a 25% discount.  However with additional staking, bonus **Trade Fee Discounts** apply based on the formula below.  There is a theoretical upper limit to 
+
+discounts set at 99% within the contract however in practice this is not achievable.
+#####log<sub>e</sub>({RSWP Stake}) * 0.07 - 0.505
+NOTE: *Based on this formula, the minimum staking amount is 1361 RSWP.*
+<img src="RSWPfeeformula.png" height=341 width=857></img>
+
+Based on the scenarios above, here are the results compared to the baseline:
+
+|Scenario|Description|Visualised Fee|
+|:---:|:---:|:---|
+|1|Baseline|<img src="Scenario1.png" height=30 width=295></img> |
+|2|Fees in RSWP|<img src="Scenario2.png" height=30 width=220></img> |
+|3|3694 RSWP Staked|<img src="Scenario3.png" height=30 width=200></img> |
+|3|34500 RSWP Staked|<img src="Scenario4.png" height=30 width=170></img> |
+|3|100k RSWP Staked|<img src="Scenario5.png" height=30 width=155></img> |
+
+A Lamden transaction fee to perform the necessary contract actions is also charged, generally around 65 Stamps (1 TAU) however is based on network traffic.
+
 
 ### How do I create a token?
 
