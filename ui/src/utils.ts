@@ -638,6 +638,17 @@ export const pageUtils = (pageStores) => {
 	}
 }
 
+export const unixToLocalTimestamp = (timestamp: string) => {
+	// console.log(timestamp)
+	let date = new Date(parseInt(timestamp))
+
+	let hours = ("0" + date.getHours()).substr(-2);
+	let minutes = ("0" + date.getMinutes()).substr(-2);
+	let seconds = ("0" + date.getSeconds()).substr(-2);
+
+	return `[${hours}:${minutes}:${seconds}]`
+}
+
 /*
 	Staking Calculations
 */

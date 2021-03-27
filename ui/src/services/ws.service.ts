@@ -142,12 +142,14 @@
 	}
 
 	private handleTrollboxHistory(history){
+		console.log({history})
 		trollboxMessages.update((val) => {
 			val.push(
 				...history.map((item) => {
 					return {
 						sender: item.sender.name,
-						message: item.message
+						message: item.message,
+						timestamp: item.timestamp
 					}
 				}))
 			return val
@@ -157,7 +159,7 @@
 
 	private handleTrollBoxMessage(msg){
 		trollboxMessages.update((val) => {
-			val.push({ sender: msg.sender.name, message: msg.message })
+			val.push({ sender: msg.sender.name, message: msg.message, timestamp: msg.timestamp })
 			return val
 		})
 	}

@@ -12,6 +12,7 @@
 	import { WalletService } from '../../services/wallet.service'
     const walletService = WalletService.getInstance();
     import { ApiService } from '../../services/api.service'
+import { unixToLocalTimestamp } from '../../utils';
     const apiService = ApiService.getInstance();
 
     //Bindings
@@ -157,7 +158,10 @@
         margin-left: 20px;
     }
     .box-header{
-        text-align: center;    
+        text-align: right;    
+        font-style: italic ;
+        text-transform: uppercase;
+        margin-right: 10px;
     }
     .box-is-open{
         visibility: visible;
@@ -165,7 +169,7 @@
         bottom: 0;
     }
     .box-controls{
-        padding: 20px;
+        padding: 5px;
     }
     .box-controls > span {
         min-width: fit-content;
@@ -176,7 +180,7 @@
     }
     .box-messages{
         box-sizing: border-box;
-        margin: 0 20px;
+        margin: 0 5px;
         padding: 2px 10px;
         border: 1px solid var(--text-primary-color-dim);
         overflow-y: scroll;
@@ -232,13 +236,13 @@
         <button class="open-close" on:click={handleBoxToggle}>
             <TrollIcon width="45px" />
         </button>
-        <div class="box-header text-large">
+        <div class="box-header">
             Troll Box
         </div>
         <div bind:this={msgBox} class="box-messages flex-grow">
             {#each $trollboxMessages as message}
                 <div class="message" style={`color: ${userColors[message.sender]}`}>
-                    <strong style={`color: ${userColors[message.sender]}`}>{`${message.sender}: `}</strong>
+                    {unixToLocalTimestamp(message.timestamp)} <strong style={`color: ${userColors[message.sender]}`}>{`${message.sender}: `}</strong>
                     {`${message.message}`}
                 </div>
             {/each}
