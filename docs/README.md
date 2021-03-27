@@ -28,7 +28,7 @@ We built Rocketswap to strengthen and foster a growing Lamden ecosystem.
 
 Rocketswap will achieve this goal by creating positive feedback loops across projects, allowing all Lamden assets to find fair market value.
 
-### How can I contact the Rocketswap Team ?
+#### How can I contact the Team ?
 
 Contact us on [Telegram](https://t.me/rocketswap)
 
