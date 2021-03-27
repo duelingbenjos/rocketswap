@@ -110,7 +110,7 @@ Based on the scenarios above, here are the results compared to the baseline:
 |:---:|:---:|:---|
 |1|Baseline|<img src="Scenario1.png" height=30 width=295></img> |
 |2|Fees in RSWP|<img src="Scenario2.png" height=30 width=220></img> |
-|3|3694 RSWP Staked|<img src="Scenario3.png" height=30 width=200></img> |
+|3|3700 RSWP Staked|<img src="Scenario3.png" height=30 width=200></img> |
 |3|34500 RSWP Staked|<img src="Scenario4.png" height=30 width=170></img> |
 |3|100k RSWP Staked|<img src="Scenario5.png" height=30 width=155></img> |
 
