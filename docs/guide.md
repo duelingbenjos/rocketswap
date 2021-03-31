@@ -109,15 +109,14 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 
 !> This is another important piece of information - If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
 
-Anyway, lets keep moving, click *Launch*.
-
+6. Anyway, lets keep moving, click *Launch*.
 <img src="./static/swap_3.png" height=455 width=640></img>
 
 **LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
-<img src="./static/swap_5.png" height=250 width=172></img>
+    <img src="./static/swap_5.png" height=250 width=172></img>
 
 The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:
-<img src="./static/swap_4.png" height=131 width=412></img>
+    <img src="./static/swap_4.png" height=131 width=412></img>
 
 <img src="./static/rocketSeparator.png" height=18 width=914></img>
 ### Liquidity Pools
