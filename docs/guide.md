@@ -7,6 +7,8 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 * The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
 * Some Mainnet TAU tokens (available on TXBit)
 
+<img src="./static/rocketSeparator.png" height=18 width=914></img>
+
 ### Getting Started
 
 1. Access your Lamden Web Wallet and make sure you have some TAU in an account (if not, buy some at TXBIT here). Stare longingly at your sweet stack of TAU.
