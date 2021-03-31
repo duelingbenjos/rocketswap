@@ -11,7 +11,7 @@ A guide for first time users of Rocketswap which covers all the core functionali
 
 3. You will see the Choose a Login Option pop-up. We are using the Lamden Web wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the Lamden Wallet option.
 
-4. On the Lamden Wallet Login pop-up:  return
+4. On the Lamden Wallet Login pop-up:  
     A. Select the checkbox Auto Connect to Lamden Wallet. (Optional — I did this for convenience)
     
     B. Click Connect
