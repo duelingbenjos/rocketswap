@@ -80,7 +80,7 @@ Lets kick off the staking process:
 <img src="./static/Staking4.png" height=920 width=544></img>
 5. Another pop-up from the security conscious people at Lamden asking to Confirm Transaction.  
     A. You can check some of the transaction details here. The amount should be the amount you entered when requesting to stake at Step 2A.  
-    B. Click *APPROVE* at the bottom to progress
+    B. Click *APPROVE* at the bottom to progress   
 <img src="./static/Staking5.png" height=919 width=539></img>
 6. YOU DID IT! Staking done! You will get a helpful message flash up briefly in the top right of the screen for a few seconds:
 <img src="./static/Staking6.png" height=150 width=407></img>
