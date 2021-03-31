@@ -99,7 +99,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     C. Fee — as it says, this is the fee for the transaction you can reduce the fee by paying in RSWP (if you have it), and also can be reduced further by staking RSWP (holding it in your tank — another article I will cover)  
     D. Slippage Tolerance — you can set the maximum permissible slip you would allow for the transaction to proceed (all the way to 49%). If the slippage at step 4B is above the tolerance you set you will get this message  
 
-    You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
+!> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
 
     E. Guaranteed minimum — as the name says, this is a guarantee the amount you receive will not slip below this figure.  
     F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.
