@@ -1,4 +1,5 @@
 * [Introduction](/)
-* [Guide](guide.md)
+* [Guides](guides.md)
+* [Fees & Discounts](fee_discount.md)
 * [Glossary](glossary.md)
 * [To Do](todo.md)
