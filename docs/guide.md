@@ -10,17 +10,17 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 <img src="./static/rocketSeparator.png" height=18 width=914></img>
 ### Getting Started
 
-1. Access your Lamden Web Wallet and make sure you have some TAU in an account (if not, buy some at TXBIT here). Stare longingly at your sweet stack of TAU.
+**1.** Access your Lamden Web Wallet and make sure you have some TAU in an account (if not, buy some at TXBIT here). Stare longingly at your sweet stack of TAU.
 
 ?> You can refer back to your wallet to see the RocketSwap progress as you progress through this guide to see — the account created, funds transferred or transaction history etc. For now move on, you can check this out when we are done.
 
-2. You will need to connect your wallet with RocketSwap, click the *Connect Wallet* at the bottom left of the screen.
+**2.** You will need to connect your wallet with RocketSwap, click the *Connect Wallet* at the bottom left of the screen.
 
-3. You will see the **Choose a Login Option** pop-up. We are using the Lamden Web Wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the *Lamden Wallet* option.
+**3.** You will see the **Choose a Login Option** pop-up. We are using the Lamden Web Wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the *Lamden Wallet* option.
 
-4. On the **Lamden Wallet Login** pop-up:  
-    A. Select the checkbox *Auto Connect to Lamden Wallet*. (Optional — I did this for future convenience)      
-    B. Click *Connect*
+**4.** On the **Lamden Wallet Login** pop-up:  
+    **A.** Select the checkbox *Auto Connect to Lamden Wallet*. (Optional — I did this for future convenience)      
+    **B.** Click *Connect*
 
 5. A pop-up will appear, **Linked Account Creation**, which will guide you through the process of creating a linked account with RocketSwap. You can learn about linked accounts by selecting the bottom link *learn about linked accounts*, or click *NEXT* to proceed.
 
@@ -138,6 +138,7 @@ Anyway, lets keep moving, click *Launch*.
 
 8. Thats it! You will get a brief message pop up on the top right for a few seconds. Similar to below (except for your chosen pair):
 <img src="./static/liquidity_6.png" height=188 width=414></img>
+
 ?> Handy Hint! To remove your liquidity, you need to go back to Add Liquidity, select your token again. When it loads you will see on the top right of the popup and option to remove. (Have a look at the figure at step 6 and you can see it).
 
 <img src="./static/rocketSeparator.png" height=18 width=914></img>
