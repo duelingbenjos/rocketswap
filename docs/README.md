@@ -41,6 +41,12 @@ Lamden is the performant Python-Based blockchain platform that makes using and c
 ### How can I get RSWP?
 RSWP will be distributed by staking Mainnet TAU on Launch Date (23th March 2021). This staking pool will be live indefinitely.
 
+Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a higher RSWP reward to compensate for the unfortunate realities of impermanent loss.
+
+### If I decide to stake am I locked in?
+
+No, you can withdraw at any time.
+
 ### RSWP Token Information
 
 * **Supply:** 1,200,000,000
@@ -52,91 +58,12 @@ RSWP will be distributed by staking Mainnet TAU on Launch Date (23th March 2021)
 
 ### What does RSWP do?
 
-
-Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a higher RSWP reward to compensate for the unfortunate realities of impermanent loss.
+RSWP is the governance token of the Rocketswap exchange. Paying fees with RSWP on Rocketswap will reduce fees by 25%. Additional discounts also apply depending on how much RSWP you are holding in your fuel tank (check the guide section on staking $RSWP).
 
 ### How can I get Mainnet TAU?
+
 Mainnet TAU is available at Txbit
 
+### My questions were not answered by this doc!
 
-
-### How do I create a token?
-
-1. Use the following code to create an LST-001 Lamden Standard Token.
-
-```python
-# LST001
-balances = Hash(default_value=0)
-
-# LST002
-metadata = Hash()
-
-@construct
-def seed():
-    # LST001 - MINT SUPPLY to wallet that submits the contract
-    balances[ctx.caller] = 1_000_000
-
-    # LST002
-    metadata['token_name'] = "MY TOKEN NAME"
-    metadata['token_symbol'] = "TKN"
-    metadata['operator'] = ctx.caller
-
-# LST002
-@export
-def change_metadata(key: str, value: Any):
-    assert ctx.caller == metadata['operator'], 'Only operator can set metadata!'
-    metadata[key] = value
-
-# LST001
-@export
-def transfer(amount: float, to: str):
-    assert amount > 0, 'Cannot send negative balances!'
-    assert balances[ctx.caller] >= amount, 'Not enough coins to send!'
-
-    balances[ctx.caller] -= amount
-    balances[to] += amount
-
-# LST001
-@export
-def approve(amount: float, to: str):
-    assert amount > 0, 'Cannot send negative balances!'
-    balances[ctx.caller, to] += amount
-
-# LST001
-@export
-def transfer_from(amount: float, to: str, main_account: str):
-    assert amount > 0, 'Cannot send negative balances!'
-    assert balances[main_account, ctx.caller] >= amount, 'Not enough coins approved to send! You have {} and are trying to spend {}'\
-        .format(balances[main_account, ctx.caller], amount)
-    assert balances[main_account] >= amount, 'Not enough coins to send!'
-
-    balances[main_account, ctx.caller] -= amount
-    balances[main_account] -= amount
-    balances[to] += amount
-
-```
-
-2. In the `seed` method make the following changes:
-    - change `metadata['token_name']` to the name of your token (keep it short)
-    - change `metadata['token_symbol']` to the SYMBOL of your token
-
-3. Upload the smart contract to the Lamden Mainnet using the [Instructions Found here](https://docs.lamden.io/docs/wallet/ide_submit_smartcontract). 
-4. Next you can set the logo for your token in the following ways
-    - `url logo`: [Call the `change_metadata` method](https://docs.lamden.io/docs/wallet/ide_run_smartcontracts) on your new token contract and set the key `token_logo_url` to the url value (include http(s)://)
-    - `picture logos`: You use `png` or `svg` files to set your token logo (max file size 32kb)
-        - `svg logo`
-            1. [Visit this site](https://base64.guru/converter/encode/image/svg) upload your file and convert it to a base64 string
-            2. Copy the base64 string
-            3. [Call the `change_metadata` method](https://docs.lamden.io/docs/wallet/ide_run_smartcontracts) on your new token contract and set the key `token_logo_base64_svg` to the base64 string
-        - `png logo`
-            1. [Visit this site](https://base64.guru/converter/encode/image/png) upload your file and convert it to a base64 string
-            2. Copy the base64 string
-            3. [Call the `change_metadata` method](https://docs.lamden.io/docs/wallet/ide_run_smartcontracts) on your new token contract and set the key `token_logo_base64_png` to the base64 string
-5. The last thing to do is to head over to [Rocketswap and Create Liquidity](https://rocketswap.exchange/#/pool-create/).
-
-### How do I see my tokens in the Lamden Wallet?
-All tokens must be manually added to the Lamden Wallet.  To do so follow these simple steps:
-1. [Download](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim) the Lamden Wallet into Chrome if you don't have it already. And follow the step-by step-instructions to create a wallet.
-2. From the main `accounts` page click the `ACCOUNTS & TOKENS` button
-3. From the `What to add` dropdown click `Token`
-4. Enter the Tokens Contract Name in the `Contract Name` input box.  If you don't know the contract name you can find it by visiting the token's Swap page on [Rocketswap](https://rocketswap.exchange).  You'll find the contract name in the address bar (contract names always begin with "con_") `https://rocketswap.exchange/#/con_rswp_lst001`
+First, good work for reading to the bottom. Second, this document is in it’s infancy and relies on good people just like you to help us if you spot an error or something missing — it will get better with time with your help. If your answer was not here, talk to the good people in Rocketswap Telegram (use the code word — cowsgomoo then we know you read this doc).
