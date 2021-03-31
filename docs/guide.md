@@ -15,22 +15,24 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 ?> You can refer back to your wallet to see the RocketSwap progress as you progress through this guide to see — the account created, funds transferred or transaction history etc. For now move on, you can check this out when we are done.
 
 2. You will need to connect your wallet with RocketSwap, click the *Connect Wallet* at the bottom left of the screen.
+<img src="./static/Gettingstarted1.png" height=480 width=960></img>
 
 3. You will see the **Choose a Login Option** pop-up. We are using the Lamden Web Wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the *Lamden Wallet* option.
+<img src="./static/Gettingstarted2.png" height=651 width=960></img>
 
 4. On the **Lamden Wallet Login** pop-up:  
     A. Select the checkbox *Auto Connect to Lamden Wallet*. (Optional — I did this for future convenience)      
     B. Click *Connect*
-
+<img src="./static/Gettingstarted3.png" height=544 width=960></img>
 5. A pop-up will appear, **Linked Account Creation**, which will guide you through the process of creating a linked account with RocketSwap. You can learn about linked accounts by selecting the bottom link *learn about linked accounts*, or click *NEXT* to proceed.
 
 6. Next pop-up screen for **Linked Account Creation**. To speed up this process you can transfer TAU from your account to the RocketSwap account about to be created as one step (instead of manually transferring from your Lamden wallet):  
     A. Select the account containing your TAU you would like to use  
     B. Enter the amount to transfer (in my example I transferred 1 TAU, but you can input however much you would like to transfer to the RocketSwap account)  
     C. Click *Yes* to proceed
-
+<img src="./static/Gettingstarted5.png" height=921 width=544></img>
 7. Final pop-up screen for **Linked Account Creation**. Personal choice around security, read the options and make a selection (I selected Yes for convenience). Then click *CREATE ACCOUNT*.
-
+<img src="./static/Gettingstarted6.png" height=918 width=540></img>
 8. Now, go and check your Lamden web wallet. You will see an additional account has been created for RocketSwap **AND** you should have funds. Go and enjoy RocketSwap!
 
 ?> Did you forget to select transfer funds or you just like doing things the hard way? Keep reading on how to transfer funds to RocketSwap Manually.
