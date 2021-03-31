@@ -1,8 +1,5 @@
 <img src="./static/RS_Logo.png" height=400 width=400></img>
 
-
-## About Rocketswap
-
 ### What is Rocketswap ?
 
 [Rocketswap](https://rocketswap.exchange) is a community developed AMM (Automated Market Maker) which resides on the [Lamden Blockchain](https://www.lamden.io).
