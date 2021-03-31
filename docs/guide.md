@@ -105,9 +105,9 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     <img src="./static/swap_2.png" height=660 width=640></img>
 
 5. Once you are happy with all the details, you can click the Swap button. A Confirm Swap pop-up will appear, for you to review the details. Take a moment to read the note, in my example it reads as follows:
->Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
+    >Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
 
-    !> This is another important piece of information - If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
+!> This is another important piece of information - If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
 
 6. Anyway, lets keep moving, click *Launch*.
 
