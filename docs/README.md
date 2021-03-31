@@ -110,7 +110,7 @@ Using the scenarios above, the resultant fees are visualised below compared to t
 
 |Scenario|Description|Visualised Fee|
 |:---:|:---:|:---|
-|1|Baseline|<img src="static\Fee_Scenario1.png" height=30 width=295></img> |
+|1|Baseline|<img src=".\static\Fee_Scenario1.png" height=30 width=295></img> |
 |2|Fees in RSWP|<img src="static\Fee_Scenario2.png" height=30 width=220></img> |
 |3|3700 RSWP Staked|<img src="static\Fee_Scenario3.png" height=30 width=200></img> |
 |3|34500 RSWP Staked|<img src="static\Fee_Scenario4.png" height=30 width=170></img> |
