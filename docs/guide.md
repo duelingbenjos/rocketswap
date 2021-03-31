@@ -128,18 +128,18 @@ The other, less fun, notification will flash up for a few seconds in the top rig
 
 
 2. Click on *Pools* in the top right of the screen.
-<img src="./static/liquidity_1.png" height=464 width=1280></img>
+<img src="./static/liquidity_1.png" height=348 width=960></img>
 3. There is a very good chance you will not be the first to create the pool, so we don’t need to create a pool so we will add to a pool that already exists. Click *Add Liquidity*.
-<img src="./static/liquidity_2.png" height=406 width=1280></img>
+<img src="./static/liquidity_2.png" height=305 width=960></img>
 4. Click Select token dropdown, wait for the list to load then select the token you would like to use (I will use DOUG for the example).
-<img src="./static/liquidity_3.png" height=468 width=1280></img>
+<img src="./static/liquidity_3.png" height=351 width=960></img>
 5. From here we can do a few things:  
     A. At the bottom we can see some of the stats for the pair selected — how much is one compared to the other which will determine how much we can add to the pool. As you can see in my example I have a lot more DOUG than TAU and they are a similar price, so I will run out of TAU before I run out of DOUG  
     B. Feel free to click on either MAX and see the result or you can enter a figure into either box to see the result. In my example I am adding 50 TAU and it automatically populates the DOUG as 61  
     C. After you are happy with the amount you are adding to the pool click *Add Supply*   
-<img src="./static/liquidity_4.png" height=517 width=640></img>
+<img src="./static/liquidity_4.png" height=388 width=960></img>
 6. Read and verify the details on the popup then click *Confirm Add Supply*.
-<img src="./static/liquidity_5.png" height=454 width=640></img>
+<img src="./static/liquidity_5.png" height=340 width=960></img>
 7. For first time users to liquidity pools there will be a popup from the Lamden Wallet for you to authorise the contract action. (Sorry did not get a screen shot). Read and accept to proceed.
 
 8. Thats it! You will get a brief message pop up on the top right for a few seconds. Similar to below (except for your chosen pair):
