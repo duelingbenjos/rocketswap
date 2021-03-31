@@ -111,7 +111,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 
 6. Anyway, lets keep moving, click *Launch*.
 
-    <img src="./static/swap_3.png" height=961 width=960></img>
+    <img src="./static/swap_3.png" height=681 width=960></img>
 
     **LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
     <img src="./static/swap_5.png" height=250 width=172></img>
