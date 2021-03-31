@@ -5,7 +5,7 @@ A guide for first time users of Rocketswap which covers all the core functionali
 
 To use [Rocketswap](https://.rocketswap.exchange) you will need :
 * The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
-* Some Mainnet TAU tokens (available on TXBit)
+* Some Mainnet TAU tokens - [available on TXBit](https://txbit.io/)
 
 <img src="./static/rocketSeparator.png" height=18 width=914></img>
 ### Getting Started
