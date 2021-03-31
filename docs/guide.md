@@ -137,3 +137,144 @@ Anyway, lets keep moving, click *Launch*.
 
 ?> Handy Hint! To remove your liquidity, you need to go back to Add Liquidity, select your token again. When it loads you will see on the top right of the popup and option to remove. (Have a look at the figure at step 6 and you can see it).
 
+### Staking RSWP (putting fuel in the fuel tank)
+
+1. First let’s have a look at what we are talking about, the $RSWP Staking and Trade Fee Discount view below:
+
+2. Let’s work though some of the details in the picture:
+* The *‘Instant 25% discount on fees when paying in RSWP’* is correct — verified by RocketSwap developers. However, it is not shown in this section on Trade Fee Discount and is applied later.
+* *‘Additional discount on fees depending on how much RSWP is in your fuel tank’* (staking). This is the bit that does show as Trade Fee Discount, and probably leads to the key question — how does it work and how much RSWP is enough?
+The staking formula is as follows — *ln({RSWP})*0.07-0.505*. If we plot that it looks like the line in blue below:
+
+So how much is enough? This really is a personal choice, however as you can see, the benefits start to diminish as you get into the higher regions. For me, I penned in the tangent line, in red above. Somewhere in the region of 34,500 to 50,000 RSWP would be a good range if you intend of doing a decent amount of transactions on the exchange. Which would equate to a 22.641% or 25.238% discount respectively. Pushing to 30%, would require close to 100k RSWP. However, this really is personal preference and depends entirely on what you are using RocketSwap for and what you are trying to achieve.
+
+For smaller investors that intend to trade a reasonable amount of the time, a target of 3694 RSWP yields an excellent ‘cost/benefit’, netting you a 7.0013% discount.
+
+##### Why, oh why, is the minimum stake 1361? Glad you asked!
+
+Zooming right in on the graph we can see it crosses the x axis not at 0, but pretty damn close to 1361 — at 1358.703 to be precise. At which point, based on the formula, if you put in less than 1358.703 you would actually be paying extra (not that this happens, as you can see in the contract below, the ‘discount’ can’t go negative).
+
+Final piece of the puzzle! how does it all add up? Looking at the Rocketswap contract, con_rocketswap_official_v1_1, we can see the following:
+`__state['FEE_PERCENTAGE'] = decimal('0.5') / 100`
+
+This is the original fee percentage being 0.5%, the ‘__discount’ is defined below:
+`__discount = Hash(default_value=1, contract='con_rocketswap_official_v1_1', name='discount')`
+
+‘__discount’ defaults to 1 (no staking) however is calculated when you stake RSWP, therefore found under ‘staking’ in the contract:
+`__state['MULTIPLIER'] = decimal('0.07')
+__state['DISCOUNT_FLOOR'] = decimal('0.505')
+discount_amount = __state['LOG_ACCURACY'] * (__staked_amount[ctx.
+            caller, __state['TOKEN_CONTRACT']] ** (1 / __state[
+            'LOG_ACCURACY']) - 1) * __state['MULTIPLIER'] - __state[
+            'DISCOUNT_FLOOR']
+        if discount_amount > decimal('0.99'):
+            discount_amount = decimal('0.99')
+        if discount_amount < 0:
+            discount_amount = 0
+        __discount[ctx.caller] = 1 - discount_amount`
+        
+You can see the formula mentioned earlier here. Also note.. technically 99% is the maximum discount however good luck getting that much RSWP. Lets go with the previous example of 34500 RSWP staked and a 22.641% discount for staking. In this case:
+`__discount[ctx.caller] = 1 - 0.22641`
+
+Looking at the ‘buy’ to put this into use:
+`fee_percent = __state['FEE_PERCENTAGE'] * __discount[ctx.caller]`
+
+which is:
+`fee_percent = 0.005 * 0.77359
+fee_percent = 0.00386795`
+
+then we add in our 25% discount for paying in RSWP:
+`__state['TOKEN_DISCOUNT'] = decimal('0.75')
+fee = tokens_purchased * fee_percent
+    if token_fees is True:
+        fee = fee * __state['TOKEN_DISCOUNT']`
+        
+The above converts the fee into a token amount however we can still calculate the end result as a total discount.
+`end result = 0.00386795 * 0.75
+           = 0.0029009625`
+           
+Or 0.29% in fees instead of our original 0.5%.
+Let’s also not forget the 20% burn on Fees in RSWP putting positive pressure on RSWP price providing further indirect benefits for hodlers of RSWP.
+
+### Creating a Token
+
+1. Use the following code to create an LST-001 Lamden Standard Token.
+
+```python
+# LST001
+balances = Hash(default_value=0)
+
+# LST002
+metadata = Hash()
+
+@construct
+def seed():
+    # LST001 - MINT SUPPLY to wallet that submits the contract
+    balances[ctx.caller] = 1_000_000
+
+    # LST002
+    metadata['token_name'] = "MY TOKEN NAME"
+    metadata['token_symbol'] = "TKN"
+    metadata['operator'] = ctx.caller
+
+# LST002
+@export
+def change_metadata(key: str, value: Any):
+    assert ctx.caller == metadata['operator'], 'Only operator can set metadata!'
+    metadata[key] = value
+
+# LST001
+@export
+def transfer(amount: float, to: str):
+    assert amount > 0, 'Cannot send negative balances!'
+    assert balances[ctx.caller] >= amount, 'Not enough coins to send!'
+
+    balances[ctx.caller] -= amount
+    balances[to] += amount
+
+# LST001
+@export
+def approve(amount: float, to: str):
+    assert amount > 0, 'Cannot send negative balances!'
+    balances[ctx.caller, to] += amount
+
+# LST001
+@export
+def transfer_from(amount: float, to: str, main_account: str):
+    assert amount > 0, 'Cannot send negative balances!'
+    assert balances[main_account, ctx.caller] >= amount, 'Not enough coins approved to send! You have {} and are trying to spend {}'\
+        .format(balances[main_account, ctx.caller], amount)
+    assert balances[main_account] >= amount, 'Not enough coins to send!'
+
+    balances[main_account, ctx.caller] -= amount
+    balances[main_account] -= amount
+    balances[to] += amount
+
+```
+
+2. In the `seed` method make the following changes:
+    - change `metadata['token_name']` to the name of your token (keep it short)
+    - change `metadata['token_symbol']` to the SYMBOL of your token
+
+3. Upload the smart contract to the Lamden Mainnet using the [Instructions Found here](https://docs.lamden.io/docs/wallet/ide_submit_smartcontract). 
+4. Next you can set the logo for your token in the following ways
+    - `url logo`: [Call the `change_metadata` method](https://docs.lamden.io/docs/wallet/ide_run_smartcontracts) on your new token contract and set the key `token_logo_url` to the url value (include http(s)://)
+    - `picture logos`: You use `png` or `svg` files to set your token logo (max file size 32kb)
+        - `svg logo`
+            1. [Visit this site](https://base64.guru/converter/encode/image/svg) upload your file and convert it to a base64 string
+            2. Copy the base64 string
+            3. [Call the `change_metadata` method](https://docs.lamden.io/docs/wallet/ide_run_smartcontracts) on your new token contract and set the key `token_logo_base64_svg` to the base64 string
+        - `png logo`
+            1. [Visit this site](https://base64.guru/converter/encode/image/png) upload your file and convert it to a base64 string
+            2. Copy the base64 string
+            3. [Call the `change_metadata` method](https://docs.lamden.io/docs/wallet/ide_run_smartcontracts) on your new token contract and set the key `token_logo_base64_png` to the base64 string
+5. The last thing to do is to head over to [Rocketswap and Create Liquidity](https://rocketswap.exchange/#/pool-create/).
+
+### How do I see my tokens in the Lamden Wallet?
+All tokens must be manually added to the Lamden Wallet.  To do so follow these simple steps:
+1. [Download](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim) the Lamden Wallet into Chrome if you don't have it already. And follow the step-by step-instructions to create a wallet.
+2. From the main `accounts` page click the `ACCOUNTS & TOKENS` button
+3. From the `What to add` dropdown click `Token`
+4. Enter the Tokens Contract Name in the `Contract Name` input box.  If you don't know the contract name you can find it by visiting the token's Swap page on [Rocketswap](https://rocketswap.exchange).  You'll find the contract name in the address bar (contract names always begin with "con_") `https://rocketswap.exchange/#/con_rswp_lst001`
+
+
