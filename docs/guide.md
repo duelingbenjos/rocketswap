@@ -1,4 +1,4 @@
-## Rocketswap Guide
+## Guide
 A guide for first time users of Rocketswap which covers all the core functionality of the application in easy to follow steps.  
 
 ### What do I need to use Rocketswap ?
