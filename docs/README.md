@@ -40,10 +40,6 @@ RSWP will be distributed by staking Mainnet TAU on Launch Date (23th March 2021)
 
 Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a higher RSWP reward to compensate for the unfortunate realities of impermanent loss.
 
-### If I decide to stake am I locked in?
-
-No, you can withdraw at any time.
-
 ### RSWP Token Information
 
 * **Supply:** 1,200,000,000
