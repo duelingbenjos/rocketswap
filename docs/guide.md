@@ -92,7 +92,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     A. Price — the price you paying for your chosen token (the TO) relative to your base token (the FROM)  
     B. Price Impact (slippage) — this is the most important piece in the entire swap and determines how much slip is likely to occur when you perform your swap. So you will see in the next screen down I did not get my full 50 RSWP, it slipped to 49.5 — this is based on the Liquidity Pool which we will cover in another article. Needless to say, be aware of slippage!  
     C. Fee — as it says, this is the fee for the transaction you can reduce the fee by paying in RSWP (if you have it), and also can be reduced further by staking RSWP (holding it in your tank — another article I will cover)  
-    D. Slippage Tolerance — you can set the maximum permissible slip you would allow for the transaction to proceed (all the way to 49%). If the slippage at step 3B is above the tolerance you set you will get this message  
+    D. Slippage Tolerance — you can set the maximum permissible slip you would allow for the transaction to proceed (all the way to 49%). If the slippage at step 4B is above the tolerance you set you will get this message  
     
 
     You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
