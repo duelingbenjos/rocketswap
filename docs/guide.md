@@ -1,9 +1,15 @@
 ## Rocketswap Guide
 A guide for first time users of Rocketswap which covers all the core functionality of the application in easy to follow steps.  
 
+### What do I need to use Rocketswap ?
+
+To use [Rocketswap](https://.rocketswap.exchange) you will need :
+* The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
+* Some Mainnet TAU tokens (available on TXBit)
+
 ### Getting Started
 
-1. Access your Lamden web wallet and make sure you have some TAU in an account (if not, buy some at TXBIT here). Stare longingly at your sweet stack of TAU.
+1. Access your Lamden Web Wallet and make sure you have some TAU in an account (if not, buy some at TXBIT here). Stare longingly at your sweet stack of TAU.
 
 ?> You can refer back to your wallet to see the RocketSwap progress as you progress through this guide to see — the account created, funds transferred or transaction history etc. For now move on, you can check this out when we are done.
 
