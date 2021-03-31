@@ -11,8 +11,7 @@ A guide for first time users of Rocketswap which covers all the core functionali
 
 3. You will see the Choose a Login Option pop-up. We are using the Lamden Web wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the Lamden Wallet option.
 
-4. On the Lamden Wallet Login pop-up:
-
+4. On the Lamden Wallet Login pop-up:  return
     A. Select the checkbox Auto Connect to Lamden Wallet. (Optional — I did this for convenience)
     
     B. Click Connect
@@ -20,31 +19,43 @@ A guide for first time users of Rocketswap which covers all the core functionali
 5. A pop-up will appear, Linked Account Creation, which will guide you through the process of creating a linked account with RocketSwap. You can learn about linked accounts by selecting the bottom link learn about linked accounts, or click NEXT to proceed.
 
 6. Next pop-up screen for Linked Account Creation. To speed up this process you can transfer TAU from your account to the RocketSwap account about to be created as one step (instead of manually transferring from your Lamden wallet):
-6A. Select the account containing your TAU you would like to use
-6B. Enter the amount to transfer (in my example I transferred 1 TAU, but you can input however much you would like to transfer to the RocketSwap account)
-6C. Click Yes to proceed
+    A. Select the account containing your TAU you would like to use
+
+    B. Enter the amount to transfer (in my example I transferred 1 TAU, but you can input however much you would like to transfer to the RocketSwap account)
+
+    C. Click Yes to proceed
 
 7. Final pop-up screen for Linked Account Creation. Personal choice around security, read the options and make a selection (I selected Yes for convenience). Then click CREATE ACCOUNT.
 
 8. Now, go and check your Lamden web wallet. You will see an additional account has been created for RocketSwap AND you should have funds. Go and enjoy RocketSwap!
 
-!> Did you forget to select transfer funds or you just like doing things the hard way? Keep reading on how to transfer funds to RocketSwap Manually.
+?> Did you forget to select transfer funds or you just like doing things the hard way? Keep reading on how to transfer funds to RocketSwap Manually.
 
 ### Adding Funds
 
 2. Head over to your Lamden web wallet and you will see the RocketSwap account:
-2A. Click the RocketSwap account address on the right to copy it
-2B. To initiate a transfer, click the account name with your TAU funds you would like send to the RocketSwap account
-2C. On the next screen select SEND TX.
+
+    A. Click the RocketSwap account address on the right to copy it
+    
+    B. To initiate a transfer, click the account name with your TAU funds you would like send to the RocketSwap account
+    
+    C. On the next screen select SEND TX.
 
 3. On the Make a Lamden Transaction pop-up:
-3A. Check your account (this will default to what you clicked)
-3B. Check stamp limit (default is already populated, this is equivalent in terminology to Ethereum GAS fees — but much cheaper)
-3C. Choose Function to Run — Default is transfer and this is the option we need
-3D. Set the amount to the figure you would like to transfer (you will need a small amount remaining for stamps
-3E. In the TO field, paste in the address you copied from the last screen
-3F. REVIEW YOUR TRANSACTION DETAILS!
-3G. Click NEXT
+
+    A. Check your account (this will default to what you clicked)
+
+    B. Check stamp limit (default is already populated, this is equivalent in terminology to Ethereum GAS fees — but much cheaper)
+
+    C. Choose Function to Run — Default is transfer and this is the option we need
+
+    D. Set the amount to the figure you would like to transfer (you will need a small amount remaining for stamps
+
+    E. In the TO field, paste in the address you copied from the last screen
+
+    F. REVIEW YOUR TRANSACTION DETAILS!
+
+    G. Click NEXT
 
 4. On the next screen, click Confirm Transaction, you should then receive a pop-up notification that the transaction was successful and the transmission cost in stamps. Select Home.
 
@@ -55,8 +66,10 @@ A guide for first time users of Rocketswap which covers all the core functionali
 ### Staking
 
 1. Once you are in RocketSwap:
-1A. Confirm your wallet is connected from the bottom left of the screen and you have funds available (Guide steps above)
-1B. Click the $RSWP wording on the top right of the screen
+
+    A. Confirm your wallet is connected from the bottom left of the screen and you have funds available (Guide steps above)
+    
+    B. Click the $RSWP wording on the top right of the screen
 
 2. Now let’s get STAKING!
 2A. Enter the amount you would like to stake in TAU. Alternatively you can select the MAX button instead of entering an amount to stake your entire wallet, you will notice if you select MAX this is not equal to your full wallet amount, this is due to some small fees need to be extracted.
