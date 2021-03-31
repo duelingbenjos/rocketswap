@@ -31,10 +31,15 @@ Rocketswap will achieve this goal by creating positive feedback loops across pro
 #### How can I contact the Team ?
 
 Contact us on [Telegram](https://t.me/rocketswap)
+Like and retweet us on [Twitter](https://twitter.com/RSwapOfficial)
+Read our articles on [Medium](https://medium.com/rswp-io)
 
-### What is Lamden ?
+### What is Lamden?
 
-Lamden is a Web 3.0 application platform, more info @ www.lamden.io
+Lamden is the performant Python-Based blockchain platform that makes using and creating the next generation of dApps easy for everyone. With distributed governance and rewards for smart contract developers, Lamden democratises access to the blockchain. More info @ www.lamden.io
+
+### How can I get RSWP?
+RSWP will be distributed by staking Mainnet TAU on Launch Date (23th March 2021). This staking pool will be live indefinitely.
 
 ### RSWP Token Information
 
@@ -45,30 +50,14 @@ Lamden is a Web 3.0 application platform, more info @ www.lamden.io
 * **Dev Reward:** 10% of emissions
 * **Deflationary Mechanisms:** Burn on payment of RSWP transaction fee.
 
-### How can I get RSWP?
-RSWP will be distributed by staking Mainnet TAU on Launch Date (23th March 2021). This staking pool will be live indefinitely.
+### What does RSWP do?
+
 
 Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a higher RSWP reward to compensate for the unfortunate realities of impermanent loss.
 
 ### How can I get Mainnet TAU?
 Mainnet TAU is available at Txbit
 
-## Using the Application
-
-### What do I need to use Rocketswap ?
-
-To use [Rocketswap](www.rswp.io) you will need :
-* The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
-* Some Mainnet TAU tokens (see the above section for more info)
-
-### How do I use Rocketswap?
-
-We have created a number of walk-throughs for first time users of Rocketswap that explain step-by-step how to perform all the basic site transactions:
-1. [Getting Started](https://clay99.medium.com/a-step-by-step-for-first-time-users-on-how-to-get-setup-on-rocketswap-rswp-io-def31dfac41b)
-2. [Adding TAU to Rocketswap](https://clay99.medium.com/rocketswap-guides-adding-funds-rswp-io-417ebd82da4)
-3. [Staking](https://clay99.medium.com/rocketswap-guides-staking-rswp-io-910718b65109)
-4. [Liquidity Pools](https://clay99.medium.com/rocketswap-guides-liquidity-pools-fd0feae6a15a)
-5. [Performing Swaps](https://clay99.medium.com/rocketswap-guides-swaps-rocketswap-exchange-42004d354bac)
 
 
 ### How do I create a token?
