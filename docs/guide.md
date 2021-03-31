@@ -89,6 +89,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     B. Next box down is what we swapping TO — also a great label on it, “To”  
     C. The arrow allows us to swap the FROM and TO tokens around. Go ahead try it out and see what it does (no costs involved)  
     D. The TO box also contains the drop down to select the token we would like to swap —go in and select the token you would like to swap. In this example I am going to swap *FROM TAU TO RSWP*  
+<img src="./static/swap_1.png" height=480 width=640></img>
 
 3. Now that we have selected the token we are swapping to, input how much we would either like to ‘spend’ (input into the FROM box), or how much we would like to ‘buy’ (in the TO box) — the opposite box will auto-magically populate. In this example I am going to populate the TO box with 50 RSWP and it is telling me it will cost me 32.14835475 TAU (in FROM).
 
@@ -97,12 +98,12 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     B. Price Impact (slippage) — this is the most important piece in the entire swap and determines how much slip is likely to occur when you perform your swap. So you will see in the next screen down I did not get my full 50 RSWP, it slipped to 49.5 — this is based on the Liquidity Pool which we will cover in another article. Needless to say, be aware of slippage!  
     C. Fee — as it says, this is the fee for the transaction you can reduce the fee by paying in RSWP (if you have it), and also can be reduced further by staking RSWP (holding it in your tank — another article I will cover)  
     D. Slippage Tolerance — you can set the maximum permissible slip you would allow for the transaction to proceed (all the way to 49%). If the slippage at step 4B is above the tolerance you set you will get this message  
-    
 
     You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
 
     E. Guaranteed minimum — as the name says, this is a guarantee the amount you receive will not slip below this figure.  
     F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.
+<img src="./static/swap_2.png" height=660 width=640></img>
 
 5. Once you are happy with all the details, you can click the Swap button. A Confirm Swap pop-up will appear, for you to review the details. Take a moment to read the note, in my example it reads as follows:
 >Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
@@ -110,8 +111,13 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 !> This is another important piece of info. If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
 
 Anyway, lets keep moving, click *Launch*.
+<img src="./static/swap_3.png" height=455 width=640></img>
 
-**LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:
+**LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
+<img src="./static/swap_5.png" height=250 width=172></img>
+
+The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:
+<img src="./static/swap_4.png" height=131 width=412></img>
 
 <img src="./static/rocketSeparator.png" height=18 width=914></img>
 ### Liquidity Pools
