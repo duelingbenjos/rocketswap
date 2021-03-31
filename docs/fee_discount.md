@@ -31,7 +31,7 @@ As above, paying fees in RSWP automatically attracts a 25% discount.  However wi
 
 Using the scenarios above, the resultant fees are visualised below compared to the baseline:
 
-|Scenario|Description|Visualised Fee|
+|Scenario|Description|Fee vs Baseline|
 |:---:|:---:|:---|
 |1|Baseline|<img src="./static/Fees_Scenario1.png" height=30 width=295></img> |
 |2|Fees in RSWP|<img src="./static/Fees_Scenario2.png" height=30 width=220></img> |
