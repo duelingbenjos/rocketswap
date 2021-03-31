@@ -89,7 +89,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     B. Next box down is what we swapping TO — also a great label on it, “To”  
     C. The arrow allows us to swap the FROM and TO tokens around. Go ahead try it out and see what it does (no costs involved)  
     D. The TO box also contains the drop down to select the token we would like to swap —go in and select the token you would like to swap. In this example I am going to swap *FROM TAU TO RSWP*  
-<img src="./static/swap_1.png" height=480 width=640></img>
+<img src="./static/swap_1.png" height=719 width=960></img>
 
 3. Now that we have selected the token we are swapping to, input how much we would either like to ‘spend’ (input into the FROM box), or how much we would like to ‘buy’ (in the TO box) — the opposite box will auto-magically populate. In this example I am going to populate the TO box with 50 RSWP and it is telling me it will cost me 32.14835475 TAU (in FROM).
 
@@ -102,7 +102,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.  
 
     ?> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
-    <img src="./static/swap_2.png" height=660 width=640></img>
+    <img src="./static/swap_2.png" height=990 width=960></img>
 
 5. Once you are happy with all the details, you can click the Swap button. A Confirm Swap pop-up will appear, for you to review the details. Take a moment to read the note, in my example it reads as follows:
     >Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
@@ -111,7 +111,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 
 6. Anyway, lets keep moving, click *Launch*.
 
-    <img src="./static/swap_3.png" height=455 width=640></img>
+    <img src="./static/swap_3.png" height=961 width=960></img>
 
     **LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
     <img src="./static/swap_5.png" height=250 width=172></img>
