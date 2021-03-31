@@ -32,16 +32,16 @@ As above, paying fees in RSWP automatically attracts a 25% discount.  However wi
 #### log<sub>e</sub>({RSWP Stake}) * 0.07 - 0.505
 
 NOTE: *Based on this formula, the minimum staking amount is 1361 RSWP.*
-<img src="./static/Fee_RSWPfeeformula.png" height=341 width=857></img>
+<img src="./static/Fees_RSWPfeeformula.png" height=341 width=857></img>
 
 Using the scenarios above, the resultant fees are visualised below compared to the baseline:
 
 |Scenario|Description|Visualised Fee|
 |:---:|:---:|:---|
-|1|Baseline|<img src="./static/Fee_Scenario1.png" height=30 width=295></img> |
-|2|Fees in RSWP|<img src="./static/Fee_Scenario2.png" height=30 width=220></img> |
-|3|3700 RSWP Staked|<img src="./static/Fee_Scenario3.png" height=30 width=200></img> |
-|3|34500 RSWP Staked|<img src="./static/Fee_Scenario4.png" height=30 width=170></img> |
-|3|100k RSWP Staked|<img src="./static/Fee_Scenario5.png" height=30 width=155></img> |
+|1|Baseline|<img src="./static/Fees_Scenario1.png" height=30 width=295></img> |
+|2|Fees in RSWP|<img src="./static/Fees_Scenario2.png" height=30 width=220></img> |
+|3|3700 RSWP Staked|<img src="./static/Fees_Scenario3.png" height=30 width=200></img> |
+|3|34500 RSWP Staked|<img src="./static/Fees_Scenario4.png" height=30 width=170></img> |
+|3|100k RSWP Staked|<img src="./static/Fees_Scenario5.png" height=30 width=155></img> |
 
 A Lamden transaction fee to perform the necessary contract actions is also charged, generally around 65 Stamps (1 TAU) however is based on network traffic at the time the transaction is processed.
