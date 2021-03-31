@@ -156,12 +156,14 @@ Zooming right in on the graph we can see it crosses the x axis not at 0, but pre
 
 Final piece of the puzzle! how does it all add up? Looking at the Rocketswap contract, con_rocketswap_official_v1_1, we can see the following:  
 ```python
-__state['FEE_PERCENTAGE'] = decimal('0.5') / 100```
+__state['FEE_PERCENTAGE'] = decimal('0.5') / 100
+```
 
 This is the original fee percentage being 0.5%, the ‘__discount’ is defined below:  
 ```python
 __discount = Hash(default_value=1, 
-contract='con_rocketswap_official_v1_1', name='discount')```
+contract='con_rocketswap_official_v1_1', name='discount')
+```
 
 ‘__discount’ defaults to 1 (no staking) however is calculated when you stake RSWP, therefore found under ‘staking’ in the contract:  
 ```python
@@ -175,32 +177,38 @@ discount_amount = __state['LOG_ACCURACY'] * (__staked_amount[ctx.
             discount_amount = decimal('0.99')  
         if discount_amount < 0:  
             discount_amount = 0  
-        __discount[ctx.caller] = 1 - discount_amount```
+        __discount[ctx.caller] = 1 - discount_amount
+```
         
 You can see the formula mentioned earlier here. Also note.. technically 99% is the maximum discount however good luck getting that much RSWP. Lets go with the previous example of 34500 RSWP staked and a 22.641% discount for staking. In this case:  
 ```python
-__discount[ctx.caller] = 1 - 0.22641```
+__discount[ctx.caller] = 1 - 0.22641
+```
 
 Looking at the ‘buy’ to put this into use:  
 ```python
-fee_percent = __state['FEE_PERCENTAGE'] * __discount[ctx.caller]```
+fee_percent = __state['FEE_PERCENTAGE'] * __discount[ctx.caller]
+```
 
 which is:  
 ```python
 fee_percent = 0.005 * 0.77359  
-fee_percent = 0.00386795```
+fee_percent = 0.00386795
+```
 
 then we add in our 25% discount for paying in RSWP:  
 ```python
 __state['TOKEN_DISCOUNT'] = decimal('0.75')  
 fee = tokens_purchased * fee_percent  
     if token_fees is True:  
-        fee = fee * __state['TOKEN_DISCOUNT']```
+        fee = fee * __state['TOKEN_DISCOUNT']
+```
         
 The above converts the fee into a token amount however we can still calculate the end result as a total discount.
 ```python
 end result = 0.00386795 * 0.75  
-           = 0.0029009625```
+           = 0.0029009625
+```
            
 Or 0.29% in fees instead of our original 0.5%.
 Let’s also not forget the 20% burn on Fees in RSWP putting positive pressure on RSWP price providing further indirect benefits for hodlers of RSWP.
