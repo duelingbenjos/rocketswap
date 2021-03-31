@@ -101,22 +101,22 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     E. Guaranteed minimum — as the name says, this is a guarantee the amount you receive will not slip below this figure.  
     F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.  
 
-?> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
-<img src="./static/swap_2.png" height=660 width=640></img>
+    ?> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
+    <img src="./static/swap_2.png" height=660 width=640></img>
 
 5. Once you are happy with all the details, you can click the Swap button. A Confirm Swap pop-up will appear, for you to review the details. Take a moment to read the note, in my example it reads as follows:
 >Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
 
-!> This is another important piece of information - If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
+    !> This is another important piece of information - If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
 
 6. Anyway, lets keep moving, click *Launch*.
 
-<img src="./static/swap_3.png" height=455 width=640></img>
+    <img src="./static/swap_3.png" height=455 width=640></img>
 
-**LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
+    **LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
     <img src="./static/swap_5.png" height=250 width=172></img>
 
-The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:
+    The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:
     <img src="./static/swap_4.png" height=131 width=412></img>
 
 <img src="./static/rocketSeparator.png" height=18 width=914></img>
