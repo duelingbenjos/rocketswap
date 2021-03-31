@@ -98,17 +98,16 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     B. Price Impact (slippage) — this is the most important piece in the entire swap and determines how much slip is likely to occur when you perform your swap. So you will see in the next screen down I did not get my full 50 RSWP, it slipped to 49.5 — this is based on the Liquidity Pool which we will cover in another article. Needless to say, be aware of slippage!  
     C. Fee — as it says, this is the fee for the transaction you can reduce the fee by paying in RSWP (if you have it), and also can be reduced further by staking RSWP (holding it in your tank — another article I will cover)  
     D. Slippage Tolerance — you can set the maximum permissible slip you would allow for the transaction to proceed (all the way to 49%). If the slippage at step 4B is above the tolerance you set you will get this message  
-
-!> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
-
     E. Guaranteed minimum — as the name says, this is a guarantee the amount you receive will not slip below this figure.  
-    F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.
+    F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.  
+
+?> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
 <img src="./static/swap_2.png" height=660 width=640></img>
 
 5. Once you are happy with all the details, you can click the Swap button. A Confirm Swap pop-up will appear, for you to review the details. Take a moment to read the note, in my example it reads as follows:
 >Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
 
-!> This is another important piece of info. If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
+!> This is another important piece of information - If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
 
 Anyway, lets keep moving, click *Launch*.
 <img src="./static/swap_3.png" height=455 width=640></img>
