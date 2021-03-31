@@ -15,7 +15,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 ?> You can refer back to your wallet to see the RocketSwap progress as you progress through this guide to see — the account created, funds transferred or transaction history etc. For now move on, you can check this out when we are done.
 
 2. You will need to connect your wallet with RocketSwap, click the *Connect Wallet* at the bottom left of the screen.
-<img src="./static/Gettingstarted1.png" height=480 width=960></img>
+<img src="./static/Gettingstarted1.png" height=100 width=1000></img>
 
 3. You will see the **Choose a Login Option** pop-up. We are using the Lamden Web Wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the *Lamden Wallet* option.
 <img src="./static/Gettingstarted2.png" height=651 width=960></img>
