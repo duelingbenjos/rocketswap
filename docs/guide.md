@@ -9,11 +9,11 @@ A guide for first time users of Rocketswap which covers all the core functionali
 
 2. You will need to connect your wallet with RocketSwap, click the *Connect Wallet* at the bottom left of the screen.
 
-3. You will see the **Choose a Login Option** pop-up. We are using the Lamden Web wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the *Lamden Wallet* option.
+3. You will see the **Choose a Login Option** pop-up. We are using the Lamden Web Wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the *Lamden Wallet* option.
 
 4. On the **Lamden Wallet Login** pop-up:  
-    A. Select the checkbox Auto Connect to Lamden Wallet. (Optional — I did this for convenience)      
-    B. Click Connect
+    A. Select the checkbox *Auto Connect to Lamden Wallet*. (Optional — I did this for future convenience)      
+    B. Click *Connect*
 
 5. A pop-up will appear, **Linked Account Creation**, which will guide you through the process of creating a linked account with RocketSwap. You can learn about linked accounts by selecting the bottom link *learn about linked accounts*, or click *NEXT* to proceed.
 
@@ -107,12 +107,12 @@ Anyway, lets keep moving, click Launch.
 
 ?> By adding liquidity you will earn 0.3% of all trades on the pair, proportional to your share of the pool. Some pairs may have some additional bonuses — RSWP for example provides additional benefits(additional RSWP earned) through staking liquidity points.
 
-1. Double check you have BOTH TAU and your other token of choice available — so a balance above 0 of both TAU and the other token.
+1. Double check you have **BOTH** TAU and your other token of choice available — so a balance above 0 of both TAU and the other token.
 
 
-2. Click on Pools in the top right of the screen.
+2. Click on *Pools* in the top right of the screen.
 
-3. There is a very good chance you will not be the first to create the pool, so we don’t need to create a pool so we will add to a pool that already exists. Click Add Liquidity.
+3. There is a very good chance you will not be the first to create the pool, so we don’t need to create a pool so we will add to a pool that already exists. Click *Add Liquidity*.
 
 4. Click Select token dropdown, wait for the list to load then select the token you would like to use (I will use DOUG for the example).
 
@@ -120,9 +120,9 @@ Anyway, lets keep moving, click Launch.
 5. From here we can do a few things:  
     A. At the bottom we can see some of the stats for the pair selected — how much is one compared to the other which will determine how much we can add to the pool. As you can see in my example I have a lot more DOUG than TAU and they are a similar price, so I will run out of TAU before I run out of DOUG  
     B. Feel free to click on either MAX and see the result or you can enter a figure into either box to see the result. In my example I am adding 50 TAU and it automatically populates the DOUG as 61  
-    C. After you are happy with the amount you are adding to the pool click Add Supply  
+    C. After you are happy with the amount you are adding to the pool click *Add Supply*   
 
-6. Read and verify the details on the popup then click Confirm Add Supply.
+6. Read and verify the details on the popup then click *Confirm Add Supply*.
 
 7. For first time users to liquidity pools there will be a popup from the Lamden Wallet for you to authorise the contract action. (Sorry did not get a screen shot). Read and accept to proceed.
 
