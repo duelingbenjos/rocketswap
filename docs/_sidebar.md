@@ -1,3 +1,3 @@
-* [FAQ](/)
-* [Glossary](glossary.md)
-* [To Do](todo.md)
+* [Introduction](/)
+* [Guides](guide.md)
+* [Fees & Discounts](fee_discount.md)

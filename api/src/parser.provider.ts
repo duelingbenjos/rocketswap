@@ -6,15 +6,15 @@ import { getContractCode, getContractName, validateTokenContract } from "./utils
 import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
-import { savePrice } from "./entities/price.entity";
 import { IBlockParser } from "./types/websocket.types";
-import { SocketService } from "./socket.service";
+import { SocketService } from "./services/socket.service";
 import { setName } from "./entities/name.entity";
 import { AuthService } from "./authentication/trollbox.service";
 import { AmmMetaEntity, updateAmmMeta } from "./entities/amm-meta.entity";
 import { updateStakingContractMeta } from "./entities/staking-meta.entity";
 import startBlockgrabber from "./blockgrabber";
 import { log } from "./utils/logger";
+import { savePrice } from "./entities/price.entity";
 
 @Injectable()
 export class ParserProvider {
@@ -144,11 +144,11 @@ export class ParserProvider {
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
 			await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp, hash, ParserProvider.amm_meta_entity?.TOKEN_CONTRACT);
-			await savePrice(state, this.socketService.handleClientUpdate);
 			await updateAmmMeta({
 				state,
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
+			await savePrice(state, this.socketService.handleClientUpdate)
 		} catch (err) {
 			this.logger.error(err);
 		}

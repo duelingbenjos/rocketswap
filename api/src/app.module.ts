@@ -6,10 +6,9 @@ import { AppController } from "./app.controller";
 import { ParserProvider } from "./parser.provider";
 import { BalanceEntity } from "./entities/balance.entity";
 import { PairEntity } from "./entities/pair.entity";
-import { PriceEntity } from "./entities/price.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
-import { SocketService } from "./socket.service";
+import { SocketService } from "./services/socket.service";
 import { NameEntity } from "./entities/name.entity";
 import { TrollboxController } from "./authentication/trollbox.controller";
 import { RefreshTokensRepository } from "./authentication/refresh-token.repository";
@@ -20,12 +19,15 @@ import { AuthService } from "./authentication/trollbox.service";
 import { RefreshTokenEntity } from "./entities/refresh-token.entity";
 import { JwtStrategy } from "./authentication/jwt.strategy";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
-import { TransactionService } from "./transaction.service";
+import { TransactionService } from "./services/transaction.service";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { UserStakingEntity } from "./entities/user-staking.entity";
 import { StakingEpochEntity } from "./entities/staking-epoch.entity";
 import { TauMarketEntity } from "./entities/tau-market.entity";
+import { TradeSubscriber } from "./subscribers/trade.subscriber";
+import { PriceEntity } from "./entities/price.entity";
+import { VolumeService } from "./services/volume.service";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -35,10 +37,10 @@ const db_options: TypeOrmModuleOptions = {
 		TokenEntity,
 		BalanceEntity,
 		PairEntity,
-		PriceEntity,
 		LpPointsEntity,
 		TradeHistoryEntity,
 		NameEntity,
+		PriceEntity,
 		RefreshTokenEntity,
 		ChatHistoryEntity,
 		AmmMetaEntity,
@@ -47,6 +49,7 @@ const db_options: TypeOrmModuleOptions = {
 		StakingEpochEntity,
 		TauMarketEntity
 	],
+	subscribers:[TradeSubscriber],
 	synchronize: true,
 	autoLoadEntities: true
 };
@@ -73,7 +76,8 @@ const db_options: TypeOrmModuleOptions = {
 		AuthService,
 		Logger,
 		TransactionService,
-		StakingEpochEntity
+		StakingEpochEntity,
+		VolumeService
 	]
 })
 export class AppModule {}

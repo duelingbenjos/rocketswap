@@ -1,6 +1,6 @@
 import axios from "axios";
 import { saveUSDPrice, TauMarketEntity } from '../entities/tau-market.entity'
-import { SocketService } from "../socket.service";
+import { SocketService } from "./socket.service";
 import {log} from '../utils/logger'
 
 /** Singleton Service */

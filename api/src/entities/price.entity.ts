@@ -21,6 +21,9 @@ export class PriceEntity extends BaseEntity {
 	@Column()
 	price: string;
 
+	@Column({nullable: true})
+	daily_volume_tau: number
+
 	@Column()
 	time: string = Date.now().toString();
 }

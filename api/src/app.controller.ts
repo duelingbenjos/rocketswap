@@ -173,14 +173,4 @@ export class AppController {
 		}
 	}
 
-	// @Get("all_balances")
-	// async getAllBalances(): Promise<any> {
-	// 	try {
-	// 		let balances: any = await BalanceEntity.find();
-	// 		return balances;
-	// 	} catch (err) {
-	// 		console.error(err);
-	// 		throw new HttpException(err, 500);
-	// 	}
-	// }
 }
