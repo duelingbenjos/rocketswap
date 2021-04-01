@@ -112,7 +112,7 @@ Lets kick off the staking process:
     F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.  
 
     ?> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
-    <img src="./static/Swap2B.png" height=787 width=1000></img>
+    <img src="./static/Swap2B.png" height=483 width=1000></img>
 
 5. Once you are happy with all the details, you can click the Swap button. A Confirm Swap pop-up will appear, for you to review the details. Take a moment to read the note, in my example it reads as follows:
     >Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
