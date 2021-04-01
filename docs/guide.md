@@ -138,7 +138,7 @@ Lets kick off the staking process:
 
 
 2. Click on *Pools* in the top right of the screen.
-<img src="./static/Liquidity1.png" height=348 width=1000></img>
+<img src="./static/Liquidity1.png" height=141 width=1000></img>
 3. There is a very good chance you will not be the first to create the pool, so we don’t need to create a pool so we will add to a pool that already exists. Click *Add Liquidity*.
 
 4. Click *Select token* dropdown, wait for the list to load then select the token you would like to use (I will use DOUG for the example).
