@@ -18,7 +18,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 <img src="./static/Gettingstarted1.png" height=100 width=1000></img>
 
 3. You will see the **Choose a Login Option** pop-up. We are using the Lamden Web Wallet, also notice in the picture below, beside the Lamden Wallet is Installed with a green tick. Select the *Lamden Wallet* option.
-<img src="./static/Gettingstarted2.png" height=651 width=960></img>
+<img src="./static/Gettingstarted2.png" height=354 width=1000></img>
 
 4. On the **Lamden Wallet Login** pop-up:  
     A. Select the checkbox *Auto Connect to Lamden Wallet*. (Optional — I did this for future convenience)      
