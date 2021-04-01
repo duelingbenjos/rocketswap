@@ -23,7 +23,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 4. On the **Lamden Wallet Login** pop-up:  
     A. Select the checkbox *Auto Connect to Lamden Wallet*. (Optional — I did this for future convenience)      
     B. Click *Connect*
-<img src="./static/Gettingstarted3.png" height=544 width=960></img>
+<img src="./static/Gettingstarted3.png" height=290 width=1000></img>
 5. A pop-up will appear, **Linked Account Creation**, which will guide you through the process of creating a linked account with RocketSwap. You can learn about linked accounts by selecting the bottom link *learn about linked accounts*, or click *NEXT* to proceed.
 
 6. Next pop-up screen for **Linked Account Creation**. To speed up this process you can transfer TAU from your account to the RocketSwap account about to be created as one step (instead of manually transferring from your Lamden wallet):  
