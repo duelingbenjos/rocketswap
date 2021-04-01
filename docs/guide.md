@@ -44,7 +44,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     A. Click the *RocketSwap account address* on the right to copy it  
     B. To initiate a transfer, click the *account name* with your TAU funds you would like send to the RocketSwap account   
     C. On the next screen select *SEND TX* 
-<img src="./static/Add_funds1.png" height=293 width=960></img>
+<img src="./static/Add_funds1.png" height=305 width=1000></img>
 2. On the **Make a Lamden Transaction** pop-up:  
     A. Check your account (this will default to what you clicked)  
     B. Check stamp limit (default is already populated, this is equivalent in terminology to Ethereum GAS fees — but much cheaper)  
@@ -53,7 +53,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     E. In the TO field, paste in the address you copied from the last screen  
     F. REVIEW YOUR TRANSACTION DETAILS!  
     G. Click *NEXT*
-<img src="./static/Add_funds2.png" height=1126 width=960></img>
+<img src="./static/Add_funds2.png" height=787 width=1000></img>
 3. On the next screen, click *Confirm Transaction*, you should then receive a pop-up notification that the transaction was successful and the transmission cost in stamps. Select *Home*.
 
 4. Select *Accounts* in the top left of your screen in the Lamden wallet. You will see the RocketSwap account now has the TAU deposited.
