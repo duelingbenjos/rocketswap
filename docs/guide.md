@@ -7,7 +7,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 * The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
 * Some Mainnet TAU tokens - [available on TXBit](https://txbit.io/)
 
-<img src="./static/rocketSeparator.png" height=18 width=914></img>
+<img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ### Getting Started
 
 1. Access your Lamden Web Wallet and make sure you have some TAU in an account (if not, [buy some at TXBIT here](https://txbit.io/)). Stare longingly at your sweet stack of TAU.
@@ -30,14 +30,14 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
     A. Select the account containing your TAU you would like to use  
     B. Enter the amount to transfer (in my example I transferred 1 TAU, but you can input however much you would like to transfer to the RocketSwap account)  
     C. Click *Yes* to proceed   
-<img src="./static/Gettingstarted5.png" height=921 width=544></img>
+<img src="./static/Gettingstarted5.png" height=921 width=1000></img>
 7. Final pop-up screen for **Linked Account Creation**. Personal choice around security, read the options and make a selection (I selected Yes for convenience). Then click *CREATE ACCOUNT*.   
-<img src="./static/Gettingstarted6.png" height=918 width=540></img>
+<img src="./static/Gettingstarted6.png" height=918 width=1000></img>
 8. Now, go and check your Lamden web wallet. You will see an additional account has been created for RocketSwap **AND** you should have funds. Go and enjoy RocketSwap!
 
 ?> Did you forget to select transfer funds or you just like doing things the hard way? Keep reading on how to transfer funds to RocketSwap Manually.
 
-<img src="./static/rocketSeparator.png" height=18 width=914></img>
+<img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ### Adding Funds
 
 1. Head over to your **Lamden web wallet** and you will see the RocketSwap account:  
@@ -60,7 +60,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 
 **Thats it! You have now deposited TAU to your RocketSwap account.**
 
-<img src="./static/rocketSeparator.png" height=18 width=914></img>
+<img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ### Staking
 
 A common question that comes up around staking is - If I decide to stake am I locked in?  On Rocketswap you can withdraw at any time.
@@ -87,7 +87,7 @@ Lets kick off the staking process:
 6. YOU DID IT! Staking done! You will get a helpful message flash up briefly in the top right of the screen for a few seconds:
 <img src="./static/Staking6.png" height=150 width=407></img>
 
-<img src="./static/rocketSeparator.png" height=18 width=914></img>
+<img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ### Performing Swaps
 
 1. The site will open up on the Swap screen, if not, select *Swap* on the top right of the screen.
@@ -127,7 +127,7 @@ Lets kick off the staking process:
     The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:
     <img src="./static/swap_4.png" height=131 width=412></img>
 
-<img src="./static/rocketSeparator.png" height=18 width=914></img>
+<img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ### Liquidity Pools
 
 ?> By adding liquidity you will earn 0.3% of all trades on the pair, proportional to your share of the pool. Some pairs may have some additional bonuses — RSWP for example provides additional benefits(additional RSWP earned) through staking liquidity points.
@@ -155,7 +155,7 @@ Lets kick off the staking process:
 
 ?> Handy Hint! To remove your liquidity, you need to go back to Add Liquidity, select your token again. When it loads you will see on the top right of the popup and option to remove. (Have a look at the figure at step 6 and you can see it).
 
-<img src="./static/rocketSeparator.png" height=18 width=914></img>
+<img src="./static/rocketSeparator.png" height=18 width=1000></img>
 
 ### Creating a Token
 
