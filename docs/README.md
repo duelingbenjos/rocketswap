@@ -53,6 +53,11 @@ Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a hig
 
 RSWP is the governance token of the Rocketswap exchange. Paying fees with RSWP on Rocketswap will reduce fees by 25%. Additional discounts also apply depending on how much RSWP you are holding in your fuel tank (check the guide section on staking $RSWP).
 
+### I found a bug!
+
+
+Submit an [issue](https://github.com/cloakdkiller/rocketswap/issues) - That way you can check to see if anyone else has reported it and this is also the best way to ensure one of the developers sees it.
+
 ### How can I get Mainnet TAU?
 
 Mainnet TAU is available at Txbit
