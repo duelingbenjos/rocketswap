@@ -79,15 +79,15 @@ Lets kick off the staking process:
 
 
 3. The **Confirm Staking** pop-up will appear. Read the conditions of what you are staking and what you are getting in return, then click *STAKE*.
-<img src="./static/Staking3.png" height=648 width=1000></img>
+<img src="./static/Staking3.png" height=577 width=1000></img>
 4. You will get a pop-up from your Lamden web wallet requesting approval for RocketSwap to spend your TAU. Read the details and if you want further information click the *what is this?* link at the bottom, otherwise, click *APPROVE*.
-<img src="./static/Staking4.png" height=920 width=1000></img>
+<img src="./static/Staking4.png" height=787 width=1000></img>
 5. Another pop-up from the security conscious people at Lamden asking to Confirm Transaction.  
     A. You can check some of the transaction details here. The amount should be the amount you entered when requesting to stake at Step 2A.  
     B. Click *APPROVE* at the bottom to progress   
-<img src="./static/Staking5.png" height=919 width=1000></img>
+<img src="./static/Staking5.png" height=787 width=1000></img>
 6. YOU DID IT! Staking done! You will get a helpful message flash up briefly in the top right of the screen for a few seconds:
-<img src="./static/Staking6.png" height=150 width=1000></img>
+<img src="./static/Staking6.png" height=126 width=1000></img>
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ## Performing Swaps
