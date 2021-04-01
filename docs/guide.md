@@ -70,12 +70,14 @@ Lets kick off the staking process:
 1. Once you are in RocketSwap:  
     A. Confirm your wallet is connected from the bottom left of the screen and you have funds available (Guide steps above)      
     B. Click the *$RSWP* wording on the top right of the screen  
-<img src="./static/Staking1.png" height=480 width=1000></img>
+<img src="./static/Staking1.png" height=141 width=1000></img>
 
 2. Now let’s get STAKING! Out of the boxes that just popped up we want the box on the left labelled TAU-RSWP.  
-    A. Enter the amount you would like to stake in TAU. Alternatively you can select the *MAX* button instead of entering an amount to stake your entire wallet, you will notice if you select *MAX* this is not equal to your full wallet amount, this is due to some small fees need to be extracted.  
-    B. When you are happy with the amount to be staked, go ahead and click *STAKE*.  
-<img src="./static/Staking2.png" height=480 width=1000></img>
+    A. The APY - Annual Percentage Yield is pegged to TAU, so they yield you will see is against this however the returns will be in RSWP equivalent  
+    B. Enter the amount you would like to stake in TAU. Alternatively you can select the *MAX* button instead of entering an amount to stake your entire wallet, you will notice if you select *MAX* this is not equal to your full wallet amount, this is due to some small fees need to be extracted.  
+    C. When you are happy with the amount to be staked, go ahead and click *STAKE*.  
+
+
 3. The **Confirm Staking** pop-up will appear. Read the conditions of what you are staking and what you are getting in return, then click *STAKE*.
 <img src="./static/Staking3.png" height=648 width=1000></img>
 4. You will get a pop-up from your Lamden web wallet requesting approval for RocketSwap to spend your TAU. Read the details and if you want further information click the *what is this?* link at the bottom, otherwise, click *APPROVE*.
