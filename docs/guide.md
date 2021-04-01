@@ -1,14 +1,14 @@
-## Guide
+# Guide
 A guide for first time users of Rocketswap which covers all the core functionality of the application in easy to follow steps.  
 
-### What do I need to use Rocketswap ?
+## What do I need to use Rocketswap ?
 
 To use [Rocketswap](https://.rocketswap.exchange) you will need :
 * The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
 * Some Mainnet TAU tokens - [available on TXBit](https://txbit.io/)
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
-### Getting Started
+## Getting Started
 
 1. Access your Lamden Web Wallet and make sure you have some TAU in an account (if not, [buy some at TXBIT here](https://txbit.io/)). Stare longingly at your sweet stack of TAU.
 
@@ -38,7 +38,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 ?> Did you forget to select transfer funds or you just like doing things the hard way? Keep reading on how to transfer funds to RocketSwap Manually.
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
-### Adding Funds
+## Adding Funds
 
 1. Head over to your **Lamden web wallet** and you will see the RocketSwap account:  
     A. Click the *RocketSwap account address* on the right to copy it  
@@ -61,7 +61,7 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 **Thats it! You have now deposited TAU to your RocketSwap account.**
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
-### Staking
+## Staking
 
 A common question that comes up around staking is - If I decide to stake am I locked in?  On Rocketswap you can withdraw at any time.
 
@@ -88,7 +88,7 @@ Lets kick off the staking process:
 <img src="./static/Staking6.png" height=150 width=407></img>
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
-### Performing Swaps
+## Performing Swaps
 
 1. The site will open up on the Swap screen, if not, select *Swap* on the top right of the screen.
 
@@ -128,7 +128,7 @@ Lets kick off the staking process:
     <img src="./static/swap_4.png" height=131 width=412></img>
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
-### Liquidity Pools
+## Liquidity Pools
 
 ?> By adding liquidity you will earn 0.3% of all trades on the pair, proportional to your share of the pool. Some pairs may have some additional bonuses — RSWP for example provides additional benefits(additional RSWP earned) through staking liquidity points.
 
@@ -157,7 +157,7 @@ Lets kick off the staking process:
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
 
-### Creating a Token
+## Creating a Token
 
 1. Use the following code to create an LST-001 Lamden Standard Token.
 
