@@ -92,17 +92,17 @@ Lets kick off the staking process:
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ## Performing Swaps
 
-1. The site will open up on the Swap screen, if not, select *Swap* on the top right of the screen.
-
+1. The site will open up on the Swap screen, if not, select *Swap* on the top right of the screen.  
+<img src="./static/SwapA.png" height=141 width=1000></img>
 2. Lets have a good look at what we are seeing on the Swap screen:  
     A. Top box is what we are swapping FROM — handily labelled “From”  
     B. Next box down is what we swapping TO — also a great label on it, “To”  
     C. The arrow allows us to swap the FROM and TO tokens around. Go ahead try it out and see what it does (no costs involved)  
     D. The TO box also contains the drop down to select the token we would like to swap —go in and select the token you would like to swap. In this example I am going to swap *FROM TAU TO RSWP*  
-<img src="./static/swap_1.png" height=719 width=960></img>
+<img src="./static/Swap1.png" height=564 width=1000></img>
 
 3. Now that we have selected the token we are swapping to, input how much we would either like to ‘spend’ (input into the FROM box), or how much we would like to ‘buy’ (in the TO box) — the opposite box will auto-magically populate. In this example I am going to populate the TO box with 50 RSWP and it is telling me it will cost me 32.14835475 TAU (in FROM).
-
+<img src="./static/Swap2A.png" height=316 width=1000></img>
 4. Lets also look at the final box because this is the most important piece of the transaction (see picture below):  
     A. Price — the price you paying for your chosen token (the TO) relative to your base token (the FROM)  
     B. Price Impact (slippage) — this is the most important piece in the entire swap and determines how much slip is likely to occur when you perform your swap. So you will see in the next screen down I did not get my full 50 RSWP, it slipped to 49.5 — this is based on the Liquidity Pool which we will cover in another article. Needless to say, be aware of slippage!  
@@ -112,7 +112,7 @@ Lets kick off the staking process:
     F. Below this box is a brief history of previous swaps, you can scroll through it by hovering your mouse over it and scrolling with your mouse wheel.  
 
     ?> You can either increase the amount of slippage you will allow OR input a lower swap amount should reduce slippage (but of course you get less of what you want). Please make sure you understand slippage and the consequences before adjusting.
-    <img src="./static/swap_2.png" height=990 width=960></img>
+    <img src="./static/Swap2B.png" height=787 width=1000></img>
 
 5. Once you are happy with all the details, you can click the Swap button. A Confirm Swap pop-up will appear, for you to review the details. Take a moment to read the note, in my example it reads as follows:
     >Output is estimated. You will receive at least 49.14579622 RSWP or the transaction will revert.
@@ -121,13 +121,13 @@ Lets kick off the staking process:
 
 6. Anyway, lets keep moving, click *Launch*.
 
-    <img src="./static/swap_3.png" height=681 width=960></img>
+    <img src="./static/Swap3.png" height=540 width=1000></img>
 
     **LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
-    <img src="./static/swap_5.png" height=250 width=172></img>
+    <img src="./static/Swap6.png" height=247 width=1000></img>
 
     The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:
-    <img src="./static/swap_4.png" height=131 width=412></img>
+    <img src="./static/Swap5.png" height=104 width=1000></img>
 
 <img src="./static/rocketSeparator.png" height=18 width=1000></img>
 ## Liquidity Pools
