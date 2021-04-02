@@ -108,5 +108,6 @@ end result = 0.00386795 * 0.75
            = 0.0029009625
 ```
            
-Or 0.29% in fees instead of our original 0.5%.
-Let’s also not forget the 20% burn on Fees in RSWP putting positive pressure on RSWP price providing further indirect benefits for hodlers of RSWP.
+Or 0.29% in fees instead of our original 0.5%.  
+> [!Note]
+> Let’s also not forget the 20% burn on Fees in RSWP putting positive pressure on RSWP price providing further indirect benefits for hodlers of RSWP.
