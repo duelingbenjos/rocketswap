@@ -36,8 +36,6 @@
 		if (val == 2) setTimeout(rocketReset, 4000)
 	})
 
-	onMount(() => console.log({active: $active}))
-
 	$: makeSmoke = $rocketState == 1 || $rocketState == 2 ? createSmoke() : stopSmoke();
 
     const createSmoke = () =>{

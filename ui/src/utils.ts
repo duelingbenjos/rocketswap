@@ -145,14 +145,6 @@ export const getSavedKeystoreData = () => {
 	return null
 }
 
-export const checkForApproval = (account: string) => {
-  return fetch(`${config.masternode}/contracts/currency/balances?key=${account}:${connectionRequest.contractName}`)
-    .then((res) => res.json())
-    .then((json) => {
-      return json.value as number
-    })
-    .catch((e) => console.error(e.message))
-}
 
 export const formatAccountAddress = (account: string, lsize = 4, rsize = 4) => {
   return account.substring(0, lsize) + '...' + account.substring(account.length - rsize)

@@ -68,7 +68,7 @@
 	$: contractName = $params.contract
 	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol}` : 'RocketSwap';
 	$: pageDescription = $selectedToken ? `Swap ${$selectedToken.token_symbol}/${config.currencySymbol}!` : 'The Fastest Swaps in Crypto!';
-	$: updateStats = updatePageStats($buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken, $slippageTolerance, $rswpPrice, $payInRswp)
+	$: updateStats = updatePageStats($tokenLP, $tauUSDPrice, $buy, $currencyAmount, $walletIsReady, $tokenAmount, $selectedToken, $slippageTolerance, $rswpPrice, $payInRswp)
 
 	selectedToken.subscribe(value => {
 		if (value) {
@@ -77,26 +77,24 @@
 	})
 
 	tradeHistory.subscribe(currentValue => {
-        console.log({tradeHistory: currentValue})
-        if (!currentValue) return
-        if (currentValue.length === 0) return
-        lastTradeType.set(currentValue[0].type)
+		if (!$selectedToken) return
+        if (!currentValue[$selectedToken.contract_name]) return
+        if (currentValue[$selectedToken.contract_name].length === 0) return
+        lastTradeType.set(currentValue[$selectedToken.contract_name][0].type)
     })
 
     tradeUpdates.subscribe(currentValue => {
-        console.log({tradeUpdates: currentValue})
-        if (!currentValue) return
-        if (currentValue.length === 0) return
-        lastTradeType.set(currentValue[currentValue.length - 1].type)
+		if (!$selectedToken) return
+        if (!currentValue[$selectedToken.contract_name]) return
+		if (currentValue[$selectedToken.contract_name].length === 0) return
+        lastTradeType.set(currentValue[$selectedToken.contract_name][currentValue[$selectedToken.contract_name].length - 1].type)
 	})
-	
-	lastTradeType.subscribe(currentValue => console.log({lastTradeType: currentValue}))
 
 	setContext('pageContext', {
 		getTokenList: async () => await apiService.getMarketList(),
 		determineValues: true,
 		pageStats,
-		resetPage: () => pageUtilites.resetPage(contractName, [currencyAmount, tokenAmount]),
+		resetPage: () => pageUtilites.resetPage($selectedToken.contract_name, [currencyAmount, tokenAmount]),
 		pageStores,
 		saveStoreValue,
 		getStampCost
@@ -129,7 +127,7 @@
 		if (slippage){
 			priceImpactTooHigh.set(slippage.isGreaterThan($slippageTolerance))
 		}
-		if ($selectedToken){
+		if ($selectedToken && $tauUSDPrice && $tokenLP){
 			currentPrice.set(quote.prices.token.multipliedBy($tauUSDPrice))
 		}
 		pageStats.set({
@@ -174,5 +172,7 @@
 		<Buttons buttonFunction="swap" buttonText="Swap" />
 		</div>
 	</SwapPanel>
-	<TradeTable />
+	{#if $selectedToken}
+		<TradeTable />
+	{/if}
 </div>

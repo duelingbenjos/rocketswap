@@ -18,8 +18,6 @@
 
 	const { pageStats, pageStores } = getContext('pageContext')
     const { currencyAmount, tokenAmount, selectedToken, tokenLP, lpBalance  } = pageStores
-    
-    pageStats.subscribe(currentValue => console.log({pageStats: currentValue}))
 
     $: tokenSymbol = $selectedToken ? $selectedToken.token_symbol : undefined;
     $: tokenContract = $selectedToken ? $selectedToken.contract_name : undefined;

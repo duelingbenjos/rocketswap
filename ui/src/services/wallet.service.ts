@@ -28,6 +28,7 @@ import {
 	getAmmStakeDetails } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
+import { LamdenBlockexplorer_API } from './blockexplorer.service'
 
 /** Singleton Wallet Service */
 
@@ -36,6 +37,7 @@ export class WalletService {
 	private lwc: WalletController
 	private toastService = ToastService.getInstance()
 	private wsService = WsService.getInstance()
+	private blockExplorerService = LamdenBlockexplorer_API.getInstance()
 	private _ws_joined: boolean = false
 	private connectionRequest = connectionRequest;
 	private installChecker = null;
@@ -441,7 +443,7 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = '0'
 			res?.data?.txBlockResult?.state?.forEach((stateChange) => {
-				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`) {
+				if (stateChange.key === `${config.ammContractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`) {
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
@@ -477,7 +479,7 @@ export class WalletService {
 		if (status === 'success') {
 			let lpPoints = "0";
 			res?.data?.txBlockResult?.state?.forEach(stateChange => {
-				if (stateChange.key === `${this.lwc.connectionRequest.contractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`){
+				if (stateChange.key === `${config.ammContractName}.lp_points:${selectedToken.contract_name}:${get(walletAddress)}`){
 					lpPoints = stateChange.value.__fixed__ || stateChange.value
 				}
 			})
@@ -536,8 +538,6 @@ export class WalletService {
 				}
 			})
 			if (callbacks) callbacks.success()
-		}else{
-			if (callbacks) callbacks.error()
 		}
 	}
 
@@ -787,6 +787,9 @@ export class WalletService {
 			this.handleTxErrors(errors, callbacks)
 			return errors
 		}
+		if (txResults.resultInfo.title === "Transaction Pending"){
+			return 'pending'
+		}
 		if (typeof txResults.txBlockResult.status !== 'undefined') {
 			if (txResults.txBlockResult.status === 0) {
 				return 'success'
@@ -799,16 +802,20 @@ export class WalletService {
 	}
 
 	public getApprovedAmount = async (vk, contract, approvalTo) => {
-		return fetch(`${config.masternode}/contracts/${contract}/balances?key=${vk}:${approvalTo || connectionRequest.contractName}`)
-				.then((res) => res.json())
-				.then((json) => {
-					let approval
-					if (typeof json?.value?.__fixed__ !== 'undefined') approval = toBigNumber(json.value.__fixed__)
-					else approval = toBigNumber(json?.value)
-					if (approval.isNaN()) approval = toBigNumber('0')
-					return approval
-				})
-				.catch((e) => console.log(e.message))
+		let keyList = [
+			{
+				"contractName": contract,
+				"variableName": "balances",
+				"key": `${vk}:${approvalTo || connectionRequest.contractName}`
+			}
+		]
+		let res = await this.blockExplorerService.getKeys(keyList)
+		let approval = res[`${keyList[0].contractName}.${keyList[0].variableName}:${keyList[0].key}`]
+		if (!approval) return toBigNumber('0')
+		if (typeof approval?.__fixed__ !== 'undefined') approval = toBigNumber(approval.__fixed__)
+		else approval = toBigNumber(approval)
+		if (approval.isNaN()) approval = toBigNumber('0')
+		return approval
 	}
 
 	public needsApproval = async (contract, amount, approvalTo = undefined) => {
@@ -819,7 +826,7 @@ export class WalletService {
 	public async approveBN(contractName, approveAmount, approveTo, callback = undefined) {
 		if (await this.needsApproval(contractName, approveAmount, approveTo)){
 			let args = {
-				amount: { __fixed__: "9999999999999" },
+				amount: { __fixed__: "1000000000" },
 				to: approveTo || connectionRequest.contractName
 			}
 			this.sendTransaction(

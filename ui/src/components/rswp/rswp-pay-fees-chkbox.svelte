@@ -20,7 +20,7 @@
 </style>
 
 <label class="flex-row chk-container text-color-dim" class:pay-in-rswp={$payInRswp} id="chk-all">
-    Pay all Fees in RSWP (30% discount)
+    Pay all Fees in RSWP (25% discount)
     <input  type="checkbox" bind:checked on:change={handleCheckChange}>
     <span  class="chk-checkmark chk-small"></span>
 </label>
