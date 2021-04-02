@@ -22,7 +22,8 @@ OK. Lets make a start by doing some prep.
 * Save as PNG (SVG is another option however this walk through will concentrate on PNG).  
 
 >[!Tip]
->A handy template to use. There are plenty of free drawing apps that will save in PNG even Microsoft Paint will work! Online apps like [PixelArt](https://www.pixilart.com/draw) also work.
+>A handy template to use is below. There are plenty of free drawing apps that will save in PNG even Microsoft Paint will work! Online apps like [PixelArt](https://www.pixilart.com/draw) also work.
+
 ![Template](./static/Token2.png ':size=96')
 
 
