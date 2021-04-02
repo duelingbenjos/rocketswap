@@ -90,12 +90,12 @@ def transfer_from(amount: float, to: str, main_account: str):
 * Click *con_new_contract*, which will populate the text box with a simple smart contract   
 * Delete all the simple smart contract text in the text box   
 * Paste in your smart contract you copied at step 3.   
-5. We need to make 3 edits to this smart contract which are all near the start under `def seed():`
-First — `balances[ctx.caller] = 1_000_000`   
-`1_000_000` — Is the number of tokens to be minted. 1 million tokens is a good number however, if you have the urge to have more or less, follow the numbering convention used which uses underscores as shown. If you want 10,000 it should be `10_000` do not do this `1_000_0`.   
-Second — `metadata[‘token_name’] = “MY TOKEN NAME”`   
-Change `“MY TOKEN NAME”` to the name of your coin, keep it short and also keep the `“ “` either side.   
-Third — `metadata[‘token_symbol’] = “TKN”`. Replace `“TKN”` with your abbreviated token name, most people go with 3–5 characters. Keep it short and keep the `“ “` either side again.   
+5. We need to make 3 edits to this smart contract which are all near the start under `def seed():`   
+* First — `balances[ctx.caller] = 1_000_000`   
+    `1_000_000` — Is the number of tokens to be minted. 1 million tokens is a good number however, if you have the urge to have more or less, follow the numbering convention used which uses underscores as shown. If you want 10,000 it should be `10_000` do not do this `1_000_0`.   
+* Second — `metadata[‘token_name’] = “MY TOKEN NAME”`   
+    Change `“MY TOKEN NAME”` to the name of your coin, keep it short and also keep the `“ “` either side.   
+* Third — `metadata[‘token_symbol’] = “TKN”`. Replace `“TKN”` with your abbreviated token name, most people go with 3–5 characters. Keep it short and keep the `“ “` either side again.   
 6. Click *Check Contract*, you should get a green bar at the bottom saying Contract is OK. If it is red, you made an error in the contract it will tell you the line number etc however I would suggest going back to step 3 and try copying and editing again. Click *Submit to Network*.
 7. You will get a screen similar to below. We need to select the account with our TAU (10 approx needed) in it which will also receive our new fancy token. And we also need to name our contract — I would suggest following the naming convention offered: `con_new_contract`, so keep the `con_` and `_contract` , replace new with your token name. If you use spaces replace with underscores.
 Write down you contract name, then click *SUBMIT CONTRACT*.
