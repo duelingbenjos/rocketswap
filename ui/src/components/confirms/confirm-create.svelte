@@ -117,6 +117,6 @@
 </div>
 
 <div class="modal-sub-box">
-    By creating liquidity you'll earn 0.3% of all trades on the pair proportional to your share of the pool. 
+    By creating liquidity you'll upto 0.5% of all trades on the pair proportional to your share of the pool. 
     Fees added to the pool accrue in real time and can be reclaimed by withdrawing your liquidity.
 </div>

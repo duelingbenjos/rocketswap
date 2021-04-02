@@ -176,10 +176,17 @@
 
 
         <div class="flex-grow flex-col flex-justify-spacearound">
-            <div class="staked flex-row">
-                <span class="flex-grow">Staked:</span>
-                <span class="weight-600">{stringToFixed($ammFuelTank_stakedAmount, 8)} <strong class="text-shadow text-color-primary">{config.ammTokenSymbol}</strong></span>
-            </div>
+            {#if !fillAmount || fillAmount.isLessThanOrEqualTo(0)}
+                <div class="staked flex-row">
+                    <span class="flex-grow">Staked:</span>
+                    <span class="weight-600">{stringToFixed($ammFuelTank_stakedAmount, 8)} <strong class="text-shadow text-color-primary">{config.ammTokenSymbol}</strong></span>
+                </div>
+            {:else}
+                <div class="staked flex-row">
+                    <span class="flex-grow">New Staked Amount:</span>
+                    <span class="weight-600">{stringToFixed(fillAmount, 8)} <strong class="text-shadow text-color-primary">{config.ammTokenSymbol}</strong></span>
+                </div>
+            {/if}
             <div class="flex flex-justify-end">
                 <button class="primary small" on:click={openRemoveAllStakeConfirm} disabled={!hasStake}>remove all</button>
             </div>
@@ -197,7 +204,7 @@
                             {/if}
                         {/if}
                     {:else}
-                        Enter Fuel Amount
+                        Enter New Fuel Amount
                     {/if}
                 </button>
                 <p class="min-stake-msg text-xsmall text-color-white">Minimum Stake is 1361 RSWP</p>
