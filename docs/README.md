@@ -27,9 +27,9 @@ Rocketswap will achieve this goal by creating positive feedback loops across pro
 
 #### How can I contact the Team ?
 
-Contact us on [Telegram](https://t.me/rocketswap)
-Like and retweet us on [Twitter](https://twitter.com/RSwapOfficial)
-Read our articles on [Medium](https://medium.com/rswp-io)
+Contact us on [Telegram](https://t.me/rocketswap)   
+Like and retweet us on [Twitter](https://twitter.com/RSwapOfficial)   
+Read our articles on [Medium](https://medium.com/rswp-io)   
 
 ### What is Lamden?
 
@@ -42,12 +42,12 @@ Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a hig
 
 ### RSWP Token Information
 
-* **Supply:** 1,200,000,000
-* **Price:** To be set by market
-* **Distribution:** TAU Staking & market LP Staking
-* **Emission Rate:** % of total on a yearly basis. 30, 20, 15, 10, 7, 5, 4, 3, 2, 2, 1, 1.
-* **Dev Reward:** 10% of emissions
-* **Deflationary Mechanisms:** Burn on payment of RSWP transaction fee.
+* **Supply:** 1,200,000,000   
+* **Price:** To be set by market   
+* **Distribution:** TAU Staking & market LP Staking   
+* **Emission Rate:** % of total on a yearly basis. 30, 20, 15, 10, 7, 5, 4, 3, 2, 2, 1, 1.   
+* **Dev Reward:** 10% of emissions   
+* **Deflationary Mechanisms:** Burn on payment of RSWP transaction fee.   
 
 ### What does RSWP do?
 

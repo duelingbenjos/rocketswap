@@ -1,3 +1,5 @@
+# Fees and Discounts
+
 ## What Rocketswap fees apply?
 
 Rocketswap fees are set at 0.5% of the token cost for the trade.  This can be offset by a number of mechanisms to reduce fees through using and/or staking the Rocketswap token, RSWP. These actions are cumulative and can result in significant savings for market participants. Below are some typical scenarios that cover the fees and benefits of using RSWP:
@@ -108,5 +110,6 @@ end result = 0.00386795 * 0.75
            = 0.0029009625
 ```
            
-Or 0.29% in fees instead of our original 0.5%.
-Let’s also not forget the 20% burn on Fees in RSWP putting positive pressure on RSWP price providing further indirect benefits for hodlers of RSWP.
+Or 0.29% in fees instead of our original 0.5%.  
+> [!Note]
+> Let’s also not forget the 20% burn on Fees in RSWP putting positive pressure on RSWP price providing further indirect benefits for hodlers of RSWP.

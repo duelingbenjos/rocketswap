@@ -1,5 +1,5 @@
 <script>
-    import { onMount, getContext } from 'svelte'
+    import { getContext } from 'svelte'
     import { fade } from 'svelte/transition';
 
     //Components
@@ -9,7 +9,10 @@
     import { tradeHistory, tradeUpdates } from '../../store'
 
     const { pageStores } = getContext('pageContext')
-    const { lastTradeType } = pageStores
+    const { selectedToken } = pageStores
+
+    $: contract_trades = $tradeHistory[$selectedToken.contract_name] || []
+    $: contract_trades_updates = $tradeUpdates[$selectedToken.contract_name] || []
 
 </script>
 
@@ -44,14 +47,14 @@
 
 <div class="trade-table flex-col">
     <div class="flex-col-reverse">
-        {#each $tradeUpdates as trade}
+        {#each contract_trades_updates as trade}
             <div in:fade={{duration: 500}}>
                 <Trade {trade} />
             </div>
         {/each} 
     </div>
 
-    {#each $tradeHistory as trade}
+    {#each contract_trades as trade}
         <div in:fade={{duration: 500}}>
             <Trade {trade} />
         </div>
