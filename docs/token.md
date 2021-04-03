@@ -1,7 +1,7 @@
 # Creating Tokens
 ![Template](./static/Token1.png ':size=1000')
 
-In this walk through we are going to look at how incredibly easy and cheap it is to create a token on the Lamden Blockchain. I will walk you through everything step by step so you too can have a fat stack of tokens with your name on it.
+In this walk through we are going to look at how incredibly easy and cheap it is to create a token on the Lamden Blockchain. I will walk you through everything step by step so you too can have a fat stack of tokens with your name on it.   
 You will learn:
 * How to make a token on the Lamden Blockchain
 * How to create and load a logo for your token
@@ -9,8 +9,8 @@ You will learn:
 * How to get your token to appear on RocketSwap
 
 You will need:
-* Your Lamden Web Wallet with approximately 15 TAU in it
-* RocketSwap setup — see my guide here (because hey, we need to throw some TAU behind our great idea and let people trade it).
+* Your Lamden Web Wallet with approximately 15 TAU in it (yes it really is this cheap - you will have change left over too!)
+* RocketSwap setup so we can add liquidity — see my guide [here](guide.md#Getting_Started) (because hey, we need to throw some TAU behind our great idea and let people trade it).
 A drawing application that saves as PNG (plenty of free options out there)
 
 OK. Lets make a start by doing some prep.
@@ -132,7 +132,7 @@ Click the small blue *run* button beside change_metadata.
 3. You token will now appear in your wallet and you can transfer it to others, or to your other wallets!
 13. Optional — loading to RocketSwap (Covered in two parts within the guide sections)
 
-## Loading the Token to Rocektswap
+## Loading the Token to Rocketswap
 This is a simple 2 step process which is covered by some of the other guide articles, links below:
 * Manually transfer your token - [Guide - Adding Funds](guide.md#Adding-Funds)  
 * We also need to provide liquidity for it, both some TAU and your token - [Guide - Liquidity](guide.md#Liquidity-Pools)
