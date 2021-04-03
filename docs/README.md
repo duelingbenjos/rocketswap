@@ -1,4 +1,3 @@
-<img src="./static/RS_Logo.png" height=400 width=400></img>
 
 ### What is Rocketswap ?
 
@@ -17,11 +16,6 @@ Liquidity Providers (LP's) earn fees by depositing liquidity (both assets of a t
 
 #### Market Participants
 Market Participants buy and sell assets in the market, their experience is identical to that of a traditional exchange user.
-
-### The Team
-
-We are a small team of engineers, with 40+ years of experience, committed to pushing the envelope of what is possible in the blockchain space, delivering value to the ecosystem as a whole and to our users.
-We built Rocketswap to strengthen and foster a growing Lamden ecosystem. 
 
 Rocketswap will achieve this goal by creating positive feedback loops across projects, allowing all Lamden assets to find fair market value.
 
