@@ -43,7 +43,7 @@ Using the scenarios above, the resultant fees are visualised below compared to t
 
 A Lamden transaction fee to perform the necessary contract actions is also charged, generally around 65 Stamps (1 TAU) however is based on network traffic at the time the transaction is processed.
 
-### Enough marketing talk.. give me the maths!
+## Enough marketing talk.. give me the maths!
 
 Discount formula is as follows:  
 #### log<sub>e</sub>({RSWP Stake}) * 0.07 - 0.505

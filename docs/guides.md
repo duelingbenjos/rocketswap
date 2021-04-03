@@ -121,9 +121,9 @@ Lets kick off the staking process:
 > If you remember above we had a guaranteed minimum of this same amount which is based on our Slippage Tolerance. If you get too stingy on your slippage, the transaction might not go through (as it says ‘revert’). On RocketSwap, this is less of an issue, you loose the tx fee (a few cents — if you did this on Ethereum, you would have just lost $30 at Uniswap). If this occurs, try again — maybe with a larger slippage (read my multiple cautions about large slippage please).
 
 6. Anyway, lets keep moving, click *Launch*.  
-![sep](./static/Swap3.png ':size=1000')
+![sep](./static/Swap3.png ':size=1000')<br>
     **LIFTOFF!!!** That’s it, you did it! Sit back and watch the rocket lift off! No seriously, RocketSwap has a rocket!  
-![sep](./static/Swap6.png ':size=1000')
+![sep](./static/Swap6.png ':size=1000')<br>
     The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:  
  ![sep](./static/Swap5.png ':size=1000')
 
