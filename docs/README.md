@@ -20,10 +20,8 @@ Market Participants buy and sell assets in the market, their experience is ident
 
 ### The Team
 
-We are a small team of engineers, with 40+ years of experience, committed to pushing the envelope of what is possible in the blockchain space, delivering value to the ecosystem as a whole and to our users.
-We built Rocketswap to strengthen and foster a growing Lamden ecosystem. 
-
-Rocketswap will achieve this goal by creating positive feedback loops across projects, allowing all Lamden assets to find fair market value.
+We are a small team of engineers, with 40+ years of experience, committed to pushing the envelope of what is possible in the blockchain space, delivering value to the ecosystem as a whole and to our users.  
+We built Rocketswap to strengthen and foster a growing Lamden ecosystem - Rocketswap will achieve this goal by creating positive feedback loops across projects, allowing all Lamden assets to find fair market value.
 
 #### How can I contact the Team ?
 
@@ -60,7 +58,7 @@ Submit an [issue](https://github.com/cloakdkiller/rocketswap/issues) on Github -
 
 ### How can I get Mainnet TAU?
 
-Mainnet TAU is available at Txbit
+Mainnet TAU is available at [Txbit](https://txbit.io/)
 
 ### My questions were not answered by this doc!
 
