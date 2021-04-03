@@ -9,8 +9,8 @@ You will learn:
 * How to get your token to appear on RocketSwap
 
 You will need:
-* Your Lamden Web Wallet with approximately 15 TAU in it (yes it really is this cheap - you will have change left over too!)
-* RocketSwap setup so we can add liquidity — see my guide [here](guide.md#Getting_Started) (because hey, we need to throw some TAU behind our great idea and let people trade it).
+* Your [Lamden Web Wallet](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim) with approximately 15 TAU in it (yes it really is this cheap - you will have change left over too!)
+* RocketSwap setup so we can add liquidity — see the guide [here](guide.md#Getting_Started) (because hey, we need to throw some TAU behind our great idea and let people trade it).
 A drawing application that saves as PNG (plenty of free options out there)
 
 OK. Lets make a start by doing some prep.
@@ -104,7 +104,7 @@ Write down you contract name, then click *SUBMIT CONTRACT*.
 > [!important]
 > Rememeber to write down or copy the contract name you created!
 
-![Template](./static/Token3.png ':size=947')
+![Template](./static/Token3.png ':size=470')
 
 After a few seconds you should get a transaction successful message. At which point in time you have made your first token. 
 
