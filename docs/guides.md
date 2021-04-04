@@ -7,7 +7,6 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 * The Lamden Wallet browser extension, available [here](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim)
 * Some Mainnet TAU tokens - [available on TXBit](https://txbit.io/)
 
-![sep](./static/rocketSeparator.png ':size=1000')
 ## Getting Started
 
 1. Access your Lamden Web Wallet and make sure you have some TAU in an account (if not, [buy some at TXBIT here](https://txbit.io/)). Stare longingly at your sweet stack of TAU.
@@ -37,7 +36,6 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 >[!Tip]
 > **Did you forget** to select transfer funds or you just like doing things the hard way? Keep reading on how to transfer funds to RocketSwap Manually.
 
-![sep](./static/rocketSeparator.png ':size=1000')
 ## Adding Funds
 
 1. Head over to your **Lamden web wallet** and you will see the RocketSwap account:  
@@ -60,7 +58,6 @@ To use [Rocketswap](https://.rocketswap.exchange) you will need :
 
 **Thats it! You have now deposited TAU to your RocketSwap account.**
 
-![sep](./static/rocketSeparator.png ':size=1000')
 ## Staking
 >[!Note]
 > A common question that comes up around staking is - If I decide to stake am I locked in?  On Rocketswap you can withdraw at any time.
@@ -89,7 +86,6 @@ Lets kick off the staking process:
 6. YOU DID IT! Staking done! You will get a helpful message flash up briefly in the top right of the screen for a few seconds:  
 
 ![sep](./static/Staking6.png ':size=1000')
-![sep](./static/rocketSeparator.png ':size=1000')
 ## Performing Swaps
 
 1. The site will open up on the Swap screen, if not, select *Swap* on the top right of the screen.  
@@ -127,7 +123,6 @@ Lets kick off the staking process:
     The other, less fun, notification will flash up for a few seconds in the top right of your screen — like below:  
  ![sep](./static/Swap5.png ':size=1000')
 
-![sep](./static/rocketSeparator.png ':size=1000')
 ## Liquidity Pools
 >[!Note]
 > By adding liquidity you will earn 0.3% of all trades on the pair, proportional to your share of the pool. Some pairs may have some additional bonuses — RSWP for example provides additional benefits(additional RSWP earned) through staking liquidity points.
@@ -155,7 +150,6 @@ Lets kick off the staking process:
 >[!Tip]
 > To remove your liquidity, you need to go back to *Add Liquidity*, select your token again. When it loads you will see on the top right of the popup and option to remove. (Have a look at the figure at step 6 and you can see it).
 
-![sep](./static/rocketSeparator.png ':size=1000')
 ## Creating a Token
 
 1. Use the following code to create an LST-001 Lamden Standard Token.
