@@ -1,4 +1,4 @@
-<img src="./static/RS_Logo.png" height=400 width=400></img>
+<img src="./static/RS_Logo.png" style="width:400px; height: auto;"></img>
 
 # Rocketswap
 
