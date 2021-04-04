@@ -2,7 +2,7 @@
 
 # Rocketswap
 
-> Trustless Asset swaps on Lamden.
+> Trustless asset swaps on Lamden
 
 [GitHub](https://github.com/cloakdkiller/rocketswap)
 [Get Started](#rocketswap)
