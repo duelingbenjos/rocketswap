@@ -4,7 +4,7 @@ import { IKvp } from "../types/misc.types";
 import { config } from "../config";
 import { TokensService } from "./tokens.service";
 import { AuthenticationPayload } from "./trollbox.controller";
-import { SocketService } from "../socket.service";
+import { SocketService } from "../services/socket.service";
 
 @Injectable()
 export class AuthService {

@@ -9,21 +9,16 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { AuthenticationPayload } from "./authentication/trollbox.controller";
-import startBlockgrabber from "./blockgrabber";
 import { BalanceEntity } from "./entities/balance.entity";
 import { ChatHistoryEntity } from "./entities/chat-history.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
-import { getTokenMetrics } from "./entities/price.entity";
-import { StakingEpochEntity } from "./entities/staking-epoch.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
-import { UserStakingEntity } from "./entities/user-staking.entity";
 import { TauMarketEntity } from "./entities/tau-market.entity";
 import { ParserProvider } from "./parser.provider";
-import { SocketService } from "./socket.service";
-import { TransactionService } from "./transaction.service";
-import { BlockDTO } from "./types/misc.types";
+import { SocketService } from "./services/socket.service";
+import { TransactionService } from "./services/transaction.service";
 import {
 	ClientUpdateType,
 	isBalanceUpdate,
@@ -41,6 +36,7 @@ import {
 import {log} from './utils/logger'
 
 import { CoinGeckoAPIService } from './services/coingecko.service'
+import { getTokenMetrics } from "./entities/price.entity";
 /**
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
@@ -52,7 +48,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	@WebSocketServer() wss: Server;
 
 	constructor(
-		private readonly parser: ParserProvider,
 		private readonly socketService: SocketService,
 		private readonly txnService: TransactionService
 	) {}

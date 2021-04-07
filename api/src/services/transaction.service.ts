@@ -1,8 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import * as lamden from "lamden-js";
-import { config } from "./config";
+import { config } from "../config";
 import { SocketService } from "./socket.service";
-import { ITxnRequest } from "./types/websocket.types";
+import { ITxnRequest } from "../types/websocket.types";
 
 @Injectable()
 export class TransactionService {

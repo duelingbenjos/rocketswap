@@ -1,8 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Server } from "socket.io";
-import { StakingEpochEntity } from "./entities/staking-epoch.entity";
-import { StakingMetaEntity } from "./entities/staking-meta.entity";
-import { getUserYield, getUserYieldPerSecond, UserStakingEntity } from "./entities/user-staking.entity";
+import { StakingEpochEntity } from "../entities/staking-epoch.entity";
+import { StakingMetaEntity } from "../entities/staking-meta.entity";
+import { getUserYield, getUserYieldPerSecond, UserStakingEntity } from "../entities/user-staking.entity";
 import {
 	handleAuthenticateResponseType,
 	handleClientUpdateType,
@@ -11,7 +11,7 @@ import {
 	EpochUpdateType,
 	IUserYieldInfo,
 	IUserYieldPayload
-} from "./types/websocket.types";
+} from "../types/websocket.types";
 
 @Injectable()
 export class SocketService {

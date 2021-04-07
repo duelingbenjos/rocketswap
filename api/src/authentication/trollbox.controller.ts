@@ -16,7 +16,7 @@ import { NameEntity } from "../entities/name.entity";
 import { TokensService } from "./tokens.service";
 import { JWTGuard } from "./jwt.guard";
 import { AuthService } from "./trollbox.service";
-import { SocketService } from "../socket.service";
+import { SocketService } from "../services/socket.service";
 import { ITrollBoxMessage } from "src/types/websocket.types";
 import {
 	saveTrollChat

@@ -27,7 +27,7 @@
     export let stakingInfo;
     export let horizontal = false;
 
-    let stakingAmount = toBigNumber("0");
+    let stakingAmount = toBigNumber("10");
     let loading = false;
     let showStakingConfirm = false;
     let showRemoveStakeConfirm = false;
@@ -57,7 +57,7 @@
 
     const startUpdater = () => {
         "!!!STARTING TIMER!!!"
-        if (!timer_yieldUpdate) timer_yieldUpdate = setInterval(updateYeild, 15000)
+        if (!timer_yieldUpdate) timer_yieldUpdate = setInterval(updateYeild, 3000)
     }
     
     const updateYeild = () =>{
