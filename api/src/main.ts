@@ -7,8 +7,8 @@ let options: NestApplicationOptions = {}
 
 if (process.env.CONTEXT === 'remote') {
   options.httpsOptions = {
-    key: fs.readFileSync("src/certs/key.pem"),
-    cert: fs.readFileSync("src/certs/pub.pem")
+    key: fs.readFileSync("./certs/key.pem"),
+    cert: fs.readFileSync("./certs/pub.pem")
   }
 }
 
@@ -17,7 +17,7 @@ async function bootstrap() {
 
   app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "rocketswap.exchange"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Origin", "staging.rocketswap.exchange"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Origin", "*.rocketswap.exchange"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Origin", "rswp.io"); // update to match the domain you will make the request from
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
