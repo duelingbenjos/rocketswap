@@ -40,6 +40,7 @@ export class ParserProvider {
 		setInterval(()=>{
 			if (Date.now() - ParserProvider.blockgrabber_last_update > 120000 ) {
 				log.warn("no response from blockgrabber in 120 seconds => starting it up again")
+				ParserProvider.updateLastChecked()
 				startBlockgrabber(this.handleNewBlock, true)
 			}
 		},5000)
@@ -134,10 +135,6 @@ export class ParserProvider {
 		const { fn, state, timestamp, hash } = args;
 		try {
 			await savePair(state);
-			await saveTransfer({
-				state,
-				handleClientUpdate: this.socketService.handleClientUpdate
-			});
 			await savePairLp(state);
 			await saveUserLp({
 				state,
