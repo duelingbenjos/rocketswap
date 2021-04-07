@@ -43,9 +43,6 @@ export class TokenEntity extends BaseEntity {
 
 	@Column({ nullable: true })
 	token_logo_url: string;
-
-	@Column({nullable:true})
-	daily_volume_tau: number
 }
 
 export class AddTokenDto {

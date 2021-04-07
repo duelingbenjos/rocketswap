@@ -6,6 +6,7 @@ import { PairEntity } from "./entities/pair.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
+import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
 import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
@@ -16,9 +17,9 @@ export class AppController {
 	@Get("amm_meta")
 	public async getAmmMeta() {
 		try {
-			const amm_meta_entity = await AmmMetaEntity.findOne()
-			if (!amm_meta_entity) throw "AMM Meta Entity does not exist"
-			return amm_meta_entity
+			const amm_meta_entity = await AmmMetaEntity.findOne();
+			if (!amm_meta_entity) throw "AMM Meta Entity does not exist";
+			return amm_meta_entity;
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
@@ -27,14 +28,33 @@ export class AppController {
 	@Get("staking_meta")
 	public async getStakingMeta() {
 		try {
-			log.log(process.env.STAKING_CONTRACTS)
-			const ents = await StakingMetaEntity.find()
+			log.log(process.env.STAKING_CONTRACTS);
+			const ents = await StakingMetaEntity.find();
 			return {
 				env: process.env.STAKING_CONTRACTS,
 				ents
-			}
+			};
 		} catch (err) {
 			throw new HttpException(err, 500);
+		}
+	}
+
+	@Get("get_market_summary")
+	public async getMarketSummary(@Query() params) {
+		const { market_name } = params;
+		try {
+			return await VolumeMetricsEntity.findOne(market_name);
+		} catch (err) {
+			log.error(err);
+		}
+	}
+
+	@Get("get_market_summaries")
+	public async getMarketSummaries() {
+		try {
+			return await VolumeMetricsEntity.find();
+		} catch (err) {
+			log.error(err);
 		}
 	}
 
@@ -42,12 +62,10 @@ export class AppController {
 	public async getTradeHistory(@Query() params) {
 		let { vk, contract_name, skip, take } = params;
 		if (!take) take = 50;
-		let select = ["contract_name", "token_symbol"];
 		const find_options = { where: {} };
 
 		if (vk) find_options["where"]["vk"] = vk;
-		if (contract_name)
-			find_options["where"]["contract_name"] = contract_name;
+		if (contract_name) find_options["where"]["contract_name"] = contract_name;
 		if (skip) find_options["skip"] = skip;
 		if (take) {
 			take = take > 50 ? 50 : take;
@@ -56,14 +74,8 @@ export class AppController {
 
 		try {
 			return await TradeHistoryEntity.find({
-				select: [
-					"contract_name",
-					"token_symbol",
-					"price",
-					"type",
-					"time"
-				],
-				order:{time: "DESC"},
+				select: ["contract_name", "token_symbol", "price", "type", "time"],
+				order: { time: "DESC" },
 				...find_options
 			});
 		} catch (err) {
@@ -74,19 +86,29 @@ export class AppController {
 	@Get("token_list")
 	public async getTokenList() {
 		try {
-			const res = await TokenEntity.find({select:['contract_name','has_market','token_base64_png','token_base64_svg','token_logo_url','token_name','token_symbol']});
+			const res = await TokenEntity.find({
+				select: [
+					"contract_name",
+					"has_market",
+					"token_base64_png",
+					"token_base64_svg",
+					"token_logo_url",
+					"token_name",
+					"token_symbol"
+				]
+			});
 			return res.map((token) => {
 				return {
 					contract_name: token.contract_name,
 					has_market: token.has_market,
-					token_base64_png: token.token_base64_png, 
+					token_base64_png: token.token_base64_png,
 					token_base64_svg: token.token_base64_svg,
 					logo: decideLogo(token),
 					token_logo_url: token.token_logo_url,
 					token_name: token.token_name,
 					token_symbol: token.token_symbol
-				}
-			})
+				};
+			});
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
@@ -96,9 +118,9 @@ export class AppController {
 	public async getToken(@Param() params) {
 		const { contract_name } = params;
 		try {
-			let token = await TokenEntity.findOne({ where: {contract_name}});
+			let token = await TokenEntity.findOne({ where: { contract_name } });
 			// let token = tokenRes[tokenRes.length - 1];
-			let lp_info = await PairEntity.findOne({where: {contract_name}});
+			let lp_info = await PairEntity.findOne({ where: { contract_name } });
 			return { token, lp_info };
 		} catch (err) {
 			throw new HttpException(err, 500);
@@ -121,7 +143,7 @@ export class AppController {
 		try {
 			const res = await LpPointsEntity.findOne(vk);
 			// console.log(res)
-			return res
+			return res;
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
@@ -135,17 +157,15 @@ export class AppController {
 			if (contract_names_arr.length > 20) {
 				throw "You may only request a maximum of 20 pairs at a time.";
 			}
-			const pair_proms: Promise<PairEntity>[] = contract_names_arr.map(
-				(contract_name) => {
-					return new Promise(async (resolve) => {
-						let tokenRes = await TokenEntity.findOne({
-							contract_name
-						});
-						let pairRes = await PairEntity.findOne(contract_name);
-						resolve(Object.assign(pairRes, tokenRes));
+			const pair_proms: Promise<PairEntity>[] = contract_names_arr.map((contract_name) => {
+				return new Promise(async (resolve) => {
+					let tokenRes = await TokenEntity.findOne({
+						contract_name
 					});
-				}
-			);
+					let pairRes = await PairEntity.findOne(contract_name);
+					resolve(Object.assign(pairRes, tokenRes));
+				});
+			});
 			const res = await Promise.all(pair_proms);
 			const res_obj = {};
 			res.forEach((pair) => {
@@ -172,5 +192,4 @@ export class AppController {
 			throw new HttpException(err, 500);
 		}
 	}
-
 }

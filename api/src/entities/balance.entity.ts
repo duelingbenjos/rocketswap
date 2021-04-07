@@ -43,17 +43,10 @@ export interface IBalance {
 	balances?: UserBalancesType;
 }
 
-export async function saveTransfer(args: {
-	state: IKvp[];
-	handleClientUpdate: handleClientUpdateType;
-}) {
+export async function saveTransfer(args: { state: IKvp[]; handleClientUpdate: handleClientUpdateType }) {
 	const { state, handleClientUpdate } = args;
-	const balances_kvp = state.filter(
-		(kvp) => kvp.key.split(".")[1].split(":")[0] === "balances"
-	);
-	const balance_updates = balances_kvp.filter(
-		(kvp) => kvp.key.split(":").length === 2
-	);
+	const balances_kvp = state.filter((kvp) => kvp.key.split(".")[1].split(":")[0] === "balances");
+	const balance_updates = balances_kvp.filter((kvp) => kvp.key.split(":").length === 2);
 	for (let kvp of balance_updates) {
 		const { key, value } = kvp;
 		const parts = key.split(".");

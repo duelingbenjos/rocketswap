@@ -28,6 +28,7 @@ import { TauMarketEntity } from "./entities/tau-market.entity";
 import { TradeSubscriber } from "./subscribers/trade.subscriber";
 import { PriceEntity } from "./entities/price.entity";
 import { VolumeService } from "./services/volume.service";
+import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -47,9 +48,10 @@ const db_options: TypeOrmModuleOptions = {
 		StakingMetaEntity,
 		UserStakingEntity,
 		StakingEpochEntity,
-		TauMarketEntity
+		TauMarketEntity,
+		VolumeMetricsEntity
 	],
-	subscribers:[TradeSubscriber],
+	subscribers: [TradeSubscriber],
 	synchronize: true,
 	autoLoadEntities: true
 };
