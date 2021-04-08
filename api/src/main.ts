@@ -10,6 +10,7 @@ if (process.env.CONTEXT === 'remote') {
     key: fs.readFileSync("src/certs/key.pem"),
     cert: fs.readFileSync("src/certs/pub.pem")
   }
+  options.cors = true
 }
 
 async function bootstrap() {
