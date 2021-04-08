@@ -7,8 +7,8 @@ let options: NestApplicationOptions = {}
 
 if (process.env.CONTEXT === 'remote') {
   options.httpsOptions = {
-    key: fs.readFileSync("./certs/key.pem"),
-    cert: fs.readFileSync("./certs/pub.pem")
+    key: fs.readFileSync("src/certs/key.pem"),
+    cert: fs.readFileSync("src/certs/pub.pem")
   }
 }
 
