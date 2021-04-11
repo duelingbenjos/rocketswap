@@ -1,12 +1,12 @@
 # Imports
 
 import currency
-import con_rswp_lst001
+import con_basic_token
 
 # Setup Tokens
 
 STAKING_TOKEN = currency
-YIELD_TOKEN = con_rswp_lst001
+YIELD_TOKEN = con_basic_token
 
 # State
 
@@ -24,8 +24,9 @@ Withdrawals = Hash(default_value=0)
 CurrentEpochIndex = Variable()
 Epochs = Hash(default_value=False)
 StakedBalance = Variable()  # The total amount of farming token in the vault.
+WithdrawnBalance = Variable()
+EpochMinTime = Variable()  # The minimum amount of seconds in Epoch
 meta = Hash(default_value=False)
-
 
 @construct
 def seed():
@@ -33,24 +34,27 @@ def seed():
     DevRewardWallet.set(ctx.caller)
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
+    WithdrawnBalance.set(0)
+    EpochMinTime.set(0) # One Day
+
     Epochs[0] = {
         "time": now,
-        "staked": 0
+        "staked": 0,
+        "rush_amount": 0
     }
 
-    meta['version'] = '0.0.1'
-    meta['type'] = 'staking'  # staking || lp_farming
+    meta['version'] = 0.01
+    meta['type'] = 'staking_rush'  # staking || lp_farming
     meta['STAKING_TOKEN'] = 'currency'
-    meta['YIELD_TOKEN'] = 'con_rswp_lst001'
+    meta['YIELD_TOKEN'] = 'con_basic_token'
 
-    EmissionRatePerHour.set(2283)
-
+    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(0.1)
 
     # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2021, month=3, day=10, hour=12))
+    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
     # The datetime at which you want staking to finish.
-    EndTime.set(datetime.datetime(year=2022, month=3, day=10, hour=00))
+    EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
 
     OpenForBusiness.set(True)
 
@@ -71,7 +75,7 @@ def addStakingTokens(amount: float):
     StakedBalance.set(new_staked_amount)
 
     # Update the Epoch
-    new_epoch_idx = incrementEpoch(new_staked_amount=new_staked_amount)
+    new_epoch_idx = decideIncrementEpoch(new_staked_amount=new_staked_amount)
 
     if Deposits[user] is False:
         Deposits[user] = []
@@ -125,6 +129,9 @@ def withdrawYield(amount: float):
 
     Withdrawals[user] = withdrawn_yield + yield_to_harvest
 
+    new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
+    WithdrawnBalance.set(new_withdrawn_amount)
+
 
 @export
 def withdrawTokensAndYield():
@@ -168,9 +175,12 @@ def withdrawTokensAndYield():
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
+    new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
+    WithdrawnBalance.set(new_withdrawn_amount)
 
     # Increment Epoch
-    incrementEpoch(new_staked_amount=new_staked_amount)
+    decideIncrementEpoch(new_staked_amount=new_staked_amount)
+    # incrementEpoch(new_staked_amount=new_staked_amount)
 
 
 # This runs over each of the items in the user's Deposit
@@ -195,9 +205,13 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
             delta = fitTimeToRange(
                 next_epoch['time']) - fitTimeToRange(this_epoch['time'])
 
-        pct_share_of_stake = amount / this_epoch['staked']
+        pct_share_of_stake = 0
+        if amount is not 0 and this_epoch['staked'] is not 0:
+            pct_share_of_stake = amount / this_epoch['staked']
+        
         # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
-        global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond()
+        emission_rate_per_hour = EmissionRatePerHour.get() + this_epoch['rush_amount']
+        global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(emission_rate_per_hour)
         deposit_yield_this_epoch = decimal(
             global_yield_this_epoch) * pct_share_of_stake
         y += deposit_yield_this_epoch
@@ -215,10 +229,18 @@ def fitTimeToRange(time: Any):
     return time
 
 
-@export
 def getCurrentEpochIndex():
     current_epoch_index = CurrentEpochIndex.get()
     return current_epoch_index
+
+
+def decideIncrementEpoch(new_staked_amount: float):
+    epoch_index = CurrentEpochIndex.get()
+    this_epoch = Epochs[epoch_index]
+    delta = now - this_epoch['time']
+    if delta.seconds >= EpochMinTime.get():
+        epoch_index = incrementEpoch(new_staked_amount)
+    return epoch_index
 
 
 def incrementEpoch(new_staked_amount: float):
@@ -227,14 +249,46 @@ def incrementEpoch(new_staked_amount: float):
     CurrentEpochIndex.set(new_epoch_idx)
     Epochs[new_epoch_idx] = {
         "time": now,
-        "staked": new_staked_amount
+        "staked": new_staked_amount,
+        "rush_amount": 0
     }
+    Epochs[new_epoch_idx]['rush_amount'] = Epochs[current_epoch]['rush_amount']
     return new_epoch_idx
 
 
 @export
-def getEmissionRatePerSecond():
-    emission_rate_per_hour = EmissionRatePerHour.get()
+def activateRush(amount_per_hour: float):
+    assertOwner()
+    current_epoch = CurrentEpochIndex.get()
+    new_epoch_idx = current_epoch + 1
+    CurrentEpochIndex.set(new_epoch_idx)
+    Epochs[new_epoch_idx] = {
+        "time": now,
+        "staked": StakedBalance.get(),
+        "rush_amount": amount_per_hour
+    }
+
+
+@export
+def deactivateRush():
+    assertOwner()
+    current_epoch = CurrentEpochIndex.get()
+    new_epoch_idx = current_epoch + 1
+    CurrentEpochIndex.set(new_epoch_idx)
+    Epochs[new_epoch_idx] = {
+        "time": now,
+        "staked": StakedBalance.get()
+    }
+
+
+@export
+def setEpochMinTime(min_seconds: float):
+    assertOwner()
+    assert min_seconds > 0, 'you must choose a positive value.'
+    EpochMinTime.set(min_seconds)
+
+
+def getEmissionRatePerSecond(emission_rate_per_hour: float):
     emission_rate_per_minute = emission_rate_per_hour / 60
     emission_rate_per_second = emission_rate_per_minute / 60
     return emission_rate_per_second
@@ -291,11 +345,29 @@ def setEndTime(year: int, month: int, day: int, hour: int):
     EndTime.set(time)
 
 
-@export
-def updateMeta(field: str, value: str):
-    assertOwner()
-    meta[field] = value
-
-
 def assertOwner():
     assert Owner.get() == ctx.caller, 'You must be the owner to call this function.'
+
+# This is only to be called in emergencies - the user will forgo their yield when calling this FN.
+
+
+@export
+def emergencyReturnStake():
+
+    user = ctx.caller
+    deposits = Deposits[user]
+
+    assert Deposits[user] is not False, "This account has no deposits to return."
+
+    stake_to_return = 0
+
+    for d in deposits:
+        stake_to_return += d['amount']
+
+    STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
+    Deposits[user] = False
+    Withdrawals[user] = 0
+
+    # Remove token amount from Staked
+    new_staked_amount = StakedBalance.get() - stake_to_return
+    StakedBalance.set(new_staked_amount)
