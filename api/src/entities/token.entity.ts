@@ -30,7 +30,7 @@ export class TokenEntity extends BaseEntity {
 	developer: string;
 	
 	@Column({ nullable: true })
-	owner: string;
+	operator: string;
 
 	@Column({ nullable: true })
 	has_market: boolean;
@@ -55,7 +55,7 @@ export class AddTokenDto {
 	token_base64_svg?: string;
 	token_base64_png?: string;
 	token_logo_url?: string;
-	owner?: string
+	operator?: string
 }
 
 export const saveToken = async (add_token_dto: AddTokenDto) => {
@@ -68,7 +68,7 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 		token_base64_svg,
 		token_base64_png,
 		token_logo_url,
-		owner
+		operator
 	} = add_token_dto;
 	if (!base_supply || !contract_name)
 		throw new Error("Field missing.");
@@ -82,7 +82,7 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 	entity.token_name = token_name;
 	entity.contract_name = contract_name;
 	entity.developer = developer;
-	entity.owner = owner;
+	entity.operator = operator;
 	entity.token_base64_svg = token_base64_svg;
 	entity.token_base64_png = token_base64_png;
 	entity.token_logo_url = token_logo_url;
@@ -100,8 +100,8 @@ export function prepareAddToken(state: IKvp[]): AddTokenDto {
 	const developer = state.find(
 		(kvp) => kvp.key === `${contract_name}.__developer__`
 	).value;
-	const owner = state.find(
-		(kvp) => kvp.key === `${contract_name}.__owner__`
+	const operator = state.find(
+		(kvp) => kvp.key === `${contract_name}.metadata.operator`
 	)?.value || "";
 	const supply_kvp = state.find((kvp) =>
 		kvp.key.includes(`${contract_name}.balances`)
@@ -128,7 +128,7 @@ export function prepareAddToken(state: IKvp[]): AddTokenDto {
 		token_base64_svg,
 		token_base64_png,
 		token_logo_url,
-		owner
+		operator
 	};
 }
 

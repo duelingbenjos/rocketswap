@@ -33,10 +33,6 @@ export interface IUserYieldInfo {
 	time_updated: number;
 }
 
-export interface IBlockParser {
-	block: BlockDTO;
-}
-
 export type ClientUpdateType =
 	| PriceUpdateType
 	| MetricsUpdateType

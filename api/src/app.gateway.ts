@@ -35,7 +35,6 @@ import {
 } from "./types/websocket.types";
 import {log} from './utils/logger'
 
-import { CoinGeckoAPIService } from './services/coingecko.service'
 import { getTokenMetrics } from "./entities/price.entity";
 /**
  * Gateway uses socket.io v2^
@@ -58,7 +57,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
 		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 		this.socketService.handleProxyTxnResponse = this.handleTxnResponse;
-		new CoinGeckoAPIService(this.socketService)
 	}
 
 	handleClientUpdate = async (update: ClientUpdateType) => {
