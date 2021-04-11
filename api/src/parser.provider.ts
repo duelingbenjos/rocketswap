@@ -6,7 +6,6 @@ import { getContractCode, getContractName, validateTokenContract } from "./utils
 import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
-import { IBlockParser } from "./types/websocket.types";
 import { SocketService } from "./services/socket.service";
 import { setName } from "./entities/name.entity";
 import { AuthService } from "./authentication/trollbox.service";
@@ -19,7 +18,7 @@ import { savePrice } from "./entities/price.entity";
 @Injectable()
 export class ParserProvider {
 	private static blockgrabber_last_update = Date.now()
-	public static amm_meta_entity
+	public static amm_meta_entity: AmmMetaEntity
 	constructor(private readonly socketService: SocketService, private readonly authService: AuthService) {}
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
@@ -48,17 +47,16 @@ export class ParserProvider {
 
 	public handleNewBlock = async (block: BlockDTO) => {
 		// const { state, fn, contract, timestamp } = block;
-		await this.parseBlock({
-			block
-		});
+		await this.parseBlock(
+			block);
 	};
 
 	/** This method is passed to the blockgrabber as a callback and checks
 	 * if we're interested in the contents of the block.
 	 */
 
-	public parseBlock = async (update: IBlockParser) => {
-		const { block } = update;
+	public parseBlock = async (block: BlockDTO) => {
+		// const { block } = update;
 		const { state, fn, contract: contract_name, timestamp, hash } = block;
 		// this.logger.log(contract_name)
 		this.addToActionQue(saveTransfer, {

@@ -39,7 +39,7 @@ export class VolumeService implements OnModuleInit {
 				const today_last_price = parseFloat(trades_last_day[0]?.price);
 				const { base_volume, volume, high, low } = this.calculateMetrics(trades_last_day);
 
-				log.log({trades_last_day})
+				// log.log({trades_last_day})
 				token_metrics_entity.Volume = trades_last_day.length ? volume : 0;
 				token_metrics_entity.BaseVolume = trades_last_day.length ? base_volume : 0;
 				token_metrics_entity.High = trades_last_day.length ? high : yesterday_last_price;
@@ -76,7 +76,7 @@ export class VolumeService implements OnModuleInit {
 			where: { contract_name, time: LessThan(one_day_ago) },
 			order: { time: "DESC" }
 		});
-		log.log({ yesterday });
+		// log.log({ yesterday });
 		return yesterday;
 	}
 
