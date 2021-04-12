@@ -2,11 +2,13 @@ import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/comm
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
+import { MarketcapEntity } from "./entities/marketcap.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
+import { GetBalancesDTO, GetMarketSummaryDTO, GetPairsInfoDTO, GetTokenDTO, GetTradeHistoryDTO, GetUserLpBalanceDTO } from "./types/dto";
 import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
@@ -40,7 +42,7 @@ export class AppController {
 	}
 
 	@Get("get_market_summary")
-	public async getMarketSummary(@Query() params) {
+	public async getMarketSummary(@Query() params: GetMarketSummaryDTO) {
 		const { market_name } = params;
 		try {
 			return await VolumeMetricsEntity.findOne(market_name);
@@ -59,7 +61,7 @@ export class AppController {
 	}
 
 	@Get("get_trade_history")
-	public async getTradeHistory(@Query() params) {
+	public async getTradeHistory(@Query() params: GetTradeHistoryDTO) {
 		let { vk, contract_name, skip, take } = params;
 		if (!take) take = 50;
 		const find_options = { where: {} };
@@ -115,7 +117,7 @@ export class AppController {
 	}
 
 	@Get("token/:contract_name")
-	public async getToken(@Param() params) {
+	public async getToken(@Param() params: GetTokenDTO) {
 		const { contract_name } = params;
 		try {
 			let token = await TokenEntity.findOne({ where: { contract_name } });
@@ -137,7 +139,7 @@ export class AppController {
 	}
 
 	@Get("user_lp_balance/:vk")
-	public async getUserLpBalance(@Param() params) {
+	public async getUserLpBalance(@Param() params: GetUserLpBalanceDTO) {
 		const { vk } = params;
 		//console.log(vk)
 		try {
@@ -150,9 +152,10 @@ export class AppController {
 	}
 
 	@Get("get_pairs/:contract_names")
-	public async getPairsInfo(@Param() params) {
+	public async getPairsInfo(@Param() params: GetPairsInfoDTO) {
 		const { contract_names } = params;
 		const contract_names_arr = contract_names.split(",");
+		if (!contract_names_arr.length) throw "Invalid contract_names provided.";
 		try {
 			if (contract_names_arr.length > 20) {
 				throw "You may only request a maximum of 20 pairs at a time.";
@@ -178,7 +181,7 @@ export class AppController {
 	}
 
 	@Get("balances/:vk")
-	async getBalances(@Param() params): Promise<any> {
+	async getBalances(@Param() params: GetBalancesDTO): Promise<any> {
 		try {
 			let balances: any = await BalanceEntity.findOne(params.vk);
 			if (!balances)
@@ -188,7 +191,15 @@ export class AppController {
 				};
 			return balances;
 		} catch (err) {
-			console.error(err);
+			throw new HttpException(err, 500);
+		}
+	}
+
+	@Get("marketcaps")
+	async getMarketcaps() {
+		try {
+			return await MarketcapEntity.find();
+		} catch (err) {
 			throw new HttpException(err, 500);
 		}
 	}

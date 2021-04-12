@@ -30,6 +30,7 @@
     "@nestjs/passport": "^7.1.5",
     "@nestjs/platform-express": "^7.0.0",
     "@nestjs/platform-socket.io": "^7.5.5",
+    "@nestjs/swagger": "^4.8.0",
     "@nestjs/typeorm": "^7.1.4",
     "@nestjs/websockets": "^7.5.5",
     "bcrypt": "^5.0.0",
@@ -47,6 +48,7 @@
     "rimraf": "^3.0.2",
     "rxjs": "^6.5.4",
     "sqlite3": "5.0.0",
+    "swagger-ui-express": "^4.1.6",
     "tracer": "^1.1.4",
     "typeorm": "^0.2.28",
     "types-validate-assert": "^1.0.1"
