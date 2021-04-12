@@ -21,6 +21,7 @@ import { ITrollBoxMessage } from "src/types/websocket.types";
 import {
 	saveTrollChat
 } from "../entities/chat-history.entity";
+import { ApiTags } from "@nestjs/swagger";
 
 export interface AuthenticationPayload {
 	user: NameEntity;
@@ -31,6 +32,8 @@ export interface AuthenticationPayload {
 	};
 }
 
+
+@ApiTags("Trollbox")
 @Controller("/api/trollbox")
 export class TrollboxController {
 	private logger: Logger = new Logger("TrollboxController");

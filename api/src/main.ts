@@ -18,9 +18,8 @@ async function bootstrap() {
 
 	const config = new DocumentBuilder()
 		.setTitle("Rocketswap API Documentation")
-		.setDescription("Details of the Rocketswap REST API")
+		.setDescription("Details of the Rocketswap REST API. Further documentation can be found @ https://rocketswap.exchange/docs/")
 		.setVersion("1.0")
-    .addTag("Main API")
 		.build();
 	const document = SwaggerModule.createDocument(app, config);
 
