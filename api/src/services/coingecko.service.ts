@@ -23,7 +23,7 @@ export class CoinGeckoAPIService implements OnModuleInit {
 		try {
 			let tickerData: any = await axios.get(`${this.baseUrl}/exchanges/${"txbit"}/tickers?coin_ids=${"lamden"}`);
 			const eth_tau_ticker = tickerData.data?.tickers?.find((ticker) => ticker.target === "ETH");
-			log.log({ eth_tau_ticker });
+			// log.log({ eth_tau_ticker });
 			if (eth_tau_ticker && eth_tau_ticker.market.name === "Txbit") {
 				let UsdPrice = eth_tau_ticker.converted_last.usd.toString();
 				CoinGeckoAPIService.last_price = eth_tau_ticker.converted_last.usd;

@@ -125,7 +125,7 @@ export class ParserProvider {
 				});
 			}
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err)
 		}
 	};
 
@@ -145,7 +145,8 @@ export class ParserProvider {
 			});
 			await savePrice(state, this.socketService.handleClientUpdate)
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err);
+			
 		}
 	};
 
@@ -169,7 +170,7 @@ export class ParserProvider {
 				this.action_que_processing = false;
 			}
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err);
 			setTimeout(async () => this.executeActionQue(action_que), 1000);
 		}
 	};

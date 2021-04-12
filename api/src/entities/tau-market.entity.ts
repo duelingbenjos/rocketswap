@@ -15,14 +15,14 @@ export class TauMarketEntity extends BaseEntity {
 
 export async function saveUSDPrice(args: { price: string; handleClientUpdate: handleClientUpdateType }) {
 	const { price, handleClientUpdate } = args;
-	log.log("SAVE USD PRICE CALLED", price);
+	// log.log("SAVE USD PRICE CALLED", price);
 	let entity = await TauMarketEntity.findOne("usd_price");
 	if (!entity) {
 		entity = new TauMarketEntity();
 		entity.info_type = "usd_price";
 	}
-	log.log({ entity });
-	// if (price !== entity.value) {
+	// log.log({ entity });
+	if (price !== entity.value) {
 	entity.value = price;
 	await entity.save();
 	const payload: TauUsdPriceUpdateType = {
@@ -30,5 +30,5 @@ export async function saveUSDPrice(args: { price: string; handleClientUpdate: ha
 		price
 	};
 	handleClientUpdate(payload);
-	// }
+	}
 }
