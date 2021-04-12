@@ -1,4 +1,5 @@
 import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -13,6 +14,7 @@ import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
 @Controller("api")
+@ApiTags("Main API")
 export class AppController {
 	constructor() {}
 
