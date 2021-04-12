@@ -24,7 +24,7 @@ async function bootstrap() {
 		.build();
 	const document = SwaggerModule.createDocument(app, config);
 
-	SwaggerModule.setup("api_docs", app, document);
+	SwaggerModule.setup("docs", app, document);
 
 	app.use((req, res, next) => {
 		res.header("Access-Control-Allow-Origin", "rocketswap.exchange"); // update to match the domain you will make the request from
