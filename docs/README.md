@@ -17,8 +17,6 @@ Liquidity Providers (LP's) earn fees by depositing liquidity (both assets of a t
 #### Market Participants
 Market Participants buy and sell assets in the market, their experience is identical to that of a traditional exchange user.
 
-Rocketswap will achieve this goal by creating positive feedback loops across projects, allowing all Lamden assets to find fair market value.
-
 #### How can I contact the Team ?
 
 Contact us on [Telegram](https://t.me/rocketswap)   
