@@ -170,7 +170,7 @@ export class ParserProvider {
 				this.action_que_processing = false;
 			}
 		} catch (err) {
-			log.err(err)
+			log.error(err)
 			this.action_que.splice(0, 1);
 			this.executeActionQue(action_que);
 		}
