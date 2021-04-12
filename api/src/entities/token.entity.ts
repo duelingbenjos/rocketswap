@@ -116,8 +116,8 @@ export function prepareAddToken(state: IKvp[]): AddTokenDto {
 		(kvp) => kvp.key === `${contract_name}.metadata:token_logo_url`
 	)?.value || '';
 
-	const base_supply = supply_kvp.value;
-	const token_seed_holder = supply_kvp.key.split(":")[1];
+	const base_supply = supply_kvp?.value;
+	const token_seed_holder = supply_kvp?.key.split(":")[1];
 	return {
 		contract_name,
 		token_name,
