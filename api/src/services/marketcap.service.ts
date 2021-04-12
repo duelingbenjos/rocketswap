@@ -16,7 +16,7 @@ export class MarketcapService implements OnModuleInit {
 			async () => {
 				await this.updateMarketCaps();
 			},
-			5 * 60 * 1000 // 15 mins
+			60 * 1000 // 1 min
 		);
 	}
 
@@ -42,7 +42,7 @@ export class MarketcapService implements OnModuleInit {
 				proms.push(marketcap_entity.save());
 			}
 			const market_caps = await Promise.all(proms);
-			log.log({ market_caps });
+			// log.log({ market_caps });
 		} catch (err) {
 			log.error(err);
 		}
