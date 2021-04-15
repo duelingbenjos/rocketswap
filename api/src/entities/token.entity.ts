@@ -1,11 +1,7 @@
 import { getContractName } from "../utils/utils";
-import {
-	Entity,
-	Column,
-	BaseEntity,
-	PrimaryGeneratedColumn
-} from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { IKvp } from "../types/misc.types";
+import { log } from "../utils/logger";
 
 /** These are tokens added by watching the submission contract / submit_contract fn */
 
@@ -14,10 +10,10 @@ export class TokenEntity extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column({nullable: true})
+	@Column({ nullable: true })
 	token_symbol: string;
 
-	@Column({nullable: true})
+	@Column({ nullable: true })
 	token_name: string;
 
 	@Column({ nullable: true })
@@ -28,7 +24,7 @@ export class TokenEntity extends BaseEntity {
 
 	@Column({ nullable: true })
 	developer: string;
-	
+
 	@Column({ nullable: true })
 	operator: string;
 
@@ -55,7 +51,7 @@ export class AddTokenDto {
 	token_base64_svg?: string;
 	token_base64_png?: string;
 	token_logo_url?: string;
-	operator?: string
+	operator?: string;
 }
 
 export const saveToken = async (add_token_dto: AddTokenDto) => {
@@ -70,11 +66,13 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 		token_logo_url,
 		operator
 	} = add_token_dto;
-	if (!base_supply || !contract_name)
+	if (!contract_name) {
+		log.log({ add_token_dto });
 		throw new Error("Field missing.");
+	}
 
-	const exists = await TokenEntity.findOne({contract_name});
-	if (exists) return
+	const exists = await TokenEntity.findOne({ contract_name });
+	if (exists) return;
 
 	const entity = new TokenEntity();
 	entity.base_supply = base_supply;
@@ -91,30 +89,14 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 
 export function prepareAddToken(state: IKvp[]): AddTokenDto {
 	const contract_name = getContractName(state);
-	const token_symbol = state.find(
-		(kvp) => kvp.key === `${contract_name}.metadata:token_symbol`
-	)?.value || '';
-	const token_name = state.find(
-		(kvp) => kvp.key === `${contract_name}.metadata:token_name`
-	)?.value || '';
-	const developer = state.find(
-		(kvp) => kvp.key === `${contract_name}.__developer__`
-	).value;
-	const operator = state.find(
-		(kvp) => kvp.key === `${contract_name}.metadata.operator`
-	)?.value || "";
-	const supply_kvp = state.find((kvp) =>
-		kvp.key.includes(`${contract_name}.balances`)
-	);
-	const token_base64_svg = state.find(
-		(kvp) => kvp.key === `${contract_name}.metadata:token_logo_base64_svg`
-	)?.value || '';
-	const token_base64_png = state.find(
-		(kvp) => kvp.key === `${contract_name}.metadata:token_logo_base64_png`
-	)?.value || '';
-	const token_logo_url = state.find(
-		(kvp) => kvp.key === `${contract_name}.metadata:token_logo_url`
-	)?.value || '';
+	const token_symbol = state.find((kvp) => kvp.key === `${contract_name}.metadata:token_symbol`)?.value || "";
+	const token_name = state.find((kvp) => kvp.key === `${contract_name}.metadata:token_name`)?.value || "";
+	const developer = state.find((kvp) => kvp.key === `${contract_name}.__developer__`).value;
+	const operator = state.find((kvp) => kvp.key === `${contract_name}.metadata.operator`)?.value || "";
+	const supply_kvp = state.find((kvp) => kvp.key.includes(`${contract_name}.balances`));
+	const token_base64_svg = state.find((kvp) => kvp.key === `${contract_name}.metadata:token_logo_base64_svg`)?.value || "";
+	const token_base64_png = state.find((kvp) => kvp.key === `${contract_name}.metadata:token_logo_base64_png`)?.value || "";
+	const token_logo_url = state.find((kvp) => kvp.key === `${contract_name}.metadata:token_logo_url`)?.value || "";
 
 	const base_supply = supply_kvp?.value;
 	const token_seed_holder = supply_kvp?.key.split(":")[1];
@@ -134,21 +116,21 @@ export function prepareAddToken(state: IKvp[]): AddTokenDto {
 
 export async function saveTokenUpdate(state: IKvp[]) {
 	state.forEach(async (change) => {
-		let contract_name = change.key.split(".")[0]
-		const entity = await TokenEntity.findOne({contract_name})
+		let contract_name = change.key.split(".")[0];
+		const entity = await TokenEntity.findOne({ contract_name });
 		if (entity) {
-			if (change.key.includes(".metadata:token_logo_base64_svg")) entity.token_base64_svg = change.value
-			if (change.key.includes(".metadata:token_logo_base64_png")) entity.token_base64_png = change.value
-			if (change.key.includes(".metadata:token_logo_url")) entity.token_logo_url = change.value
-			if (change.key.includes(".metadata:token_symbol")) entity.token_symbol = change.value
-			if (change.key.includes(".metadata:token_name")) entity.token_name = change.value
+			if (change.key.includes(".metadata:token_logo_base64_svg")) entity.token_base64_svg = change.value;
+			if (change.key.includes(".metadata:token_logo_base64_png")) entity.token_base64_png = change.value;
+			if (change.key.includes(".metadata:token_logo_url")) entity.token_logo_url = change.value;
+			if (change.key.includes(".metadata:token_symbol")) entity.token_symbol = change.value;
+			if (change.key.includes(".metadata:token_name")) entity.token_name = change.value;
 			try {
-				await entity.save()
-			}catch (err) {
-				console.error(err)
+				await entity.save();
+			} catch (err) {
+				console.error(err);
 			}
 		}
-	})
+	});
 }
 
 export async function getTokenList(): Promise<string[]> {

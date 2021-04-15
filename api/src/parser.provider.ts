@@ -87,11 +87,11 @@ export class ParserProvider {
 					const add_token_dto = prepareAddToken(state);
 					const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto;
 
-					this.addToActionQue(updateBalance, {
-						amount,
-						contract_name,
-						vk
-					});
+					// this.addToActionQue(saveTransfer, {
+					// 	amount,
+					// 	contract_name,
+					// 	vk
+					// });
 					this.addToActionQue(saveToken, add_token_dto);
 					this.addToActionQue(this.updateTokenList);
 				}
@@ -170,9 +170,9 @@ export class ParserProvider {
 				this.action_que_processing = false;
 			}
 		} catch (err) {
-			log.error(err)
+			log.error(err);
 			this.action_que.splice(0, 1);
-			this.executeActionQue(action_que);
+			setTimeout(async () => this.executeActionQue(action_que), 1000);
 		}
 	};
 

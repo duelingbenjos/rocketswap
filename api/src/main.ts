@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { NestApplicationOptions } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { log } from "./utils/logger";
 const fs = require("fs");
 
 let options: NestApplicationOptions = {};

@@ -2,6 +2,7 @@ import { IKvp } from "../types/misc.types";
 import { getVal } from "../utils/utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
+import { log } from "../utils/logger";
 
 /** Updated when the token balance from one of the token contracts the API detects has a change. */
 
@@ -49,10 +50,12 @@ export async function saveTransfer(args: { state: IKvp[]; handleClientUpdate: ha
 	const balance_updates = balances_kvp.filter((kvp) => kvp.key.split(":").length === 2);
 	for (let kvp of balance_updates) {
 		const { key, value } = kvp;
+		log.log(key)
 		const parts = key.split(".");
 		const is_balance = parts[1].split(":")[0] === "balances" ? true : false;
-
+		
 		const vk = key.split(":")[1];
+		log.log(vk)
 		const contract_name = parts[0];
 		const amount = getVal(kvp);
 		if (is_balance && vk && contract_name) {
