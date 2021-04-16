@@ -27,7 +27,6 @@ export class ParserProvider {
 
 	public static updateLastChecked = (time_delta: number = 0) => {
 		ParserProvider.blockgrabber_last_update = time_delta + Date.now()
-		// log.log(`Updating last checked ... with time_delta of : ${time_delta}`)
 	}
 
 	async onModuleInit() {
@@ -85,13 +84,6 @@ export class ParserProvider {
 				}
 				if (token_is_valid) {
 					const add_token_dto = prepareAddToken(state);
-					const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto;
-
-					this.addToActionQue(updateBalance, {
-						amount,
-						contract_name,
-						vk
-					});
 					this.addToActionQue(saveToken, add_token_dto);
 					this.addToActionQue(this.updateTokenList);
 				}
@@ -170,7 +162,7 @@ export class ParserProvider {
 				this.action_que_processing = false;
 			}
 		} catch (err) {
-			log.error(err)
+			log.error(err);
 			this.action_que.splice(0, 1);
 			this.executeActionQue(action_que);
 		}
