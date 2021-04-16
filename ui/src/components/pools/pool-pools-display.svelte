@@ -25,7 +25,7 @@
         {#if $walletIsReady}
             <p>No liquidity found.</p>
         {:else}
-            <p>Wallet is not Connected.</p>
+            <p>Wallet is Not Connected.</p>
         {/if}
     {/if}
 </div>
