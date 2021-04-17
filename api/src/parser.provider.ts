@@ -164,7 +164,7 @@ export class ParserProvider {
 		} catch (err) {
 			log.error(err);
 			this.action_que.splice(0, 1);
-			this.executeActionQue(action_que);
+			setTimeout(async () => this.executeActionQue(action_que), 1000);
 		}
 	};
 

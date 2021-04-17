@@ -101,18 +101,23 @@ export class AppController {
 					"token_symbol"
 				]
 			});
-			return res.map((token) => {
-				return {
-					contract_name: token.contract_name,
-					has_market: token.has_market,
-					token_base64_png: token.token_base64_png,
-					token_base64_svg: token.token_base64_svg,
-					logo: decideLogo(token),
-					token_logo_url: token.token_logo_url,
-					token_name: token.token_name,
-					token_symbol: token.token_symbol
-				};
-			});
+
+			return res
+				.filter((token) => {
+					return token.token_symbol && token.token_name;
+				})
+				.map((token) => {
+					return {
+						contract_name: token.contract_name,
+						has_market: token.has_market,
+						token_base64_png: token.token_base64_png,
+						token_base64_svg: token.token_base64_svg,
+						logo: decideLogo(token),
+						token_logo_url: token.token_logo_url,
+						token_name: token.token_name,
+						token_symbol: token.token_symbol
+					};
+				});
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}

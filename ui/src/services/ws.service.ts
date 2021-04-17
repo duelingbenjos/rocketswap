@@ -98,6 +98,7 @@
 		This payload is an array containing all the registered staking pools in the API
 		*/
 		this.connection.on(`staking_panel`, (payload) => {
+			console.log(JSON.parse(JSON.stringify(payload)))
 			stakingInfo.set(valuesToBigNumber(payload))
 			console.log({staking_panel: payload})
 		})
@@ -274,7 +275,7 @@
 	}
 
 	private handleUserYieldFeed(payload) {
-		console.log({user_yield_list: payload})
+		console.log(JSON.parse(JSON.stringify({user_yield_list: payload})))
 		userYieldInfo.set(valuesToBigNumber(payload))
 	}
 
