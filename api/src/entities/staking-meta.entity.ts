@@ -69,7 +69,6 @@ export const updateStakingContractMeta = async (args: {
 	try {
 		const { state, handleClientUpdate, staking_contract, fn } = args;
 		let entity = await StakingMetaEntity.findOne(staking_contract);
-		log.log({ STAKING_CONTRACT: staking_contract });
 		if (!entity) {
 			entity = new StakingMetaEntity();
 			entity.contract_name = staking_contract;
