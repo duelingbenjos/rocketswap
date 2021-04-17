@@ -76,7 +76,7 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 
 	const entity = new TokenEntity();
 	entity.base_supply = base_supply;
-	entity.token_symbol = token_symbol;
+	entity.token_symbol = token_symbol ? await decideSymbol(token_symbol) : token_symbol;
 	entity.token_name = token_name;
 	entity.contract_name = contract_name;
 	entity.developer = developer;
@@ -86,6 +86,26 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 	entity.token_logo_url = token_logo_url;
 	return await entity.save();
 };
+
+async function decideSymbol(token_symbol: string): Promise<string> {
+	const symbol_entity = await TokenEntity.findOne({ where: { token_symbol } });
+
+	if (symbol_entity) {
+		const parts = token_symbol.split("_");
+		log.log({ parts });
+		let idx = parts[1];
+		let new_idx;
+		if (idx) {
+			if (parseInt(idx) > -1) {
+				new_idx = parseInt(idx) + 1;
+			}
+		} else {
+			new_idx = 1;
+		}
+		return await decideSymbol(`${parts[0]}_${new_idx}`);
+	}
+	return token_symbol;
+}
 
 export function prepareAddToken(state: IKvp[]): AddTokenDto {
 	const contract_name = getContractName(state);
