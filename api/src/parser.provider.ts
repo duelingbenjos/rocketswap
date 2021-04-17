@@ -85,13 +85,6 @@ export class ParserProvider {
 				}
 				if (token_is_valid) {
 					const add_token_dto = prepareAddToken(state);
-					const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto;
-
-					// this.addToActionQue(saveTransfer, {
-					// 	amount,
-					// 	contract_name,
-					// 	vk
-					// });
 					this.addToActionQue(saveToken, add_token_dto);
 					this.addToActionQue(this.updateTokenList);
 				}
