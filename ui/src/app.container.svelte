@@ -9,6 +9,7 @@
 	import TrollBox from './components/misc/troll-box.svelte'
 	import TrollBoxButton from './components/misc/troll-box-button.svelte'
 	import ToastsContainer from './components/toasts-container.svelte'
+	import TestnetBanner from './components/misc/testnet-banner.svelte'
 
 	//Services
 	import { WalletService } from './services/wallet.service'
@@ -149,3 +150,4 @@
 <Footer />
 <TrollBoxButton />
 <TrollBox />
+<TestnetBanner/>

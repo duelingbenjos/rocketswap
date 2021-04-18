@@ -28,6 +28,10 @@ import { TauMarketEntity } from "./entities/tau-market.entity";
 import { TradeSubscriber } from "./subscribers/trade.subscriber";
 import { PriceEntity } from "./entities/price.entity";
 import { VolumeService } from "./services/volume.service";
+import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
+import { MarketcapEntity } from "./entities/marketcap.entity";
+import { MarketcapService } from "./services/marketcap.service";
+import { CoinGeckoAPIService } from "./services/coingecko.service";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -47,9 +51,11 @@ const db_options: TypeOrmModuleOptions = {
 		StakingMetaEntity,
 		UserStakingEntity,
 		StakingEpochEntity,
-		TauMarketEntity
+		TauMarketEntity,
+		VolumeMetricsEntity,
+		MarketcapEntity
 	],
-	subscribers:[TradeSubscriber],
+	subscribers: [TradeSubscriber],
 	synchronize: true,
 	autoLoadEntities: true
 };
@@ -77,7 +83,9 @@ const db_options: TypeOrmModuleOptions = {
 		Logger,
 		TransactionService,
 		StakingEpochEntity,
-		VolumeService
+		VolumeService,
+		MarketcapService,
+		CoinGeckoAPIService
 	]
 })
 export class AppModule {}

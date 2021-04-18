@@ -170,6 +170,7 @@ import { unixToLocalTimestamp } from '../../utils';
     }
     .box-controls{
         padding: 5px;
+        width: 80%;
     }
     .box-controls > span {
         min-width: fit-content;
@@ -200,6 +201,12 @@ import { unixToLocalTimestamp } from '../../utils';
 
     .message-body {
         margin-left: 3px;
+    }
+    /* When page width is greater than 430px (tablets) */
+    @media screen and (min-width: 430px) {
+        .box-controls{
+            width: 100%;
+        }        
     }
 
     /* When page width is greater than 900px (tablets) */

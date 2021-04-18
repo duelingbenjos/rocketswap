@@ -6,7 +6,6 @@ import { getContractCode, getContractName, validateTokenContract } from "./utils
 import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
-import { IBlockParser } from "./types/websocket.types";
 import { SocketService } from "./services/socket.service";
 import { setName } from "./entities/name.entity";
 import { AuthService } from "./authentication/trollbox.service";
@@ -19,7 +18,7 @@ import { savePrice } from "./entities/price.entity";
 @Injectable()
 export class ParserProvider {
 	private static blockgrabber_last_update = Date.now()
-	public static amm_meta_entity
+	public static amm_meta_entity: AmmMetaEntity
 	constructor(private readonly socketService: SocketService, private readonly authService: AuthService) {}
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
@@ -28,7 +27,6 @@ export class ParserProvider {
 
 	public static updateLastChecked = (time_delta: number = 0) => {
 		ParserProvider.blockgrabber_last_update = time_delta + Date.now()
-		// log.log(`Updating last checked ... with time_delta of : ${time_delta}`)
 	}
 
 	async onModuleInit() {
@@ -40,6 +38,7 @@ export class ParserProvider {
 		setInterval(()=>{
 			if (Date.now() - ParserProvider.blockgrabber_last_update > 120000 ) {
 				log.warn("no response from blockgrabber in 120 seconds => starting it up again")
+				ParserProvider.updateLastChecked()
 				startBlockgrabber(this.handleNewBlock, true)
 			}
 		},5000)
@@ -47,17 +46,16 @@ export class ParserProvider {
 
 	public handleNewBlock = async (block: BlockDTO) => {
 		// const { state, fn, contract, timestamp } = block;
-		await this.parseBlock({
-			block
-		});
+		await this.parseBlock(
+			block);
 	};
 
 	/** This method is passed to the blockgrabber as a callback and checks
 	 * if we're interested in the contents of the block.
 	 */
 
-	public parseBlock = async (update: IBlockParser) => {
-		const { block } = update;
+	public parseBlock = async (block: BlockDTO) => {
+		// const { block } = update;
 		const { state, fn, contract: contract_name, timestamp, hash } = block;
 		// this.logger.log(contract_name)
 		this.addToActionQue(saveTransfer, {
@@ -86,13 +84,6 @@ export class ParserProvider {
 				}
 				if (token_is_valid) {
 					const add_token_dto = prepareAddToken(state);
-					const { contract_name, token_seed_holder: vk, base_supply: amount } = add_token_dto;
-
-					this.addToActionQue(updateBalance, {
-						amount,
-						contract_name,
-						vk
-					});
 					this.addToActionQue(saveToken, add_token_dto);
 					this.addToActionQue(this.updateTokenList);
 				}
@@ -126,7 +117,7 @@ export class ParserProvider {
 				});
 			}
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err)
 		}
 	};
 
@@ -134,10 +125,6 @@ export class ParserProvider {
 		const { fn, state, timestamp, hash } = args;
 		try {
 			await savePair(state);
-			await saveTransfer({
-				state,
-				handleClientUpdate: this.socketService.handleClientUpdate
-			});
 			await savePairLp(state);
 			await saveUserLp({
 				state,
@@ -150,7 +137,8 @@ export class ParserProvider {
 			});
 			await savePrice(state, this.socketService.handleClientUpdate)
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err);
+			
 		}
 	};
 
@@ -174,7 +162,8 @@ export class ParserProvider {
 				this.action_que_processing = false;
 			}
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err);
+			this.action_que.splice(0, 1);
 			setTimeout(async () => this.executeActionQue(action_que), 1000);
 		}
 	};

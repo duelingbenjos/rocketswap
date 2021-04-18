@@ -36,6 +36,7 @@
     let keystoreStep = 1;
     let selectedWallet;
     let saveData;
+    let fileName;
     let ks;
 
 
@@ -88,6 +89,7 @@
         }
         if (file) {
             if (file.name.includes(".keystore")){
+                fileName = file.name
                 setKeystore(file)
             }
         }
@@ -149,6 +151,10 @@
             return `${wallet.nickname}: ${formatAccountAddress(wallet.vk, 4, 4)}`
         }
         return formatAccountAddress(wallet.vk, 8, 4)
+    }
+
+    const handleOnFocus = (e) => {
+        e.target.removeAttribute('readonly')
     }
 </script>
 
@@ -213,32 +219,38 @@
     <div class="flex-col flex-center-center flex-grow" 
          in:fade="{{delay: 0, duration: 300, opacity: 0.5, easing: quintOut}}">
         <PasswordIcon width="15%" margin="-1rem 0 1rem" />
-        <form id="form-password" on:submit|preventDefault={handlePasswordSubmit}>
+        <form id="loginForm" on:submit|preventDefault={handlePasswordSubmit}>
+            <input  id="text" name="username" value={fileName} />
             <label for="password">Enter your Keystore Password </label>
             <div class="flex-row flex-center-center">
                 {#if hidePassword}
                     <input 
                         id="password"
+                        name="password"
                         class="primaryInput" 
                         type="password"
                         bind:value={password} 
                     />
                     <button 
+                        id="loginButton"
                         title="Show Password"
                         class="flex-row flex-center-center" 
-                        on:click={() => hidePassword = false}>
+                        on:click|preventDefault={() => hidePassword = false}>
                             <VisibleIcon margin="0 0 0 4px"/>
                     </button>   
                 {:else}
                     <input 
                         id="password"
+                        name="password"
                         class="primaryInput" 
-                        bind:value={password} 
+                        bind:value={password}
+                        autocomplete="off" readonly on:focus={handleOnFocus}
                     />
                     <button 
+                        id="loginButton"
                         title="Hide Password"
                         class="flex-row flex-center-center" 
-                        on:click={() => hidePassword = true}>
+                        on:click|preventDefault={() => hidePassword = true}>
                             <InvisibleIcon margin="0 0 0 4px"/>
                     </button>
                 {/if}
@@ -246,7 +258,7 @@
         </form>
         <span class="text-error">{errorMsg}</span>
         <div class="buttons flex-row flex-center-center flex-grow">
-            <input type="submit" class="primary" value="Unlock" form="form-password" disabled={password === ""}/>
+            <input type="submit" class="primary" value="Unlock" form="loginForm" disabled={password === ""}/>
             <button class="primary outline" on:click={backToStep1}>Back</button>
         </div>
     </div>

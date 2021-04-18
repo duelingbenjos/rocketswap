@@ -35,13 +35,12 @@ import {
 } from "./types/websocket.types";
 import {log} from './utils/logger'
 
-import { CoinGeckoAPIService } from './services/coingecko.service'
 import { getTokenMetrics } from "./entities/price.entity";
 /**
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
  */
-@WebSocketGateway({origin: "*", cors: {origins: ['*']}} )
+@WebSocketGateway({origin: "*", cors: {origins: ['*', 'staging.rocketswap.exchange']}} )
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger("AppGateway");
 
@@ -58,7 +57,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.socketService.handleAuthenticateResponse = this.handleAuthenticateResponse;
 		this.socketService.handleTrollboxMsg = this.handleTrollboxMsg;
 		this.socketService.handleProxyTxnResponse = this.handleTxnResponse;
-		new CoinGeckoAPIService(this.socketService)
 	}
 
 	handleClientUpdate = async (update: ClientUpdateType) => {

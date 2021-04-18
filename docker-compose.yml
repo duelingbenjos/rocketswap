@@ -43,7 +43,7 @@ services:
       - ROCKETSWAP_DB_USERNAME=root
       - ROCKETSWAP_DB_PASSWORD=example
       - ROCKETSWAP_DB_FIRST_RUN=${ROCKETSWAP_DB_FIRST_RUN}
-      - currBlockNum=1
+      - currBlockNum=7500
       - CONTEXT=remote
     network_mode: host
 

@@ -13,7 +13,7 @@ export class TradeSubscriber implements EntitySubscriberInterface<TradeHistoryEn
     // const priceGotUpdated = event.entity
     // if (priceGotUpdated) {
     //   if (Number(event.databaseEntity.price) !== event.entity.price) {
-        console.log(event.entity)
+        // console.log(event.entity)
     //     Logger.log(`Price changed from 
     // //     ${ event.databaseEntity.price } to 
     // //     ${ event.entity.price }`, 'Product Price Updated');

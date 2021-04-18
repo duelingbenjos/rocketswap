@@ -5,7 +5,7 @@ const CURRENCY_NAME = 'Lamden Testnet Token'
 const AMM_CONTRACT_NAME = 'con_amm_v9'
 const AMM_TOKEN_CONTRACT = 'con_rswp_lst001'
 const AMM_TOKEN_SYMBOL = 'RSWP'
-const AMM_TOKEN_STAKING_CONTRACT = 'con_staking_dtau_rswp_lst001_4'
+const AMM_TOKEN_STAKING_CONTRACT = 'con_simple_staking_rswp'
 const AMM_FEE = '0.003'
 const AMM_TOKEN_DISCOUNT = '0.75'
 const NAMES_CONTRACT = 'con_ipseity_5'
@@ -30,6 +30,7 @@ export const connectionRequest = {
 export const stamps = {
   defaultValue: 50,
   create_market: 120,
+  create_liquidity: 85,
   add_liquidity: 85,
   remove_liquidity: 80,
   addStakingTokens: 120,

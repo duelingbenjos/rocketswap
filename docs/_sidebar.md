@@ -1,3 +1,5 @@
 * [Introduction](/)
-* [Guides](guide.md)
+* [Guides](guides.md)
 * [Fees & Discounts](fee_discount.md)
+* [Creating Tokens](token.md)
+* [Developer Docs](developer_docs.md)

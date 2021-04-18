@@ -98,6 +98,7 @@
 		This payload is an array containing all the registered staking pools in the API
 		*/
 		this.connection.on(`staking_panel`, (payload) => {
+			console.log(JSON.parse(JSON.stringify(payload)))
 			stakingInfo.set(valuesToBigNumber(payload))
 			console.log({staking_panel: payload})
 		})
@@ -142,7 +143,6 @@
 	}
 
 	private handleTrollboxHistory(history){
-		console.log({history})
 		trollboxMessages.update((val) => {
 			val.push(
 				...history.map((item) => {
@@ -225,21 +225,29 @@
 	public joinTradeFeed(contract_name: string) {
 		if (this.current_trade_feed === contract_name) return
 
-		this.connection.on(`trade_update:${contract_name}`, this.handleTradeUpdate)
+		this.connection.on(`trade_update:${contract_name}`, (event) => this.handleTradeUpdate(event, contract_name))
 		this.connection.emit('join_room', `trade_feed:${contract_name}`)
 		this.current_trade_feed = contract_name
 
 		this.joinedFeeds[`trade_feed:${contract_name}`] = true
 	}
 
-	private handleTradeUpdate(event) {
-		console.log({handleTradeUpdate: JSON.parse(JSON.stringify(event))})
-		if (event.history) tradeHistory.set(valuesToBigNumber(event.history))
+	private handleTradeUpdate(event, contract_name) {
+		if (event.history) {
+			tradeHistory.update( current => {
+				if (!current[contract_name]) current[contract_name] = []
+				let tradeList = valuesToBigNumber(event.history)
+				current[contract_name] = tradeList.filter(trade => !trade.price.isEqualTo(0))
+				return current
+			})
+		}
 		else {
 			if (event.action === 'trade_update') {
-				tradeUpdates.update((trades) => {
-					trades.push(valuesToBigNumber(event))
-					return trades
+				tradeUpdates.update((current) => {
+					if (!current[contract_name]) current[contract_name] = []
+					let trade = valuesToBigNumber(event)
+					if (!trade.price.isEqualTo(0)) current[contract_name].push(trade)
+					return current
 				})
 			}
 		}
@@ -267,7 +275,7 @@
 	}
 
 	private handleUserYieldFeed(payload) {
-		console.log({user_yield_list: payload})
+		console.log(JSON.parse(JSON.stringify({user_yield_list: payload})))
 		userYieldInfo.set(valuesToBigNumber(payload))
 	}
 

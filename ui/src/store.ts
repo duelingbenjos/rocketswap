@@ -119,8 +119,8 @@ export const trollboxMessages = writable([]);
 export const bearerToken = writable(null)
 
 //AMM TRADES
-export const tradeHistory = writable([]);
-export const tradeUpdates = writable([]);
+export const tradeHistory = writable({});
+export const tradeUpdates = writable({});
 
 
 // POOLS AND LIQUIDITY

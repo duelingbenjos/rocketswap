@@ -55,6 +55,9 @@
         let args = {
             amount: {"__fixed__": stringToFixed(withdrawAmount, 8)}
         }
+        if (stakingInfo.contract_name === config.ammTokenStakingContract) {
+            args.amount.__fixed__ = stringToFixed(withdrawAmount.multipliedBy(1.1), 8)
+        }
         walletService.withdrawStake(stakingInfo.contract_name, args, stakingToken, yieldToken, {success, error})
         .catch(err => {
             console.log(err)
@@ -75,7 +78,7 @@
         padding-top: 1rem;
     }
     .sub-text{
-        margin: 1rem 0;
+        margin: -1rem 0 1rem;
         width: 90%;
     }
 
@@ -104,9 +107,9 @@
         </div>
         <InputNumber placeholder="0" on:input={handleAmountInput} startingValue={stringToFixed(currentYield, 8)} margin="0.25rem 0 1rem"/>
     </div>
-    {#if config.ammTokenContract === stakingInfo.contract_name}
+    {#if stakingInfo.contract_name === config.ammTokenStakingContract}
         <p class="text-xsmall sub-text text-primary-dim">
-            ** 10% of the yeild from all {config.ammTokenSymbol} withdrawls goes to the developers of Rocketswap!
+            ** 10% of the yeild from all {config.ammTokenSymbol} withdrawls in this contract goes to the developers of Rocketswap!  It will be added automatically to the transaction total.
         </p>
     {/if}
     <div class="flex-col modal-confirm-details-box text-small weight-400">

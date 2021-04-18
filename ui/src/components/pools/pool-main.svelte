@@ -4,9 +4,9 @@
     import PoolsDisplay from './pool-pools-display.svelte'
 
     let liquidityMessage = {
-        title: "Liquidity provider rewards",
+        title: "Liquidity Provider Rewards",
         messages: [
-            "Liquidity providers earn a 0.3% fee on all trades proportional to the their share of the pool.", 
+            "Liquidity providers earn fees as high as 0.5%, depending on discounts, on all trades proportional to the their share of the pool.", 
             "Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity."
         ]
     }
