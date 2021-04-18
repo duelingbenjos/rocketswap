@@ -215,7 +215,8 @@ class MyTestCase(unittest.TestCase):
         env_4 = {'now': Datetime(year=2021, month=2, day=1, hour=4, minute=30)}
         env_5 = {'now': Datetime(year=2021, month=2, day=1, hour=6, minute=30)}
 
-        self.contract.setEmissionRatePerHour(amount=100)
+        self.contract.changeAmountPerHour(amount_per_hour=100)
+
         self.contract.setDevRewardPct(amount=0)
 
         self.contract.addStakingTokens(
@@ -272,10 +273,10 @@ class MyTestCase(unittest.TestCase):
         murray_token_balance = self.basic_token.balances['murray']
         pete_token_balance = self.basic_token.balances['pete']
 
-        # self.assertAlmostEqual(bob_token_balance, 252.9100529)
-        # self.assertAlmostEqual(janis_token_balance, 76.4550264)
-        # self.assertAlmostEqual(murray_token_balance, 172.4867724)
-        # self.assertAlmostEqual(pete_token_balance, 148.1481481)
+        self.assertAlmostEqual(bob_token_balance, 252.9100529)
+        self.assertAlmostEqual(janis_token_balance, 76.4550264)
+        self.assertAlmostEqual(murray_token_balance, 172.4867724)
+        self.assertAlmostEqual(pete_token_balance, 148.1481481)
 
         total = bob_token_balance + janis_token_balance + \
             murray_token_balance + pete_token_balance
@@ -287,280 +288,284 @@ class MyTestCase(unittest.TestCase):
         current_epoch = self.contract.Epochs[current_epoch_index]
 
         self.assertEqual(current_epoch['staked'], 0)
-        self.assertEqual(current_epoch_index, 8)
+        self.assertEqual(current_epoch_index, 9)
 
-    # def test_03_multi_party_stake_and_withdraw_yield(self):
-    #     start_env = {'now': Datetime(year=2021, month=2, day=1,)}
-    #     env_2 = {'now': Datetime(year=2021, month=2, day=1, hour=1)}
-    #     env_3 = {'now': Datetime(year=2021, month=2, day=1, hour=2)}
-    #     env_4 = {'now': Datetime(year=2021, month=2, day=1, hour=4, minute=30)}
-    #     env_5 = {'now': Datetime(year=2021, month=2, day=1, hour=6, minute=30)}
+    def test_03_multi_party_stake_and_withdraw_yield(self):
+        start_env = {'now': Datetime(year=2021, month=2, day=1,)}
+        env_2 = {'now': Datetime(year=2021, month=2, day=1, hour=1)}
+        env_3 = {'now': Datetime(year=2021, month=2, day=1, hour=2)}
+        env_4 = {'now': Datetime(year=2021, month=2, day=1, hour=4, minute=30)}
+        env_5 = {'now': Datetime(year=2021, month=2, day=1, hour=6, minute=30)}
 
-    #     self.contract.setEmissionRatePerHour(amount=100)
-    #     self.contract.setDevRewardPct(amount=0)
+        self.contract.changeAmountPerHour(amount_per_hour=100)
 
-    #     self.contract.addStakingTokens(
-    #         environment=start_env, signer="bob", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_2, signer="janis", amount=5)
-    #     self.contract.addStakingTokens(
-    #         environment=env_3, signer="murray", amount=20)
-    #     self.contract.addStakingTokens(
-    #         environment=env_4, signer="pete", amount=100)
+        self.contract.setDevRewardPct(amount=0)
 
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="bob", amount=1009299299299)
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="janis", amount=100000000)
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="murray", amount=100000000)
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="pete", amount=100000000)
+        # self.contract.setEmissionRatePerHour(amount=100)
+        # self.contract.setDevRewardPct(amount=0)
 
-    #     bob_token_balance = self.basic_token.balances['bob']
-    #     janis_token_balance = self.basic_token.balances['janis']
-    #     murray_token_balance = self.basic_token.balances['murray']
-    #     pete_token_balance = self.basic_token.balances['pete']
+        self.contract.addStakingTokens(
+            environment=start_env, signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_2, signer="janis", amount=5)
+        self.contract.addStakingTokens(
+            environment=env_3, signer="murray", amount=20)
+        self.contract.addStakingTokens(
+            environment=env_4, signer="pete", amount=100)
 
-    #     bob_expected_amount = 252.9100529
-    #     janis_expected_amount = 76.4550264
-    #     murray_expected_amount = 172.4867724
-    #     pete_expected_amount = 148.1481481
+        self.contract.withdrawYield(
+            environment=env_5, signer="bob", amount=1009299299299)
+        self.contract.withdrawYield(
+            environment=env_5, signer="janis", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_5, signer="murray", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_5, signer="pete", amount=100000000)
 
-    #     self.assertAlmostEqual(bob_token_balance, bob_expected_amount)
-    #     self.assertAlmostEqual(janis_token_balance, janis_expected_amount)
-    #     self.assertAlmostEqual(murray_token_balance, murray_expected_amount)
-    #     self.assertAlmostEqual(pete_token_balance, pete_expected_amount)
+        bob_token_balance = self.basic_token.balances['bob']
+        janis_token_balance = self.basic_token.balances['janis']
+        murray_token_balance = self.basic_token.balances['murray']
+        pete_token_balance = self.basic_token.balances['pete']
 
-    #     bob_withdrawn = self.contract.Withdrawals['bob']
-    #     janis_withdrawn = self.contract.Withdrawals['janis']
-    #     murray_withdrawn = self.contract.Withdrawals['murray']
-    #     pete_withdrawn = self.contract.Withdrawals['pete']
+        bob_expected_amount = 252.9100529
+        janis_expected_amount = 76.4550264
+        murray_expected_amount = 172.4867724
+        pete_expected_amount = 148.1481481
 
-    #     self.assertAlmostEqual(bob_withdrawn, bob_expected_amount)
-    #     self.assertAlmostEqual(janis_withdrawn, janis_expected_amount)
-    #     self.assertAlmostEqual(murray_withdrawn, murray_expected_amount)
-    #     self.assertAlmostEqual(pete_withdrawn, pete_expected_amount)
+        self.assertAlmostEqual(bob_token_balance, bob_expected_amount)
+        self.assertAlmostEqual(janis_token_balance, janis_expected_amount)
+        self.assertAlmostEqual(murray_token_balance, murray_expected_amount)
+        self.assertAlmostEqual(pete_token_balance, pete_expected_amount)
 
-    #     total = bob_token_balance + janis_token_balance + \
-    #         murray_token_balance + pete_token_balance
-    #     vault_balance = self.basic_token.balances['con_farming']
+        bob_withdrawn = self.contract.Withdrawals['bob']
+        janis_withdrawn = self.contract.Withdrawals['janis']
+        murray_withdrawn = self.contract.Withdrawals['murray']
+        pete_withdrawn = self.contract.Withdrawals['pete']
 
-    #     self.assertEqual(vault_balance + total, 10000000)
+        self.assertAlmostEqual(bob_withdrawn, bob_expected_amount)
+        self.assertAlmostEqual(janis_withdrawn, janis_expected_amount)
+        self.assertAlmostEqual(murray_withdrawn, murray_expected_amount)
+        self.assertAlmostEqual(pete_withdrawn, pete_expected_amount)
 
-    #     current_epoch_index = self.contract.CurrentEpochIndex.get()
-    #     current_epoch = self.contract.Epochs[current_epoch_index]
+        total = bob_token_balance + janis_token_balance + \
+            murray_token_balance + pete_token_balance
+        vault_balance = self.basic_token.balances['con_farming']
 
-    #     self.assertEqual(current_epoch_index, 4)
-    #     self.assertEqual(current_epoch['staked'], 135)
+        self.assertEqual(vault_balance + total, 10000000)
 
-    # def test_04_multi_party_stake_and_withdraw_yield_then_withdraw_tokens_and_yield(self):
-    #     start_env = {'now': Datetime(year=2021, month=2, day=1,)}
-    #     env_2 = {'now': Datetime(year=2021, month=2, day=1, hour=1)}
-    #     env_3 = {'now': Datetime(year=2021, month=2, day=1, hour=2)}
-    #     env_4 = {'now': Datetime(year=2021, month=2, day=1, hour=4, minute=30)}
-    #     env_5 = {'now': Datetime(year=2021, month=2, day=1, hour=6, minute=30)}
+        current_epoch_index = self.contract.CurrentEpochIndex.get()
+        current_epoch = self.contract.Epochs[current_epoch_index]
 
-    #     self.contract.setEmissionRatePerHour(amount=100)
-    #     self.contract.setDevRewardPct(amount=0)
+        self.assertEqual(current_epoch_index, 5)
+        self.assertEqual(current_epoch['staked'], 135)
 
-    #     self.contract.addStakingTokens(
-    #         environment=start_env, signer="bob", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_2, signer="janis", amount=5)
-    #     self.contract.addStakingTokens(
-    #         environment=env_3, signer="murray", amount=20)
-    #     self.contract.addStakingTokens(
-    #         environment=env_4, signer="pete", amount=100)
+    def test_04_multi_party_stake_and_withdraw_yield_then_withdraw_tokens_and_yield(self):
+        start_env = {'now': Datetime(year=2021, month=2, day=1,)}
+        env_2 = {'now': Datetime(year=2021, month=2, day=1, hour=1)}
+        env_3 = {'now': Datetime(year=2021, month=2, day=1, hour=2)}
+        env_4 = {'now': Datetime(year=2021, month=2, day=1, hour=4, minute=30)}
+        env_5 = {'now': Datetime(year=2021, month=2, day=1, hour=6, minute=30)}
 
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="bob", amount=1009299299299)
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="janis", amount=100000000)
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="murray", amount=100000000)
-    #     self.contract.withdrawYield(
-    #         environment=env_5, signer="pete", amount=100000000)
+        self.contract.changeAmountPerHour(amount_per_hour=100)
+        self.contract.setDevRewardPct(amount=0)
 
-    #     current_epoch_index = self.contract.CurrentEpochIndex.get()
-    #     current_epoch = self.contract.Epochs[current_epoch_index]
-    #     # print(current_epoch['staked'])
-    #     self.assertEqual(current_epoch_index, 4)
-    #     self.assertEqual(current_epoch['staked'], 135)
+        self.contract.addStakingTokens(
+            environment=start_env, signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_2, signer="janis", amount=5)
+        self.contract.addStakingTokens(
+            environment=env_3, signer="murray", amount=20)
+        self.contract.addStakingTokens(
+            environment=env_4, signer="pete", amount=100)
 
-    #     self.contract.withdrawTokensAndYield(environment=env_5, signer="bob")
-    #     self.contract.withdrawTokensAndYield(environment=env_5, signer="janis")
-    #     self.contract.withdrawTokensAndYield(
-    #         environment=env_5, signer="murray")
-    #     self.contract.withdrawTokensAndYield(environment=env_5, signer="pete")
+        self.contract.withdrawYield(
+            environment=env_5, signer="bob", amount=1009299299299)
+        self.contract.withdrawYield(
+            environment=env_5, signer="janis", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_5, signer="murray", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_5, signer="pete", amount=100000000)
 
-    #     current_epoch_index = self.contract.CurrentEpochIndex.get()
-    #     self.assertEqual(current_epoch_index, 8)
+        current_epoch_index = self.contract.CurrentEpochIndex.get()
+        current_epoch = self.contract.Epochs[current_epoch_index]
+        # print(current_epoch['staked'])
+        self.assertEqual(current_epoch_index, 5)
+        self.assertEqual(current_epoch['staked'], 135)
 
-    #     bob_token_balance = self.basic_token.balances['bob']
-    #     janis_token_balance = self.basic_token.balances['janis']
-    #     murray_token_balance = self.basic_token.balances['murray']
-    #     pete_token_balance = self.basic_token.balances['pete']
+        self.contract.withdrawTokensAndYield(environment=env_5, signer="bob")
+        self.contract.withdrawTokensAndYield(environment=env_5, signer="janis")
+        self.contract.withdrawTokensAndYield(
+            environment=env_5, signer="murray")
+        self.contract.withdrawTokensAndYield(environment=env_5, signer="pete")
 
-    #     bob_expected_amount = 252.9100529
-    #     janis_expected_amount = 76.4550264
-    #     murray_expected_amount = 172.4867724
-    #     pete_expected_amount = 148.1481481
+        current_epoch_index = self.contract.CurrentEpochIndex.get()
+        self.assertEqual(current_epoch_index, 9)
 
-    #     self.assertAlmostEqual(bob_token_balance, bob_expected_amount)
-    #     self.assertAlmostEqual(janis_token_balance, janis_expected_amount)
-    #     self.assertAlmostEqual(murray_token_balance, murray_expected_amount)
-    #     self.assertAlmostEqual(pete_token_balance, pete_expected_amount)
+        bob_token_balance = self.basic_token.balances['bob']
+        janis_token_balance = self.basic_token.balances['janis']
+        murray_token_balance = self.basic_token.balances['murray']
+        pete_token_balance = self.basic_token.balances['pete']
 
-    #     total = bob_token_balance + janis_token_balance + \
-    #         murray_token_balance + pete_token_balance
-    #     vault_balance = self.basic_token.balances['con_farming']
+        bob_expected_amount = 252.9100529
+        janis_expected_amount = 76.4550264
+        murray_expected_amount = 172.4867724
+        pete_expected_amount = 148.1481481
 
-    #     self.assertEqual(vault_balance + total, 10000000)
+        self.assertAlmostEqual(bob_token_balance, bob_expected_amount)
+        self.assertAlmostEqual(janis_token_balance, janis_expected_amount)
+        self.assertAlmostEqual(murray_token_balance, murray_expected_amount)
+        self.assertAlmostEqual(pete_token_balance, pete_expected_amount)
 
-    #     current_epoch = self.contract.Epochs[current_epoch_index]
-    #     self.assertEqual(current_epoch['staked'], 0)
+        total = bob_token_balance + janis_token_balance + \
+            murray_token_balance + pete_token_balance
+        vault_balance = self.basic_token.balances['con_farming']
 
-    #     bob_deposits = self.contract.Deposits['bob']
-    #     janis_deposits = self.contract.Deposits['janis']
-    #     murray_deposits = self.contract.Deposits['murray']
-    #     pete_deposits = self.contract.Deposits['pete']
+        self.assertEqual(vault_balance + total, 10000000)
 
-    #     self.assertEqual(bob_deposits, False)
-    #     self.assertEqual(janis_deposits, False)
-    #     self.assertEqual(murray_deposits, False)
-    #     self.assertEqual(pete_deposits, False)
+        current_epoch = self.contract.Epochs[current_epoch_index]
+        self.assertEqual(current_epoch['staked'], 0)
 
-    # def test_05_recover_yield_token(self):
-    #     self.assertEqual(self.basic_token.balances['con_farming'], 10000000)
-    #     self.contract.recoverYieldToken(amount=10000000)
-    #     self.assertEqual(self.basic_token.balances['con_farming'], 0)
+        bob_deposits = self.contract.Deposits['bob']
+        janis_deposits = self.contract.Deposits['janis']
+        murray_deposits = self.contract.Deposits['murray']
+        pete_deposits = self.contract.Deposits['pete']
 
-    # def test_06_start_time(self):
-    #     env_1 = {'now': Datetime(year=2020, month=2, day=1)}
-    #     env_2 = {'now': Datetime(year=2021, month=2, day=1)}
+        self.assertEqual(bob_deposits, False)
+        self.assertEqual(janis_deposits, False)
+        self.assertEqual(murray_deposits, False)
+        self.assertEqual(pete_deposits, False)
 
-    #     self.contract.setStartTime(year=2022, month=1, day=1, hour=0)
+    def test_05_recover_yield_token(self):
+        self.assertEqual(self.basic_token.balances['con_farming'], 10000000)
+        self.contract.recoverYieldToken(amount=10000000)
+        self.assertEqual(self.basic_token.balances['con_farming'], 0)
 
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="bob", amount=10)
+    def test_06_start_time(self):
+        env_1 = {'now': Datetime(year=2020, month=2, day=1)}
+        env_2 = {'now': Datetime(year=2021, month=2, day=1)}
 
-    #     with self.assertRaises(AssertionError):
-    #         self.contract.withdrawYield(
-    #             environment=env_2, signer="bob", amount=1500)
+        self.contract.setStartTime(year=2022, month=1, day=1, hour=0)
 
-    # def test_07_set_time_methods(self):
-    #     env_1 = {'now': Datetime(year=2021, month=1, day=1, hour=0)}
-    #     env_2 = {'now': Datetime(year=2021, month=1, day=1, hour=2)}
+        self.contract.addStakingTokens(
+            environment=env_1, signer="bob", amount=10)
 
-    #     self.contract.setStartTime(year=2021, month=1, day=1, hour=1)
-    #     self.contract.setEndTime(year=2021, month=1, day=1, hour=1)
+        with self.assertRaises(AssertionError):
+            self.contract.withdrawYield(
+                environment=env_2, signer="bob", amount=1500)
 
-    #     start_time = self.contract.StartTime.get()
-    #     end_time = self.contract.EndTime.get()
+    def test_07_set_time_methods(self):
+        env_1 = {'now': Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {'now': Datetime(year=2021, month=1, day=1, hour=2)}
 
-    #     self.assertEqual(Datetime(year=2021, month=1,
-    #                               day=1, hour=1), start_time)
-    #     self.assertEqual(Datetime(year=2021, month=1, day=1, hour=1), end_time)
+        self.contract.setStartTime(year=2021, month=1, day=1, hour=1)
+        self.contract.setEndTime(year=2021, month=1, day=1, hour=1)
 
-    # def test_08_start_time(self):
-    #     env_1 = {'now': Datetime(year=2021, month=1, day=1, hour=0)}
-    #     env_2 = {'now': Datetime(year=2021, month=1, day=1, hour=1)}
+        start_time = self.contract.StartTime.get()
+        end_time = self.contract.EndTime.get()
 
-    #     # self.contract.setStartTime(year=2021, month=1, day=1, hour=1)
-    #     # self.contract.setEndTime(year=2023, month=1, day=1, hour=1)
+        self.assertEqual(Datetime(year=2021, month=1,
+                                  day=1, hour=1), start_time)
+        self.assertEqual(Datetime(year=2021, month=1, day=1, hour=1), end_time)
 
-    #     self.contract.setEmissionRatePerHour(environment=env_1, amount=100)
-    #     self.contract.setDevRewardPct(environment=env_1, amount=0)
+    def test_08_start_time(self):
+        env_1 = {'now': Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {'now': Datetime(year=2021, month=1, day=1, hour=1)}
 
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="bob", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="janis", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="murray", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="pete", amount=10)
+        # self.contract.setStartTime(year=2021, month=1, day=1, hour=1)
+        # self.contract.setEndTime(year=2023, month=1, day=1, hour=1)
 
-    #     self.contract.withdrawYield(
-    #         environment=env_2, signer="bob", amount=1009299299299)
+        self.contract.changeAmountPerHour(amount_per_hour=100)
+        self.contract.setDevRewardPct(amount=0)
 
-    #     self.assertEqual(self.basic_token.balances['bob'], 25)
-    #     self.contract.withdrawTokensAndYield(signer="bob")
+        self.contract.addStakingTokens(
+            environment=env_1, signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_1, signer="janis", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_1, signer="murray", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_1, signer="pete", amount=10)
 
-    # def test_09_end_time(self):
-    #     env_1 = {'now': Datetime(year=2021, month=1, day=1, hour=0)}
-    #     env_2 = {'now': Datetime(year=2021, month=1, day=1, hour=3)}
+        self.contract.withdrawYield(
+            environment=env_2, signer="bob", amount=1009299299299)
 
-    #     self.contract.setStartTime(year=2021, month=1, day=1, hour=1)
-    #     self.contract.setEndTime(year=2021, month=1, day=1, hour=2)
+        self.assertEqual(self.basic_token.balances['bob'], 25)
+        self.contract.withdrawTokensAndYield(signer="bob")
 
-    #     self.contract.setEmissionRatePerHour(amount=100)
-    #     self.contract.setDevRewardPct(amount=0)
+    def test_09_end_time(self):
+        env_1 = {'now': Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {'now': Datetime(year=2021, month=1, day=1, hour=3)}
 
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="bob", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="janis", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="murray", amount=10)
-    #     self.contract.addStakingTokens(
-    #         environment=env_1, signer="pete", amount=10)
+        self.contract.setStartTime(year=2021, month=1, day=1, hour=1)
+        self.contract.setEndTime(year=2021, month=1, day=1, hour=2)
 
-    #     self.contract.withdrawYield(
-    #         environment=env_2, signer="bob", amount=1009299299299)
-    #     self.contract.withdrawYield(
-    #         environment=env_2, signer="janis", amount=100000000)
-    #     self.contract.withdrawYield(
-    #         environment=env_2, signer="murray", amount=100000000)
-    #     self.contract.withdrawYield(
-    #         environment=env_2, signer="pete", amount=100000000)
+        self.contract.changeAmountPerHour(amount_per_hour=100)
+        self.contract.setDevRewardPct(amount=0)
 
-    #     self.contract.withdrawTokensAndYield(environment=env_2, signer="bob")
-    #     self.contract.withdrawTokensAndYield(environment=env_2, signer="janis")
-    #     self.contract.withdrawTokensAndYield(
-    #         environment=env_2, signer="murray")
-    #     self.contract.withdrawTokensAndYield(environment=env_2, signer="pete")
+        self.contract.addStakingTokens(
+            environment=env_1, signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_1, signer="janis", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_1, signer="murray", amount=10)
+        self.contract.addStakingTokens(
+            environment=env_1, signer="pete", amount=10)
 
-    #     self.assertEqual(self.basic_token.balances['bob'], 25)
-    #     self.assertEqual(self.basic_token.balances['janis'], 25)
-    #     self.assertEqual(self.basic_token.balances['murray'], 25)
-    #     self.assertEqual(self.basic_token.balances['pete'], 25)
+        self.contract.withdrawYield(
+            environment=env_2, signer="bob", amount=1009299299299)
+        self.contract.withdrawYield(
+            environment=env_2, signer="janis", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_2, signer="murray", amount=100000000)
+        self.contract.withdrawYield(
+            environment=env_2, signer="pete", amount=100000000)
 
-    # def test_10_addStakingTokens_check_len_should_pass(self):
+        self.contract.withdrawTokensAndYield(environment=env_2, signer="bob")
+        self.contract.withdrawTokensAndYield(environment=env_2, signer="janis")
+        self.contract.withdrawTokensAndYield(
+            environment=env_2, signer="murray")
+        self.contract.withdrawTokensAndYield(environment=env_2, signer="pete")
 
-    #     self.contract.addStakingTokens(
-    #         signer="bob", amount=10)
-    #     self.contract.addStakingTokens(
-    #         signer="bob", amount=10)
+        self.assertEqual(self.basic_token.balances['bob'], 25)
+        self.assertEqual(self.basic_token.balances['janis'], 25)
+        self.assertEqual(self.basic_token.balances['murray'], 25)
+        self.assertEqual(self.basic_token.balances['pete'], 25)
 
-    #     deposits = self.contract.Deposits['bob']
-    #     self.assertEqual(len(deposits), 2)
+    def test_10_addStakingTokens_check_len_should_pass(self):
 
-    # def test_11_addStakingTokens_check_len_should_fail(self):
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
 
-    #     self.contract.addStakingTokens(
-    #         signer="bob", amount=10)
-    #     self.contract.addStakingTokens(
-    #         signer="bob", amount=10)
+        deposits = self.contract.Deposits['bob']
+        self.assertEqual(len(deposits), 2)
 
-    #     deposits = self.contract.Deposits['bob']
-    #     self.contract.addStakingTokens(
-    #         signer="bob", amount=10)
+    def test_11_addStakingTokens_check_len_should_fail(self):
 
-    #     with self.assertRaises(AssertionError):
-    #         self.assertEqual(len(deposits), 2)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
 
-    # def test_12_addStakingTokens_withdrawTokensAndYield_check_len_should_pass(self):
+        deposits = self.contract.Deposits['bob']
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
 
-    #     self.contract.addStakingTokens(
-    #         signer="bob", amount=10)
-    #     self.contract.addStakingTokens(
-    #         signer="bob", amount=10)
+        with self.assertRaises(AssertionError):
+            self.assertEqual(len(deposits), 2)
 
-    #     self.contract.withdrawTokensAndYield(signer="bob")
-    #     deposits = self.contract.Deposits['bob']
-    #     self.assertEqual(deposits, False)
+    def test_12_addStakingTokens_withdrawTokensAndYield_check_len_should_pass(self):
+
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+        self.contract.addStakingTokens(
+            signer="bob", amount=10)
+
+        self.contract.withdrawTokensAndYield(signer="bob")
+        deposits = self.contract.Deposits['bob']
+        self.assertEqual(deposits, False)
 
 
 

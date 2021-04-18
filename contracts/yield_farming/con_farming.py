@@ -28,6 +28,7 @@ WithdrawnBalance = Variable()
 EpochMinTime = Variable()  # The minimum amount of seconds in Epoch
 meta = Hash(default_value=False)
 
+
 @construct
 def seed():
     Owner.set(ctx.caller)
@@ -35,7 +36,7 @@ def seed():
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
-    EpochMinTime.set(0) # One Day
+    EpochMinTime.set(0)  # One Day
 
     Epochs[0] = {
         "time": now,
@@ -208,10 +209,11 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         pct_share_of_stake = 0
         if amount is not 0 and this_epoch['staked'] is not 0:
             pct_share_of_stake = amount / this_epoch['staked']
-        
+
         # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
         emission_rate_per_hour = this_epoch['amt_per_hr']
-        global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(emission_rate_per_hour)
+        global_yield_this_epoch = delta.seconds * \
+            getEmissionRatePerSecond(emission_rate_per_hour)
         deposit_yield_this_epoch = decimal(
             global_yield_this_epoch) * pct_share_of_stake
         y += deposit_yield_this_epoch
@@ -258,11 +260,13 @@ def incrementEpoch(new_staked_amount: float):
 
 
 @export
-def changeStakedPerHour(amount_per_hour: float):
+def changeAmountPerHour(amount_per_hour: float):
     assertOwner()
     current_epoch = CurrentEpochIndex.get()
     new_epoch_idx = current_epoch + 1
     CurrentEpochIndex.set(new_epoch_idx)
+    setEmissionRatePerHour(amount=amount_per_hour)
+
     Epochs[new_epoch_idx] = {
         "time": now,
         "staked": StakedBalance.get(),
