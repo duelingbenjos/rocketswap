@@ -40,10 +40,10 @@ def seed():
     Epochs[0] = {
         "time": now,
         "staked": 0,
-        "rush_amount": 0
+        "amt_per_hr": 3000
     }
 
-    meta['version'] = 0.01
+    meta['version'] = '0.0.1'
     meta['type'] = 'staking_rush'  # staking || lp_farming
     meta['STAKING_TOKEN'] = 'currency'
     meta['YIELD_TOKEN'] = 'con_basic_token'
@@ -210,7 +210,7 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
             pct_share_of_stake = amount / this_epoch['staked']
         
         # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
-        emission_rate_per_hour = EmissionRatePerHour.get() + this_epoch['rush_amount']
+        emission_rate_per_hour = this_epoch['amt_per_hr']
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(emission_rate_per_hour)
         deposit_yield_this_epoch = decimal(
             global_yield_this_epoch) * pct_share_of_stake
@@ -238,7 +238,8 @@ def decideIncrementEpoch(new_staked_amount: float):
     epoch_index = CurrentEpochIndex.get()
     this_epoch = Epochs[epoch_index]
     delta = now - this_epoch['time']
-    if delta.seconds >= EpochMinTime.get():
+    delta_seconds = delta.seconds if delta.seconds > 0 else 0
+    if delta_seconds >= EpochMinTime.get():
         epoch_index = incrementEpoch(new_staked_amount)
     return epoch_index
 
@@ -250,14 +251,14 @@ def incrementEpoch(new_staked_amount: float):
     Epochs[new_epoch_idx] = {
         "time": now,
         "staked": new_staked_amount,
-        "rush_amount": 0
+        "amt_per_hr": 0
     }
-    Epochs[new_epoch_idx]['rush_amount'] = Epochs[current_epoch]['rush_amount']
+    Epochs[new_epoch_idx]['amt_per_hr'] = Epochs[current_epoch]['amt_per_hr']
     return new_epoch_idx
 
 
 @export
-def activateRush(amount_per_hour: float):
+def changeStakedPerHour(amount_per_hour: float):
     assertOwner()
     current_epoch = CurrentEpochIndex.get()
     new_epoch_idx = current_epoch + 1
@@ -265,19 +266,7 @@ def activateRush(amount_per_hour: float):
     Epochs[new_epoch_idx] = {
         "time": now,
         "staked": StakedBalance.get(),
-        "rush_amount": amount_per_hour
-    }
-
-
-@export
-def deactivateRush():
-    assertOwner()
-    current_epoch = CurrentEpochIndex.get()
-    new_epoch_idx = current_epoch + 1
-    CurrentEpochIndex.set(new_epoch_idx)
-    Epochs[new_epoch_idx] = {
-        "time": now,
-        "staked": StakedBalance.get()
+        "amt_per_hr": amount_per_hour
     }
 
 
