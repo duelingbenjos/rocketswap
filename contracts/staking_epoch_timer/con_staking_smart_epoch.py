@@ -26,6 +26,9 @@ Epochs = Hash(default_value=False)
 StakedBalance = Variable()  # The total amount of farming token in the vault.
 WithdrawnBalance = Variable()
 EpochMinTime = Variable()  # The minimum amount of seconds in Epoch
+EpochMaxRatioIncrease = (
+    Variable()
+)  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
 
 
@@ -36,18 +39,15 @@ def seed():
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
-    EpochMinTime.set(0)  # One Day
+    EpochMaxRatioIncrease.set(0.5)
+    EpochMinTime.set(0)
 
-    Epochs[0] = {
-        "time": now,
-        "staked": 0,
-        "amt_per_hr": 3000
-    }
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
-    meta['version'] = '0.0.1'
-    meta['type'] = 'staking_rush'  # staking || lp_farming
-    meta['STAKING_TOKEN'] = 'currency'
-    meta['YIELD_TOKEN'] = 'con_basic_token'
+    meta["version"] = "0.0.1"
+    meta["type"] = "staking_rush"  # staking || lp_farming
+    meta["STAKING_TOKEN"] = "currency"
+    meta["YIELD_TOKEN"] = "con_basic_token"
 
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(0.1)
@@ -62,8 +62,8 @@ def seed():
 
 @export
 def addStakingTokens(amount: float):
-    assert OpenForBusiness.get() == True, 'This staking pool is not open right now.'
-    assert amount > 0, 'You cannot stake a negative balance.'
+    assert OpenForBusiness.get() == True, "This staking pool is not open right now."
+    assert amount > 0, "You cannot stake a negative balance."
 
     user = ctx.caller
 
@@ -76,7 +76,7 @@ def addStakingTokens(amount: float):
     StakedBalance.set(new_staked_amount)
 
     # Update the Epoch
-    new_epoch_idx = decideIncrementEpoch(new_staked_amount=new_staked_amount)
+    epoch_index = decideIncrementEpoch(new_staked_amount=new_staked_amount)
 
     if Deposits[user] is False:
         Deposits[user] = []
@@ -85,18 +85,14 @@ def addStakingTokens(amount: float):
 
     deposits = Deposits[user]
 
-    deposits.append({
-        'starting_epoch': new_epoch_idx,
-        'time': now,
-        'amount': amount
-    })
+    deposits.append({"starting_epoch": epoch_index, "time": now, "amount": amount})
 
     Deposits[user] = deposits
 
 
 @export
 def withdrawYield(amount: float):
-    assert amount > 0, 'You cannot harvest a negative balance'
+    assert amount > 0, "You cannot harvest a negative balance"
 
     user = ctx.caller
     deposits = Deposits[user]
@@ -109,14 +105,17 @@ def withdrawYield(amount: float):
 
     for d in deposits:
         harvestable_yield += calculateYield(
-            starting_epoch_index=d['starting_epoch'], start_time=d['time'], amount=d['amount'])
+            starting_epoch_index=d["starting_epoch"],
+            start_time=d["time"],
+            amount=d["amount"],
+        )
 
     # Determine maximum amount of yield user can withdraw
     harvestable_yield -= withdrawn_yield
 
     yield_to_harvest = amount if amount < harvestable_yield else harvestable_yield
 
-    assert yield_to_harvest > 0, 'There is no yield to harvest right now :('
+    assert yield_to_harvest > 0, "There is no yield to harvest right now :("
 
     # Take % of Yield Tokens, send it to dev fund
     dev_share = yield_to_harvest * DevRewardPct.get()
@@ -125,7 +124,7 @@ def withdrawYield(amount: float):
         YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
 
     # Send remanding Yield Tokens to user
-    user_share = yield_to_harvest-dev_share
+    user_share = yield_to_harvest - dev_share
     YIELD_TOKEN.transfer(to=user, amount=user_share)
 
     Withdrawals[user] = withdrawn_yield + yield_to_harvest
@@ -148,8 +147,11 @@ def withdrawTokensAndYield():
 
     for d in deposits:
         yield_to_harvest += calculateYield(
-            starting_epoch_index=d['starting_epoch'], start_time=d['time'], amount=d['amount'])
-        stake_to_return += d['amount']
+            starting_epoch_index=d["starting_epoch"],
+            start_time=d["time"],
+            amount=d["amount"],
+        )
+        stake_to_return += d["amount"]
 
     # Send Staking Tokens to user
     STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
@@ -164,7 +166,7 @@ def withdrawTokensAndYield():
             YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
 
         # Send remanding Yield Tokens to user
-        user_share = yield_to_harvest-dev_share
+        user_share = yield_to_harvest - dev_share
         YIELD_TOKEN.transfer(to=user, amount=user_share)
 
     # Reset User's Deposits
@@ -181,7 +183,6 @@ def withdrawTokensAndYield():
 
     # Increment Epoch
     decideIncrementEpoch(new_staked_amount=new_staked_amount)
-    # incrementEpoch(new_staked_amount=new_staked_amount)
 
 
 # This runs over each of the items in the user's Deposit
@@ -191,31 +192,31 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
     y = 0
     while this_epoch_index <= current_epoch_index:
         this_epoch = Epochs[this_epoch_index]
-        next_epoch = Epochs[this_epoch_index+1]
+        next_epoch = Epochs[this_epoch_index + 1]
 
         delta = 0
 
         if starting_epoch_index == current_epoch_index:
             delta = fitTimeToRange(now) - fitTimeToRange(start_time)
         elif this_epoch_index == starting_epoch_index:
-            delta = fitTimeToRange(
-                next_epoch['time']) - fitTimeToRange(start_time)
+            delta = fitTimeToRange(next_epoch["time"]) - fitTimeToRange(start_time)
         elif this_epoch_index == current_epoch_index:
-            delta = fitTimeToRange(now) - fitTimeToRange(this_epoch['time'])
+            delta = fitTimeToRange(now) - fitTimeToRange(this_epoch["time"])
         else:
-            delta = fitTimeToRange(
-                next_epoch['time']) - fitTimeToRange(this_epoch['time'])
+            delta = fitTimeToRange(next_epoch["time"]) - fitTimeToRange(
+                this_epoch["time"]
+            )
 
         pct_share_of_stake = 0
-        if amount is not 0 and this_epoch['staked'] is not 0:
-            pct_share_of_stake = amount / this_epoch['staked']
+        if amount is not 0 and this_epoch["staked"] is not 0:
+            pct_share_of_stake = amount / this_epoch["staked"]
 
         # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
-        emission_rate_per_hour = this_epoch['amt_per_hr']
-        global_yield_this_epoch = delta.seconds * \
-            getEmissionRatePerSecond(emission_rate_per_hour)
-        deposit_yield_this_epoch = decimal(
-            global_yield_this_epoch) * pct_share_of_stake
+        emission_rate_per_hour = this_epoch["amt_per_hr"]
+        global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
+            emission_rate_per_hour
+        )
+        deposit_yield_this_epoch = decimal(global_yield_this_epoch) * pct_share_of_stake
         y += deposit_yield_this_epoch
 
         this_epoch_index += 1
@@ -239,11 +240,33 @@ def getCurrentEpochIndex():
 def decideIncrementEpoch(new_staked_amount: float):
     epoch_index = CurrentEpochIndex.get()
     this_epoch = Epochs[epoch_index]
-    delta = now - this_epoch['time']
+    this_epoch_staked = this_epoch["staked"]
+    delta = now - this_epoch["time"]
     delta_seconds = delta.seconds if delta.seconds > 0 else 0
-    if delta_seconds >= EpochMinTime.get():
+    if (
+        delta_seconds >= EpochMinTime.get()
+        or this_epoch_staked is 0
+        or maxRatioIncreaseExceeded(
+            new_staked_amount=new_staked_amount, this_epoch_staked=this_epoch_staked
+        )
+    ):
         epoch_index = incrementEpoch(new_staked_amount)
     return epoch_index
+
+
+def maxRatioIncreaseExceeded(new_staked_amount: float, this_epoch_staked: float):
+    smaller = new_staked_amount if new_staked_amount <= this_epoch_staked else this_epoch_staked
+    bigger = new_staked_amount if new_staked_amount >= this_epoch_staked else this_epoch_staked
+    dif = bigger - smaller
+    return (
+        dif
+    ) / smaller >= EpochMaxRatioIncrease.get()
+
+def maxRatioIncreaseExceeded_old(new_staked_amount: float, this_epoch_staked: float):
+    # smaller = 
+    return (
+        new_staked_amount - this_epoch_staked
+    ) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
 
 def incrementEpoch(new_staked_amount: float):
@@ -253,9 +276,8 @@ def incrementEpoch(new_staked_amount: float):
     Epochs[new_epoch_idx] = {
         "time": now,
         "staked": new_staked_amount,
-        "amt_per_hr": 0
+        "amt_per_hr": Epochs[current_epoch]["amt_per_hr"],
     }
-    Epochs[new_epoch_idx]['amt_per_hr'] = Epochs[current_epoch]['amt_per_hr']
     return new_epoch_idx
 
 
@@ -270,15 +292,22 @@ def changeAmountPerHour(amount_per_hour: float):
     Epochs[new_epoch_idx] = {
         "time": now,
         "staked": StakedBalance.get(),
-        "amt_per_hr": amount_per_hour
+        "amt_per_hr": amount_per_hour,
     }
 
 
 @export
 def setEpochMinTime(min_seconds: float):
     assertOwner()
-    assert min_seconds > 0, 'you must choose a positive value.'
+    assert min_seconds >= 0, "you must choose a positive value."
     EpochMinTime.set(min_seconds)
+
+
+@export
+def setEpochMaxRatioIncrease(ratio: float):
+    assertOwner()
+    assert ratio > 0, "must be a positive value"
+    EpochMaxRatioIncrease.set(ratio)
 
 
 def getEmissionRatePerSecond(emission_rate_per_hour: float):
@@ -302,7 +331,7 @@ def setDevWallet(vk: str):
 @export
 def setDevRewardPct(amount: float):
     assertOwner()
-    assert amount < 1 and amount >= 0, 'Amount must be a value between 0 and 1'
+    assert amount < 1 and amount >= 0, "Amount must be a value between 0 and 1"
     DevRewardPct.set(amount)
 
 
@@ -339,7 +368,8 @@ def setEndTime(year: int, month: int, day: int, hour: int):
 
 
 def assertOwner():
-    assert Owner.get() == ctx.caller, 'You must be the owner to call this function.'
+    assert Owner.get() == ctx.caller, "You must be the owner to call this function."
+
 
 # This is only to be called in emergencies - the user will forgo their yield when calling this FN.
 
@@ -355,7 +385,7 @@ def emergencyReturnStake():
     stake_to_return = 0
 
     for d in deposits:
-        stake_to_return += d['amount']
+        stake_to_return += d["amount"]
 
     STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
     Deposits[user] = False
