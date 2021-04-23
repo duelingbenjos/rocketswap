@@ -205,45 +205,45 @@ class MyTestCase(unittest.TestCase):
         self.contract.addStakingTokens(environment=start_env, signer="bob", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEquals(current_epoch["staked"], 10)
+        self.assertEqual(current_epoch["staked"], 10)
 
         self.contract.addStakingTokens(environment=env_2, signer="janis", amount=5)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEquals(current_epoch["staked"], 15)
+        self.assertEqual(current_epoch["staked"], 15)
 
         self.contract.addStakingTokens(environment=env_3, signer="murray", amount=20)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEquals(current_epoch["staked"], 35)
+        self.assertEqual(current_epoch["staked"], 35)
 
         self.contract.addStakingTokens(environment=env_4, signer="pete", amount=100)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEquals(current_epoch["staked"], 135)
+        self.assertEqual(current_epoch["staked"], 135)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="bob")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEquals(current_epoch["staked"], 125)
+        self.assertEqual(current_epoch["staked"], 125)
         self.assertEqual(self.contract.Deposits["bob"], False)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="janis")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEquals(current_epoch["staked"], 120)
+        self.assertEqual(current_epoch["staked"], 120)
         self.assertEqual(self.contract.Deposits["janis"], False)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="murray")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
         self.assertEqual(self.contract.Deposits["murray"], False)
-        self.assertEquals(current_epoch["staked"], 100)
+        self.assertEqual(current_epoch["staked"], 100)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="pete")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEquals(current_epoch["staked"], 0)
+        self.assertEqual(current_epoch["staked"], 0)
         self.assertEqual(self.contract.Deposits["pete"], False)
 
         bob_token_balance = self.basic_token.balances["bob"]
@@ -645,12 +645,13 @@ class MyTestCase(unittest.TestCase):
         # all of the below test occurs within the min epoch time
         # will only increment when the maxRatioIncrease is exceeded.
         self.contract.setEpochMinTime(min_seconds=60*60)
+        self.contract.setEpochMaxRatioIncrease(ratio = 0.1)
 
         # increments
         self.contract.addStakingTokens(signer="bob", amount=10)
+
         # increments
         self.contract.addStakingTokens(signer="bob", amount=10)
-        
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         self.assertEqual(current_epoch_index, 2)
 
@@ -659,53 +660,64 @@ class MyTestCase(unittest.TestCase):
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         self.assertEqual(current_epoch_index, 3)
 
-        # skips
-        self.contract.addStakingTokens(signer="bob", amount=10)
-        current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 3)
-
         # increments
-        self.contract.addStakingTokens(signer="bob", amount=20)
+        self.contract.addStakingTokens(signer="bob", amount=3)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         self.assertEqual(current_epoch_index, 4)
 
         # skips
-        self.contract.addStakingTokens(signer="bob", amount=20)
+        self.contract.addStakingTokens(signer="bob", amount=3)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         self.assertEqual(current_epoch_index, 4)
 
-        ## 80 Staked so far
-
         # increments
-        self.contract.addStakingTokens(signer="janis", amount=80)
+        self.contract.addStakingTokens(signer="bob", amount=1)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         self.assertEqual(current_epoch_index, 5)
 
-        # increments
-        self.contract.withdrawTokensAndYield(signer="janis")
-        current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 6)             
+    def test_21_epoch_incrementing_when_max_ratio_exceeded_withdrawTokensAndYield(self):
+        # all of the below test occurs within the min epoch time
+        # will only increment when the maxRatioIncrease is exceeded.
+        self.contract.setEpochMinTime(min_seconds=60*60)
+        self.contract.setEpochMaxRatioIncrease(ratio = 0.1)
 
         # increments
-        self.contract.addStakingTokens(signer="janis", amount=40)
+        self.contract.addStakingTokens(signer="bob", amount=100)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 7)
+        self.assertEqual(current_epoch_index, 1)
+        
+        # print(self.contract.Epochs[2])
+        # {'time': 2021-04-21 17:16:00, 'staked': 100, 'amt_per_hr': 3000}
+
 
         # increments
-        self.contract.withdrawTokensAndYield(signer="janis")
+        self.contract.addStakingTokens(signer="janis", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 8)     
+        self.assertEqual(current_epoch_index, 2)
+        # print(self.contract.Epochs[2])
+        # {'time': 2021-04-21 17:19:00, 'staked': 110, 'amt_per_hr': 3000}
 
         # skip
-        self.contract.addStakingTokens(signer="janis", amount=30)
+        self.contract.addStakingTokens(signer="janis", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 8)
+        self.assertEqual(current_epoch_index, 2)
+        # print(self.contract.Epochs[2])
+        # {'time': 2021-04-21 17:19:00, 'staked': 110, 'amt_per_hr': 3000}
 
-        # skip
+        # increments
+        self.contract.addStakingTokens(signer="janis", amount=10)
+        current_epoch_index = self.contract.CurrentEpochIndex.get()
+        self.assertEqual(current_epoch_index, 3)
+        print(self.contract.Epochs[3])
+        # {'time': 2021-04-21 17:33:00, 'staked': 130, 'amt_per_hr': 3000}
+
+        # increments
         self.contract.withdrawTokensAndYield(signer="janis")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 8)                
-
+        # print(self.contract.StakedBalance.get())
+        print(self.contract.Epochs[4])
+        # self.assertEqual(current_epoch_index, 2)
+        self.assertEqual(current_epoch_index, 4)
 
 if __name__ == "__main__":
     unittest.main()

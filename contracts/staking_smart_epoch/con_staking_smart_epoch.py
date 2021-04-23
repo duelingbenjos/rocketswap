@@ -246,7 +246,7 @@ def decideIncrementEpoch(new_staked_amount: float):
     if (
         delta_seconds >= EpochMinTime.get()
         or this_epoch_staked is 0
-        or maxRatioIncreaseExceeded(
+        or maxStakedChangeRatioExceeded(
             new_staked_amount=new_staked_amount, this_epoch_staked=this_epoch_staked
         )
     ):
@@ -254,18 +254,12 @@ def decideIncrementEpoch(new_staked_amount: float):
     return epoch_index
 
 
-def maxRatioIncreaseExceeded(new_staked_amount: float, this_epoch_staked: float):
+def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: float):
     smaller = new_staked_amount if new_staked_amount <= this_epoch_staked else this_epoch_staked
     bigger = new_staked_amount if new_staked_amount >= this_epoch_staked else this_epoch_staked
     dif = bigger - smaller
     return (
         dif
-    ) / smaller >= EpochMaxRatioIncrease.get()
-
-def maxRatioIncreaseExceeded_old(new_staked_amount: float, this_epoch_staked: float):
-    # smaller = 
-    return (
-        new_staked_amount - this_epoch_staked
     ) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
 
