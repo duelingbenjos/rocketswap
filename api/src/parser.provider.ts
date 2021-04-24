@@ -10,24 +10,28 @@ import { SocketService } from "./services/socket.service";
 import { setName } from "./entities/name.entity";
 import { AuthService } from "./authentication/trollbox.service";
 import { AmmMetaEntity, updateAmmMeta } from "./entities/amm-meta.entity";
-import { updateStakingContractMeta } from "./entities/staking-meta.entity";
 import startBlockgrabber from "./blockgrabber";
 import { log } from "./utils/logger";
 import { savePrice } from "./entities/price.entity";
+import { StakingService } from "./services/staking.service";
 
 @Injectable()
 export class ParserProvider {
-	private static blockgrabber_last_update = Date.now()
-	public static amm_meta_entity: AmmMetaEntity
-	constructor(private readonly socketService: SocketService, private readonly authService: AuthService) {}
+	private static blockgrabber_last_update = Date.now();
+	public static amm_meta_entity: AmmMetaEntity;
+	constructor(
+		private readonly socketService: SocketService,
+		private readonly authService: AuthService,
+		private readonly stakingService: StakingService
+	) {}
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
 	private action_que_processing: boolean;
 	private logger: Logger = new Logger("ParserProvider");
 
 	public static updateLastChecked = (time_delta: number = 0) => {
-		ParserProvider.blockgrabber_last_update = time_delta + Date.now()
-	}
+		ParserProvider.blockgrabber_last_update = time_delta + Date.now();
+	};
 
 	async onModuleInit() {
 		this.updateTokenList();
@@ -35,19 +39,18 @@ export class ParserProvider {
 
 		startBlockgrabber(this.handleNewBlock);
 
-		setInterval(()=>{
-			if (Date.now() - ParserProvider.blockgrabber_last_update > 120000 ) {
-				log.warn("no response from blockgrabber in 120 seconds => starting it up again")
-				ParserProvider.updateLastChecked()
-				startBlockgrabber(this.handleNewBlock, true)
+		setInterval(() => {
+			if (Date.now() - ParserProvider.blockgrabber_last_update > 120000) {
+				log.warn("no response from blockgrabber in 120 seconds => starting it up again");
+				ParserProvider.updateLastChecked();
+				startBlockgrabber(this.handleNewBlock, true);
 			}
-		},5000)
+		}, 5000);
 	}
 
 	public handleNewBlock = async (block: BlockDTO) => {
 		// const { state, fn, contract, timestamp } = block;
-		await this.parseBlock(
-			block);
+		await this.parseBlock(block);
 	};
 
 	/** This method is passed to the blockgrabber as a callback and checks
@@ -76,7 +79,7 @@ export class ParserProvider {
 					this.addToActionQue(this.refreshAmmMeta);
 				}
 				if (staking_contracts.includes(submitted_contract_name)) {
-					this.addToActionQue(updateStakingContractMeta, {
+					this.addToActionQue(this.stakingService.updateStakingContractMeta, {
 						state,
 						handleClientUpdate: this.socketService.handleClientUpdate,
 						staking_contract: submitted_contract_name
@@ -109,7 +112,7 @@ export class ParserProvider {
 						break;
 				}
 			} else if (staking_contracts.includes(contract_name)) {
-				this.addToActionQue(updateStakingContractMeta, {
+				this.addToActionQue(this.stakingService.updateStakingContractMeta, {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate,
 					staking_contract: contract_name,
@@ -117,7 +120,7 @@ export class ParserProvider {
 				});
 			}
 		} catch (err) {
-			log.error(err)
+			log.error(err);
 		}
 	};
 
@@ -130,15 +133,21 @@ export class ParserProvider {
 				state,
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
-			await saveReserves(fn, state, this.socketService.handleClientUpdate, timestamp, hash, ParserProvider.amm_meta_entity?.TOKEN_CONTRACT);
+			await saveReserves(
+				fn,
+				state,
+				this.socketService.handleClientUpdate,
+				timestamp,
+				hash,
+				ParserProvider.amm_meta_entity?.TOKEN_CONTRACT
+			);
 			await updateAmmMeta({
 				state,
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
-			await savePrice(state, this.socketService.handleClientUpdate)
+			await savePrice(state, this.socketService.handleClientUpdate);
 		} catch (err) {
 			log.error(err);
-			
 		}
 	};
 

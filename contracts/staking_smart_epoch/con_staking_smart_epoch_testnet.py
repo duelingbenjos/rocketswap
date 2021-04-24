@@ -1,12 +1,11 @@
 # Imports
 
-import currency
-import con_basic_token
+import con_rswp_lst001
 
 # Setup Tokens
 
-STAKING_TOKEN = currency
-YIELD_TOKEN = con_basic_token
+STAKING_TOKEN = con_rswp_lst001
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
@@ -38,17 +37,17 @@ def seed():
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
-    EpochMaxRatioIncrease.set(0.5)
+    EpochMaxRatioIncrease.set(10)
     EpochMinTime.set(0)
 
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 100}
 
     meta["version"] = "0.0.1"
     meta["type"] = "staking_smart_epoch"  # staking || lp_farming
-    meta["STAKING_TOKEN"] = "currency"
-    meta["YIELD_TOKEN"] = "con_basic_token"
+    meta["STAKING_TOKEN"] = "con_rswp_lst001"
+    meta["YIELD_TOKEN"] = "con_rswp_lst001"
 
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
+    EmissionRatePerHour.set(100)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(0.1)
 
     # The datetime from which you want to allow staking.
@@ -254,18 +253,12 @@ def decideIncrementEpoch(new_staked_amount: float):
 
 
 def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: float):
-    smaller = (
-        new_staked_amount
-        if new_staked_amount <= this_epoch_staked
-        else this_epoch_staked
-    )
-    bigger = (
-        new_staked_amount
-        if new_staked_amount >= this_epoch_staked
-        else this_epoch_staked
-    )
+    smaller = new_staked_amount if new_staked_amount <= this_epoch_staked else this_epoch_staked
+    bigger = new_staked_amount if new_staked_amount >= this_epoch_staked else this_epoch_staked
     dif = bigger - smaller
-    return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
+    return (
+        dif
+    ) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
 
 def incrementEpoch(new_staked_amount: float):
@@ -334,7 +327,6 @@ def setDevRewardPct(amount: float):
     DevRewardPct.set(amount)
 
 
-@export
 def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)

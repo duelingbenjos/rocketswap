@@ -1,4 +1,4 @@
-import { StakingEpochEntity } from "src/entities/staking-epoch.entity";
+import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { AuthenticationPayload } from "../authentication/trollbox.controller";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { UserStakingEntity } from "../entities/user-staking.entity";
