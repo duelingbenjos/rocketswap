@@ -26,13 +26,17 @@ export class StakingService implements OnModuleInit {
 		// log.debug("UPDATE ROI CALLED")
 		// log.log({staking_contracts})
 		for (let contract_name of staking_contracts) {
-			const meta_entity = await StakingMetaEntity.findOne(contract_name);
-			// log.debug({meta_entity})
-			if (meta_entity) {
-				const ROI = await this.decideROI(meta_entity);
-				// log.debug({ROI})
-				if (ROI) meta_entity.ROI_yearly = ROI;
-				await meta_entity.save();
+			try {
+				const meta_entity = await StakingMetaEntity.findOne(contract_name);
+				// log.debug({meta_entity})
+				if (meta_entity) {
+					const ROI = await this.decideROI(meta_entity);
+					// log.debug({ROI})
+					if (ROI) meta_entity.ROI_yearly = ROI;
+					await meta_entity.save();
+				}
+			} catch (err) {
+				log.error(err);
 			}
 		}
 	};
