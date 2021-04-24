@@ -177,7 +177,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
 		this.socketService.addStakingPanelClient(subject);
 		const yield_list = await this.socketService.getClientYieldList(subject);
-		//log.log("called");
 		client.emit("user_yield_list", yield_list);
 	}
 

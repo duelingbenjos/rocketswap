@@ -92,7 +92,6 @@ async function decideSymbol(token_symbol: string): Promise<string> {
 
 	if (symbol_entity) {
 		const parts = token_symbol.split("_");
-		log.log({ parts });
 		let idx = parts[1];
 		let new_idx;
 		if (idx) {
