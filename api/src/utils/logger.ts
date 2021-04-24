@@ -10,7 +10,7 @@ var conf = {
 		error : clc.red.bold
 	},
 	format: [
-    '{{timestamp}} <{{title}}> [{{file}}:{{line}}] {{message}} ', //default format
+    '{{timestamp}} <{{title}}> [{{file}}:{{line}}] {{message}}', //default format
     {
       error:
         '{{timestamp}} ({{file}}:{{line}}) <{{title}}> {{message}}\nCall Stack:\n{{stack}}' // error format
