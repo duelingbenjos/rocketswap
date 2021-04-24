@@ -146,9 +146,6 @@ export class StakingService implements OnModuleInit {
 					case `${staking_contract}.EmissionRatePerTauYearly`:
 						entity["EmissionRatePerTauYearly"] = getVal(kvp);
 						entity["EmissionRatePerHour"] = parseFloat(getVal(kvp)) / 365 / 24;
-
-						const ROI = await this.decideROI(entity);
-						if (ROI) entity.ROI_yearly = ROI;
 						break;
 					case `${staking_contract}.EmissionRatePerSecond`:
 						entity["EmissionRatePerSecond"] = getVal(kvp);
