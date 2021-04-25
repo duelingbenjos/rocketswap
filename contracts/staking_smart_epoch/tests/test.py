@@ -264,7 +264,7 @@ class MyTestCase(unittest.TestCase):
         )
         vault_balance = self.basic_token.balances["con_staking_smart_epoch"]
 
-        self.assertEqual(vault_balance + total, 10000000)
+        self.assertAlmostEqual(vault_balance + total, 10000000)
 
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
@@ -339,7 +339,7 @@ class MyTestCase(unittest.TestCase):
         )
         vault_balance = self.basic_token.balances["con_staking_smart_epoch"]
 
-        self.assertEqual(vault_balance + total, 10000000)
+        self.assertAlmostEqual(vault_balance + total, 10000000)
 
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
@@ -416,7 +416,7 @@ class MyTestCase(unittest.TestCase):
         )
         vault_balance = self.basic_token.balances["con_staking_smart_epoch"]
 
-        self.assertEqual(vault_balance + total, 10000000)
+        self.assertAlmostEqual(vault_balance + total, 10000000)
 
         current_epoch = self.contract.Epochs[current_epoch_index]
         self.assertEqual(current_epoch["staked"], 0)

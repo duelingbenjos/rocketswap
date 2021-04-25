@@ -38,16 +38,16 @@ def seed():
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(10)
-    EpochMinTime.set(0)
+    EpochMinTime.set(30*60) # 30 mins
 
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 100}
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
     meta["version"] = "0.0.1"
     meta["type"] = "staking_smart_epoch"  # staking || lp_farming
     meta["STAKING_TOKEN"] = "con_rswp_lst001"
     meta["YIELD_TOKEN"] = "con_rswp_lst001"
 
-    EmissionRatePerHour.set(100)  # 1200000 RSWP per year = 10% of supply
+    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(0.1)
 
     # The datetime from which you want to allow staking.
@@ -214,7 +214,7 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
             emission_rate_per_hour
         )
-        deposit_yield_this_epoch = decimal(global_yield_this_epoch) * pct_share_of_stake
+        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake
         y += deposit_yield_this_epoch
 
         this_epoch_index += 1

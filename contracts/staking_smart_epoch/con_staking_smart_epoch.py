@@ -215,7 +215,7 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
             emission_rate_per_hour
         )
-        deposit_yield_this_epoch = decimal(global_yield_this_epoch) * pct_share_of_stake
+        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake
         y += deposit_yield_this_epoch
 
         this_epoch_index += 1
