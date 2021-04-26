@@ -56,7 +56,6 @@
     .wallet-option{
         margin-top: 1rem;
     }
-
     .modal-heading{
         position: relative;
         margin-bottom: 2rem;
@@ -68,10 +67,6 @@
     @media screen and (min-width: 430px) {
         .modal-style{
             border-radius:  73px var(--border-radius) var(--border-radius) var(--border-radius);
-        }
-        .wallet-button{
-            display: flex;
-            flex-direction: row;
         }
     }
 </style>
@@ -114,7 +109,7 @@
                             </a>
                         {:else}
                             {#if $lwc_info.locked }
-                                <div class="text-small text-color--primary-dim">Locked</div>
+                                <span class="text-small text-color--primary weight-600">Locked - Open the Lamden Wallet to unlock</span>
                             {:else}
                                 <div class="flex flex-align-center text-small text-color--primary-dim">
                                     Installed

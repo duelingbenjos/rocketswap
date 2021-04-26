@@ -171,6 +171,7 @@ import { unixToLocalTimestamp } from '../../utils';
     .box-controls{
         padding: 5px;
         width: 80%;
+        box-sizing: border-box;
     }
     .box-controls > span {
         min-width: fit-content;

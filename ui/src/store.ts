@@ -121,6 +121,7 @@ export const bearerToken = writable(null)
 //AMM TRADES
 export const tradeHistory = writable({});
 export const tradeUpdates = writable({});
+export const allTradeUpdates = writable([]);
 
 
 // POOLS AND LIQUIDITY

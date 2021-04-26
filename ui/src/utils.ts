@@ -15,7 +15,8 @@ import {
 	payInRswp, 
 	ammFuelTank,
 	ammFuelTank_discount,
-	rswpMetrics} from './store'
+	rswpMetrics,
+	tauUSDPrice} from './store'
 
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
@@ -100,6 +101,7 @@ export const initializeStateFromLocalStorage = () => {
 	getSlippageTolerance()
 	getPayInRswp()
 	getEarnFilters()
+	getTauUsdPrice()
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -128,6 +130,14 @@ export const setEarnFilters = (value) => {
 	setLSValue("earn_filters", value)
 	earnFilters.set(value)
 }
+export const getTauUsdPrice = () => {
+	let value = localStorage.getItem("tau_usd_price")
+	if (value === null) tauUSDPrice.set(toBigNumber(0))
+	else tauUSDPrice.set(toBigNumber(JSON.parse(value)))
+}
+export const setTauUsdPrice = (value) => {
+	setLSValue("tau_usd_price", value)
+}
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))
 }
@@ -148,6 +158,10 @@ export const getSavedKeystoreData = () => {
 
 export const formatAccountAddress = (account: string, lsize = 4, rsize = 4) => {
   return account.substring(0, lsize) + '...' + account.substring(account.length - rsize)
+}
+
+export const numberWithCommas = (x) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 export const returnFloat = (value: any) => {
@@ -605,7 +619,7 @@ export const pageUtils = (pageStores) => {
 				  location.hash = `/${route}${get(selectedToken).contract_name}`
 			  }
 		}else{
-			window.history.pushState("", "", `/#/${route}`);
+			window.history.replaceState("", "", `/#/${route}`);
 		}	
 
 	}

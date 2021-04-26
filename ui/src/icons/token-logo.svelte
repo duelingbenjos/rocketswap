@@ -6,7 +6,8 @@
     export let margin = '0 10px';
 
     let height = width;
-    
+    let brokenLogo = false;
+
     $: svgLogo = tokenMeta ? tokenMeta.token_base64_svg || undefined : undefined;
     $: pngLogo = tokenMeta ? tokenMeta.token_base64_png || undefined : undefined;
     $: urlB64Logo = tokenMeta ? tokenMeta.logo_base64_url || undefined : undefined;
@@ -14,6 +15,10 @@
     $: componentLogo = tokenMeta ? tokenMeta.logo_component || undefined : undefined;
 
     $: placeholderLogo = !svgLogo && !pngLogo && !urlLogo && !urlB64Logo && !componentLogo ? genericIcon_base64_svg : undefined;
+
+    const logoBroken = (e) => {
+        brokenLogo = true
+    }
 </script>
 
 <style>
@@ -22,7 +27,7 @@
     }
 </style>
 
-{#if svgLogo || pngLogo}
+{#if (svgLogo || pngLogo)}
     {#if svgLogo}   
         <img style={`margin: ${margin};`} {width} {height} src="{`data:image/svg+xml;base64,${svgLogo}`}" alt="token logo"/>
     {/if}
@@ -35,9 +40,14 @@
         <img style={`margin: ${margin};`} {width} {height} src="{urlB64Logo}" alt="token logo"/>
     {/if}
 
-    {#if urlLogo && !urlB64Logo}   
-        <img style={`margin: ${margin};`} {width} {height} src="{urlLogo}" alt="token logo"/>
+    {#if urlLogo && !urlB64Logo && !brokenLogo}  
+        <img style={`margin: ${margin};`} {width} {height} src="{urlLogo}" alt="token logo" on:error={logoBroken}/>
     {/if}
+
+    {#if brokenLogo}
+        <img style={`margin: ${margin};`} {width} {height} src="{`data:image/svg+xml;base64,${genericIcon_base64_svg}`}" alt="token logo"/>
+    {/if}
+
 {/if}
 
 {#if componentLogo}
@@ -45,7 +55,7 @@
 {/if}
 
 {#if placeholderLogo}   
-    <img style={`margin: ${margin};`} {width} {height} src="{`data:image/svg+xml;base64,${placeholderLogo}`}" alt="token logo"/>
+    <img style={`margin: ${margin};`} {width} {height} src="{`data:image/svg+xml;base64,${genericIcon_base64_svg}`}" alt="token logo"/>
 {/if}
 
 

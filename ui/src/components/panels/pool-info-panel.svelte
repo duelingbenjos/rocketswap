@@ -91,7 +91,7 @@
     <div class="flex-row header">
         <TokenLogo tokenMeta={pairInfo} width={'45px'} margin={"0 12px 0 0"}/>
         <div class="flex-col text-large identity">
-            <a href="{`/#/${pairInfo.contract_name}`}">{pairInfo.token_symbol || "none"}</a>
+            <a href="{`/#/swap/${pairInfo.contract_name}`}">{pairInfo.token_symbol || "none"}</a>
             <span class="text-primary-dimmer">{pairInfo.token_name || "none"}</span>
         </div> 
         <div class="flex-row flex-start-end flex-grow">

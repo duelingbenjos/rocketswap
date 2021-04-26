@@ -4,7 +4,7 @@
 	import { active } from 'svelte-hash-router'
 
 	// Misc
-	import { walletBalance, rocketState, keystore, walletAddress } from '../store'
+	import { walletBalance, rocketState, keystore, walletAddress, lwc_info } from '../store'
 	import { config } from '../config'
 	import { formatAccountAddress, stringToFixed, openNewTab } from '../utils'
 
@@ -110,6 +110,9 @@
 		text-decoration: underline;
 		font-size: var(--text-size-large)
 	}
+	.wallet-message.locked{
+		text-decoration: none;
+	}
 	.primary{
 		border-radius: var(--border-radius);
 		margin-left: 10px;
@@ -121,12 +124,18 @@
 		margin-right: 8px;
 		border-radius: 99px;
 	}
+	button.locked{
+		padding: 8px 10px;;
+	}
 	.connected{
 		background: var(--color-primary);
 		padding: 3px 10px;
 		color: var(--color-gray-5);
 		margin-left: 0;
 		border-radius: 99px;
+	}
+	.connected.locked{
+		padding: 0;
 	}
 	.text-size {
 		font-size: var(--text-size-large);
@@ -230,15 +239,25 @@
 						blastOff={$rocketState == 2}
 					/>
 				</div>
-			<div class="balance text-size">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
-			<div class="flex-row flex-center-center primary connected text-size">
-				<button class="flex flex-center-center" on:click={logout} title="logout">
-					<AntennaIcon width="20px" margin="0 8px 0 0" />
-				</button>
-				<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" rel="noopener noreferrer" target="_blank" >
-					{formatAccountAddress($walletAddress,4,2)}
-				</a>
-			</div>
+			
+			{#if $lwc_info.locked}
+				<span class="wallet-message locked text-size weight-600 text-color-white">Lamden Wallet Locked</span>
+				<div class="flex-row flex-center-center primary connected locked text-size">
+					<button class="flex flex-center-center primary not-connected medium" on:click={toggleModal} title="login">
+						<AntennaIcon width="20px" margin="0 0 0 0" />
+					</button>
+				</div>
+			{:else}
+				<div class="balance text-size">{stringToFixed($walletBalance, 8)} {config.currencySymbol}</div>
+				<div class="flex-row flex-center-center primary connected text-size">
+					<button class="flex flex-center-center" on:click={logout} title="logout">
+						<AntennaIcon width="20px" margin="0 8px 0 0" />
+					</button>
+					<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" rel="noopener noreferrer" target="_blank" >
+						{formatAccountAddress($walletAddress,4,2)}
+					</a>
+				</div>
+			{/if}
 		{:else}
 			<button class="flex flex-align-center wallet-message text-size weight-600 text-color-white" on:click={toggleModal} title="login">
 				Connect Wallet
