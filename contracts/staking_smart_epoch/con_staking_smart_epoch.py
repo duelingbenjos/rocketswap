@@ -210,6 +210,7 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         if amount is not 0 and this_epoch["staked"] is not 0:
             pct_share_of_stake = amount / this_epoch["staked"]
 
+        # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
         emission_rate_per_hour = this_epoch["amt_per_hr"]
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
             emission_rate_per_hour
@@ -392,4 +393,3 @@ def emergencyReturnStake():
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
-    decideIncrementEpoch(new_staked_amount=new_staked_amount)

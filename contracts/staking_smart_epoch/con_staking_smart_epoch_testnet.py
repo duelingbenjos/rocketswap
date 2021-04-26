@@ -184,7 +184,7 @@ def withdrawTokensAndYield():
 
 
 # This runs over each of the items in the user's Deposit
-def calculateYield(starting_epoch_index: int, start_time, amount: float):
+def calculateYield(starting_epoch_index, start_time, amount):
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
     y = 0
@@ -209,6 +209,7 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         if amount is not 0 and this_epoch["staked"] is not 0:
             pct_share_of_stake = amount / this_epoch["staked"]
 
+        # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
         emission_rate_per_hour = this_epoch["amt_per_hr"]
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
             emission_rate_per_hour
