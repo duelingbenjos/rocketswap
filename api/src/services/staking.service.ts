@@ -34,6 +34,7 @@ export class StakingService implements OnModuleInit {
 				// log.debug({ROI})
 				if (ROI) meta_entity.ROI_yearly = ROI;
 				await meta_entity.save();
+				this.socketService.handleClientUpdate({ action: "staking_panel_update", data: meta_entity });
 			}
 		}
 	};
