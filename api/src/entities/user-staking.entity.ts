@@ -121,13 +121,13 @@ function calculateYield(args: {
 		let next_epoch = epochs[this_epoch_index + 1];
 		log.log({ this_epoch_index });
 		log.log({ this_epoch });
-		log.log({ this_epoch_time: (Date.now() - datetimeToUnix(deposit_start_time)) / 1000 });
-		log.log({ now: new Date(Date.now()).toLocaleTimeString() });
+		log.log({ this_epoch_time: (dateNowUtc() - datetimeToUnix(deposit_start_time)) / 1000 });
+		log.log({ now: new Date(dateNowUtc()).toLocaleTimeString() });
 		log.log({ starting_epoch_index });
 		let delta = 0;
 		log.log({utc_now: new Date().toUTCString()})
 		if (starting_epoch_index === current_epoch_index) {
-			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(deposit_start_time));
+			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(deposit_start_time));
 			log.log(1);
 		} else if (this_epoch_index === starting_epoch_index) {
 			log.log(2);
@@ -135,7 +135,7 @@ function calculateYield(args: {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(deposit_start_time));
 		} else if (this_epoch_index === current_epoch_index) {
 			log.log(3);
-			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(this_epoch.time));
+			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(this_epoch.time));
 		} else {
 			log.log(4);
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
@@ -185,11 +185,11 @@ function calculateSimpleYield(args: {
 		let delta = 0;
 		
 		if (starting_epoch_index === current_epoch_index) {
-			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(deposit_start_time));
+			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(deposit_start_time));
 		} else if (this_epoch_index === starting_epoch_index) {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(deposit_start_time));
 		} else if (this_epoch_index === current_epoch_index) {
-			delta = fitTime(Date.now()) - fitTime(datetimeToUnix(this_epoch.time));
+			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(this_epoch.time));
 		} else {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
 		}
@@ -225,7 +225,7 @@ const stakingTimeWindowIsActive = (meta: StakingMetaEntity): boolean => {
 	let { StartTime, EndTime } = meta;
 	let start_time = datetimeToUnix(StartTime);
 	let end_time = datetimeToUnix(EndTime);
-	let time = Date.now();
+	let time = dateNowUtc();
 
 	return time > start_time && time < end_time;
 };
@@ -244,4 +244,13 @@ function timeThing() {
 	let hour = new Date().getUTCHours()
 	log.log(time)
 	log.log(hour)
+}
+
+function dateNowUtc() {
+	const utc_hour = new Date().getUTCHours()
+	const this_zone_hour = new Date().getHours()
+
+	const hour_difference = this_zone_hour - utc_hour
+	const difference_ms = hour_difference * 60 * 60 * 1000
+	return Date.now() - difference_ms
 }

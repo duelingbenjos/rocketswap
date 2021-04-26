@@ -10,10 +10,10 @@ var conf = {
 		error : clc.red.bold
 	},
 	format: [
-    '{{timestamp}} <{{title}}> {{message}} (in {{file}}:{{line}})', //default format
+    '{{timestamp}} <{{title}}> [{{file}}:{{line}}] {{message}}', //default format
     {
       error:
-        '{{timestamp}} <{{title}}> {{message}} ({{file}}:{{line}})\nCall Stack:\n{{stack}}' // error format
+        '{{timestamp}} ({{file}}:{{line}}) <{{title}}> {{message}}\nCall Stack:\n{{stack}}' // error format
     }
   ],
   dateformat: 'HH:MM:ss',

@@ -1,5 +1,6 @@
 import { IContractingTime } from "src/types/misc.types";
 import { handleClientUpdateType } from "src/types/websocket.types";
+import { log } from "../utils/logger";
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -42,7 +43,10 @@ export async function updateEpoch(args: {
 	entity.time = time;
 	entity.epoch_index = epoch_index;
 	entity.staking_contract = staking_contract;
-	entity.amt_per_hr = amt_per_hr;
+	log.log({ amt_per_hr });
+	if (amt_per_hr) {
+		entity.amt_per_hr = amt_per_hr.__fixed__ ? amt_per_hr.__fixed__ : amt_per_hr;
+	}
 
 	await entity.save();
 	handleClientUpdate({ action: "epoch_update", data: entity });
