@@ -38,7 +38,7 @@ def seed():
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
-    EpochMaxRatioIncrease.set(0.5)
+    EpochMaxRatioIncrease.set(1/2)
     EpochMinTime.set(0)
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
@@ -49,7 +49,7 @@ def seed():
     meta["YIELD_TOKEN"] = "con_basic_token"
 
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
-    DevRewardPct.set(0.1)
+    DevRewardPct.set(1/10)
 
     # The datetime from which you want to allow staking.
     StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
@@ -210,7 +210,6 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         if amount is not 0 and this_epoch["staked"] is not 0:
             pct_share_of_stake = amount / this_epoch["staked"]
 
-        # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
         emission_rate_per_hour = this_epoch["amt_per_hr"]
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
             emission_rate_per_hour
@@ -393,3 +392,4 @@ def emergencyReturnStake():
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
+    decideIncrementEpoch(new_staked_amount=new_staked_amount)

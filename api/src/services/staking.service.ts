@@ -11,10 +11,11 @@ import { IKvp } from "../types/misc.types";
 import { handleClientUpdateType } from "../types/websocket.types";
 import { getVal } from "../utils/utils";
 import { updateUserStakingInfo } from "../entities/user-staking.entity";
+import { SocketService } from "./socket.service";
 
 @Injectable()
 export class StakingService implements OnModuleInit {
-	constructor() {}
+	constructor(private readonly socketService: SocketService) {}
 
 	async onModuleInit() {
 		setInterval(async () => {
