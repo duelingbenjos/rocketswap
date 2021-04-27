@@ -11,32 +11,30 @@ import { IKvp } from "../types/misc.types";
 import { handleClientUpdateType } from "../types/websocket.types";
 import { getVal } from "../utils/utils";
 import { updateUserStakingInfo } from "../entities/user-staking.entity";
+import { SocketService } from "./socket.service";
 
 @Injectable()
 export class StakingService implements OnModuleInit {
-	constructor() {}
+	constructor(private readonly socketService: SocketService) {}
 
 	async onModuleInit() {
 		setInterval(async () => {
-			await this.updateROI();
-		}, 5000);
+			Promise.resolve(this.updateROI());
+		}, 30000);
 	}
 
 	updateROI = async () => {
 		// log.debug("UPDATE ROI CALLED")
 		// log.log({staking_contracts})
 		for (let contract_name of staking_contracts) {
-			try {
-				const meta_entity = await StakingMetaEntity.findOne(contract_name);
-				// log.debug({meta_entity})
-				if (meta_entity) {
-					const ROI = await this.decideROI(meta_entity);
-					// log.debug({ROI})
-					if (ROI) meta_entity.ROI_yearly = ROI;
-					await meta_entity.save();
-				}
-			} catch (err) {
-				log.error(err);
+			const meta_entity = await StakingMetaEntity.findOne(contract_name);
+			// log.debug({meta_entity})
+			if (meta_entity) {
+				const ROI = await this.decideROI(meta_entity);
+				// log.debug({ROI})
+				if (ROI) meta_entity.ROI_yearly = ROI;
+				await meta_entity.save();
+				this.socketService.handleClientUpdate({ action: "staking_panel_update", data: meta_entity });
 			}
 		}
 	};
@@ -58,7 +56,7 @@ export class StakingService implements OnModuleInit {
 			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			// log.log("staking_smart_epoch called");
-			return this.getRSWPStakingROI(meta_entity);
+			return await this.getRSWPStakingROI(meta_entity);
 		}
 	};
 
