@@ -16,7 +16,8 @@ import {
 	ammFuelTank,
 	ammFuelTank_discount,
 	rswpMetrics,
-	tauUSDPrice} from './store'
+	tauUSDPrice,
+	currencyType} from './store'
 
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
@@ -102,6 +103,7 @@ export const initializeStateFromLocalStorage = () => {
 	getPayInRswp()
 	getEarnFilters()
 	getTauUsdPrice()
+	getCurrencyType()
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -137,6 +139,15 @@ export const getTauUsdPrice = () => {
 }
 export const setTauUsdPrice = (value) => {
 	setLSValue("tau_usd_price", value)
+}
+export const getCurrencyType = () => {
+	let value = localStorage.getItem("currency_type")
+	if (value === null) currencyType.set("tau")
+	else currencyType.set(JSON.parse(value))
+}
+export const setCurrencyType = (value) => {
+	setLSValue("currency_type", value)
+	currencyType.set(value)
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))

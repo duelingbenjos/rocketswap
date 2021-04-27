@@ -13,7 +13,7 @@
 	const wsService = WsService.getInstance()
     
     // Misc
-    import { tauUSDPrice } from '../store'
+    import { tauUSDPrice, currencyType } from '../store'
     import { stringToFixed } from '../utils'
 
     let marketData;
@@ -64,6 +64,8 @@
 </script>
 
 <div class="page-container"  >
-	<HomePanel {marketData}/>
+    {#if $currencyType}
+	    <HomePanel {marketData}/>
+    {/if}
     <TradeRockets {marketData}/>
 </div>

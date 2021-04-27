@@ -25,6 +25,7 @@ export const epochs = writable({});
 export const rocketState = writable(0);
 export const toast_store: Writable<ToastMetaType[]> = writable([])
 export const tabHidden = writable(false);
+export const currencyType = writable();
 
 // EXCHANGE PRICES
 export const tauUSDPrice = writable(null);

@@ -56,7 +56,7 @@
     }
 
     /* When page width is greater than 730px (tablets) */
-    @media screen and (min-width: 730px) {
+    @media screen and (min-width: 650px) {
 		.main-menu{
             display: none;
         }

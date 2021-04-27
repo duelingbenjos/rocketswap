@@ -6,8 +6,15 @@
     import TokenLogo from '../../icons/token-logo.svelte'
 
 	//Misc
-    import { stringToFixed, numberWithCommas } from '../../utils'
-    import { tauUSDPrice } from '../../store'
+    import { stringToFixed, numberWithCommas, setCurrencyType } from '../../utils'
+    import { tauUSDPrice, currencyType } from '../../store'
+
+    let selectElm
+    let type = $currencyType
+
+    $: currencyToDisplay = $currencyType
+
+    const handleCurrencyTypeChange = () => setCurrencyType(type)
 
 </script>
 
@@ -44,6 +51,10 @@
     a:hover{
         color: var(--color-primary);
     }
+    select{
+        width: unset;
+        padding: 0px 5px 0px 7px;
+    }
 
 	@media screen and (min-width: 430px) {
         td{
@@ -67,7 +78,14 @@
             <tr class="headings">
                 <th>#</th>
                 <th>Name</th>
-                <th>Price (USD)</th>
+                <th>
+                    <div class="dropdown">
+                        <select bind:value={type} bind:this={selectElm} on:blur={handleCurrencyTypeChange}>
+                                <option value={"tau"}>Price TAU</option>
+                                <option value={"usd"}>Price USD</option>
+                        </select>
+                    </div>
+                </th>
                 <th>24hr %</th>
                 <th>Volume (24hrs)</th>
             </tr>
@@ -82,13 +100,13 @@
                             <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
                         </div>
                     </td>
-                    <td>${stringToFixed(tokenInfo.usdPrice, 3)}</td>
+                    <td>{currencyToDisplay === "usd" ? `$${stringToFixed(tokenInfo.usdPrice, 2)}` : stringToFixed(tokenInfo.Last, 5)}</td>
                     <td 
                         class:text-error={tokenInfo.change === "minus"}
                         class:text-success={tokenInfo.change === "plus"}>
                         {tokenInfo.vol24Str}
                     </td>
-                    <td>${numberWithCommas(stringToFixed(tokenInfo.usdVolume, 2))}</td>
+                    <td>{numberWithCommas(currencyToDisplay === "usd" ? `$${stringToFixed(tokenInfo.usdVolume, 2)}` : stringToFixed(tokenInfo.Volume, 5))}</td>
                 </tr>
             {/each}
         </table>
