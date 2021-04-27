@@ -29,6 +29,7 @@ EpochMaxRatioIncrease = (
     Variable()
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
+decimal_converter_var = Variable()
 
 
 @construct
@@ -215,6 +216,8 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
             emission_rate_per_hour
         )
+        decimal_converter_var.set(pct_share_of_stake)
+        pct_share_of_stake = decimal_converter_var.get()
         deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake
         y += deposit_yield_this_epoch
 
