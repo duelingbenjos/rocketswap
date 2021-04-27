@@ -101,7 +101,7 @@ function calculateYield(args: {
 }): number {
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
-	timeThing()
+	timeThing();
 
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
@@ -125,7 +125,7 @@ function calculateYield(args: {
 		log.log({ now: new Date(dateNowUtc()).toLocaleTimeString() });
 		log.log({ starting_epoch_index });
 		let delta = 0;
-		log.log({utc_now: new Date().toUTCString()})
+		log.log({ utc_now: new Date().toUTCString() });
 		if (starting_epoch_index === current_epoch_index) {
 			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(deposit_start_time));
 			log.log(1);
@@ -183,7 +183,7 @@ function calculateSimpleYield(args: {
 		let next_epoch = epochs[this_epoch_index + 1];
 		// console.log(this_epoch_index, current_epoch_index)
 		let delta = 0;
-		
+
 		if (starting_epoch_index === current_epoch_index) {
 			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(deposit_start_time));
 		} else if (this_epoch_index === starting_epoch_index) {
@@ -239,18 +239,14 @@ function datetimeToUnix(time: IContractingTime) {
 	return new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], arr[5]).getTime();
 }
 
-function timeThing() {
-	let time = new Date().getHours()
-	let hour = new Date().getUTCHours()
-	log.log(time)
-	log.log(hour)
-}
-
 function dateNowUtc() {
-	const utc_hour = new Date().getUTCHours()
-	const this_zone_hour = new Date().getHours()
+	const utc_hour = new Date().getUTCHours();
+	const this_zone_hour = new Date().getHours();
 
-	const hour_difference = this_zone_hour - utc_hour
-	const difference_ms = hour_difference * 60 * 60 * 1000
-	return Date.now() - difference_ms
+	const hour_difference = this_zone_hour - utc_hour;
+	if (hour_difference !== 0) {
+		let difference_ms = hour_difference * 60 * 60 * 1000;
+		return Date.now() - difference_ms;
+	}
+	return Date.now();
 }
