@@ -19,8 +19,8 @@ export class StakingService implements OnModuleInit {
 
 	async onModuleInit() {
 		setInterval(async () => {
-			await this.updateROI();
-		}, 5000);
+			Promise.resolve(this.updateROI());
+		}, 30000);
 	}
 
 	updateROI = async () => {
@@ -56,7 +56,7 @@ export class StakingService implements OnModuleInit {
 			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			// log.log("staking_smart_epoch called");
-			return this.getRSWPStakingROI(meta_entity);
+			return await this.getRSWPStakingROI(meta_entity);
 		}
 	};
 
