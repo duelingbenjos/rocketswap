@@ -111,6 +111,6 @@
             {/each}
         </table>
     {:else}
-        <PulseSpinner />
+        <PulseSpinner margin="0 auto" color="var(--color-primary)" />
     {/if}
 </div>
