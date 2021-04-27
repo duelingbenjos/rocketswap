@@ -28,6 +28,7 @@ EpochMaxRatioIncrease = (
     Variable()
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
+decimal_converter_var = Variable()
 
 
 @construct
@@ -48,7 +49,7 @@ def seed():
     meta["YIELD_TOKEN"] = "con_rswp_lst001"
 
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
-    DevRewardPct.set(0.1)
+    DevRewardPct.set(1/10)
 
     # The datetime from which you want to allow staking.
     StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
@@ -184,7 +185,7 @@ def withdrawTokensAndYield():
 
 
 # This runs over each of the items in the user's Deposit
-def calculateYield(starting_epoch_index: int, start_time, amount: float):
+def calculateYield(starting_epoch_index, start_time, amount):
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
     y = 0
@@ -214,6 +215,8 @@ def calculateYield(starting_epoch_index: int, start_time, amount: float):
         global_yield_this_epoch = delta.seconds * getEmissionRatePerSecond(
             emission_rate_per_hour
         )
+        decimal_converter_var.set(pct_share_of_stake)
+        pct_share_of_stake = decimal_converter_var.get()
         deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake
         y += deposit_yield_this_epoch
 
@@ -385,3 +388,5 @@ def emergencyReturnStake():
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
+    decideIncrementEpoch(new_staked_amount=new_staked_amount)
+

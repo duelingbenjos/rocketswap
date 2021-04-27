@@ -77,28 +77,28 @@ class MyTestCase(unittest.TestCase):
         bob_currency_balance = self.currency.balances["bob"]
         vault_currency_balance = self.currency.balances["con_staking_smart_epoch"]
 
-        self.assertEqual(vault_currency_balance, 100)
+        self.assertAlmostEqual(vault_currency_balance, 100)
 
         staked = self.contract.StakedBalance.get()
-        self.assertEqual(staked, 100)
+        self.assertAlmostEqual(staked, 100)
 
         current_epoch = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch, 1)
+        self.assertAlmostEqual(current_epoch, 1)
 
         deposit_record = self.contract.Deposits["bob"]
-        self.assertEqual(len(deposit_record), 1)
+        self.assertAlmostEqual(len(deposit_record), 1)
         print(deposit_record)
-        self.assertEqual(deposit_record[0]["amount"], 100)
+        self.assertAlmostEqual(deposit_record[0]["amount"], 100)
 
         self.contract.addStakingTokens(environment=env_2, signer="bob", amount=150)
         staked = self.contract.StakedBalance.get()
-        self.assertEqual(staked, 250)
+        self.assertAlmostEqual(staked, 250)
 
         current_epoch = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch, 2)
+        self.assertAlmostEqual(current_epoch, 2)
 
         deposit_record = self.contract.Deposits["bob"]
-        self.assertEqual(len(deposit_record), 2)
+        self.assertAlmostEqual(len(deposit_record), 2)
 
     def test_02_add_staking_tokens(self):
         start_env = {"now": Datetime(year=2021, month=2, day=1)}
@@ -121,41 +121,41 @@ class MyTestCase(unittest.TestCase):
         self.contract.withdrawYield(environment=env_2, signer="bob", amount=1500)
 
         bob_token_balance = self.basic_token.balances["bob"]
-        self.assertEqual(bob_token_balance, 1350)
+        self.assertAlmostEqual(bob_token_balance, 1350)
 
         dev_share = self.basic_token.balances["dev_wallet"]
-        self.assertEqual(dev_share, 150)
+        self.assertAlmostEqual(dev_share, 150)
 
         self.contract.withdrawYield(environment=env_2, signer="bob", amount=1500)
 
         bob_token_balance = self.basic_token.balances["bob"]
-        self.assertEqual(bob_token_balance, 2700)
+        self.assertAlmostEqual(bob_token_balance, 2700)
 
         dev_share = self.basic_token.balances["dev_wallet"]
-        self.assertEqual(dev_share, 300)
+        self.assertAlmostEqual(dev_share, 300)
 
         with self.assertRaises(AssertionError):
             self.contract.withdrawYield(environment=env_2, signer="bob", amount=1500)
 
         bob_token_balance = self.basic_token.balances["bob"]
-        self.assertEqual(bob_token_balance, 2700)
+        self.assertAlmostEqual(bob_token_balance, 2700)
 
         dev_share = self.basic_token.balances["dev_wallet"]
-        self.assertEqual(dev_share, 300)
+        self.assertAlmostEqual(dev_share, 300)
 
         withdrawals_bob = self.contract.Withdrawals["bob"]
-        self.assertEqual(withdrawals_bob, 3000)
+        self.assertAlmostEqual(withdrawals_bob, 3000)
 
         self.contract.withdrawTokensAndYield(environment=env_2, signer="bob")
 
         bob_token_balance = self.basic_token.balances["bob"]
-        self.assertEqual(bob_token_balance, 2700)
+        self.assertAlmostEqual(bob_token_balance, 2700)
 
         dev_share = self.basic_token.balances["dev_wallet"]
-        self.assertEqual(dev_share, 300)
+        self.assertAlmostEqual(dev_share, 300)
 
         withdrawals_bob = self.contract.Withdrawals["bob"]
-        self.assertEqual(withdrawals_bob, False)
+        self.assertAlmostEqual(withdrawals_bob, False)
 
     def test_04_withdraw_yield(self):
 
@@ -177,13 +177,13 @@ class MyTestCase(unittest.TestCase):
             self.contract.withdrawYield(environment=env_3, signer="bob", amount=1500)
 
         bob_token_balance = self.basic_token.balances["bob"]
-        self.assertEqual(bob_token_balance, 2700)
+        self.assertAlmostEqual(bob_token_balance, 2700)
 
         dev_share = self.basic_token.balances["dev_wallet"]
-        self.assertEqual(dev_share, 300)
+        self.assertAlmostEqual(dev_share, 300)
 
         withdrawals_bob = self.contract.Withdrawals["bob"]
-        self.assertEqual(withdrawals_bob, False)
+        self.assertAlmostEqual(withdrawals_bob, False)
 
     def test_06_multi_party_stake_and_withdraw_tokens_and_yield(self):
         start_env = {
@@ -205,46 +205,46 @@ class MyTestCase(unittest.TestCase):
         self.contract.addStakingTokens(environment=start_env, signer="bob", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 10)
+        self.assertAlmostEqual(current_epoch["staked"], 10)
 
         self.contract.addStakingTokens(environment=env_2, signer="janis", amount=5)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 15)
+        self.assertAlmostEqual(current_epoch["staked"], 15)
 
         self.contract.addStakingTokens(environment=env_3, signer="murray", amount=20)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 35)
+        self.assertAlmostEqual(current_epoch["staked"], 35)
 
         self.contract.addStakingTokens(environment=env_4, signer="pete", amount=100)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 135)
+        self.assertAlmostEqual(current_epoch["staked"], 135)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="bob")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 125)
-        self.assertEqual(self.contract.Deposits["bob"], False)
+        self.assertAlmostEqual(current_epoch["staked"], 125)
+        self.assertAlmostEqual(self.contract.Deposits["bob"], False)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="janis")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 120)
-        self.assertEqual(self.contract.Deposits["janis"], False)
+        self.assertAlmostEqual(current_epoch["staked"], 120)
+        self.assertAlmostEqual(self.contract.Deposits["janis"], False)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="murray")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(self.contract.Deposits["murray"], False)
-        self.assertEqual(current_epoch["staked"], 100)
+        self.assertAlmostEqual(self.contract.Deposits["murray"], False)
+        self.assertAlmostEqual(current_epoch["staked"], 100)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="pete")
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 0)
-        self.assertEqual(self.contract.Deposits["pete"], False)
+        self.assertAlmostEqual(current_epoch["staked"], 0)
+        self.assertAlmostEqual(self.contract.Deposits["pete"], False)
 
         bob_token_balance = self.basic_token.balances["bob"]
         janis_token_balance = self.basic_token.balances["janis"]
@@ -269,8 +269,8 @@ class MyTestCase(unittest.TestCase):
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
 
-        self.assertEqual(current_epoch["staked"], 0)
-        self.assertEqual(current_epoch_index, 9)
+        self.assertAlmostEqual(current_epoch["staked"], 0)
+        self.assertAlmostEqual(current_epoch_index, 9)
 
     def test_07_multi_party_stake_and_withdraw_yield(self):
         start_env = {
@@ -344,8 +344,8 @@ class MyTestCase(unittest.TestCase):
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
 
-        self.assertEqual(current_epoch_index, 5)
-        self.assertEqual(current_epoch["staked"], 135)
+        self.assertAlmostEqual(current_epoch_index, 5)
+        self.assertAlmostEqual(current_epoch["staked"], 135)
 
     def test_08_multi_party_stake_and_withdraw_yield_then_withdraw_tokens_and_yield(
         self,
@@ -382,8 +382,8 @@ class MyTestCase(unittest.TestCase):
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         current_epoch = self.contract.Epochs[current_epoch_index]
         # print(current_epoch['staked'])
-        self.assertEqual(current_epoch_index, 5)
-        self.assertEqual(current_epoch["staked"], 135)
+        self.assertAlmostEqual(current_epoch_index, 5)
+        self.assertAlmostEqual(current_epoch["staked"], 135)
 
         self.contract.withdrawTokensAndYield(environment=env_5, signer="bob")
         self.contract.withdrawTokensAndYield(environment=env_5, signer="janis")
@@ -391,7 +391,7 @@ class MyTestCase(unittest.TestCase):
         self.contract.withdrawTokensAndYield(environment=env_5, signer="pete")
 
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 9)
+        self.assertAlmostEqual(current_epoch_index, 9)
 
         bob_token_balance = self.basic_token.balances["bob"]
         janis_token_balance = self.basic_token.balances["janis"]
@@ -419,22 +419,22 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(vault_balance + total, 10000000)
 
         current_epoch = self.contract.Epochs[current_epoch_index]
-        self.assertEqual(current_epoch["staked"], 0)
+        self.assertAlmostEqual(current_epoch["staked"], 0)
 
         bob_deposits = self.contract.Deposits["bob"]
         janis_deposits = self.contract.Deposits["janis"]
         murray_deposits = self.contract.Deposits["murray"]
         pete_deposits = self.contract.Deposits["pete"]
 
-        self.assertEqual(bob_deposits, False)
-        self.assertEqual(janis_deposits, False)
-        self.assertEqual(murray_deposits, False)
-        self.assertEqual(pete_deposits, False)
+        self.assertAlmostEqual(bob_deposits, False)
+        self.assertAlmostEqual(janis_deposits, False)
+        self.assertAlmostEqual(murray_deposits, False)
+        self.assertAlmostEqual(pete_deposits, False)
 
     def test_09_recover_yield_token(self):
-        self.assertEqual(self.basic_token.balances["con_staking_smart_epoch"], 10000000)
+        self.assertAlmostEqual(self.basic_token.balances["con_staking_smart_epoch"], 10000000)
         self.contract.recoverYieldToken(amount=10000000)
-        self.assertEqual(self.basic_token.balances["con_staking_smart_epoch"], 0)
+        self.assertAlmostEqual(self.basic_token.balances["con_staking_smart_epoch"], 0)
 
     def test_10_start_time(self):
         env_1 = {"now": Datetime(year=2020, month=2, day=1)}
@@ -457,8 +457,8 @@ class MyTestCase(unittest.TestCase):
         start_time = self.contract.StartTime.get()
         end_time = self.contract.EndTime.get()
 
-        self.assertEqual(Datetime(year=2021, month=1, day=1, hour=1), start_time)
-        self.assertEqual(Datetime(year=2021, month=1, day=1, hour=1), end_time)
+        self.assertAlmostEqual(Datetime(year=2021, month=1, day=1, hour=1), start_time)
+        self.assertAlmostEqual(Datetime(year=2021, month=1, day=1, hour=1), end_time)
 
     def test_12_start_time(self):
         env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
@@ -479,7 +479,7 @@ class MyTestCase(unittest.TestCase):
             environment=env_2, signer="bob", amount=1009299299299
         )
 
-        self.assertEqual(self.basic_token.balances["bob"], 25)
+        self.assertAlmostEqual(self.basic_token.balances["bob"], 25)
         self.contract.withdrawTokensAndYield(signer="bob")
 
     def test_13_end_time(self):
@@ -511,10 +511,10 @@ class MyTestCase(unittest.TestCase):
         self.contract.withdrawTokensAndYield(environment=env_2, signer="murray")
         self.contract.withdrawTokensAndYield(environment=env_2, signer="pete")
 
-        self.assertEqual(self.basic_token.balances["bob"], 25)
-        self.assertEqual(self.basic_token.balances["janis"], 25)
-        self.assertEqual(self.basic_token.balances["murray"], 25)
-        self.assertEqual(self.basic_token.balances["pete"], 25)
+        self.assertAlmostEqual(self.basic_token.balances["bob"], 25)
+        self.assertAlmostEqual(self.basic_token.balances["janis"], 25)
+        self.assertAlmostEqual(self.basic_token.balances["murray"], 25)
+        self.assertAlmostEqual(self.basic_token.balances["pete"], 25)
 
     def test_14_addStakingTokens_check_len_should_pass(self):
 
@@ -522,7 +522,7 @@ class MyTestCase(unittest.TestCase):
         self.contract.addStakingTokens(signer="bob", amount=10)
 
         deposits = self.contract.Deposits["bob"]
-        self.assertEqual(len(deposits), 2)
+        self.assertAlmostEqual(len(deposits), 2)
 
     def test_15_addStakingTokens_check_len_should_fail(self):
 
@@ -533,7 +533,7 @@ class MyTestCase(unittest.TestCase):
         self.contract.addStakingTokens(signer="bob", amount=10)
 
         with self.assertRaises(AssertionError):
-            self.assertEqual(len(deposits), 2)
+            self.assertAlmostEqual(len(deposits), 2)
 
     def test_16_addStakingTokens_withdrawTokensAndYield_check_len_should_pass(self):
 
@@ -542,7 +542,7 @@ class MyTestCase(unittest.TestCase):
 
         self.contract.withdrawTokensAndYield(signer="bob")
         deposits = self.contract.Deposits["bob"]
-        self.assertEqual(deposits, False)
+        self.assertAlmostEqual(deposits, False)
 
     def test_17_emergencyReturnStake(self):
         env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
@@ -555,16 +555,16 @@ class MyTestCase(unittest.TestCase):
 
         self.contract.emergencyReturnStake(environment=env_2, signer="bob")
         deposits = self.contract.Deposits["bob"]
-        self.assertEqual(deposits, False)
+        self.assertAlmostEqual(deposits, False)
 
         withdrawals = self.contract.Withdrawals["bob"]
-        self.assertEqual(withdrawals, 0)
+        self.assertAlmostEqual(withdrawals, 0)
 
         bob_balance = self.currency.balances["bob"]
-        self.assertEqual(bob_balance, 1000)
+        self.assertAlmostEqual(bob_balance, 1000)
 
         with self.assertRaises(AssertionError):
-            self.assertEqual(bob_balance, 0)
+            self.assertAlmostEqual(bob_balance, 0)
 
     def test_18_epoch_incrementing_over_time(self):
         # Testing that the Epoch will not increment unless the decided time has elapsed.
@@ -577,7 +577,7 @@ class MyTestCase(unittest.TestCase):
         self.contract.setDevRewardPct(amount=0)
 
         current_epoch_idx = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_idx, 1)
+        self.assertAlmostEqual(current_epoch_idx, 1)
 
         self.contract.addStakingTokens(environment=env_1, signer="bob", amount=10)
         self.contract.addStakingTokens(environment=env_1, signer="janis", amount=10)
@@ -585,7 +585,7 @@ class MyTestCase(unittest.TestCase):
         self.contract.addStakingTokens(environment=env_1, signer="pete", amount=10)
 
         current_epoch_idx = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_idx, 5)
+        self.assertAlmostEqual(current_epoch_idx, 5)
 
         min_seconds = 60 * 60
         self.contract.setEpochMinTime(environment=env_2, min_seconds=min_seconds)
@@ -594,19 +594,19 @@ class MyTestCase(unittest.TestCase):
         self.contract.addStakingTokens(environment=env_3, signer="pete", amount=10)
 
         current_epoch_idx = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_idx, 5)
+        self.assertAlmostEqual(current_epoch_idx, 5)
 
         self.contract.addStakingTokens(environment=env_4, signer="pete", amount=10)
 
         current_epoch_idx = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_idx, 6)
+        self.assertAlmostEqual(current_epoch_idx, 6)
 
         staked_balance = self.contract.StakedBalance.get()
-        self.assertEqual(staked_balance, 60)
+        self.assertAlmostEqual(staked_balance, 60)
         
         current_epoch = self.contract.Epochs[current_epoch_idx]
         current_epoch_staked_balance = current_epoch['staked']
-        self.assertEqual(current_epoch_staked_balance, 60)
+        self.assertAlmostEqual(current_epoch_staked_balance, 60)
 
     def test_19_epoch_incrementing_when_max_ratio_exceeded_addStakingTokens(self):
         # all of the below test occurs within the min epoch time
@@ -619,27 +619,27 @@ class MyTestCase(unittest.TestCase):
         self.contract.addStakingTokens(signer="bob", amount=10)
         
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 2)
+        self.assertAlmostEqual(current_epoch_index, 2)
 
         # increments
         self.contract.addStakingTokens(signer="bob", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 3)
+        self.assertAlmostEqual(current_epoch_index, 3)
 
         # skips
         self.contract.addStakingTokens(signer="bob", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 3)
+        self.assertAlmostEqual(current_epoch_index, 3)
 
         # increments
         self.contract.addStakingTokens(signer="bob", amount=20)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 4)
+        self.assertAlmostEqual(current_epoch_index, 4)
 
         # skips
         self.contract.addStakingTokens(signer="bob", amount=20)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 4)
+        self.assertAlmostEqual(current_epoch_index, 4)
 
     def test_20_epoch_incrementing_when_max_ratio_exceeded_withdrawTokensAndYield(self):
         # all of the below test occurs within the min epoch time
@@ -653,27 +653,27 @@ class MyTestCase(unittest.TestCase):
         # increments
         self.contract.addStakingTokens(signer="bob", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 2)
+        self.assertAlmostEqual(current_epoch_index, 2)
 
         # increments
         self.contract.addStakingTokens(signer="bob", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 3)
+        self.assertAlmostEqual(current_epoch_index, 3)
 
         # increments
         self.contract.addStakingTokens(signer="bob", amount=3)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 4)
+        self.assertAlmostEqual(current_epoch_index, 4)
 
         # skips
         self.contract.addStakingTokens(signer="bob", amount=3)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 4)
+        self.assertAlmostEqual(current_epoch_index, 4)
 
         # increments
         self.contract.addStakingTokens(signer="bob", amount=1)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 5)
+        self.assertAlmostEqual(current_epoch_index, 5)
 
     def test_21_epoch_incrementing_when_max_ratio_exceeded_withdrawTokensAndYield(self):
         # all of the below test occurs within the min epoch time
@@ -684,7 +684,7 @@ class MyTestCase(unittest.TestCase):
         # increments
         self.contract.addStakingTokens(signer="bob", amount=100)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 1)
+        self.assertAlmostEqual(current_epoch_index, 1)
         
         # print(self.contract.Epochs[2])
         # {'time': 2021-04-21 17:16:00, 'staked': 100, 'amt_per_hr': 3000}
@@ -693,21 +693,21 @@ class MyTestCase(unittest.TestCase):
         # increments
         self.contract.addStakingTokens(signer="janis", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 2)
+        self.assertAlmostEqual(current_epoch_index, 2)
         # print(self.contract.Epochs[2])
         # {'time': 2021-04-21 17:19:00, 'staked': 110, 'amt_per_hr': 3000}
 
         # skip
         self.contract.addStakingTokens(signer="janis", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 2)
+        self.assertAlmostEqual(current_epoch_index, 2)
         # print(self.contract.Epochs[2])
         # {'time': 2021-04-21 17:19:00, 'staked': 110, 'amt_per_hr': 3000}
 
         # increments
         self.contract.addStakingTokens(signer="janis", amount=10)
         current_epoch_index = self.contract.CurrentEpochIndex.get()
-        self.assertEqual(current_epoch_index, 3)
+        self.assertAlmostEqual(current_epoch_index, 3)
         print(self.contract.Epochs[3])
         # {'time': 2021-04-21 17:33:00, 'staked': 130, 'amt_per_hr': 3000}
 
@@ -716,8 +716,8 @@ class MyTestCase(unittest.TestCase):
         current_epoch_index = self.contract.CurrentEpochIndex.get()
         # print(self.contract.StakedBalance.get())
         print(self.contract.Epochs[4])
-        # self.assertEqual(current_epoch_index, 2)
-        self.assertEqual(current_epoch_index, 4)
+        # self.assertAlmostEqual(current_epoch_index, 2)
+        self.assertAlmostEqual(current_epoch_index, 4)
 
 if __name__ == "__main__":
     unittest.main()
