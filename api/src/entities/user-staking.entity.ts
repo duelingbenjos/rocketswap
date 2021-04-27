@@ -101,8 +101,6 @@ function calculateYield(args: {
 }): number {
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
-	timeThing();
-
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
 
