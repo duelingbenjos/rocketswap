@@ -59,7 +59,7 @@ async function calculateCirculatingSupply(token: TokenEntity) {
 		}
 		const staking_contract_balances = await Promise.all(proms);
 		staking_contract_balances.forEach((staking_balance) => {
-			if (staking_balance.balances && staking_balance.balances[token.contract_name]) {
+			if (staking_balance?.balances && staking_balance.balances[token.contract_name]) {
 				circulating_supply -= Number(staking_balance.balances[token.contract_name]);
 			}
 		});
