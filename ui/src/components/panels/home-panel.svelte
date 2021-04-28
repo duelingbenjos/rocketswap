@@ -4,7 +4,11 @@
     // Components
     import PulseSpinner from '../pulse-spinner.svelte'
     import TokenLogo from '../../icons/token-logo.svelte'
+    import TradeRocket from '../misc/trade-rocket.svelte'
 
+    // Icons
+    import DirectionalChevron from '../../icons/directional-chevron.svelte'
+    
 	//Misc
     import { stringToFixed, numberWithCommas, setCurrencyType } from '../../utils'
     import { tauUSDPrice, currencyType } from '../../store'
@@ -87,7 +91,12 @@
                     </div>
                 </th>
                 <th>24hr %</th>
-                <th>Volume (24hrs)</th>
+                <th>
+                    Volume (24hrs) 
+                    <button>
+                        <DirectionalChevron width="10px" direction="down" color="var(--text-color-highlight)"/>
+                    </button>
+                </th>
             </tr>
 
             {#each marketData as tokenInfo, index}
