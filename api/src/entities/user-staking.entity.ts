@@ -238,13 +238,13 @@ function datetimeToUnix(time: IContractingTime) {
 }
 
 function dateNowUtc() {
-	const utc_hour = new Date().getUTCHours();
-	const this_zone_hour = new Date().getHours();
+	// const utc_hour = new Date().getUTCHours();
+	// const this_zone_hour = new Date().getHours();
 
-	const hour_difference = this_zone_hour - utc_hour;
-	if (hour_difference !== 0) {
-		let difference_ms = hour_difference * 60 * 60 * 1000;
-		return Date.now() - difference_ms;
-	}
+	// const hour_difference = this_zone_hour - utc_hour;
+	// if (hour_difference !== 0) {
+	// 	let difference_ms = hour_difference * 60 * 60 * 1000;
+	// 	return Date.now() - difference_ms;
+	// }
 	return Date.now();
 }
