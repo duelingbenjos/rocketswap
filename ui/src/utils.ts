@@ -17,7 +17,8 @@ import {
 	ammFuelTank_discount,
 	rswpMetrics,
 	tauUSDPrice,
-	currencyType} from './store'
+	currencyType,
+	homePageTableFilter} from './store'
 
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
@@ -104,6 +105,7 @@ export const initializeStateFromLocalStorage = () => {
 	getEarnFilters()
 	getTauUsdPrice()
 	getCurrencyType()
+	getHomePageTableFilter()
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -148,6 +150,14 @@ export const getCurrencyType = () => {
 export const setCurrencyType = (value) => {
 	setLSValue("currency_type", value)
 	currencyType.set(value)
+}
+export const getHomePageTableFilter = () => {
+	let value = localStorage.getItem("home_page_talbe_filters")
+	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", current: "volume"})
+	else homePageTableFilter.set(JSON.parse(value))
+}
+export const setHomePageTableFilter = (volume, price, current) => {
+	setLSValue("home_page_talbe_filters", {volume, price, current})
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))
