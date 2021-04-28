@@ -61,7 +61,7 @@ export class StakingService implements OnModuleInit {
 	};
 
 	getRSWPStakingROI = async (meta_entity: StakingMetaEntity) =>
-		(this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100;
+		Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
 
 	getSimpleStakingROI = async (yearly_emission_rate: number) => {
 		const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity?.TOKEN_CONTRACT);
