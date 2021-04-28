@@ -51,8 +51,11 @@ export async function updateUserStakingInfo(args: {
 		entity.vk = vk;
 		entity.staking_contract = staking_contract;
 	}
-	if (deposits) {
-		entity.deposits = deposits.value;
+	if (deposits?.value) {
+		entity.deposits = deposits.value.map((deposit) => {
+			if (deposit.starting_epoch.__fixed__) deposit.starting_epoch = Number(deposit.starting_epoch.__fixed__);
+			return deposit;
+		});
 	}
 	if (withdrawals) {
 		entity.withdrawals = withdrawals.value.__fixed__ ? parseFloat(withdrawals.value.__fixed__) : 0;
@@ -75,6 +78,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 
 	for (let d of deposits) {
 		let calcFn = meta.meta.type === "staking_simple" ? calculateSimpleYield : calculateYield;
+		log.log(meta);
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,
@@ -99,22 +103,28 @@ function calculateYield(args: {
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
+	log.log("CALCULATE YIELD CALLED");
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
+
+	log.log({ start_time, end_time });
 
 	const fitTime = (time: number): number => {
 		if (time < start_time) time = start_time;
 		else if (time > end_time) time = end_time;
 		return time;
 	};
-	log.log(new Date(datetimeToUnix(deposit_start_time)).toLocaleTimeString());
+
 	amount = parseFloat(amount.__fixed__);
 	let this_epoch_index = starting_epoch_index;
 	let y = 0;
-
+	log.log({ this_epoch_index });
+	log.log({ epochs });
 	while (this_epoch_index <= current_epoch_index) {
+		log.log({ this_epoch_index });
+		log.log({ current_epoch_index });
 		let this_epoch = epochs[this_epoch_index];
 		let next_epoch = epochs[this_epoch_index + 1];
 		log.log({ this_epoch_index });
@@ -238,13 +248,16 @@ function datetimeToUnix(time: IContractingTime) {
 }
 
 function dateNowUtc() {
-	// const utc_hour = new Date().getUTCHours();
-	// const this_zone_hour = new Date().getHours();
-
-	// const hour_difference = this_zone_hour - utc_hour;
-	// if (hour_difference !== 0) {
-	// 	let difference_ms = hour_difference * 60 * 60 * 1000;
-	// 	return Date.now() - difference_ms;
-	// }
+	const utc_hour = new Date().getUTCHours();
+	const this_zone_hour = new Date().getHours();
+	const minute_difference = new Date().getTimezoneOffset();
+	const hour_difference = this_zone_hour - utc_hour;
+	log.log({ hour_difference });
+	log.log({ minute_difference });
+	if (minute_difference !== 0) {
+		let difference_ms = minute_difference * 60 * 1000;
+		log.log({ difference_ms });
+		return Date.now() + difference_ms;
+	}
 	return Date.now();
 }
