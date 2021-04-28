@@ -38,7 +38,7 @@ export class MarketcapService implements OnModuleInit {
 				marketcap_entity.token_symbol = token.token_symbol;
 				marketcap_entity.circulating_supply = await calculateCirculatingSupply(token);
 				marketcap_entity.marketcap_tau = Number(pair_entity.price) * marketcap_entity.circulating_supply;
-				marketcap_entity.marketcap_usd = marketcap_entity.marketcap_tau * CoinGeckoAPIService.last_price
+				marketcap_entity.marketcap_usd = marketcap_entity.marketcap_tau * CoinGeckoAPIService.last_price;
 				proms.push(marketcap_entity.save());
 			}
 			const market_caps = await Promise.all(proms);
@@ -59,7 +59,7 @@ async function calculateCirculatingSupply(token: TokenEntity) {
 		}
 		const staking_contract_balances = await Promise.all(proms);
 		staking_contract_balances.forEach((staking_balance) => {
-			if (staking_balance.balances[token.contract_name]) {
+			if (staking_balance?.balances && staking_balance.balances[token.contract_name]) {
 				circulating_supply -= Number(staking_balance.balances[token.contract_name]);
 			}
 		});
