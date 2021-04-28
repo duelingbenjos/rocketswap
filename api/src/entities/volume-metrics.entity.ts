@@ -1,4 +1,5 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, PrimaryColumn } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryColumn, JoinColumn, OneToOne } from "typeorm";
+import { TokenEntity } from "./token.entity";
 
 /** Based on the TXBIT.io API, for compatibility with coingecko
  * https://apidocs.txbit.io/#public-getmarketsummary
@@ -30,6 +31,10 @@ export class VolumeMetricsEntity extends BaseEntity {
 	@Column({ nullable: true })
 	token_symbol: string;
 
+    @OneToOne(() => TokenEntity)
+    @JoinColumn()
+    token: TokenEntity;
+	
 	@Column({ nullable: true })
 	Last: number;
 
@@ -59,4 +64,7 @@ export class VolumeMetricsEntity extends BaseEntity {
 
 	@Column({ nullable: true })
 	Low: number;
+
+	@Column({nullable: true})
+	token_attached?: boolean
 }
