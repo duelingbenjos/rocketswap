@@ -30,6 +30,13 @@ export class VolumeService implements OnModuleInit {
 					token_metrics_entity.MarketName = `${config.currencySymbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
 					token_metrics_entity.token_symbol = token.token_symbol;
 				}
+				if (!token_metrics_entity.token_attached) {
+					const token_entity = await TokenEntity.findOne({ where: { contract_name } });
+					if (token_entity) {
+						token_metrics_entity.token = token_entity;
+						token_metrics_entity.token_attached = true;
+					}
+				}
 
 				const last_yesterday_trade = await this.getLastYesterdayTrade(contract_name);
 				// const last_yesterday_price = par

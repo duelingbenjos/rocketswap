@@ -40,7 +40,7 @@ export class ParserProvider {
 		startBlockgrabber(this.handleNewBlock);
 
 		setInterval(() => {
-			if (Date.now() - ParserProvider.blockgrabber_last_update > 120000) {
+			if (Date.now() - ParserProvider.blockgrabber_last_update > 180000) {
 				log.warn("no response from blockgrabber in 120 seconds => starting it up again");
 				ParserProvider.updateLastChecked();
 				startBlockgrabber(this.handleNewBlock, true);
@@ -116,6 +116,8 @@ export class ParserProvider {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate,
 					staking_contract: contract_name,
+					timestamp,
+					hash,
 					fn
 				});
 			}

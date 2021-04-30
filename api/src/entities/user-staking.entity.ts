@@ -78,7 +78,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 
 	for (let d of deposits) {
 		let calcFn = meta.meta.type === "staking_simple" ? calculateSimpleYield : calculateYield;
-		log.log(meta);
+		// log.log(meta);
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,
@@ -103,13 +103,13 @@ function calculateYield(args: {
 	epochs: StakingEpochEntity[];
 	meta: StakingMetaEntity;
 }): number {
-	log.log("CALCULATE YIELD CALLED");
+	// log.log("CALCULATE YIELD CALLED");
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
 
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
 
-	log.log({ start_time, end_time });
+	// log.log({ start_time, end_time });
 
 	const fitTime = (time: number): number => {
 		if (time < start_time) time = start_time;
@@ -120,32 +120,20 @@ function calculateYield(args: {
 	amount = parseFloat(amount.__fixed__);
 	let this_epoch_index = starting_epoch_index;
 	let y = 0;
-	log.log({ this_epoch_index });
-	log.log({ epochs });
+	// log.log({ this_epoch_index });
+	// log.log({ epochs });
 	while (this_epoch_index <= current_epoch_index) {
-		log.log({ this_epoch_index });
-		log.log({ current_epoch_index });
+
 		let this_epoch = epochs[this_epoch_index];
 		let next_epoch = epochs[this_epoch_index + 1];
-		log.log({ this_epoch_index });
-		log.log({ this_epoch });
-		log.log({ this_epoch_time: (dateNowUtc() - datetimeToUnix(deposit_start_time)) / 1000 });
-		log.log({ now: new Date(dateNowUtc()).toLocaleTimeString() });
-		log.log({ starting_epoch_index });
 		let delta = 0;
-		log.log({ utc_now: new Date().toUTCString() });
 		if (starting_epoch_index === current_epoch_index) {
 			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(deposit_start_time));
-			log.log(1);
 		} else if (this_epoch_index === starting_epoch_index) {
-			log.log(2);
-			log.log({ next_epoch });
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(deposit_start_time));
 		} else if (this_epoch_index === current_epoch_index) {
-			log.log(3);
 			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(this_epoch.time));
 		} else {
-			log.log(4);
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
 		}
 
@@ -154,7 +142,6 @@ function calculateYield(args: {
 		let pct_share_of_stake = amount / this_epoch.amount_staked;
 		let global_yield_this_epoch = delta_seconds * getEmissionRatePerSecond(this_epoch.amt_per_hr);
 		let deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake;
-		log.log({ contract: meta.contract_name, global_yield_this_epoch, pct_share_of_stake });
 		y += deposit_yield_this_epoch;
 		this_epoch_index += 1;
 	}
@@ -252,11 +239,8 @@ function dateNowUtc() {
 	const this_zone_hour = new Date().getHours();
 	const minute_difference = new Date().getTimezoneOffset();
 	const hour_difference = this_zone_hour - utc_hour;
-	log.log({ hour_difference });
-	log.log({ minute_difference });
 	if (minute_difference !== 0) {
 		let difference_ms = minute_difference * 60 * 1000;
-		log.log({ difference_ms });
 		return Date.now() + difference_ms;
 	}
 	return Date.now();

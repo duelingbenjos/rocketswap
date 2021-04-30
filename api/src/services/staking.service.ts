@@ -33,8 +33,8 @@ export class StakingService implements OnModuleInit {
 				const ROI = await this.decideROI(meta_entity);
 				// log.debug({ROI})
 				if (ROI) meta_entity.ROI_yearly = ROI;
-				await meta_entity.save();
 				this.socketService.handleClientUpdate({ action: "staking_panel_update", data: meta_entity });
+				await meta_entity.save();
 			}
 		}
 	};
@@ -61,7 +61,7 @@ export class StakingService implements OnModuleInit {
 	};
 
 	getRSWPStakingROI = async (meta_entity: StakingMetaEntity) =>
-		(this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100;
+		Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
 
 	getSimpleStakingROI = async (yearly_emission_rate: number) => {
 		const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity?.TOKEN_CONTRACT);
@@ -84,11 +84,14 @@ export class StakingService implements OnModuleInit {
 		state: IKvp[];
 		handleClientUpdate: handleClientUpdateType;
 		staking_contract: string;
+		timestamp: number;
+		hash: string;
 		fn: string;
 	}) => {
 		// console.log({ updateStakingContractMeta: args });
 		try {
-			const { state, handleClientUpdate, staking_contract, fn } = args;
+			const { state, handleClientUpdate, staking_contract, fn, hash, timestamp } = args;
+			let previous_staked_balance: number
 			let entity = await StakingMetaEntity.findOne(staking_contract);
 			if (!entity) {
 				entity = new StakingMetaEntity();
@@ -106,6 +109,7 @@ export class StakingService implements OnModuleInit {
 						entity["CurrentEpochIndex"] = getVal(kvp);
 						break;
 					case `${staking_contract}.StakedBalance`:
+						previous_staked_balance = JSON.parse(JSON.stringify(entity.StakedBalance))
 						entity["StakedBalance"] = getVal(kvp);
 						break;
 					case `${staking_contract}.meta:version`:
@@ -162,6 +166,11 @@ export class StakingService implements OnModuleInit {
 						amount_staked: staked,
 						emission_rate_per_tau,
 						amt_per_hr,
+						fn,
+						real_staked_balance: entity.StakedBalance,
+						previous_staked_balance,
+						timestamp,
+						hash,
 						handleClientUpdate
 					});
 					entity.Epoch = {

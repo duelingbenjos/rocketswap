@@ -62,6 +62,15 @@ export class AppController {
 		}
 	}
 
+	@Get("get_market_summaries_w_token")
+	public async getMarketSummariesWToken() {
+		try {
+			return await VolumeMetricsEntity.find({relations:['token']});
+		} catch (err) {
+			log.error(err);
+		}
+	}
+
 	@Get("get_trade_history")
 	public async getTradeHistory(@Query() params: GetTradeHistoryDTO) {
 		let { vk, contract_name, skip, take } = params;

@@ -10,38 +10,53 @@ class MyTestCase(unittest.TestCase):
         self.c.flush()
 
         with open("../currency.s.py") as f:
-            code = f.read()
-            self.c.submit(code, name="currency", constructor_args={"vk": "sys"})
+            contract = f.read()
+            self.c.submit(contract, 'currency', constructor_args={"vk": "sys"})
+            self.c.submit(contract, 'con_token1', constructor_args={"vk": "sys"})
+            self.c.submit(contract, 'con_rswp', constructor_args={"vk": "sys"})
 
-        self.currency = self.c.get_contract("currency")
+        with open('../dex.py') as f:
+            dex = f.read()
+            self.c.submit(dex, 'dex')
+
 
         with open("../con_basic_token.py") as f:
             code = f.read()
             self.c.submit(code, name="con_basic_token")
 
+
+        with open("con_liquidity_mining_smart_epoch.py") as f:
+            code = f.read()
+            self.c.submit(code, name="con_liquidity_mining_smart_epoch")
+
+        self.contract = self.c.get_contract("con_liquidity_mining_smart_epoch")
+
+        self.dex = self.c.get_contract('dex')
+        self.rswp = self.c.get_contract('con_rswp')
+        self.token1 = self.c.get_contract('con_token1')
+        self.currency = self.c.get_contract("currency")
+
+        # This probably needs to become the DEX token
         self.basic_token = self.c.get_contract("con_basic_token")
 
-        with open("con_staking_smart_epoch.py") as f:
-            code = f.read()
-            self.c.submit(code, name="con_staking_smart_epoch")
 
-        self.contract = self.c.get_contract("con_staking_smart_epoch")
 
-        self.setupToken()
+        self.setupApprovals()
 
-    def setupToken(self):
+
+    def setupApprovals(self):
         # Approvals
-        self.currency.approve(signer="bob", amount=999999999999, to="con_staking_smart_epoch")
-        self.currency.approve(signer="lucy", amount=999999999999, to="con_staking_smart_epoch")
-        self.currency.approve(signer="pete", amount=999999999999, to="con_staking_smart_epoch")
-        self.currency.approve(signer="janis", amount=999999999999, to="con_staking_smart_epoch")
-        self.currency.approve(signer="murray", amount=999999999999, to="con_staking_smart_epoch")
+        self.currency.approve(signer="bob", amount=999999999999, to="con_liquidity_mining_smart_epoch")
+        self.currency.approve(signer="lucy", amount=999999999999, to="con_liquidity_mining_smart_epoch")
+        self.currency.approve(signer="pete", amount=999999999999, to="con_liquidity_mining_smart_epoch")
+        self.currency.approve(signer="janis", amount=999999999999, to="con_liquidity_mining_smart_epoch")
+        self.currency.approve(signer="murray", amount=999999999999, to="con_liquidity_mining_smart_epoch")
 
-        self.currency.approve(signer="con_staking_smart_epoch", amount=999999999999, to="bob")
-        self.currency.approve(signer="con_staking_smart_epoch", amount=999999999999, to="lucy")
-        self.currency.approve(signer="con_staking_smart_epoch", amount=999999999999, to="janis")
-        self.currency.approve(signer="con_staking_smart_epoch", amount=999999999999, to="murray")
-        self.currency.approve(signer="con_staking_smart_epoch", amount=999999999999, to="pete")
+        self.currency.approve(signer="con_liquidity_mining_smart_epoch", amount=999999999999, to="bob")
+        self.currency.approve(signer="con_liquidity_mining_smart_epoch", amount=999999999999, to="lucy")
+        self.currency.approve(signer="con_liquidity_mining_smart_epoch", amount=999999999999, to="janis")
+        self.currency.approve(signer="con_liquidity_mining_smart_epoch", amount=999999999999, to="murray")
+        self.currency.approve(signer="con_liquidity_mining_smart_epoch", amount=999999999999, to="pete")
 
         self.currency.approve(amount=999999999999, to="bob")
         self.currency.approve(amount=999999999999, to="janis")
@@ -49,14 +64,41 @@ class MyTestCase(unittest.TestCase):
         self.currency.approve(amount=999999999999, to="pete")
         self.currency.approve(amount=999999999999, to="lucy")
 
-        self.basic_token.approve(amount=99999999999, to="con_staking_smart_epoch")
-        self.basic_token.approve(signer="con_staking_smart_epoch", amount=99999999999, to="bob")
-        self.basic_token.approve(signer="con_staking_smart_epoch", amount=99999999999, to="lucy")
-        self.basic_token.approve(signer="con_staking_smart_epoch", amount=99999999999, to="murray")
-        self.basic_token.approve(signer="con_staking_smart_epoch", amount=99999999999, to="janis")
-        self.basic_token.approve(signer="con_staking_smart_epoch", amount=99999999999, to="pete")
+        self.basic_token.approve(amount=99999999999, to="con_liquidity_mining_smart_epoch")
+        self.basic_token.approve(signer="con_liquidity_mining_smart_epoch", amount=99999999999, to="bob")
+        self.basic_token.approve(signer="con_liquidity_mining_smart_epoch", amount=99999999999, to="lucy")
+        self.basic_token.approve(signer="con_liquidity_mining_smart_epoch", amount=99999999999, to="murray")
+        self.basic_token.approve(signer="con_liquidity_mining_smart_epoch", amount=99999999999, to="janis")
+        self.basic_token.approve(signer="con_liquidity_mining_smart_epoch", amount=99999999999, to="pete")
 
-        self.basic_token.transfer(to="con_staking_smart_epoch", amount=10000000)
+        self.basic_token.transfer(to="con_liquidity_mining_smart_epoch", amount=10000000)
+
+        self.currency.approve(amount=10000000000, to='dex')
+        self.rswp.approve(amount=10000000000, to='dex')
+        
+
+        self.dex.create_market(contract='con_rswp', currency_amount=100, token_amount=100)
+        self.dex.add_liquidity(contract='con_rswp', currency_amount=100000)
+
+        self.dex.approve_liquidity(contract='con_rswp', to='sys', amount=5000)
+        self.dex.approve_liquidity(contract='con_rswp', to='bob', amount=5000)
+        self.dex.approve_liquidity(contract='con_rswp', to='lucy', amount=5000)
+        self.dex.approve_liquidity(contract='con_rswp', to='janis', amount=5000)
+        self.dex.approve_liquidity(contract='con_rswp', to='murray', amount=5000)
+        self.dex.approve_liquidity(contract='con_rswp', to='pete', amount=5000)
+
+        self.dex.approve_liquidity(contract='con_rswp', to='con_liquidity_mining_smart_epoch', amount=5000, signer="bob")
+        self.dex.approve_liquidity(contract='con_rswp', to='con_liquidity_mining_smart_epoch', amount=5000, signer="lucy")
+        self.dex.approve_liquidity(contract='con_rswp', to='con_liquidity_mining_smart_epoch', amount=5000, signer="janis")
+        self.dex.approve_liquidity(contract='con_rswp', to='con_liquidity_mining_smart_epoch', amount=5000, signer="murray")
+        self.dex.approve_liquidity(contract='con_rswp', to='con_liquidity_mining_smart_epoch', amount=5000, signer="pete")
+
+        self.dex.transfer_liquidity_from(contract='con_rswp', to='bob', main_account='sys', amount=1000)
+        self.dex.transfer_liquidity_from(contract='con_rswp', to='lucy', main_account='sys', amount=1000)
+        self.dex.transfer_liquidity_from(contract='con_rswp', to='janis', main_account='sys', amount=1000)
+        self.dex.transfer_liquidity_from(contract='con_rswp', to='murray', main_account='sys', amount=1000)
+        self.dex.transfer_liquidity_from(contract='con_rswp', to='pete', main_account='sys', amount=1000)
+
         self.currency.transfer(to="bob", amount=1000)
         self.currency.transfer(to="lucy", amount=1000)
         self.currency.transfer(to="janis", amount=1000)
@@ -64,6 +106,8 @@ class MyTestCase(unittest.TestCase):
         self.currency.transfer(to="pete", amount=1000)
 
         self.contract.setDevWallet(vk="dev_wallet")
+
+
 
     def tearDown(self):
         self.c.flush()
@@ -73,9 +117,9 @@ class MyTestCase(unittest.TestCase):
         env_2 = {"now": Datetime(year=2021, month=2, day=1, hour=1)}
 
         self.contract.addStakingTokens(environment=start_env, signer="bob", amount=100)
-
-        bob_currency_balance = self.currency.balances["bob"]
-        vault_currency_balance = self.currency.balances["con_staking_smart_epoch"]
+  
+        bob_balance = self.dex.lp_points["con_rswp","bob"]
+        vault_currency_balance = self.dex.lp_points["con_rswp","con_liquidity_mining_smart_epoch"]
 
         self.assertAlmostEqual(vault_currency_balance, 100)
 
@@ -262,7 +306,7 @@ class MyTestCase(unittest.TestCase):
             + murray_token_balance
             + pete_token_balance
         )
-        vault_balance = self.basic_token.balances["con_staking_smart_epoch"]
+        vault_balance = self.basic_token.balances["con_liquidity_mining_smart_epoch"]
 
         self.assertAlmostEqual(vault_balance + total, 10000000)
 
@@ -337,7 +381,7 @@ class MyTestCase(unittest.TestCase):
             + murray_token_balance
             + pete_token_balance
         )
-        vault_balance = self.basic_token.balances["con_staking_smart_epoch"]
+        vault_balance = self.basic_token.balances["con_liquidity_mining_smart_epoch"]
 
         self.assertAlmostEqual(vault_balance + total, 10000000)
 
@@ -414,7 +458,7 @@ class MyTestCase(unittest.TestCase):
             + murray_token_balance
             + pete_token_balance
         )
-        vault_balance = self.basic_token.balances["con_staking_smart_epoch"]
+        vault_balance = self.basic_token.balances["con_liquidity_mining_smart_epoch"]
 
         self.assertAlmostEqual(vault_balance + total, 10000000)
 
@@ -432,9 +476,9 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(pete_deposits, False)
 
     def test_09_recover_yield_token(self):
-        self.assertAlmostEqual(self.basic_token.balances["con_staking_smart_epoch"], 10000000)
+        self.assertAlmostEqual(self.basic_token.balances["con_liquidity_mining_smart_epoch"], 10000000)
         self.contract.recoverYieldToken(amount=10000000)
-        self.assertAlmostEqual(self.basic_token.balances["con_staking_smart_epoch"], 0)
+        self.assertAlmostEqual(self.basic_token.balances["con_liquidity_mining_smart_epoch"], 0)
 
     def test_10_start_time(self):
         env_1 = {"now": Datetime(year=2020, month=2, day=1)}
@@ -688,7 +732,6 @@ class MyTestCase(unittest.TestCase):
         
         # print(self.contract.Epochs[2])
         # {'time': 2021-04-21 17:16:00, 'staked': 100, 'amt_per_hr': 3000}
-
 
         # increments
         self.contract.addStakingTokens(signer="janis", amount=10)

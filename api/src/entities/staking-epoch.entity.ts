@@ -25,6 +25,21 @@ export class StakingEpochEntity extends BaseEntity {
 
 	@Column({ nullable: true })
 	amt_per_hr: number;
+
+	@Column({ nullable: true })
+	fn: string;
+
+	@Column({ nullable: true })
+	previous_staked_balance: number;
+
+	@Column({ nullable: true })
+	real_staked_balance: number;
+
+	@Column({ nullable: true })
+	hash: string;
+
+	@Column({ nullable: true })
+	timestamp: number;
 }
 
 export async function updateEpoch(args: {
@@ -34,15 +49,38 @@ export async function updateEpoch(args: {
 	amt_per_hr?: any;
 	emission_rate_per_tau: any;
 	time: any;
+	fn: string;
+	previous_staked_balance: number;
+	real_staked_balance: number;
+	timestamp: number;
+	hash: string;
 	handleClientUpdate: handleClientUpdateType;
 }) {
-	const { handleClientUpdate, amount_staked, time, epoch_index, staking_contract, amt_per_hr, emission_rate_per_tau } = args;
+	const {
+		handleClientUpdate,
+		amount_staked,
+		time,
+		epoch_index,
+		staking_contract,
+		amt_per_hr,
+		emission_rate_per_tau,
+		fn,
+		real_staked_balance,
+		previous_staked_balance,
+		timestamp,
+		hash
+	} = args;
 	const entity = new StakingEpochEntity();
 	entity.amount_staked = amount_staked?.__fixed__;
 	entity.emission_rate_per_tau = emission_rate_per_tau?.__fixed__;
 	entity.time = time;
 	entity.epoch_index = epoch_index;
 	entity.staking_contract = staking_contract;
+	entity.fn = fn;
+	entity.previous_staked_balance = previous_staked_balance;
+	entity.real_staked_balance = real_staked_balance;
+	entity.timestamp = timestamp;
+	entity.hash = hash;
 	log.log({ amt_per_hr });
 	if (amt_per_hr) {
 		entity.amt_per_hr = amt_per_hr.__fixed__ ? amt_per_hr.__fixed__ : amt_per_hr;

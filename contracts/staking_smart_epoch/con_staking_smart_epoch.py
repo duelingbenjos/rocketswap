@@ -240,7 +240,7 @@ def getCurrentEpochIndex():
 
 
 def decideIncrementEpoch(new_staked_amount: float):
-    epoch_index = CurrentEpochIndex.get()
+    epoch_index = getCurrentEpochIndex()
     this_epoch = Epochs[epoch_index]
     this_epoch_staked = this_epoch["staked"]
     delta = now - this_epoch["time"]
@@ -272,7 +272,7 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
 
 
 def incrementEpoch(new_staked_amount: float):
-    current_epoch = CurrentEpochIndex.get()
+    current_epoch = getCurrentEpochIndex()
     new_epoch_idx = current_epoch + 1
     CurrentEpochIndex.set(new_epoch_idx)
     Epochs[new_epoch_idx] = {
@@ -286,7 +286,7 @@ def incrementEpoch(new_staked_amount: float):
 @export
 def changeAmountPerHour(amount_per_hour: float):
     assertOwner()
-    current_epoch = CurrentEpochIndex.get()
+    current_epoch = getCurrentEpochIndex()
     new_epoch_idx = current_epoch + 1
     CurrentEpochIndex.set(new_epoch_idx)
     setEmissionRatePerHour(amount=amount_per_hour)
