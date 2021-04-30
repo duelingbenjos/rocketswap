@@ -116,6 +116,8 @@ export class ParserProvider {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate,
 					staking_contract: contract_name,
+					timestamp,
+					hash,
 					fn
 				});
 			}
