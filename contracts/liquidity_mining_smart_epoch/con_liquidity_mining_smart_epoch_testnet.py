@@ -43,14 +43,14 @@ def seed():
     EpochMaxRatioIncrease.set(1/2)
     EpochMinTime.set(0)
 
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 1500}
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
     meta["version"] = "0.0.1"
     meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
     meta["STAKING_TOKEN"] = LIQUIDITY_TOKEN
-    EmissionRatePerHour.set(1500)  # 1200000 RSWP per year = 10% of supply
     meta["YIELD_TOKEN"] = YIELD_TOKEN
 
+    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(1/10)
 
     # The datetime from which you want to allow staking.
