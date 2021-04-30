@@ -13,7 +13,7 @@
 	const wsService = WsService.getInstance()
     
     // Misc
-    import { tauUSDPrice } from '../store'
+    import { tauUSDPrice, currencyType, homePageTableFilter } from '../store'
     import { stringToFixed } from '../utils'
 
     let marketData;
@@ -27,7 +27,7 @@
             d.vol24Str = vol24Str
             if (vol24Str.includes('-')) d.change = "minus"
             if (vol24Str.includes('+')) d.change = "plus"
-            if (vol24Str === '+0%') d.change = "even"
+            if (vol24Str === '+0') d.change = "even"
             d.usdPrice = d.Last.multipliedBy($tauUSDPrice)
             d.usdVolume = d.Volume.multipliedBy(d.Last).multipliedBy($tauUSDPrice)
 
@@ -43,10 +43,10 @@
 
     const calc24PricePercent  = (prevDayPrice, lastPrice) => {
         let change = lastPrice.dividedBy(prevDayPrice).multipliedBy(100)
-        if (change.isEqualTo(100)) return `+0%`
-        if (change.isGreaterThan(100)) return `+${stringToFixed(change.minus(1).toFixed(2), 2)}%`
+        if (change.isEqualTo(100)) return `+0`
+        if (change.isGreaterThan(100)) return `+${stringToFixed(change.minus(1).toFixed(2), 2)}`
         change = prevDayPrice.dividedBy(lastPrice).multipliedBy(100)
-        return `-${stringToFixed(change.minus(1).toFixed(2), 2)}%`
+        return `-${stringToFixed(change.minus(1).toFixed(2), 2)}`
     }
 
 
@@ -64,6 +64,8 @@
 </script>
 
 <div class="page-container"  >
-	<HomePanel {marketData}/>
+    {#if $currencyType && homePageTableFilter}
+	    <HomePanel {marketData}/>
+    {/if}
     <TradeRockets {marketData}/>
 </div>

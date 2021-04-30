@@ -59,4 +59,7 @@ export class VolumeMetricsEntity extends BaseEntity {
 
 	@Column({ nullable: true })
 	Low: number;
+
+	@Column({ nullable: true })
+	PercentPriceIncrease_24h: number;
 }

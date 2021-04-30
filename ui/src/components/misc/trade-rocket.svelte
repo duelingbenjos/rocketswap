@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte'
+    import { onMount, afterUpdate } from 'svelte'
 	import { fly } from 'svelte/transition';
     import { linear } from 'svelte/easing';    
 
@@ -11,9 +11,8 @@
     export let tokenMeta;
 
     let goNow = false;
+    let rocket, innerRocket, innerHeight, innerWidth;
     
-    let rocket, innerHeight, innerWidth;
-
     onMount(() => {
         setTimeout(() => goNow = true, 0)
         setTimeout(() => {
@@ -23,14 +22,17 @@
         }, 6000)
     })
 
+    afterUpdate(() => console.log({rocket, innerRocket}))
+
     const getLeftValue = () => {
         let area = innerWidth - 200
         return  Math.floor(Math.random() * area) + 100
     }
 
     const getFlyDirection = () => {
-        if (tradeType === "buy") return innerHeight + 200
-        return (innerHeight + 200) * -1
+        console.log({innerHeight})
+        if (tradeType === "buy") return innerHeight  + 250
+        return (innerHeight + 500) * -1
     }
 </script>
 
@@ -40,20 +42,33 @@
     }
 
     div.buy{
-        top: -100px;
+        /*top: -250px;*/
+        top: -250px;
     }
 
     div.sell{
-        bottom: -100px;
-       
+        /*bottom: -150px;*/
+        bottom: -200px;
+        transform: translateY(-100px);
+    }
+    span{
+        position: absolute;
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        transform: translateX(-50%);
+        top: 115px;
+        left: 50%;
+        letter-spacing: -7px;
+        opacity: 0.6;
+        font-weight: 800;
     }
     .direction.sell{
-         transform: rotate(180deg);
+         transform: rotate(180deg) translateY(-100%);
     }
-    .logo{
+    .logo-top{
         position: absolute;
         transform: translateX(-50%);
-        top: 16px;
+        top: 83px;
         left: 50%;
     }
 </style>
@@ -63,19 +78,21 @@
 {#if goNow}
     <div 
         bind:this={rocket}
-        class="test" 
         class:buy={tradeType === "buy"} 
         class:sell={tradeType === "sell"}
-        in:fly="{{delay: 0, duration: 3000, x: 0, y: getFlyDirection(), opacity: 1, easing: linear}}" 
-        style={`left: ${getLeftValue()}px`}>
-        <div class="direction" class:sell={tradeType === "sell"}>
-            <div class="logo">
-                <TokenLogo {tokenMeta} width="18px" />
+        in:fly="{{delay: 0, duration: 5000, x: 0, y: getFlyDirection(), opacity: 1, easing: linear}}" 
+        style={`left: ${getLeftValue()}px;`}>
+        <div class="direction" class:sell={tradeType === "sell"} bind:this={innerRocket}>
+            <div class="logo-top">
+                <TokenLogo {tokenMeta} width="30px" />
             </div>
             <IconTradeRocket 
                 width="80px"
-                color={tradeType === "buy" ? "green" : "red"}
+                color={tradeType === "buy" ? "var(--trade-rocket-green)" : "var(--trade-rocket-red)"}
             />
+            <span class:sell={tradeType === "sell"}>
+                {tokenMeta.token_symbol || "NONE"}
+            </span>
         </div>
     </div>
 {/if}

@@ -59,7 +59,6 @@
 	}
 	.links {
 		align-items: center;
-		font-size: var(--text-size-xlarge);
 		font-weight: 600;
 		box-sizing: border-box;
 		z-index: 10;
@@ -67,7 +66,7 @@
 
 	.links > a {
 		color: var(--header-primary-color);
-		margin-right: 40px;
+		margin-right: 20px;
 		padding: 0 5px;
 
 	}
@@ -150,7 +149,7 @@
 
     }
 	/* When page width is greater than 475px (tablets) */
-	 @media screen and (min-width: 830px) {
+	 @media screen and (min-width: 940px) {
 		.powered-by{
 			display: block;
 			position: relative;
@@ -161,14 +160,24 @@
 	
 	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
+		.right-content{
+			display: flex;
+		}
 		.socials{
 			display: block;
 		}
+
     }
 	/* When page width is greater than 730px (tablets) */
-    @media screen and (min-width: 730px) {
-		.right-content{
-			display: flex;
+    @media screen and (min-width: 800px) {
+
+		.links{
+			font-size: var(--text-size-xlarge);
+		}
+		.links > a {
+			color: var(--header-primary-color);
+			margin-right: 30px;
+			padding: 0 5px;
 		}
     }
 </style>
@@ -244,8 +253,8 @@
 			<div class="light-dark-button">
 				<LightDark margin="1rem auto"/>
 			</div>
-			<div class="flex flex-grow flex-align-end">
-        		<Socials width="30px" margin="2rem auto"  color="white" stroke="black" iconMargin="0 8px"/>
+			<div class="flex flex-grow">
+        		<Socials width="30px" margin="3rem auto"  color="white" stroke="black" iconMargin="0 8px"/>
     		</div>
 		</div>
 	</MainMenu>

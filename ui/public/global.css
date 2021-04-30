@@ -52,6 +52,9 @@ body {
 	--error-color: #ea4c1c;
 	--error-color-dark: #861f00;
 
+	--trade-rocket-red: #ad3915;
+	--trade-rocket-green: #0a9a6f;
+
 	--text-primary-color: #fff;
 	--text-primary-color-dim: #ffffffb8;
 	--text-primary-color-dimmer: #ffffff7d;
@@ -124,9 +127,11 @@ body {
 	--price-color-buy: var(--color-primary);
 
 	background-repeat:no-repeat;
-	background: var(--main-background-solid);
-	background: var(--main-background-gradient);
+	background-image: var(--main-background-solid);
+	background-image: url('/assets/images/stars-bg.png'), var(--main-background-gradient);
+	background-blend-mode: exclusion;
 	background-attachment: fixed;
+	background-size: cover;
 
 	color: var(--text-primary-color);
 }
@@ -185,6 +190,9 @@ body.light{
 	--fuel-tank-text-shadow: var(--color-gray-3);
 	--small-box-background: #2b284b00;
 	--price-color-buy: var(--color-primary-dark);
+
+	background-image: var(--main-background-gradient);
+	background-blend-mode: none;
 }
 
 .text-xsmall{

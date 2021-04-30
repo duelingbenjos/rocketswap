@@ -9,12 +9,11 @@ import { config } from "../config";
 
 @Injectable()
 export class VolumeService implements OnModuleInit {
-
 	async onModuleInit() {
 		await this.updateDailyVolumes();
 		setInterval(async () => {
 			await this.updateDailyVolumes();
-		}, 30000);
+		}, 20000);
 	}
 
 	private async updateDailyVolumes() {
@@ -44,12 +43,12 @@ export class VolumeService implements OnModuleInit {
 				token_metrics_entity.BaseVolume = trades_last_day.length ? base_volume : 0;
 				token_metrics_entity.High = trades_last_day.length ? high : yesterday_last_price;
 				token_metrics_entity.Low = trades_last_day.length ? low : yesterday_last_price;
-				token_metrics_entity.PrevDay = yesterday_last_price;
+				token_metrics_entity.PrevDay = yesterday_last_price || 0;
 				token_metrics_entity.TimeStamp = Date.now();
 				token_metrics_entity.Last = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.Bid = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.Ask = trades_last_day.length ? today_last_price : yesterday_last_price;
-
+				token_metrics_entity.PercentPriceIncrease_24h = ((token_metrics_entity.Last - token_metrics_entity.PrevDay) / token_metrics_entity.PrevDay) * 100;
 				proms.push(token_metrics_entity.save());
 			}
 			await Promise.all(proms);

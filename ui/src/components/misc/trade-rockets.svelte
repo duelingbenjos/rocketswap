@@ -1,4 +1,7 @@
 <script>
+    import { onMount, afterUpdate } from 'svelte'
+
+    // Components
     import TradeRocket from './trade-rocket.svelte'
 
     // Misc
@@ -16,6 +19,34 @@
         if (!rocketLauncher) return
         launchRocket(update[update.length - 1])
     })
+
+    onMount(() => {
+        //launchRocketsTest()
+        //setInterval(launchRocketsTest, 4000)
+    })
+
+    const launchRocketsTest = () => {
+        launchRocket({
+            "action":"trade_update",
+            "type":"sell",
+            "amount":"5",
+            "contract_name":"con_rswp_lst001",
+            "token_symbol":"RSWP",
+            "price":"1.43789601",
+            "time":1619574222,
+            "hash":"88eb447edb5cc1be49907683ef4f7de57a485c0bc4dceb0ddc26db72a3ef47d8"
+        })
+        launchRocket({
+            "action":"trade_update",
+            "type":"buy",
+            "amount":"5",
+            "contract_name":"con_rswp_lst001",
+            "token_symbol":"RSWP",
+            "price":"1.43789601",
+            "time":1619574222,
+            "hash":"88eb447edb5cc1be49907683ef4f7de57a485c0bc4dceb0ddc26db72a3ef47d8"
+        })
+        }
 
     function launchRocket(tradeUpdate){
         let marketInfo = marketData.find(f => f.contract_name === tradeUpdate.contract_name)
