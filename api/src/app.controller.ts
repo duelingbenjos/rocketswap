@@ -78,7 +78,7 @@ export class AppController {
 
 		try {
 			return await TradeHistoryEntity.find({
-				select: ["contract_name", "token_symbol", "price", "type", "time"],
+				select: ["contract_name", "token_symbol", "price", "type", "time", "amount"],
 				order: { time: "DESC" },
 				...find_options
 			});
@@ -86,7 +86,7 @@ export class AppController {
 			throw new HttpException(err, 500);
 		}
 	}
-
+	
 	@Get("token_list")
 	public async getTokenList() {
 		try {
