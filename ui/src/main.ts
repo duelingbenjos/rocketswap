@@ -11,10 +11,10 @@ import { routes } from 'svelte-hash-router'
 import Home from './pages/home.page.svelte'
 
 routes.set({
-  '/': {
-    $$component: Home,
-    $$name: 'Home'
-  },
+  // '/': {
+  //   $$component: Home,
+  //   $$name: 'Home'
+  // },
   '/swap/': {
     $$component: Swap,
     $$name: 'Swap',
@@ -28,11 +28,10 @@ routes.set({
     $$component: RSWP,
     $$name: '$RSWP'
   },
-  /*
   '/farm/': {
     $$component: Farm,
     $$name: 'Farm'
-  },*/
+  },
   '/pool-create/': {
     $$component: CreatePool,
     $$name: 'Create Pool',
