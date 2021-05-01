@@ -109,7 +109,7 @@ export class StakingService implements OnModuleInit {
 						entity["CurrentEpochIndex"] = getVal(kvp);
 						break;
 					case `${staking_contract}.StakedBalance`:
-						previous_staked_balance = JSON.parse(JSON.stringify(entity.StakedBalance))
+						if (entity.StakedBalance) previous_staked_balance = JSON.parse(JSON.stringify(entity.StakedBalance))
 						entity["StakedBalance"] = getVal(kvp);
 						break;
 					case `${staking_contract}.meta:version`:
