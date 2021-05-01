@@ -15,7 +15,7 @@ routes.set({
   //   $$component: Home,
   //   $$name: 'Home'
   // },
-  '/swap/': {
+  '/': {
     $$component: Swap,
     $$name: 'Swap',
     ':contract': Swap,
@@ -28,11 +28,10 @@ routes.set({
     $$component: RSWP,
     $$name: '$RSWP'
   },
-  /*
   '/farm/': {
     $$component: Farm,
     $$name: 'Farm'
-  },*/
+  },
   '/pool-create/': {
     $$component: CreatePool,
     $$name: 'Create Pool',
