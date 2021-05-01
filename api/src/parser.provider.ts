@@ -10,20 +10,26 @@ import { SocketService } from "./services/socket.service";
 import { setName } from "./entities/name.entity";
 import { AuthService } from "./authentication/trollbox.service";
 import { AmmMetaEntity, updateAmmMeta } from "./entities/amm-meta.entity";
-import startBlockgrabber from "./blockgrabber";
+import blockgrabber from "./blockgrabber";
 import { log } from "./utils/logger";
 import { savePrice } from "./entities/price.entity";
 import { StakingService } from "./services/staking.service";
+import { nanoid } from 'nanoid'
 
 @Injectable()
 export class ParserProvider {
+	// Blockgrabber
 	private static blockgrabber_last_update = Date.now();
+	public static blockgrabber_active_instance_id: string;
+
 	public static amm_meta_entity: AmmMetaEntity;
+
 	constructor(
 		private readonly socketService: SocketService,
 		private readonly authService: AuthService,
 		private readonly stakingService: StakingService
 	) {}
+
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
 	private action_que_processing: boolean;
@@ -37,19 +43,21 @@ export class ParserProvider {
 		this.updateTokenList();
 		ParserProvider.amm_meta_entity = await AmmMetaEntity.findOne();
 
-		startBlockgrabber(this.handleNewBlock);
+		this.startBlockgrabber(false);
 
+		/**
+		 * Temporary workaround, since the blockgrabber likes to stop checking for blocks randomly.
+		 */
 		setInterval(() => {
-			if (Date.now() - ParserProvider.blockgrabber_last_update > 180000) {
-				log.warn("no response from blockgrabber in 120 seconds => starting it up again");
+			if (Date.now() - ParserProvider.blockgrabber_last_update > 30000) {
+				log.warn("no response from blockgrabber in 30 seconds => starting it up again");
 				ParserProvider.updateLastChecked();
-				startBlockgrabber(this.handleNewBlock, true);
+				this.startBlockgrabber(true);
 			}
 		}, 5000);
 	}
 
 	public handleNewBlock = async (block: BlockDTO) => {
-		// const { state, fn, contract, timestamp } = block;
 		await this.parseBlock(block);
 	};
 
@@ -58,9 +66,7 @@ export class ParserProvider {
 	 */
 
 	public parseBlock = async (block: BlockDTO) => {
-		// const { block } = update;
 		const { state, fn, contract: contract_name, timestamp, hash } = block;
-		// this.logger.log(contract_name)
 		this.addToActionQue(saveTransfer, {
 			state,
 			handleClientUpdate: this.socketService.handleClientUpdate
@@ -160,7 +166,6 @@ export class ParserProvider {
 	private executeActionQue = async (action_que: { action: any; args: any }[]) => {
 		try {
 			if (action_que.length) {
-				// this.logger.log(`ACTION QUE PROCESSING ${action_que.length} `)
 				const { action, args } = this.action_que[0];
 				if (args) {
 					await action(args);
@@ -196,6 +201,12 @@ export class ParserProvider {
 	private refreshAmmMeta = async () => {
 		const amm_meta_entity = await AmmMetaEntity.findOne();
 		ParserProvider.amm_meta_entity = amm_meta_entity;
+	};
+
+	private startBlockgrabber = (skip_wipe: boolean = false) => {
+		let id = nanoid(7);
+		ParserProvider.blockgrabber_active_instance_id = id
+		blockgrabber(this.handleNewBlock, skip_wipe, id);
 	};
 }
 

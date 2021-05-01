@@ -31,7 +31,7 @@ if (typeof process.env.RE_LOAD_API !== "undefined") {
 	if (process.env.RE_LOAD_API === "yes") reloadAPI = true;
 }
 
-const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boolean) => {
+const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string) => {
 	let currBlockNum = 1;
 	let checkNextIn = 0;
 	let maxCheckCount = 10;
@@ -216,6 +216,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 
 	const checkForBlocks = async () => {
 		log.log("checking")
+		if (instance_id !== ParserProvider.blockgrabber_active_instance_id) return
 		updateLastChecked()
 		let response: any = await getLatestBlock_MN();
 
@@ -298,7 +299,7 @@ function updateLastChecked(time_delta:number = 0) {
 	ParserProvider.updateLastChecked(time_delta)
 }
 
-export default (handleNewBlock: handleNewBlock, bypass_wipe: boolean = false) => {
+export default (handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string) => {
 	db.connect(
 		connectionString,
 		{ useNewUrlParser: true, useUnifiedTopology: true },
@@ -306,7 +307,7 @@ export default (handleNewBlock: handleNewBlock, bypass_wipe: boolean = false) =>
 			if (error) log.log(error);
 			else {
 				//log.log("connection successful");
-				databaseLoader(mongoose_models, handleNewBlock, bypass_wipe);
+				databaseLoader(mongoose_models, handleNewBlock, bypass_wipe, instance_id);
 			}
 		}
 	);
