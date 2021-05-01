@@ -1,13 +1,16 @@
 # Imports
 
-# import currency
-import con_basic_token
-import dex
+# Reward Token
+import con_rswp_lst001
+
+# AMM Contract
+import con_amm_v9
+
 # Setup Tokens
 
-DEX = dex
-LIQUIDITY_TOKEN = "con_rswp"
-YIELD_TOKEN = con_basic_token
+DEX = con_amm_v9
+LIQUIDITY_TOKEN = "con_rswp_lst001" # TAU/RSWP Pair
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
@@ -41,14 +44,14 @@ def seed():
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(1/2)
-    EpochMinTime.set(0)
+    EpochMinTime.set(3600)
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
     meta["version"] = "0.0.1"
     meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
-    meta["STAKING_TOKEN"] = LIQUIDITY_TOKEN
-    meta["YIELD_TOKEN"] = YIELD_TOKEN
+    meta["STAKING_TOKEN"] = 'currency'
+    meta["YIELD_TOKEN"] = 'con_rswp_lst001'
 
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(1/10)
