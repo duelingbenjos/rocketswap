@@ -21,20 +21,19 @@
     let joinedFeeds = []
 
     async function getData(){
-        let data = await apiService.get_market_summaries_with_token_info()
+        let data = await apiService.get_market_summaries()
         data.map(d => {
-            let vol24Str =  calc24PricePercent(d.PrevDay, d.Last)
-            d.vol24Str = vol24Str
-            if (vol24Str.includes('-')) d.change = "minus"
-            if (vol24Str.includes('+')) d.change = "plus"
-            if (vol24Str === '+0') d.change = "even"
+            d.price24Str =  calc24PricePercent(d.PrevDay, d.Last)
+            if (d.price24Str.includes('-')) d.change = "minus"
+            if (d.price24Str.includes('+')) d.change = "plus"
+            if (d.price24Str === '+0') d.change = "even"
+
             d.usdPrice = d.Last.multipliedBy($tauUSDPrice)
             d.usdVolume = d.Volume.multipliedBy(d.Last).multipliedBy($tauUSDPrice)
 
             if (!joinedFeeds.includes(d.contract_name)){
                 wsService.joinTradeFeed(d.contract_name)
                 joinedFeeds.push(d.contract_name)
-                console.log(joinedFeeds)
             }
             return d
         })
