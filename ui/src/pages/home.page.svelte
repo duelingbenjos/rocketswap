@@ -23,7 +23,10 @@
     async function getData(){
         let data = await apiService.get_market_summaries()
         data.map(d => {
-            d.price24Str =  calc24PricePercent(d.PrevDay, d.Last)
+            const changePercent = d.PercentPriceIncrease_24h.multipliedBy(100)
+            if (d.PercentPriceIncrease_24h.isEqualTo(0)) d.price24Str = `+0`
+            if (d.PercentPriceIncrease_24h.isGreaterThan(0)) d.price24Str = `+${stringToFixed(changePercent.minus(1).toFixed(2), 2)}`
+            if (d.PercentPriceIncrease_24h.isLessThan(0)) d.price24Str = `-${stringToFixed(changePercent.minus(1).toFixed(2), 2)}`
             if (d.price24Str.includes('-')) d.change = "minus"
             if (d.price24Str.includes('+')) d.change = "plus"
             if (d.price24Str === '+0') d.change = "even"
@@ -39,15 +42,6 @@
         })
         marketData = data
     }
-
-    const calc24PricePercent  = (prevDayPrice, lastPrice) => {
-        let change = lastPrice.dividedBy(prevDayPrice).multipliedBy(100)
-        if (change.isEqualTo(100)) return `+0`
-        if (change.isGreaterThan(100)) return `+${stringToFixed(change.minus(1).toFixed(2), 2)}`
-        change = prevDayPrice.dividedBy(lastPrice).multipliedBy(100)
-        return `-${stringToFixed(change.minus(1).toFixed(2), 2)}`
-    }
-
 
     onMount(() => {
         getData()

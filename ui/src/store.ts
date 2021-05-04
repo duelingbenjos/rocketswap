@@ -88,6 +88,10 @@ export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProces
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
 
+export const rswpYeildInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
+	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenYieldContract) || null
+})
+
 export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => {
 	let currentPrice = toBigNumber("0")
 	let rswpMetrics = $token_metrics_store[config.ammTokenContract]
