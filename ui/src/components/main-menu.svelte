@@ -8,6 +8,13 @@
 
     // Misc
     import { mainMenuOpen } from '../store'
+
+    mainMenuOpen.subscribe(curr => {
+        if (typeof window === 'undefined') return
+        if (curr) document.body.style.overflow = "hidden"
+        else document.body.style.overflow = "auto"
+        
+    })
     
 </script>
 
@@ -63,7 +70,7 @@
     }
 </style>
 
-<div class="main-menu flex-row flex-align-center">
+<div class="main-menu flex-row flex-align-center" on:scroll|preventDefault>
     <div class="flex-col menu" class:show={$mainMenuOpen}>
         <slot name="links"> </slot>
     </div>

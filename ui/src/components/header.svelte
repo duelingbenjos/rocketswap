@@ -85,7 +85,7 @@
 	}
 
 	.mobile-link {
-		margin: 0.5rem auto;
+		margin: 0.25rem auto;
 	}
 	.prices{
 		margin: -0.2rem 0 0;
@@ -97,10 +97,10 @@
 		margin-bottom: -0.5rem;
 	}
 	.rocket{
-		margin: 0 auto 2rem;
+		margin: 0 auto 1rem;
 		padding: 10px;
-		width: 85px;
-		height: 85px;
+		width: 55px;
+		height: 55px;
 		border: 2px solid white;
 		position: relative;
 		border-radius: 99px;
@@ -157,8 +157,6 @@
 		}
     }
 
-	
-	/* When page width is greater than 650px (tablets) */
     @media screen and (min-width: 650px) {
 		.right-content{
 			display: flex;
@@ -168,9 +166,19 @@
 		}
 
     }
-	/* When page width is greater than 730px (tablets) */
-    @media screen and (min-width: 800px) {
 
+    @media screen and (min-width: 800px) {
+		.links{
+			font-size: var(--text-size-large);
+		}
+		.links > a {
+			color: var(--header-primary-color);
+			margin-right: 30px;
+			padding: 0 5px;
+		}
+    }
+
+    @media screen and (min-width: 1000px) {
 		.links{
 			font-size: var(--text-size-xlarge);
 		}
@@ -220,17 +228,17 @@
 		<div class="mobile-links flex-col" slot="links">
 			<div class="rocket">
 				<Rocket 
-					width="70px" 
+					width="50px" 
 					direction="up-right" 
 					blastOff={true} 
 					color="var(--color-primary)"
-					styles="position: absolute; top: 17px; left: 13px;"
+					styles="position: absolute; top: 12px; left: 9px;"
 				/>
 			</div>
 			{#each links as e}
 				{#if menuItems.includes(e.$$name)}
 					<div class="mobile-link flex-row flex-center-center">
-						<a  class=" text-xxlarge weight-400"
+						<a  class=" text-large weight-400"
 							class:active={e === $active} 
 							href={e.$$href} on:click={handleLinkClick}> 
 							{e.$$name} 
@@ -239,7 +247,7 @@
 				{/if}
 			{/each}
 				<div class="mobile-link flex-row flex-center-center">
-					<a  class="text-xxlarge weight-400"
+					<a  class="text-large weight-400"
 						href="{`${window.location.protocol}//${config.docs_subdomain}.${window.location.hostname}`}" on:click={handleLinkClick}
 						rel="noopener noreferrer" target="_blank"> 
 						{"Docs"} 
