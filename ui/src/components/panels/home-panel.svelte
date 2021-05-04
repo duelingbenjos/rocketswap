@@ -20,6 +20,7 @@
     $: volumeFilter = $homePageTableFilter ? $homePageTableFilter.volume : null;
     $: priceFilter = $homePageTableFilter ? $homePageTableFilter.price : null;
     $: nameFilter = $homePageTableFilter ? $homePageTableFilter.name : null;
+    $: priceChangeFilter = $homePageTableFilter ? $homePageTableFilter.name : null;
     $: currentFilter = $homePageTableFilter ? $homePageTableFilter.current : null;
 
     $: results = sortMarketData(marketData, $homePageTableFilter)
@@ -32,7 +33,7 @@
             if (current[filer_name] === "asc") current[filer_name] = "dsc"
             else current[filer_name] = "asc"
 
-            setHomePageTableFilter(current.volume, current.price, current.name, current.current)
+            setHomePageTableFilter(current.volume, current.price, current.price_change, current.name, current.current)
             return current
         })
     }
@@ -44,8 +45,10 @@
         let r =  marketData.sort((a, b) => {
             if (currentFilter === "volume" && volumeFilter === "dsc") return a.Volume.isGreaterThan(b.Volume) ? 1 : -1
             if (currentFilter === "volume" && volumeFilter === "asc") return a.Volume.isLessThan(b.Volume) ? 1 : -1
-            if (currentFilter === "price" && priceFilter === "dsc") return parseFloat(a.vol24Str) > parseFloat(b.vol24Str) ? 1 : -1
-            if (currentFilter === "price" && priceFilter === "asc") return parseFloat(a.vol24Str) < parseFloat(b.vol24Str) ? 1 : -1
+            if (currentFilter === "price" && priceFilter === "dsc") return a.Last.isGreaterThan(b.Last) ? 1 : -1
+            if (currentFilter === "price" && priceFilter === "asc") return a.Last.isLessThan(b.Last) ? 1 : -1
+            if (currentFilter === "price_change" && priceChangeFilter === "dsc") return a.vol24Str > b.vol24Str ? 1 : -1
+            if (currentFilter === "price_change" && priceChangeFilter === "asc") return a.vol24Str < b.vol24Str ? 1 : -1
             if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > a.token.token_name ? 1 : -1
             if (currentFilter === "name" && nameFilter === "asc") return a.token.token_name < a.token.token_name ? 1 : -1
         })
@@ -170,24 +173,36 @@
                     </button>
                 </th>
                 <th>
-                    <div class="dropdown">
-                        <select bind:value={type} bind:this={selectElm} on:blur={handleCurrencyTypeChange}>
-                                <option value={"tau"}>Price TAU</option>
-                                <option value={"usd"}>Price USD</option>
-                        </select>
+                    <div class="flex-row flex-align-center">
+                            <div class="dropdown">
+                            <select bind:value={type} bind:this={selectElm} on:blur={handleCurrencyTypeChange}>
+                                    <option value={"tau"}>Price TAU</option>
+                                    <option value={"usd"}>Price USD</option>
+                            </select>
+                        </div>
+                        <button class="flex-row" on:click={() => handleFilterClick('price')}>
+                            <DirectionalChevron 
+                                width="10px"
+                                styles={`position: relative; ${priceFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
+                                margin={"0 0 0 8px"}
+                                direction={priceFilter === "asc" ? "down" : "up"} 
+                                color={currentFilter === "price" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                            />
+                        </button>
                     </div>
                 </th>
                 <th class="mobile-hide">                    
-                    <button class="flex-row" on:click={() => handleFilterClick('price')}>
+                    <button class="flex-row" on:click={() => handleFilterClick('price_change')}>
                             24hr % 
                         <DirectionalChevron 
                             width="10px"
-                            styles={`position: relative; ${priceFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
+                            styles={`position: relative; ${priceChangeFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
                             margin={"0 0 0 8px"}
-                            direction={priceFilter === "asc" ? "down" : "up"} 
-                            color={currentFilter === "price" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                            direction={priceChangeFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "price_change" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
                         />
-                    </button></th>
+                    </button>
+                </th>
                 <th>
                     <button class="flex-row" on:click={() => handleFilterClick('volume')}>
                         Volume (24hrs) 
