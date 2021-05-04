@@ -32,6 +32,7 @@ import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
 import { MarketcapEntity } from "./entities/marketcap.entity";
 import { MarketcapService } from "./services/marketcap.service";
 import { CoinGeckoAPIService } from "./services/coingecko.service";
+import { StakingService } from "./services/staking.service";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -85,7 +86,8 @@ const db_options: TypeOrmModuleOptions = {
 		StakingEpochEntity,
 		VolumeService,
 		MarketcapService,
-		CoinGeckoAPIService
+		CoinGeckoAPIService,
+		StakingService
 	]
 })
 export class AppModule {}

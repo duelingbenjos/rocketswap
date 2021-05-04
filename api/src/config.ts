@@ -12,4 +12,4 @@ export const config = {
 
 export const staking_contracts = process.env.STAKING_CONTRACTS
 	? process.env.STAKING_CONTRACTS.split(",")
-	: ["con_staking_dtau_rswp_lst001_4", "con_staking_rswp_doug", "con_simple_staking_rswp"];
+	: [ "con_staking_smart_epoch_rswp_rswp_11", "con_simple_staking_rswp", "con_yf_rswp3" ];

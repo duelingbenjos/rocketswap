@@ -20,7 +20,7 @@
 	const api = ApiService.getInstance()
 
     //Misc
-    import { rswpStakingInfo } from '../store'
+    import { rswpStakingInfo, rswpYeildInfo } from '../store'
     import { config } from '../config'
 
     let rswpToken = writable()
@@ -41,7 +41,7 @@
 
     const getRSWPTokenInfo = async () => rswpToken.set(await api.getToken(config.ammTokenContract).then(res => res.token))
 
-    const gotoBuyRSWP = () => location.assign(`/#/${config.ammTokenContract}`)
+    const gotoBuyRSWP = () => location.assign(`/#/swap/${config.ammTokenContract}`)
 
 </script>
 
@@ -145,7 +145,8 @@
     </div>
 
     <div class="flex panels">
-        <StakingPanel stakingInfo={$rswpStakingInfo}/>
+        <StakingPanel stakingInfo={$rswpStakingInfo} />
+       <!-- <StakingPanel stakingInfo={$rswpYeildInfo} />-->
         <RSWPDiscountPanel />
     </div>
 </div>

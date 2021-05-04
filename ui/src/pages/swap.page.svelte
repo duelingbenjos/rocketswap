@@ -108,10 +108,10 @@
 	const joinTradeFeed_UpdateWindow = (contract_name) => {
 		pageUtilites.refreshTokenInfo(contract_name).then(res => {
 			if (res){
-				pageUtilites.updateWindowHistory("")
+				pageUtilites.updateWindowHistory("swap/")
 				ws.joinTradeFeed(contract_name)
 			}else{
-				pageUtilites.updateWindowHistory("", false)
+				pageUtilites.updateWindowHistory("swap/", false)
 			}
 		})
 	}

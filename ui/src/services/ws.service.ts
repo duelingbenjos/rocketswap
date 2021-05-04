@@ -5,7 +5,7 @@
 		tokenBalances, 
 		ws_id, 
 		trollboxMessages, 
-		tradeUpdates, 
+		tradeUpdates,  allTradeUpdates,
 		tradeHistory, 
 		stakingInfo, 
 		userYieldInfo,
@@ -14,7 +14,7 @@
 		lpPairs,
 		tauUSDPrice } from '../store'
 	import type { MetricsUpdateType, TokenMetricsType } from '../types/api.types'
-	import { valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision } from '../utils'
+	import { valuesToBigNumber, setBearerToken, toBigNumber, toBigNumberPrecision, setTauUsdPrice } from '../utils'
 	import { config, getBaseUrl } from '../config'
 
 	/** Singleton socket.io service */
@@ -184,11 +184,11 @@
 	private handleTauUsdFeed(msg){
 		console.log({handleTauUsdFeed: msg})
 		if (msg.current_price){
-			localStorage.setItem('tau_usd_price', JSON.stringify(msg.current_price))
+			setTauUsdPrice(msg.current_price)
 			tauUSDPrice.set(toBigNumber(msg.current_price))
 		}
 		if (msg.price){
-			localStorage.setItem('tau_usd_price_UPDATE', JSON.stringify(msg.price))
+			setTauUsdPrice(msg.price)
 			tauUSDPrice.set(toBigNumber(msg.price))
 		}
 
@@ -223,8 +223,13 @@
 	}
 
 	public joinTradeFeed(contract_name: string) {
+		console.log({joinedFeeds: this.joinedFeeds, contract_name, currentEquals: this.current_trade_feed === contract_name, joinedAlready: this.joinedFeeds[`trade_feed:${contract_name}`]})
 		if (this.current_trade_feed === contract_name) return
+		if (this.joinedFeeds[`trade_feed:${contract_name}`]) return
 
+		console.log({contract_name})
+		
+		console.log("joining " + contract_name)
 		this.connection.on(`trade_update:${contract_name}`, (event) => this.handleTradeUpdate(event, contract_name))
 		this.connection.emit('join_room', `trade_feed:${contract_name}`)
 		this.current_trade_feed = contract_name
@@ -233,6 +238,7 @@
 	}
 
 	private handleTradeUpdate(event, contract_name) {
+		console.log({event, contract_name, joinedFeeds: this.joinedFeeds})
 		if (event.history) {
 			tradeHistory.update( current => {
 				if (!current[contract_name]) current[contract_name] = []
@@ -240,21 +246,25 @@
 				current[contract_name] = tradeList.filter(trade => !trade.price.isEqualTo(0))
 				return current
 			})
-		}
-		else {
+		}else {
 			if (event.action === 'trade_update') {
+				let trade = valuesToBigNumber(event)
+				if (trade.price.isEqualTo(0)) return
 				tradeUpdates.update((current) => {
 					if (!current[contract_name]) current[contract_name] = []
-					let trade = valuesToBigNumber(event)
-					if (!trade.price.isEqualTo(0)) current[contract_name].push(trade)
+					current[contract_name].push(trade)
+					return current
+				})
+				allTradeUpdates.update(current => {
+					current.push(trade)
 					return current
 				})
 			}
 		}
 	}
 
-	public leaveTradeFeed() {
-		const contract_name = this.current_trade_feed
+	public leaveTradeFeed(contract_name = undefined) {
+		if (!contract_name) contract_name = this.current_trade_feed
 		this.connection.off(`trade_update:${contract_name}`)
 		this.current_trade_feed = ''
 
@@ -262,6 +272,7 @@
 		tradeUpdates.set([])
 
 		this.joinedFeeds[`trade_feed:${contract_name}`] = false
+		console.log({joinedFeeds: this.joinedFeeds})
 	}
 
 /* -------------------------

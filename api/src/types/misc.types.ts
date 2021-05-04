@@ -18,3 +18,5 @@ export interface handleNewBlock {
 export interface IContractingTime {
 	__time__: [number, number, number, number, number, number];
 }
+
+export type StakingType = "staking_simple" | "staking_smart_epoch"

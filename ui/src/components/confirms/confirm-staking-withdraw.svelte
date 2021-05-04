@@ -56,7 +56,7 @@
             amount: {"__fixed__": stringToFixed(withdrawAmount, 8)}
         }
         if (stakingInfo.contract_name === config.ammTokenStakingContract) {
-            args.amount.__fixed__ = stringToFixed(withdrawAmount.multipliedBy(1.1), 8)
+            args.amount.__fixed__ = stringToFixed(withdrawAmount.dividedBy(90).multipliedBy(100), 8)
         }
         walletService.withdrawStake(stakingInfo.contract_name, args, stakingToken, yieldToken, {success, error})
         .catch(err => {

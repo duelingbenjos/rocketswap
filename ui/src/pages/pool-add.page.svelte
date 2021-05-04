@@ -42,7 +42,7 @@
 
   	let pageUtilites = pageUtils(pageStores)
 
-	$: contractName = $params.contract
+	$: contractName = $selectedToken?.contract_name || $params.contract
 	$: pageTitle = $selectedToken ? `RocketSwap: ${$selectedToken.token_symbol}/${config.currencySymbol}` : 'RocketSwap Add Liquidity!';
 	$: pageDescription = $selectedToken ? `Add liquidity to the ${$selectedToken.token_symbol}/${config.currencySymbol} pool!` : 'Add Liquidity!';
 	$: removeHref = $selectedToken ? `/#/pool-remove/${$selectedToken.contract_name}` : false;
@@ -50,6 +50,7 @@
 
 	selectedToken.subscribe(value => {
 		if (value) {
+			contractName = value.contract_name
 			if (!value.has_market){
 				pageUtilites.redirectToCreatePool(value.contract_name)
 			}else{

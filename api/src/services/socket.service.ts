@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { Server } from "socket.io";
+import { staking_contracts } from "../config";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { getUserYield, getUserYieldPerSecond, UserStakingEntity } from "../entities/user-staking.entity";
@@ -55,7 +55,7 @@ export class SocketService {
 		try {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			// if (!staking_entities || !staking_entities.length) return;
-			const payload = await staking_entities.reduce(async (accumP, user_entity) => {
+			const payload = await staking_entities.filter(ent => staking_contracts.includes(ent.staking_contract)).reduce(async (accumP, user_entity) => {
 				const accum = await accumP
 				if (
 					(!user_entity.yield_info ||

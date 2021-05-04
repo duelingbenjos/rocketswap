@@ -9,12 +9,11 @@ import { config } from "../config";
 
 @Injectable()
 export class VolumeService implements OnModuleInit {
-
 	async onModuleInit() {
 		await this.updateDailyVolumes();
 		setInterval(async () => {
 			await this.updateDailyVolumes();
-		}, 30000);
+		}, 20000);
 	}
 
 	private async updateDailyVolumes() {
@@ -31,6 +30,13 @@ export class VolumeService implements OnModuleInit {
 					token_metrics_entity.MarketName = `${config.currencySymbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
 					token_metrics_entity.token_symbol = token.token_symbol;
 				}
+				if (!token_metrics_entity.token_attached) {
+					const token_entity = await TokenEntity.findOne({ where: { contract_name } });
+					if (token_entity) {
+						token_metrics_entity.token = token_entity;
+						token_metrics_entity.token_attached = true;
+					}
+				}
 
 				const last_yesterday_trade = await this.getLastYesterdayTrade(contract_name);
 				// const last_yesterday_price = par
@@ -44,12 +50,12 @@ export class VolumeService implements OnModuleInit {
 				token_metrics_entity.BaseVolume = trades_last_day.length ? base_volume : 0;
 				token_metrics_entity.High = trades_last_day.length ? high : yesterday_last_price;
 				token_metrics_entity.Low = trades_last_day.length ? low : yesterday_last_price;
-				token_metrics_entity.PrevDay = yesterday_last_price;
+				token_metrics_entity.PrevDay = yesterday_last_price || 0;
 				token_metrics_entity.TimeStamp = Date.now();
 				token_metrics_entity.Last = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.Bid = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.Ask = trades_last_day.length ? today_last_price : yesterday_last_price;
-
+				token_metrics_entity.PercentPriceIncrease_24h = ((token_metrics_entity.Last - token_metrics_entity.PrevDay) / token_metrics_entity.PrevDay) * 100;
 				proms.push(token_metrics_entity.save());
 			}
 			await Promise.all(proms);

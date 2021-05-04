@@ -1,5 +1,5 @@
 <script>
-    import { walletIsReady } from '../store'
+    import { walletIsReady, lwc_info } from '../store'
     export let width = "24px";
     export let margin = "0";
     export let color = "var(--color-primary)"

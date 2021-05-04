@@ -13,7 +13,7 @@
     div{
         box-sizing: border-box;
         flex-wrap: wrap;
-        margin-bottom: 4rem;
+        padding-bottom: 10rem;
     }
 </style>
 <div class="flex-row flex-justify-spaceevenly">

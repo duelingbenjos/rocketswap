@@ -25,6 +25,8 @@ export const epochs = writable({});
 export const rocketState = writable(0);
 export const toast_store: Writable<ToastMetaType[]> = writable([])
 export const tabHidden = writable(false);
+export const currencyType = writable(undefined);
+export const homePageTableFilter = writable(undefined);
 
 // EXCHANGE PRICES
 export const tauUSDPrice = writable(null);
@@ -86,6 +88,10 @@ export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProces
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
 
+export const rswpYeildInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
+	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenYieldContract) || null
+})
+
 export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => {
 	let currentPrice = toBigNumber("0")
 	let rswpMetrics = $token_metrics_store[config.ammTokenContract]
@@ -121,6 +127,7 @@ export const bearerToken = writable(null)
 //AMM TRADES
 export const tradeHistory = writable({});
 export const tradeUpdates = writable({});
+export const allTradeUpdates = writable([]);
 
 
 // POOLS AND LIQUIDITY
