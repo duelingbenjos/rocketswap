@@ -128,12 +128,18 @@ body {
 
 	background-repeat:no-repeat;
 	background-image: var(--main-background-solid);
-	background-image: url('/assets/images/stars-bg.png'), var(--main-background-gradient);
+	background-image: url('/assets/images/stars-bg-mobile.png'), var(--main-background-gradient);
 	background-blend-mode: exclusion;
 	background-attachment: fixed;
 	background-size: cover;
 
 	color: var(--text-primary-color);
+}
+
+@media screen and (min-width: 430px) {
+	body{
+		background-image: url('/assets/images/stars-bg.png'), var(--main-background-gradient);
+	}
 }
 
 body.light{
@@ -1020,6 +1026,10 @@ div[slot="main-centered"]{
 	color: var(--color-gray-3);
 }
 
+.deathstar{
+	
+}
+
 /* When page width is greater than 430px and less than 650px (phones) */
 @media screen and (min-width: 430px) {
 	select {
@@ -1052,6 +1062,8 @@ div[slot="main-centered"]{
 		align-items: center;
 	}
 }
+
+
 
 /* When page width is greater than 650px (tablets) */
 @media screen and (min-width: 650px) {
