@@ -24,12 +24,18 @@
         let data = await apiService.get_market_summaries()
         data.map(d => {
             const changePercent = d.PercentPriceIncrease_24h.multipliedBy(100)
-            if (d.PercentPriceIncrease_24h.isEqualTo(0)) d.price24Str = `+0`
-            if (d.PercentPriceIncrease_24h.isGreaterThan(0)) d.price24Str = `+${stringToFixed(changePercent.minus(1).toFixed(2), 2)}`
-            if (d.PercentPriceIncrease_24h.isLessThan(0)) d.price24Str = `-${stringToFixed(changePercent.minus(1).toFixed(2), 2)}`
-            if (d.price24Str.includes('-')) d.change = "minus"
-            if (d.price24Str.includes('+')) d.change = "plus"
-            if (d.price24Str === '+0') d.change = "even"
+            if (d.PercentPriceIncrease_24h.isEqualTo(0)) {
+                d.price24Str = `+0`
+                d.change = "even"
+            }
+            if (d.PercentPriceIncrease_24h.isGreaterThan(0)) {
+                d.price24Str = `+${stringToFixed(changePercent.minus(1).toFixed(2), 2)}`
+                d.change = "plus"
+            }
+            if (d.PercentPriceIncrease_24h.isLessThan(0)) {
+                d.price24Str = `${stringToFixed(changePercent.minus(1).toFixed(2), 2)}`
+                d.change = "minus"
+            }
 
             d.usdPrice = d.Last.multipliedBy($tauUSDPrice)
             d.usdVolume = d.Volume.multipliedBy(d.Last).multipliedBy($tauUSDPrice)

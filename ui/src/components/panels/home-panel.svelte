@@ -68,6 +68,9 @@
     .headings{
         border-bottom: 1px solid var(--text-primary-color-dimmer);
     }
+    .mobile-hide{
+        display: none;
+    }
 
     th{
         text-align: left;
@@ -77,6 +80,7 @@
     td{
         max-width: 100px;
         padding: 12px 8px 0;
+        vertical-align: top;
     }
     div.ellipsis{
         overflow: hidden;
@@ -101,7 +105,16 @@
     button{
         align-items: baseline;
     }
-    
+
+
+    @media screen and (min-width: 430px) {
+        .mobile-show{
+            display: none;
+        }
+        .mobile-hide{
+            display: table-cell;
+        }
+	}
 
 	@media screen and (min-width: 550px) {
         td{
@@ -164,7 +177,7 @@
                         </select>
                     </div>
                 </th>
-                <th>                    
+                <th class="mobile-hide">                    
                     <button class="flex-row" on:click={() => handleFilterClick('price')}>
                             24hr % 
                         <DirectionalChevron 
@@ -201,10 +214,17 @@
                     </td>
                     <td>
                         {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(2)}` : stringToFixed(tokenInfo.Last, 5)}
+                        <div
+                            class:text-error={tokenInfo.change === "minus"}
+                            class:text-success={tokenInfo.change === "plus"}
+                            class="mobile-show">
+                            {tokenInfo.price24Str}%
+                        </div>
                     </td>
                     <td
                         class:text-error={tokenInfo.change === "minus"}
-                        class:text-success={tokenInfo.change === "plus"}>
+                        class:text-success={tokenInfo.change === "plus"}
+                        class="mobile-hide">
                         {tokenInfo.price24Str}%
                     </td>
                     <td>

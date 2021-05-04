@@ -146,7 +146,7 @@
 
     <div class="flex panels">
         <StakingPanel stakingInfo={$rswpStakingInfo} />
-        <StakingPanel stakingInfo={$rswpYeildInfo} />
+       <!-- <StakingPanel stakingInfo={$rswpYeildInfo} />-->
         <RSWPDiscountPanel />
     </div>
 </div>
