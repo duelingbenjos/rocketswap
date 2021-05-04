@@ -88,7 +88,7 @@ export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProces
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
 
-export const rswpYeildInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
+export const rswpYieldInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenYieldContract) || null
 })
 
