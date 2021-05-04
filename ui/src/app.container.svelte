@@ -166,6 +166,6 @@
 <TrollBoxButton />
 <TrollBox />
 <TestnetBanner/>
-{#if isMay4th()}
+{#if isMay4th() && $currentThemeName === "dark"}
 	<DeathStarImage />
 {/if}
