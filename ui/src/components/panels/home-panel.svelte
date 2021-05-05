@@ -10,7 +10,7 @@
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
     
 	//Misc
-    import { stringToFixed, numberWithCommas, setCurrencyType, setHomePageTableFilter } from '../../utils'
+    import { stringToFixed, numberWithCommas, setCurrencyType, setHomePageTableFilter, toBigNumber } from '../../utils'
     import { tauUSDPrice, currencyType, homePageTableFilter } from '../../store'
 
     let selectElm
@@ -243,7 +243,7 @@
                         {tokenInfo.price24Str}%
                     </td>
                     <td>
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2)}` : stringToFixed(tokenInfo.Volume, 5))}  
+                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.Volume, 5))}
                     </td>
                 </tr>
             {/each}

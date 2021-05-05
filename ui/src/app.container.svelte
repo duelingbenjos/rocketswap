@@ -135,10 +135,7 @@
 		let month = date.getMonth()
 		let day = date.getDate()
 
-		console.log({month, day})
-
 		return month === 4 && day === 4
-		
 	}
 </script>
 

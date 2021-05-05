@@ -181,8 +181,17 @@ export const formatAccountAddress = (account: string, lsize = 4, rsize = 4) => {
   return account.substring(0, lsize) + '...' + account.substring(account.length - rsize)
 }
 
-export const numberWithCommas = (x) => {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+export const numberWithCommas = (nStr) => {
+	nStr += '';
+	var x = nStr.split('.');
+	var x1 = x[0];
+	var x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+	 x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
 }
 
 export const returnFloat = (value: any) => {
