@@ -768,10 +768,6 @@ class MyTestCase(unittest.TestCase):
         # No compounding / one epoch
         env_0 = {"now": Datetime(year=2021, month=1, day=1)}
         env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
-        # env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
-        # env_3 = {"now": Datetime(year=2021, month=1, day=1, hour=3)}
-        # env_4 = {"now": Datetime(year=2021, month=1, day=1, hour=4)}
-        # env_5 = {"now": Datetime(year=2021, month=1, day=1, hour=5)}
 
         self.contract.toggleCompounding(on=True)
         self.contract.setDevRewardPct(amount=0)
@@ -789,9 +785,6 @@ class MyTestCase(unittest.TestCase):
         env_0 = {"now": Datetime(year=2021, month=1, day=1)}
         env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
         env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
-        # env_3 = {"now": Datetime(year=2021, month=1, day=1, hour=3)}
-        # env_4 = {"now": Datetime(year=2021, month=1, day=1, hour=4)}
-        # env_5 = {"now": Datetime(year=2021, month=1, day=1, hour=5)}
 
         self.contract.toggleCompounding(on=True)
         self.contract.setDevRewardPct(amount=0)
@@ -815,8 +808,6 @@ class MyTestCase(unittest.TestCase):
         env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
         env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
         env_3 = {"now": Datetime(year=2021, month=1, day=1, hour=3)}
-        # env_4 = {"now": Datetime(year=2021, month=1, day=1, hour=4)}
-        # env_5 = {"now": Datetime(year=2021, month=1, day=1, hour=5)}
 
         self.contract.toggleCompounding(on=True)
         self.contract.setDevRewardPct(amount=0)
