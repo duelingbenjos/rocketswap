@@ -257,22 +257,16 @@ def decideIncrementEpoch(new_staked_amount: float):
 
 
 def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: float):
-    smaller = (
-        new_staked_amount
-        if new_staked_amount <= this_epoch_staked
-        else this_epoch_staked
-    )
-    bigger = (
-        new_staked_amount
-        if new_staked_amount >= this_epoch_staked
-        else this_epoch_staked
-    )
+    smaller = new_staked_amount if new_staked_amount <= this_epoch_staked else this_epoch_staked
+    bigger = new_staked_amount if new_staked_amount >= this_epoch_staked else this_epoch_staked
     dif = bigger - smaller
-    return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
+    return (
+        dif
+    ) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
 
 def incrementEpoch(new_staked_amount: float):
-    current_epoch = getCurrentEpochIndex()
+    current_epoch = CurrentEpochIndex.get()
     new_epoch_idx = current_epoch + 1
     CurrentEpochIndex.set(new_epoch_idx)
     Epochs[new_epoch_idx] = {
@@ -286,7 +280,7 @@ def incrementEpoch(new_staked_amount: float):
 @export
 def changeAmountPerHour(amount_per_hour: float):
     assertOwner()
-    current_epoch = getCurrentEpochIndex()
+    current_epoch = CurrentEpochIndex.get()
     new_epoch_idx = current_epoch + 1
     CurrentEpochIndex.set(new_epoch_idx)
     setEmissionRatePerHour(amount=amount_per_hour)
@@ -337,7 +331,6 @@ def setDevRewardPct(amount: float):
     DevRewardPct.set(amount)
 
 
-@export
 def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
@@ -346,7 +339,13 @@ def setEmissionRatePerHour(amount: float):
 @export
 def recoverYieldToken(amount: float):
     assertOwner()
-    YIELD_TOKEN.transfer(amount=amount, to=Owner.get())
+    assert amount > 0, "Yield token amount must be greater than 0"
+    staked_balance = StakedBalance.get()
+    yield_balances = ForeignHash(foreign_contract=meta["YIELD_TOKEN"], foreign_name='balances')
+    total_in_contract = yield_balances[ctx.this]
+    total_available = total_in_contract - staked_balance
+    amount_to_recover = amount if amount <= total_available else total_available
+    YIELD_TOKEN.transfer(amount=amount_to_recover, to=Owner.get())
 
 
 @export
@@ -396,3 +395,4 @@ def emergencyReturnStake():
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
+    decideIncrementEpoch(new_staked_amount=new_staked_amount)

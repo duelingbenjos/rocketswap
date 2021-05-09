@@ -29,6 +29,7 @@ EpochMaxRatioIncrease = (
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
 decimal_converter_var = Variable()
+TimeRampValues = Variable()
 
 
 @construct
@@ -39,17 +40,32 @@ def seed():
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(10)
-    EpochMinTime.set(30*60) # 30 mins
+    EpochMinTime.set(30 * 60)  # 30 mins
+    Compounding.set(True)
+    TimeRampValues.set(
+        [
+            {lower: 0, upper: 2, multiplier: 0.1},
+            {lower: 2, upper: 4, multiplier: 0.2},
+            {lower: 4, upper: 6, multiplier: 0.3},
+            {lower: 6, upper: 8, multiplier: 0.4},
+            {lower: 8, upper: 10, multiplier: 0.5},
+            {lower: 10, upper: 12, multiplier: 0.6},
+            {lower: 12, upper: 14, multiplier: 0.7},
+            {lower: 14, upper: 16, multiplier: 0.8},
+            {lower: 16, upper: 18, multiplier: 0.9},
+            {lower: 18, upper: 20, multiplier: 1},
+        ]
+    )
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
     meta["version"] = "0.0.1"
-    meta["type"] = "staking_smart_epoch"  # staking || lp_farming
+    meta["type"] = "staking_smart_epoch_compounding"  # staking || lp_farming || etcetera ...
     meta["STAKING_TOKEN"] = "con_rswp_lst001"
     meta["YIELD_TOKEN"] = "con_rswp_lst001"
 
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
-    DevRewardPct.set(1/10)
+    DevRewardPct.set(1 / 10)
 
     # The datetime from which you want to allow staking.
     StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
@@ -184,14 +200,21 @@ def withdrawTokensAndYield():
     decideIncrementEpoch(new_staked_amount=new_staked_amount)
 
 
+
 # This runs over each of the items in the user's Deposit
-def calculateYield(starting_epoch_index, start_time, amount):
+def calculateYield(starting_epoch_index: int, start_time, amount: float):
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
     y = 0
+    step_multiplier = 1
+
     while this_epoch_index <= current_epoch_index:
         this_epoch = Epochs[this_epoch_index]
         next_epoch = Epochs[this_epoch_index + 1]
+
+        if UseTimeRamp.get():
+            time_ramp_delta = now - fitTimeToRange(this_epoch["time"])
+            step_multiplier = findTimeRampStep(time_ramp_delta.days)
 
         delta = 0
 
@@ -209,6 +232,9 @@ def calculateYield(starting_epoch_index, start_time, amount):
         pct_share_of_stake = 0
         if amount is not 0 and this_epoch["staked"] is not 0:
             pct_share_of_stake = amount / this_epoch["staked"]
+        
+        # in compounding scenario amount can exceed the staked amount
+        # e.g 1100 / 1000 = 1.1
 
         # These two lines below were causing some problems, until I used the decimal method. get a python expert to review.
         emission_rate_per_hour = this_epoch["amt_per_hr"]
@@ -217,13 +243,15 @@ def calculateYield(starting_epoch_index, start_time, amount):
         )
         decimal_converter_var.set(pct_share_of_stake)
         pct_share_of_stake = decimal_converter_var.get()
-        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake
+        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake * step_multiplier
         y += deposit_yield_this_epoch
+        
+        if UseCompounding.get():
+            amount += deposit_yield_this_epoch
 
         this_epoch_index += 1
 
     return y
-
 
 def fitTimeToRange(time: Any):
     if time < StartTime.get():
@@ -256,12 +284,18 @@ def decideIncrementEpoch(new_staked_amount: float):
 
 
 def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: float):
-    smaller = new_staked_amount if new_staked_amount <= this_epoch_staked else this_epoch_staked
-    bigger = new_staked_amount if new_staked_amount >= this_epoch_staked else this_epoch_staked
+    smaller = (
+        new_staked_amount
+        if new_staked_amount <= this_epoch_staked
+        else this_epoch_staked
+    )
+    bigger = (
+        new_staked_amount
+        if new_staked_amount >= this_epoch_staked
+        else this_epoch_staked
+    )
     dif = bigger - smaller
-    return (
-        dif
-    ) / this_epoch_staked >= EpochMaxRatioIncrease.get()
+    return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
 
 def incrementEpoch(new_staked_amount: float):
@@ -338,7 +372,13 @@ def setEmissionRatePerHour(amount: float):
 @export
 def recoverYieldToken(amount: float):
     assertOwner()
-    YIELD_TOKEN.transfer(amount=amount, to=Owner.get())
+    assert amount > 0, "Yield token amount must be greater than 0"
+    staked_balance = StakedBalance.get()
+    yield_balances = ForeignHash(foreign_contract=meta["YIELD_TOKEN"], foreign_name='balances')
+    total_in_contract = yield_balances[ctx.this]
+    total_available = total_in_contract - staked_balance
+    amount_to_recover = amount if amount <= total_available else total_available
+    YIELD_TOKEN.transfer(amount=amount_to_recover, to=Owner.get())
 
 
 @export
@@ -389,3 +429,33 @@ def emergencyReturnStake():
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
     decideIncrementEpoch(new_staked_amount=new_staked_amount)
+
+
+@export
+def toggleCompounding(on: bool):
+    assertOwner()
+    UseCompounding.set(on)
+
+
+@export
+def toggleTimeRamp(on: bool):
+    assertOwner()
+    UseTimeRamp.set(on)
+
+
+@export
+def findTimeRampStep(days: int):
+    time_ramps = TimeRampValues.get()
+    step = None
+    for s in time_ramps:
+        if s["lower"] <= days and s["upper"] > days:
+            step = s
+    if step is None:
+        return time_ramps[len(time_ramps) - 1]["multiplier"]
+    return step["multiplier"]
+
+
+@export 
+def setTimeRampValues(data: list):
+    assertOwner()
+    TimeRampValues.set(data)
