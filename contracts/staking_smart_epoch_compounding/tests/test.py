@@ -86,19 +86,15 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(current_epoch, 1)
 
         deposit_record = self.contract.Deposits["bob"]
-        self.assertAlmostEqual(len(deposit_record), 1)
-        print(deposit_record)
-        self.assertAlmostEqual(deposit_record[0]["amount"], 100)
+        self.assertAlmostEqual(deposit_record["amount"], 100)
 
         self.contract.addStakingTokens(environment=env_2, signer="bob", amount=150)
         staked = self.contract.StakedBalance.get()
-        self.assertAlmostEqual(staked, 250)
+        self.assertAlmostEqual(staked, 250 + 3000 - 3000 / 10)
 
         current_epoch = self.contract.CurrentEpochIndex.get()
         self.assertAlmostEqual(current_epoch, 2)
 
-        deposit_record = self.contract.Deposits["bob"]
-        self.assertAlmostEqual(len(deposit_record), 2)
 
     def test_02_add_staking_tokens(self):
         start_env = {"now": Datetime(year=2021, month=2, day=1)}
@@ -521,24 +517,24 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(self.basic_token.balances["murray"], 25)
         self.assertAlmostEqual(self.basic_token.balances["pete"], 25)
 
-    def test_14_addStakingTokens_check_len_should_pass(self):
+    def test_14_addStakingTokens_check_amount_should_pass(self):
 
         self.contract.addStakingTokens(signer="bob", amount=10)
         self.contract.addStakingTokens(signer="bob", amount=10)
 
         deposits = self.contract.Deposits["bob"]
-        self.assertAlmostEqual(len(deposits), 2)
+        self.assertAlmostEqual(deposits["amount"], 20)
 
-    def test_15_addStakingTokens_check_len_should_fail(self):
+    def test_15_addStakingTokens_check_amount_should_fail(self):
 
+        self.contract.addStakingTokens(signer="bob", amount=10)
         self.contract.addStakingTokens(signer="bob", amount=10)
         self.contract.addStakingTokens(signer="bob", amount=10)
 
         deposits = self.contract.Deposits["bob"]
-        self.contract.addStakingTokens(signer="bob", amount=10)
 
         with self.assertRaises(AssertionError):
-            self.assertAlmostEqual(len(deposits), 2)
+            self.assertAlmostEqual(deposits['amount'], 20)
 
     def test_16_addStakingTokens_withdrawTokensAndYield_check_len_should_pass(self):
 
@@ -596,7 +592,7 @@ class MyTestCase(unittest.TestCase):
         self.contract.setEpochMinTime(environment=env_2, min_seconds=min_seconds)
 
         # This one gets skipped / doesn't increment the epoch.
-        self.contract.addStakingTokens(environment=env_3, signer="pete", amount=10)
+        self.contract.addStakingTokens(environment=env_1, signer="pete", amount=10)
 
         current_epoch_idx = self.contract.CurrentEpochIndex.get()
         self.assertAlmostEqual(current_epoch_idx, 5)
@@ -607,11 +603,11 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(current_epoch_idx, 6)
 
         staked_balance = self.contract.StakedBalance.get()
-        self.assertAlmostEqual(staked_balance, 60)
+        self.assertAlmostEqual(staked_balance, 110)
         
         current_epoch = self.contract.Epochs[current_epoch_idx]
         current_epoch_staked_balance = current_epoch['staked']
-        self.assertAlmostEqual(current_epoch_staked_balance, 60)
+        self.assertAlmostEqual(current_epoch_staked_balance, 110)
 
     def test_19_epoch_incrementing_when_max_ratio_exceeded_addStakingTokens(self):
         # all of the below test occurs within the min epoch time
@@ -764,69 +760,64 @@ class MyTestCase(unittest.TestCase):
 
         self.assertAlmostEqual(bob_token_balance, 216000)
 
-    def test_23_compounding_one_epoch(self):
-        # No compounding / one epoch
-        env_0 = {"now": Datetime(year=2021, month=1, day=1)}
-        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
 
-        self.contract.toggleCompounding(on=True)
-        self.contract.setDevRewardPct(amount=0)
-
-        self.contract.addStakingTokens(environment = env_0, signer="bob", amount=1000)
-        self.contract.withdrawTokensAndYield(environment = env_1, signer="bob")
+    def test_23_time_ramps_carry_to_new_deposit(self):
         
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=11, hour=0)}
+        env_3 = {"now": Datetime(year=2021, month=1, day=21, hour=0)}
+
+        self.contract.toggleTimeRamp(on = True)
+        self.contract.setDevRewardPct(amount = 0)
+        self.contract.changeAmountPerHour(amount_per_hour = 10)
+
+
+        self.contract.addStakingTokens(environment = env_1, signer="bob", amount=10)
+        self.contract.addStakingTokens(environment = env_2, signer="bob", amount=10)
+
+       
+        bob_deposits = self.contract.Deposits["bob"]
+        print(bob_deposits)
+
+
+        # expected balance =
+        # Epoch 1 - 10 days // time_step_multiplier = 0.1
+        # (10 x 24 x 10 = 2400 * 0.1) + 20
+        # = 260
+
+        self.assertAlmostEqual(bob_deposits['amount'], 260)
+
+        #increment epoch
+        self.contract.addStakingTokens(environment = env_3, signer="bob", amount=0)
+        bob_deposits = self.contract.Deposits["bob"]
+
+        # expected balance =
+        # Epoch 1 - 260
+        # Epoch 2 - 3 // 10 days // time_step_multiplier = 0.3
+        # (10 x 24 x 10 = 2400 * 0.2) + 260
+
+        self.assertAlmostEqual(bob_deposits['amount'], 740)
+
+
+    def test_24_compounding_gives_correct_deposit_balance(self):
         
-        bob_token_balance = self.basic_token.balances["bob"]
-        
-        self.assertAlmostEqual(bob_token_balance, 3000)
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+        env_3 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
 
-    def test_24_compounding_two_epochs(self):
-        # compounding / epoch 1 - 2 (1 hour)
-        env_0 = {"now": Datetime(year=2021, month=1, day=1)}
-        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
-        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
+        self.contract.setDevRewardPct(amount = 0)
+        self.contract.changeAmountPerHour(amount_per_hour = 10)
 
-        self.contract.toggleCompounding(on=True)
-        self.contract.setDevRewardPct(amount=0)
-        self.contract.changeAmountPerHour(environment = env_1, amount_per_hour = 100) 
+        self.contract.addStakingTokens(environment = env_1, signer="bob", amount=10)
+        self.contract.addStakingTokens(environment = env_2, signer="bob", amount=10)
+        # bob deposit = 10 + 10 + 10
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits['amount'], 30)
+        self.contract.addStakingTokens(environment = env_3, signer="bob", amount=10)
 
-        self.contract.addStakingTokens(environment = env_0, signer="bob", amount=1000)
-        self.contract.changeAmountPerHour(environment = env_1, amount_per_hour = 100) # Increment epoch
-        
-        # Expected yield = 
-        # hr 1 100
-        # h2 2 yield on stake of 1000 + 100  (1100) = 110
-        # total : 210
-
-        self.contract.withdrawTokensAndYield(environment = env_2, signer="bob")
-        bob_token_balance = self.basic_token.balances["bob"]
-        self.assertAlmostEqual(bob_token_balance, 210)
-
-    def test_25_compounding_three_epochs(self):
-        # compounding / epoch 1 - 2 - 3 (2 hours, 2 epochs)
-        env_0 = {"now": Datetime(year=2021, month=1, day=1)}
-        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
-        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
-        env_3 = {"now": Datetime(year=2021, month=1, day=1, hour=3)}
-
-        self.contract.toggleCompounding(on=True)
-        self.contract.setDevRewardPct(amount=0)
-        self.contract.changeAmountPerHour(amount_per_hour = 100)
-
-        self.contract.addStakingTokens(environment = env_0, signer="bob", amount=1000)
-        self.contract.changeAmountPerHour(environment = env_1, amount_per_hour = 100) # Increment epoch
-        self.contract.changeAmountPerHour(environment = env_2, amount_per_hour = 100) # Increment epoch
-
-        # Expected yield.
-        # hr 1 100
-        # hr 2 yield on stake of 1000 + 100  (1100) = 110 // total : 210
-        # hr 3 yield on stake of 1210 / 1000 = 1.21 * 100 = 121 // total : 121 + 210 = 331
-
-        self.contract.withdrawTokensAndYield(environment = env_3, signer="bob")
-
-        bob_token_balance = self.basic_token.balances["bob"]
-        self.assertAlmostEqual(bob_token_balance, 331)
-
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits['amount'], 50)
+       
 
 if __name__ == "__main__":
     unittest.main()
