@@ -28,21 +28,12 @@ export class ApiService {
 
 	async get_market_summaries(){
 		try {
-			let summary = await axios.get(`${this.base_url}/api/get_market_summaries`).then((res) => valuesToBigNumber(res.data))
+			let summary = await axios.get(`${this.base_url}/api/get_market_summaries_w_token`).then((res) => valuesToBigNumber(res.data))
 			return summary
 		} catch (err) {
 			console.error(err)
 			throw err
 		}
-	}
-
-	async get_market_summaries_with_token_info(){
-		let summaries = await this.get_market_summaries()
-		return await Promise.all(summaries.map(summary => new Promise(async (resolver) => {
-			let token_info = this.token_info_cache[summary.contract_name]
-			if(!token_info) token_info = await this.getToken(summary.contract_name)
-			resolver({...token_info, ...summary})
-		})))
 	}
 
 	async getMarketList() {

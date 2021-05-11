@@ -5,8 +5,8 @@ const CURRENCY_NAME = 'Lamden Testnet Token'
 const AMM_CONTRACT_NAME = 'con_amm_v9'
 const AMM_TOKEN_CONTRACT = 'con_rswp_lst001'
 const AMM_TOKEN_SYMBOL = 'RSWP'
-const AMM_TOKEN_STAKING_CONTRACT = 'con_staking_smart_epoch_rswp_rswp_11'
-// const AMM_TOKEN_STAKING_CONTRACT = 'con_simple_staking_rswp'
+const AMM_TOKEN_YIELD_CONTRACT = 'con_staking_smart_epoch_rswp_rswp_11'
+const AMM_TOKEN_STAKING_CONTRACT = 'con_simple_staking_rswp'
 const AMM_FEE = '0.003'
 const AMM_TOKEN_DISCOUNT = '0.75'
 const NAMES_CONTRACT = 'con_ipseity_5'
@@ -55,6 +55,7 @@ export const config = {
   ammTokenContract: AMM_TOKEN_CONTRACT, // Change for PROD
   ammTokenDiscount: AMM_TOKEN_DISCOUNT,
   ammTokenStakingContract: AMM_TOKEN_STAKING_CONTRACT, // Change for PROD
+  ammTokenYieldContract: AMM_TOKEN_YIELD_CONTRACT, // Change for PROD
   ammFee: AMM_FEE, //Change for PROD
   blockExplorer: BLOCKEXPLORER_URL, //Change for PROD
   docs_subdomain: DOCS_SUBDOMAIN,

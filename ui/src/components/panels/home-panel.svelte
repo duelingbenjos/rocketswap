@@ -19,46 +19,36 @@
     $: currencyToDisplay = $currencyType
     $: volumeFilter = $homePageTableFilter ? $homePageTableFilter.volume : null;
     $: priceFilter = $homePageTableFilter ? $homePageTableFilter.price : null;
+    $: nameFilter = $homePageTableFilter ? $homePageTableFilter.name : null;
     $: currentFilter = $homePageTableFilter ? $homePageTableFilter.current : null;
 
     $: results = sortMarketData(marketData, $homePageTableFilter)
 
     const handleCurrencyTypeChange = () => setCurrencyType(type)
 
-    const handleVolumeFilterClick = () => {
+    const handleFilterClick = (filer_name) => {
         homePageTableFilter.update(current => {
-            if (current.current !== "volume") current.current = "volume"
-            if (current.volume === "asc") current.volume = "dsc"
-            else current.volume = "asc"
-            
-            setHomePageTableFilter(current.volume, current.prive, current.current)
-            return current
-        })
-    }
+            if (current.current !== filer_name) current.current = filer_name
+            if (current[filer_name] === "asc") current[filer_name] = "dsc"
+            else current[filer_name] = "asc"
 
-    const handlePriceFilterClick = () => {
-        homePageTableFilter.update(current => {
-            if (current.current !== "price") current.current = "price"
-            if (current.price === "asc") current.price = "dsc"
-            else current.price = "asc"
-
-            setHomePageTableFilter(current.volume, current.prive, current.current)
+            setHomePageTableFilter(current.volume, current.price, current.name, current.current)
             return current
         })
     }
 
     const sortMarketData = () => {
-        console.log("click")
         if (!marketData) return []
         if (!$homePageTableFilter) return marketData
 
         let r =  marketData.sort((a, b) => {
             if (currentFilter === "volume" && volumeFilter === "dsc") return a.Volume.isGreaterThan(b.Volume) ? 1 : -1
-            if (currentFilter === "volume" && volumeFilter === "asc") return a.Volume.isGreaterThan(b.Volume) ? -1 : 1
+            if (currentFilter === "volume" && volumeFilter === "asc") return a.Volume.isLessThan(b.Volume) ? 1 : -1
             if (currentFilter === "price" && priceFilter === "dsc") return parseFloat(a.vol24Str) > parseFloat(b.vol24Str) ? 1 : -1
-            if (currentFilter === "price" && priceFilter === "asc") return parseFloat(a.vol24Str) > parseFloat(b.vol24Str) ? -1 : 1
+            if (currentFilter === "price" && priceFilter === "asc") return parseFloat(a.vol24Str) < parseFloat(b.vol24Str) ? 1 : -1
+            if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > a.token.token_name ? 1 : -1
+            if (currentFilter === "name" && nameFilter === "asc") return a.token.token_name < a.token.token_name ? 1 : -1
         })
-        console.log(r)
         return r
     }
 
@@ -78,6 +68,9 @@
     .headings{
         border-bottom: 1px solid var(--text-primary-color-dimmer);
     }
+    .mobile-hide{
+        display: none;
+    }
 
     th{
         text-align: left;
@@ -87,6 +80,7 @@
     td{
         max-width: 100px;
         padding: 12px 8px 0;
+        vertical-align: top;
     }
     div.ellipsis{
         overflow: hidden;
@@ -111,7 +105,16 @@
     button{
         align-items: baseline;
     }
-    
+
+
+    @media screen and (min-width: 430px) {
+        .mobile-show{
+            display: none;
+        }
+        .mobile-hide{
+            display: table-cell;
+        }
+	}
 
 	@media screen and (min-width: 550px) {
         td{
@@ -154,7 +157,18 @@
         <table>
             <tr class="headings">
                 <th>#</th>
-                <th>Name</th>
+                <th>                    
+                    <button class="flex-row" on:click={() => handleFilterClick('name')}>
+                        Name
+                        <DirectionalChevron 
+                            width="10px"
+                            styles={`position: relative; ${nameFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
+                            margin={"0 0 0 8px"}
+                            direction={nameFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "name" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                        />
+                    </button>
+                </th>
                 <th>
                     <div class="dropdown">
                         <select bind:value={type} bind:this={selectElm} on:blur={handleCurrencyTypeChange}>
@@ -163,8 +177,8 @@
                         </select>
                     </div>
                 </th>
-                <th>                    
-                    <button class="flex-row" on:click={handlePriceFilterClick}>
+                <th class="mobile-hide">                    
+                    <button class="flex-row" on:click={() => handleFilterClick('price')}>
                             24hr % 
                         <DirectionalChevron 
                             width="10px"
@@ -175,7 +189,7 @@
                         />
                     </button></th>
                 <th>
-                    <button class="flex-row" on:click={handleVolumeFilterClick}>
+                    <button class="flex-row" on:click={() => handleFilterClick('volume')}>
                         Volume (24hrs) 
                         <DirectionalChevron 
                             width="10px" 
@@ -198,13 +212,24 @@
                             <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
                         </div>
                     </td>
-                    <td>{currencyToDisplay === "usd" ? `$${stringToFixed(tokenInfo.usdPrice, 2)}` : stringToFixed(tokenInfo.Last, 5)}</td>
-                    <td 
-                        class:text-error={tokenInfo.change === "minus"}
-                        class:text-success={tokenInfo.change === "plus"}>
-                        {tokenInfo.vol24Str}%
+                    <td>
+                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(2)}` : stringToFixed(tokenInfo.Last, 5)}
+                        <div
+                            class:text-error={tokenInfo.change === "minus"}
+                            class:text-success={tokenInfo.change === "plus"}
+                            class="mobile-show">
+                            {tokenInfo.price24Str}%
+                        </div>
                     </td>
-                    <td>{numberWithCommas(currencyToDisplay === "usd" ? `$${stringToFixed(tokenInfo.usdVolume, 2)}` : stringToFixed(tokenInfo.Volume, 5))}</td>
+                    <td
+                        class:text-error={tokenInfo.change === "minus"}
+                        class:text-success={tokenInfo.change === "plus"}
+                        class="mobile-hide">
+                        {tokenInfo.price24Str}%
+                    </td>
+                    <td>
+                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2)}` : stringToFixed(tokenInfo.Volume, 5))}  
+                    </td>
                 </tr>
             {/each}
         </table>

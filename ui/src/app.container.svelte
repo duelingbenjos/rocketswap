@@ -3,7 +3,7 @@
 	import { writable } from 'svelte/store'
 	import Router from 'svelte-hash-router'
 
-	//Components
+	// Components
 	import Header from './components/header.svelte'
 	import Footer from './components/footer.svelte'
 	import TrollBox from './components/misc/troll-box.svelte'
@@ -11,7 +11,10 @@
 	import ToastsContainer from './components/toasts-container.svelte'
 	import TestnetBanner from './components/misc/testnet-banner.svelte'
 
-	//Services
+	// Icons
+	import DeathStarImage from './icons/deathstar.svelte'
+
+	// Services
 	import { WalletService } from './services/wallet.service'
 	import { ApiService } from './services/api.service'
 	import { WsService } from './services/ws.service'
@@ -20,7 +23,7 @@
 	import { initializeStateFromLocalStorage  } from './utils'
 	import { tabHidden } from './store' 
 
-	//TO DO REMOVE THIS!!
+	// TO DO REMOVE THIS!!
 	import { ToastService } from './services/toast.service'
 	const toastService = ToastService.getInstance()
 
@@ -126,6 +129,17 @@
 	function getThemeSetting() {
 		return JSON.parse(localStorage.getItem("lighttheme"))
 	}
+
+	const isMay4th = () => {
+		let date = new Date()
+		let month = date.getMonth()
+		let day = date.getDate()
+
+		console.log({month, day})
+
+		return month === 4 && day === 4
+		
+	}
 </script>
 
 <style>
@@ -152,3 +166,6 @@
 <TrollBoxButton />
 <TrollBox />
 <TestnetBanner/>
+{#if isMay4th()}
+	<DeathStarImage />
+{/if}

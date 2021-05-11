@@ -223,8 +223,11 @@
 	}
 
 	public joinTradeFeed(contract_name: string) {
+		console.log({joinedFeeds: this.joinedFeeds, contract_name, currentEquals: this.current_trade_feed === contract_name, joinedAlready: this.joinedFeeds[`trade_feed:${contract_name}`]})
 		if (this.current_trade_feed === contract_name) return
 		if (this.joinedFeeds[`trade_feed:${contract_name}`]) return
+
+		console.log({contract_name})
 		
 		console.log("joining " + contract_name)
 		this.connection.on(`trade_update:${contract_name}`, (event) => this.handleTradeUpdate(event, contract_name))
@@ -260,8 +263,8 @@
 		}
 	}
 
-	public leaveTradeFeed() {
-		const contract_name = this.current_trade_feed
+	public leaveTradeFeed(contract_name = undefined) {
+		if (!contract_name) contract_name = this.current_trade_feed
 		this.connection.off(`trade_update:${contract_name}`)
 		this.current_trade_feed = ''
 
@@ -269,6 +272,7 @@
 		tradeUpdates.set([])
 
 		this.joinedFeeds[`trade_feed:${contract_name}`] = false
+		console.log({joinedFeeds: this.joinedFeeds})
 	}
 
 /* -------------------------

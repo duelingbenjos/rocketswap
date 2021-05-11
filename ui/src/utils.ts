@@ -153,11 +153,11 @@ export const setCurrencyType = (value) => {
 }
 export const getHomePageTableFilter = () => {
 	let value = localStorage.getItem("home_page_talbe_filters")
-	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", current: "volume"})
+	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", name: "asc", current: "volume"})
 	else homePageTableFilter.set(JSON.parse(value))
 }
-export const setHomePageTableFilter = (volume, price, current) => {
-	setLSValue("home_page_talbe_filters", {volume, price, current})
+export const setHomePageTableFilter = (volume, price, name, current) => {
+	setLSValue("home_page_talbe_filters", {volume, price, name, current})
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))

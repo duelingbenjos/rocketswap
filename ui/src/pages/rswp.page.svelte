@@ -20,7 +20,7 @@
 	const api = ApiService.getInstance()
 
     //Misc
-    import { rswpStakingInfo } from '../store'
+    import { rswpStakingInfo, rswpYeildInfo } from '../store'
     import { config } from '../config'
 
     let rswpToken = writable()
@@ -145,7 +145,8 @@
     </div>
 
     <div class="flex panels">
-        <StakingPanel stakingInfo={$rswpStakingInfo}/>
+        <StakingPanel stakingInfo={$rswpStakingInfo} />
+       <!-- <StakingPanel stakingInfo={$rswpYeildInfo} />-->
         <RSWPDiscountPanel />
     </div>
 </div>

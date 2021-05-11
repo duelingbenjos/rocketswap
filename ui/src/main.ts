@@ -11,10 +11,10 @@ import { routes } from 'svelte-hash-router'
 import Home from './pages/home.page.svelte'
 
 routes.set({
-  // '/': {
-  //   $$component: Home,
-  //   $$name: 'Home'
-  // },
+  '/': {
+    $$component: Home,
+     $$name: 'Home'
+   },
   '/swap/': {
     $$component: Swap,
     $$name: 'Swap',
