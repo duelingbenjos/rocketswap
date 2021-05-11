@@ -52,10 +52,15 @@ export async function updateUserStakingInfo(args: {
 		entity.staking_contract = staking_contract;
 	}
 	if (deposits?.value) {
-		entity.deposits = deposits.value.map((deposit) => {
-			if (deposit.starting_epoch.__fixed__) deposit.starting_epoch = Number(deposit.starting_epoch.__fixed__);
-			return deposit;
-		});
+		if (deposits.value.length) {
+			entity.deposits = deposits.value.map((deposit) => {
+				if (deposit.starting_epoch.__fixed__) deposit.starting_epoch = Number(deposit.starting_epoch.__fixed__);
+				return deposit;
+			});
+		} else if (deposits.value.starting_epoch) {
+			deposits.value.starting_epoch = Number(deposits.value.starting_epoch.__fixed__);
+			entity.deposits = [deposits.value];
+		}
 	}
 	if (withdrawals) {
 		entity.withdrawals = withdrawals.value.__fixed__ ? parseFloat(withdrawals.value.__fixed__) : 0;
@@ -78,6 +83,11 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 
 	for (let d of deposits) {
 		let calcFn = meta.meta.type === "staking_simple" ? calculateSimpleYield : calculateYield;
+		if (calcFn === 'staking_simple') {
+
+		} else if (calcFn === 'staking_smart_epoch_compounding_timeramp') {
+
+		} else if (calcFn === '')
 		// log.log(meta);
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
@@ -123,7 +133,6 @@ function calculateYield(args: {
 	// log.log({ this_epoch_index });
 	// log.log({ epochs });
 	while (this_epoch_index <= current_epoch_index) {
-
 		let this_epoch = epochs[this_epoch_index];
 		let next_epoch = epochs[this_epoch_index + 1];
 		let delta = 0;

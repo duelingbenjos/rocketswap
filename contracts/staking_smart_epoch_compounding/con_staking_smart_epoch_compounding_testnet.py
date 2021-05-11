@@ -46,16 +46,16 @@ def seed():
 
     TimeRampValues.set(
         [
-            {lower: 0, upper: 1, multiplier: 0.1},
-            {lower: 1, upper: 2, multiplier: 0.2},
-            {lower: 2, upper: 3, multiplier: 0.3},
-            {lower: 3, upper: 4, multiplier: 0.4},
-            {lower: 4, upper: 5, multiplier: 0.5},
-            {lower: 5, upper: 6, multiplier: 0.6},
-            {lower: 6, upper: 7, multiplier: 0.7},
-            {lower: 7, upper: 8, multiplier: 0.8},
-            {lower: 8, upper: 9, multiplier: 0.9},
-            {lower: 9, upper: 10, multiplier: 1},
+            {'lower': 0, 'upper': 1, 'multiplier': 0.1},
+            {'lower': 1, 'upper': 2, 'multiplier': 0.2},
+            {'lower': 2, 'upper': 3, 'multiplier': 0.3},
+            {'lower': 3, 'upper': 4, 'multiplier': 0.4},
+            {'lower': 4, 'upper': 5, 'multiplier': 0.5},
+            {'lower': 5, 'upper': 6, 'multiplier': 0.6},
+            {'lower': 6, 'upper': 7, 'multiplier': 0.7},
+            {'lower': 7, 'upper': 8, 'multiplier': 0.8},
+            {'lower': 8, 'upper': 9, 'multiplier': 0.9},
+            {'lower': 9, 'upper': 10, 'multiplier': 1},
         ]
     )
 
