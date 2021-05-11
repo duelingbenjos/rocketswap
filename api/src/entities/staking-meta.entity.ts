@@ -1,13 +1,5 @@
-import { IContractingTime, IKvp, StakingType } from "../types/misc.types";
-import { getVal } from "../utils/utils";
+import { IContractingTime, StakingType } from "../types/misc.types";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
-import { handleClientUpdateType } from "../types/websocket.types";
-import { updateUserStakingInfo } from "./user-staking.entity";
-import { updateEpoch } from "./staking-epoch.entity";
-import { PairEntity } from "./pair.entity";
-import { ParserProvider } from "../parser.provider";
-import { log } from "../utils/logger";
-import { config } from "rxjs";
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -62,5 +54,5 @@ export class StakingMetaEntity extends BaseEntity {
 	};
 
 	@Column({ nullable: true })
-	ROI_yearly: number;
+	ROI_yearly: number = 0;
 }
