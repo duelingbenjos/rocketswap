@@ -55,7 +55,8 @@ export class VolumeService implements OnModuleInit {
 				token_metrics_entity.Last = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.Bid = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.Ask = trades_last_day.length ? today_last_price : yesterday_last_price;
-				token_metrics_entity.PercentPriceIncrease_24h = ((token_metrics_entity.Last - token_metrics_entity.PrevDay) / token_metrics_entity.PrevDay) * 100;
+				token_metrics_entity.PercentPriceIncrease_24h =
+					((token_metrics_entity.Last - token_metrics_entity.PrevDay) / token_metrics_entity.PrevDay) * 100;
 				proms.push(token_metrics_entity.save());
 			}
 			await Promise.all(proms);
@@ -78,10 +79,14 @@ export class VolumeService implements OnModuleInit {
 	private async getLastYesterdayTrade(contract_name: string) {
 		const one_day_ago = Date.now() / 1000 - 24 * 60 * 60;
 		// const one_day_ago = Date.now() / 1000 - 24;
-		const yesterday = await TradeHistoryEntity.findOne({
+		let yesterday = await TradeHistoryEntity.findOne({
 			where: { contract_name, time: LessThan(one_day_ago) },
 			order: { time: "DESC" }
 		});
+		if (!yesterday) {
+			let trades_last_day = await this.getTradesLastDay(contract_name);
+			yesterday = trades_last_day[0];
+		}
 		// log.log({ yesterday });
 		return yesterday;
 	}
