@@ -7,7 +7,9 @@
         position: absolute;
         bottom: 200px;
         left: 100px;
-        width: 75px
+        width: 75px;
+        z-index: -1;
+        opacity: 0.8;
     }
     @media screen and (min-width: 430px) {
         img{
