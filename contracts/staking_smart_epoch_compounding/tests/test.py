@@ -819,5 +819,39 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(bob_deposits['amount'], 50)
        
 
+    def test_25_test_date(self):
+        
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
+        # env_3 = {"now": Datetime(year=2021, month=5, day=1, hour=2)}
+
+        self.contract.setDevRewardPct(amount = 0)
+        self.contract.changeAmountPerHour(amount_per_hour = 10)
+
+        self.contract.addStakingTokens(environment = env_1, signer="bob", amount=10)
+        self.contract.addStakingTokens(environment = env_2, signer="bob", amount=10)
+        # bob deposit = 10 + 10 + 10
+        bob_deposits = self.contract.Deposits["bob"]
+        print(str(bob_deposits['step_offset']))
+
+
+    def test_26_withdraw_after_compound_fails(self):
+        
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=5, day=1, hour=0)}
+
+        self.contract.setDevRewardPct(amount = 0)
+        self.contract.changeAmountPerHour(amount_per_hour = 10)
+
+        self.contract.addStakingTokens(environment = env_1, signer="bob", amount=10)
+        self.contract.addStakingTokens(environment = env_2, signer="bob", amount=10)
+        bob_token_balance_1 = self.basic_token.balances["bob"]
+        # self.assertAlmostEqual(bob_token_balance, 288000)
+
+        # bob deposit = 10 + 10 + 10
+        bob_token_balance_2 = self.basic_token.balances["bob"]
+        with self.assertRaises(AssertionError):
+            self.contract.withdrawYield(environment = env_2, signer="bob", amount=100000)
+       
 if __name__ == "__main__":
     unittest.main()

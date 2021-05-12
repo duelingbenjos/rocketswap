@@ -157,9 +157,10 @@ def increaseDeposit(amount: float):
     StakedBalance.set(new_global_staked)
     WithdrawnBalance.set(WithdrawnBalance.get() + yield_to_harvest)
 
+    Withdrawals[user] = 0
     Deposits[user] = {
         "starting_epoch": decideIncrementEpoch(new_staked_amount=new_global_staked),
-        "time": now,
+        "time": start_time,
         "amount": total_deposit_amount,
         "step_offset": now - start_time,
     }
@@ -260,35 +261,35 @@ def withdrawTokensAndYield():
 # This runs over each of the items in the user's Deposit
 def calculateYield(deposit):
     starting_epoch_index = deposit.get("starting_epoch")
-    time = deposit.get("time")
+    deposit_start_time = deposit.get("time")
     amount = deposit.get("amount")
     step_offset = deposit.get("step_offset")
 
-    if deposit.get("step_offset") is None:
-        step_offset = now - now  # now - now should = 0 delta
+    if step_offset is not None:
+        deposit_start_time = deposit_start_time + step_offset
+    else:
+        step_offset = now - now  # now - now // 0 delta
 
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
 
     y = 0
-    step_multiplier = 1
-
-    # assert False, (this_epoch_index, current_epoch_index)
+    time_step_multiplier = 1
 
     while this_epoch_index <= current_epoch_index:
         this_epoch = Epochs[this_epoch_index]
         next_epoch = Epochs[this_epoch_index + 1]
 
         if UseTimeRamp.get():
-            time_ramp_delta = now - fitTimeToRange(this_epoch["time"]) + step_offset
-            step_multiplier = findTimeRampStep(time_ramp_delta.days)
+            time_ramp_delta = fitTimeToRange(now) - fitTimeToRange(this_epoch["time"]) + step_offset
+            time_step_multiplier = findTimeRampStep(time_ramp_delta.days)
 
         delta = 0
 
         if starting_epoch_index == current_epoch_index:
-            delta = fitTimeToRange(now) - fitTimeToRange(time)
+            delta = fitTimeToRange(now) - fitTimeToRange(deposit_start_time)
         elif this_epoch_index == starting_epoch_index:
-            delta = fitTimeToRange(next_epoch["time"]) - fitTimeToRange(time)
+            delta = fitTimeToRange(next_epoch["time"]) - fitTimeToRange(deposit_start_time)
         elif this_epoch_index == current_epoch_index:
             delta = fitTimeToRange(now) - fitTimeToRange(this_epoch["time"])
         else:
@@ -308,7 +309,7 @@ def calculateYield(deposit):
         decimal_converter_var.set(pct_share_of_stake)
         pct_share_of_stake = decimal_converter_var.get()
         deposit_yield_this_epoch = (
-            global_yield_this_epoch * pct_share_of_stake * step_multiplier
+            global_yield_this_epoch * pct_share_of_stake * time_step_multiplier
         )
         y += deposit_yield_this_epoch
 
