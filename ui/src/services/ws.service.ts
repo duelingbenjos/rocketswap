@@ -272,7 +272,6 @@
 		tradeUpdates.set([])
 
 		this.joinedFeeds[`trade_feed:${contract_name}`] = false
-		console.log({joinedFeeds: this.joinedFeeds})
 	}
 
 /* -------------------------

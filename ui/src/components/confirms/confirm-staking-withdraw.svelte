@@ -109,7 +109,7 @@
     </div>
     {#if stakingInfo.contract_name === config.ammTokenStakingContract}
         <p class="text-xsmall sub-text text-primary-dim">
-            ** 10% of the yeild from all {config.ammTokenSymbol} withdrawls in this contract goes to the developers of Rocketswap!  It will be added automatically to the transaction total.
+            ** 10% of the yield from all {config.ammTokenSymbol} withdrawals goes to the developers of Rocketswap!  This amount will be added automatically to the transaction total.
         </p>
     {/if}
     <div class="flex-col modal-confirm-details-box text-small weight-400">

@@ -153,11 +153,11 @@ export const setCurrencyType = (value) => {
 }
 export const getHomePageTableFilter = () => {
 	let value = localStorage.getItem("home_page_talbe_filters")
-	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", name: "asc", current: "volume"})
+	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", price_change: "asc", name: "asc", current: "volume"})
 	else homePageTableFilter.set(JSON.parse(value))
 }
-export const setHomePageTableFilter = (volume, price, name, current) => {
-	setLSValue("home_page_talbe_filters", {volume, price, name, current})
+export const setHomePageTableFilter = (volume, price, price_change, name, current) => {
+	setLSValue("home_page_talbe_filters", {volume, price, price_change, name, current})
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))
@@ -181,8 +181,17 @@ export const formatAccountAddress = (account: string, lsize = 4, rsize = 4) => {
   return account.substring(0, lsize) + '...' + account.substring(account.length - rsize)
 }
 
-export const numberWithCommas = (x) => {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+export const numberWithCommas = (nStr) => {
+	nStr += '';
+	var x = nStr.split('.');
+	var x1 = x[0];
+	var x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+	 x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
 }
 
 export const returnFloat = (value: any) => {
