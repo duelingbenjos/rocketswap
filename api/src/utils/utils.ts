@@ -26,11 +26,7 @@ export const getNewJoiner = (state, prev_state): string => {
  */
 
 export function validateTokenContract(contract: string): boolean {
-	const required_fields = [
-		"def transfer",
-		"def approve",
-		"def transfer_from"
-	];
+	const required_fields = ["def transfer", "def approve", "def transfer_from"];
 	let missing = required_fields.map((field) => contract.includes(field));
 	let missing_idx = missing.findIndex((field) => field === false);
 	return missing_idx > -1 ? false : true;
@@ -111,4 +107,13 @@ export function decideLogo(token: TokenEntity): { type: string; data: string } {
 	}
 
 	return obj;
+}
+
+export function dateNowUtc() {
+	const minute_difference = new Date().getTimezoneOffset();
+	if (minute_difference !== 0) {
+		let difference_ms = minute_difference * 60 * 1000;
+		return Date.now() + difference_ms;
+	}
+	return Date.now();
 }

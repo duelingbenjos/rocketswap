@@ -1,18 +1,17 @@
 import { Injectable, Logger } from "@nestjs/common";
+import { getUserYieldPerSecond } from "../utils/yield-utils";
 import { staking_contracts } from "../config";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
-import { getUserYield, getUserYieldPerSecond, UserStakingEntity } from "../entities/user-staking.entity";
+import { getUserYield, UserStakingEntity } from "../entities/user-staking.entity";
 import {
 	handleAuthenticateResponseType,
 	handleClientUpdateType,
 	handleTrollboxMsg,
 	handleProxyTxnResponse,
-	EpochUpdateType,
-	IUserYieldInfo,
 	IUserYieldPayload
 } from "../types/websocket.types";
-
+import { log } from "../utils/logger";
 @Injectable()
 export class SocketService {
 	private logger: Logger = new Logger("SocketService");
@@ -55,28 +54,35 @@ export class SocketService {
 		try {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			// if (!staking_entities || !staking_entities.length) return;
-			const payload = await staking_entities.filter(ent => staking_contracts.includes(ent.staking_contract)).reduce(async (accumP, user_entity) => {
-				const accum = await accumP
-				if (
-					(!user_entity.yield_info ||
-						!Object.keys(user_entity.yield_info).length ||
-						user_entity.yield_info.epoch_updated !== this.staking_epochs[user_entity.staking_contract]) &&
-					user_entity.deposits.length
-				) {
-					const epoch_entities = await StakingEpochEntity.find({
-						where: { staking_contract: user_entity.staking_contract },
-						take: 10000
-					});
-					const metrics = await this.updateClientStakingMetrics(vk, user_entity.staking_contract, user_entity, epoch_entities);
-					user_entity.yield_info = metrics[user_entity.staking_contract];
-					user_entity.save();
-				}
-				accum[user_entity.staking_contract] = user_entity.yield_info;
-				return accum;
-			}, Promise.resolve({}));
+			const payload = await staking_entities
+				.filter((ent) => staking_contracts.includes(ent.staking_contract))
+				.reduce(async (accumP, user_entity) => {
+					const accum = await accumP;
+					if (
+						(!user_entity.yield_info ||
+							!Object.keys(user_entity.yield_info).length ||
+							user_entity.yield_info.epoch_updated !== this.staking_epochs[user_entity.staking_contract]) &&
+						user_entity.deposits.length
+					) {
+						const epoch_entities = await StakingEpochEntity.find({
+							where: { staking_contract: user_entity.staking_contract },
+							take: 10000
+						});
+						const metrics = await this.updateClientStakingMetrics(
+							vk,
+							user_entity.staking_contract,
+							user_entity,
+							epoch_entities
+						);
+						user_entity.yield_info = metrics[user_entity.staking_contract];
+						user_entity.save();
+					}
+					accum[user_entity.staking_contract] = user_entity.yield_info;
+					return accum;
+				}, Promise.resolve({}));
 			return payload;
 		} catch (err) {
-			this.logger.error(err)
+			log.error(err);
 		}
 	}
 
@@ -88,7 +94,6 @@ export class SocketService {
 			for (let vk of this.staking_panel_clients) {
 				const user_entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
 				// console.log(user_entity);
-				if (user_entity) {
 					//console.log("sendClientStakingUpdates, user_entity found");
 					const user_yield_payload: IUserYieldPayload = await this.updateClientStakingMetrics(
 						vk,
@@ -104,10 +109,9 @@ export class SocketService {
 						data: user_yield_payload,
 						vk
 					});
-				}
 			}
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err);
 		}
 	}
 
@@ -117,6 +121,7 @@ export class SocketService {
 		user_entity: UserStakingEntity,
 		epoch_entities: StakingEpochEntity[]
 	): Promise<IUserYieldPayload> {
+		log.error("UPDATE CLIENT STAKING METRICS CALLED")
 		//console.log("UPDATECLIENTSTAKINGMETRICS");
 		try {
 			/** Hack here to make this work, deeper refactor needed. */
@@ -137,7 +142,8 @@ export class SocketService {
 			//console.log(total_staked);
 			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities_filtered });
 			//console.log("current yield", current_yield);
-			const yield_per_sec = getUserYieldPerSecond(meta_entity, total_staked, user_entity);
+			// log.log({user_entity})
+			const yield_per_sec = user_entity.deposits.length ? getUserYieldPerSecond(meta_entity, total_staked, user_entity) : 0;
 			const time_updated = Date.now();
 			const epoch_updated = meta_entity.Epoch.index;
 
@@ -158,7 +164,7 @@ export class SocketService {
 				[staking_contract]: user_entity.yield_info
 			};
 		} catch (err) {
-			this.logger.error(err);
+			log.error(err);
 		}
 	}
 }

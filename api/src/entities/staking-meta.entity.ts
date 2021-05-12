@@ -1,4 +1,4 @@
-import { IContractingTime, StakingType } from "../types/misc.types";
+import { IContractingTime, ITimeRampValue, StakingType } from "../types/misc.types";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 
 @Entity()
@@ -44,6 +44,12 @@ export class StakingMetaEntity extends BaseEntity {
 
 	@Column({ nullable: true })
 	WithdrawnBalance: string;
+
+	@Column({ nullable: true })
+	UseTimeRamp: boolean;
+
+	@Column({ nullable: true, type: "simple-json" })
+	TimeRampValues: ITimeRampValue[];
 
 	@Column({ nullable: true, type: "simple-json" })
 	Epoch: {

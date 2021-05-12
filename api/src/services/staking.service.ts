@@ -57,6 +57,12 @@ export class StakingService implements OnModuleInit {
 		) {
 			// log.log("staking_smart_epoch called");
 			return await this.getRSWPStakingROI(meta_entity);
+		} else if (
+			meta.type === "staking_smart_epoch_compounding_timeramp" &&
+			meta.STAKING_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT &&
+			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
+		) {
+			return await this.getRSWPStakingROI(meta_entity);
 		}
 	};
 
@@ -91,7 +97,7 @@ export class StakingService implements OnModuleInit {
 		// console.log({ updateStakingContractMeta: args });
 		try {
 			const { state, handleClientUpdate, staking_contract, fn, hash, timestamp } = args;
-			let previous_staked_balance: number
+			let previous_staked_balance: number;
 			let entity = await StakingMetaEntity.findOne(staking_contract);
 			if (!entity) {
 				entity = new StakingMetaEntity();
@@ -109,7 +115,7 @@ export class StakingService implements OnModuleInit {
 						entity["CurrentEpochIndex"] = getVal(kvp);
 						break;
 					case `${staking_contract}.StakedBalance`:
-						if (entity.StakedBalance) previous_staked_balance = JSON.parse(JSON.stringify(entity.StakedBalance))
+						if (entity.StakedBalance) previous_staked_balance = JSON.parse(JSON.stringify(entity.StakedBalance));
 						entity["StakedBalance"] = getVal(kvp);
 						break;
 					case `${staking_contract}.meta:version`:
@@ -155,7 +161,14 @@ export class StakingService implements OnModuleInit {
 					case `${staking_contract}.WithdrawnBalance`:
 						entity["WithdrawnBalance"] = getVal(kvp);
 						break;
+					case `${staking_contract}.UseTimeRamp`:
+						entity["UseTimeRamp"] = getVal(kvp);
+						break;
+					case `${staking_contract}.TimeRampValues`:
+						entity["TimeRampValues"] = getVal(kvp);
+						break;
 				}
+
 				if (kvp.key.includes("Epochs")) {
 					const index = parseInt(kvp.key.split(":")[1]);
 					const { staked, time, emission_rate_per_tau, amt_per_hr } = kvp.value;
