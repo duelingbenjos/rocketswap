@@ -95,20 +95,22 @@ export class SocketService {
 				const user_entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
 				// console.log(user_entity);
 					//console.log("sendClientStakingUpdates, user_entity found");
-					const user_yield_payload: IUserYieldPayload = await this.updateClientStakingMetrics(
-						vk,
-						staking_contract,
-						user_entity,
-						epoch_entities
-					);
-					//console.log(user_yield_payload);
-					user_entity.yield_info = user_yield_payload[staking_contract];
-					await user_entity.save();
-					this.handleClientUpdate({
-						action: "user_yield_update",
-						data: user_yield_payload,
-						vk
-					});
+					if (user_entity) {
+						const user_yield_payload: IUserYieldPayload = await this.updateClientStakingMetrics(
+							vk,
+							staking_contract,
+							user_entity,
+							epoch_entities
+						);
+						//console.log(user_yield_payload);
+						user_entity.yield_info = user_yield_payload[staking_contract];
+						await user_entity.save();
+						this.handleClientUpdate({
+							action: "user_yield_update",
+							data: user_yield_payload,
+							vk
+						});
+					}
 			}
 		} catch (err) {
 			log.error(err);
