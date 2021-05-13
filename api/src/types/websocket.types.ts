@@ -31,6 +31,7 @@ export interface IUserYieldInfo {
 	yield_per_sec: number;
 	epoch_updated: number;
 	time_updated: number;
+	user_reward_rate?: number;
 }
 
 export type ClientUpdateType =

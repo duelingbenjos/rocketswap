@@ -25,6 +25,9 @@ export class UserStakingEntity extends BaseEntity {
 
 	@Column({ nullable: true, type: "simple-json" })
 	yield_info: IUserYieldInfo;
+
+	@Column({nullable: true})
+	user_reward_rate?: number
 }
 
 export interface IStakingDeposit {
@@ -87,7 +90,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 		let staking_contract_type = meta.meta?.type;
 
 		if (!staking_contract_type) {
-			log.error("no meta info found");
+			log.warn("no meta info found");
 			return;
 		}
 		if (staking_contract_type === "staking_simple") {

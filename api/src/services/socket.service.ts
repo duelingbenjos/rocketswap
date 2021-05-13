@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { getUserYieldPerSecond } from "../utils/yield-utils";
+import { getUserRewardRate, getUserYieldPerSecond } from "../utils/yield-utils";
 import { staking_contracts } from "../config";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
@@ -53,7 +53,6 @@ export class SocketService {
 	public async getClientYieldList(vk: string) {
 		try {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
-			// if (!staking_entities || !staking_entities.length) return;
 			const payload = await staking_entities
 				.filter((ent) => staking_contracts.includes(ent.staking_contract))
 				.reduce(async (accumP, user_entity) => {
@@ -88,29 +87,24 @@ export class SocketService {
 
 	public async sendClientStakingUpdates(staking_contract: string) {
 		try {
-			//console.log("sendClientStakingUpdates called");
 			const epoch_entities = await StakingEpochEntity.find({ where: { staking_contract }, take: 10000 });
-			//console.log(this.staking_panel_clients);
 			for (let vk of this.staking_panel_clients) {
 				const user_entity = await UserStakingEntity.findOne({ where: { vk, staking_contract } });
-				// console.log(user_entity);
-					//console.log("sendClientStakingUpdates, user_entity found");
-					if (user_entity) {
-						const user_yield_payload: IUserYieldPayload = await this.updateClientStakingMetrics(
-							vk,
-							staking_contract,
-							user_entity,
-							epoch_entities
-						);
-						//console.log(user_yield_payload);
-						user_entity.yield_info = user_yield_payload[staking_contract];
-						await user_entity.save();
-						this.handleClientUpdate({
-							action: "user_yield_update",
-							data: user_yield_payload,
-							vk
-						});
-					}
+				if (user_entity) {
+					const user_yield_payload: IUserYieldPayload = await this.updateClientStakingMetrics(
+						vk,
+						staking_contract,
+						user_entity,
+						epoch_entities
+					);
+					user_entity.yield_info = user_yield_payload[staking_contract];
+					await user_entity.save();
+					this.handleClientUpdate({
+						action: "user_yield_update",
+						data: user_yield_payload,
+						vk
+					});
+				}
 			}
 		} catch (err) {
 			log.error(err);
@@ -123,10 +117,8 @@ export class SocketService {
 		user_entity: UserStakingEntity,
 		epoch_entities: StakingEpochEntity[]
 	): Promise<IUserYieldPayload> {
-		log.error("UPDATE CLIENT STAKING METRICS CALLED")
-		//console.log("UPDATECLIENTSTAKINGMETRICS");
 		try {
-			/** Hack here to make this work, deeper refactor needed. */
+			/** Hack here to make this work, on testnet, after multiple resyncs. */
 			let epoch_entities_filtered = [];
 			epoch_entities.forEach((epoch) => {
 				if (epoch_entities_filtered.findIndex((ent) => ent.epoch_index === epoch.epoch_index) < 0) {
@@ -134,22 +126,14 @@ export class SocketService {
 				}
 			});
 			epoch_entities_filtered.sort((a, b) => a.epoch_index - b.epoch_index);
-
 			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract } });
-
 			const total_staked = user_entity.deposits.reduce((accum, deposit) => {
-				//console.log("deposit", deposit);
 				return (accum += parseFloat(deposit.amount.__fixed__));
 			}, 0);
-			//console.log(total_staked);
 			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities_filtered });
-			//console.log("current yield", current_yield);
-			// log.log({user_entity})
 			const yield_per_sec = user_entity.deposits.length ? getUserYieldPerSecond(meta_entity, total_staked, user_entity) : 0;
 			const time_updated = Date.now();
 			const epoch_updated = meta_entity.Epoch.index;
-
-			//console.log(current_yield);
 
 			user_entity.yield_info = {
 				current_yield,
@@ -159,7 +143,8 @@ export class SocketService {
 				total_staked
 			};
 
-			// console.log(user_entity);
+			if (meta_entity.meta.type === "staking_smart_epoch_compounding_timeramp")
+				user_entity.yield_info.user_reward_rate = getUserRewardRate(meta_entity, user_entity.deposits[0]);
 
 			await user_entity.save();
 			return {
