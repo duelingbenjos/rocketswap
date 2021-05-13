@@ -33,23 +33,20 @@ import {
 	isClientStakingUpdate,
 	isTauUsdPriceUpdate
 } from "./types/websocket.types";
-import {log} from './utils/logger'
+import { log } from "./utils/logger";
 
 import { getTokenMetrics } from "./entities/price.entity";
 /**
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
  */
-@WebSocketGateway({origin: "*", cors: {origins: ['*', 'staging.rocketswap.exchange']}} )
+@WebSocketGateway({ origin: "*", cors: { origins: ["*", "staging.rocketswap.exchange"] } })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger("AppGateway");
 
 	@WebSocketServer() wss: Server;
 
-	constructor(
-		private readonly socketService: SocketService,
-		private readonly txnService: TransactionService
-	) {}
+	constructor(private readonly socketService: SocketService, private readonly txnService: TransactionService) {}
 
 	afterInit(server: Server) {
 		this.logger.log(`Websocket Initialised`);
@@ -77,7 +74,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				}
 				break;
 			case "user_lp_update":
-				if (isUserLpUpdateType(update)){
+				if (isUserLpUpdateType(update)) {
 					// log.log(update)
 					this.wss.emit(`user_lp_update:${update.vk}`, update);
 				}
@@ -116,7 +113,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				if (isTauUsdPriceUpdate(update)) {
 					// log.log("UPDATE", update);
 					this.wss.emit(`tau_usd_price`, update);
-				}	
+				}
 		}
 	};
 
@@ -138,14 +135,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async handleJoinRoom(client: Socket, room: string) {
 		client.join(room);
 		client.emit("joined_room", room);
-		log.log({joined: room})
+		log.log({ joined: room });
 		const [prefix, subject] = room.split(":");
 		switch (prefix) {
 			case "price_feed":
 				this.handleJoinPriceFeed(subject, client);
 				break;
 			case "user_lp_feed":
-				log.log("joining user_lp_feed")
+				log.log("joining user_lp_feed");
 				this.handleJoinUserLpFeed(subject, client);
 				break;
 			case "balance_feed":
@@ -182,23 +179,24 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	private async handleJoinTauUsdPrice(client: Socket) {
-		let entity = await TauMarketEntity.findOne({info_type: "usd_price"});
-		client.emit('tau_usd_price', {current_price: entity.value})
+		let entity = await TauMarketEntity.findOne({ info_type: "usd_price" });
+		client.emit("tau_usd_price", { current_price: entity.value });
 	}
 
 	private async handleJoinStakingPanel(client: Socket) {
-		const staking_entities = await StakingMetaEntity.find()
+		const staking_entities = await StakingMetaEntity.find();
 		let response = staking_entities.map(async (entity) => {
 			return new Promise(async (resolver) => {
-				const staking_token = await TokenEntity.findOne({contract_name: entity.meta.STAKING_TOKEN})
-				const yield_token = await TokenEntity.findOne({contract_name: entity.meta.YIELD_TOKEN})
+				const staking_token = await TokenEntity.findOne({ contract_name: entity.meta.STAKING_TOKEN });
+				const yield_token = await TokenEntity.findOne({ contract_name: entity.meta.YIELD_TOKEN });
 				resolver({
-					...entity, staking_token, yield_token
-				})
-			})
-
-		})
-		client.emit('staking_panel', await Promise.all(response))
+					...entity,
+					staking_token,
+					yield_token
+				});
+			});
+		});
+		client.emit("staking_panel", await Promise.all(response));
 	}
 
 	private async handleJoinTrollBox(client: Socket) {
@@ -238,13 +236,15 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	private async handleJoinTradeFeed(subject: string, client: Socket) {
 		try {
-			const trade_update = await TradeHistoryEntity.find({
-				select: ["contract_name", "token_symbol", "price", "type", "time", "amount"],
-				order: { time: "DESC" },
-				where: { contract_name: subject },
-				take: 50
-			});
-			client.emit(`trade_update:${subject}`, { history: trade_update });
+			if (subject !== "global") {
+				const trade_update = await TradeHistoryEntity.find({
+					select: ["contract_name", "token_symbol", "price", "type", "time", "amount"],
+					order: { time: "DESC" },
+					where: { contract_name: subject },
+					take: 50
+				});
+				client.emit(`trade_update:${subject}`, { history: trade_update });
+			}
 		} catch (err) {
 			this.logger.error(err);
 		}
