@@ -46,11 +46,6 @@ export type ClientUpdateType =
 	| ClientStakingUpdateType
 	| TauUsdPriceUpdateType;
 
-// export interface UserStakingUpdateType extends UpdateType {
-// 	action: "user_staking_update";
-// 	data: UserStakingEntity;
-// }
-
 export interface ClientStakingUpdateType extends UpdateType {
 	action: "client_staking_update";
 	staking_contract: string;
