@@ -86,6 +86,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				if (isTradeUpdate(update)) {
 					this.wss.emit(`trade_update`, { update });
 					this.wss.emit(`trade_update:${update.contract_name}`, update);
+					this.wss.emit(`trade_update:global`, update);
 				}
 				break;
 			case "epoch_update":
