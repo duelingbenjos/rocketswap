@@ -328,7 +328,8 @@ export function valuesToBigNumber(obj: any) {
 			if (	property === 'time' || 
 					property === 'vk' || 
 					property === 'time_updated' || 
-					property === 'hash') {
+					property === 'hash' || 
+					property === 'token_symbol') {
 				// ignore these values
 			} else if (typeof obj[property] === 'string') {
 				// Check if item is a string
