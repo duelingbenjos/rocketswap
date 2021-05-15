@@ -567,7 +567,7 @@ def setTimeRampValues(data: list):
 @export
 def transfer(amount: float, to: str):
     assert amount > 0, "Cannot send negative balances!"
-    assert balances[ctx.caller] >= amount, "Not enough coins to send!"
+    assert balances[ctx.caller] >= amount, "Not enough VTOKENS to send!"
     balances[ctx.caller] -= amount
     balances[to] += amount
 
@@ -595,7 +595,6 @@ def transfer_from(amount: float, to: str, main_account: str):
 
 def returnAndBurnVToken(amount: float):
     user = ctx.caller
-    this = ctx.this
     assert (
         balances[user] >= amount
     ), "Your VTOKEN balance is too low to unstake, recover your VTOKENS and try again."

@@ -157,39 +157,6 @@ def increaseDeposit(
     return Deposits[user]
 
 
-# @export
-# def addStakingTokens(amount: float):
-#     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
-#     assert amount > 0, "You cannot stake a negative balance."
-
-#     user = ctx.caller
-
-#     # Take the staking tokens from the user's wallet
-#     # STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
-#     DEX.transfer_liquidity_from(
-#         contract=LIQUIDITY_TOKEN, to=ctx.this, main_account=user, amount=amount
-#     )
-
-#     # Update the Staked amount
-#     staked = StakedBalance.get()
-#     new_staked_amount = staked + amount
-#     StakedBalance.set(new_staked_amount)
-
-#     # Update the Epoch
-#     epoch_index = decideIncrementEpoch(new_staked_amount=new_staked_amount)
-
-#     if Deposits[user] is False:
-#         Deposits[user] = []
-
-#     # Create a record of the user's deposit
-
-#     deposits = Deposits[user]
-
-#     deposits.append({"starting_epoch": epoch_index, "time": now, "amount": amount})
-
-#     Deposits[user] = deposits
-
-
 @export
 def withdrawYield(amount: float):
     assert amount > 0, "You cannot harvest a negative balance"
@@ -524,9 +491,6 @@ def removeFromTrustedImporters(contract: str):
     trusted_importers = TrustedImporters.get()
     trusted_importers.remove(contract)
     TrustedImporters.set(trusted_importers)
-
-
-# VTokens
 
 
 # VTOKEN METHODS

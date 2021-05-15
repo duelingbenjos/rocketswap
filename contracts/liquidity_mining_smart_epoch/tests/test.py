@@ -763,5 +763,75 @@ class MyTestCase(unittest.TestCase):
         # self.assertAlmostEqual(current_epoch_index, 2)
         self.assertAlmostEqual(current_epoch_index, 4)
 
+
+    def test_22_insufficient_vtoken_will_fail(self):
+
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=5, day=1, hour=0)}
+
+        self.contract.setDevRewardPct(amount=0)
+        self.contract.changeAmountPerHour(amount_per_hour=10)
+
+        self.contract.addStakingTokens(environment=env_1, signer="bob", amount=10)
+
+        bob_token_balance = self.contract.balances["bob"]
+        self.assertAlmostEqual(bob_token_balance, 10)
+
+        self.contract.transfer(environment=env_1, signer="bob", to="lucy", amount=10)
+
+        bob_token_balance = self.contract.balances["bob"]
+        self.assertAlmostEqual(bob_token_balance, 0)
+
+        lucy_token_balance = self.contract.balances["lucy"]
+        self.assertAlmostEqual(lucy_token_balance, 10)
+
+        with self.assertRaises(AssertionError):
+            self.contract.withdrawTokensAndYield(environment=env_2, signer="bob")
+
+    def test_23_enough_vtoken_will_pass(self):
+
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=5, day=1, hour=0)}
+
+        self.contract.setDevRewardPct(amount=0)
+        self.contract.changeAmountPerHour(amount_per_hour=10)
+
+        self.contract.addStakingTokens(environment=env_1, signer="bob", amount=10)
+
+        bob_token_balance = self.contract.balances["bob"]
+        self.assertAlmostEqual(bob_token_balance, 10)
+
+        self.contract.transfer(environment=env_1, signer="bob", to="lucy", amount=10)
+
+        bob_token_balance = self.contract.balances["bob"]
+        self.assertAlmostEqual(bob_token_balance, 0)
+
+        lucy_token_balance = self.contract.balances["lucy"]
+
+        self.assertAlmostEqual(lucy_token_balance, 10)
+        self.contract.transfer(environment=env_2, signer="lucy", to="bob", amount=10)
+
+        # bob deposit = 10 + 10 + 10
+        self.contract.withdrawTokensAndYield(environment=env_2, signer="bob")
+
+    def test_24_xfer_from_vtoken_should_pass(self):
+
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=5, day=1, hour=0)}
+
+        self.contract.setDevRewardPct(amount=0)
+        self.contract.changeAmountPerHour(amount_per_hour=10)
+
+        self.contract.addStakingTokens(environment=env_1, signer="bob", amount=10)
+
+        bob_token_balance = self.contract.balances["bob"]
+        self.assertAlmostEqual(bob_token_balance, 10)
+
+        self.contract.transfer_from(environment=env_2, signer="con_staking_smart_epoch", amount=10, to="con_staking_smart_epoch", main_account="bob")
+       
+        contract_token_balance = self.contract.balances["con_staking_smart_epoch"]
+
+        self.assertAlmostEqual(contract_token_balance, 10)
+
 if __name__ == "__main__":
     unittest.main()

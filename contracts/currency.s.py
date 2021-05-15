@@ -10,7 +10,7 @@ def transfer(amount: float, to: str):
 
     sender = ctx.caller
 
-    assert balances[sender] >= amount, 'Not enough coins to send!'
+    assert balances[sender] >= amount, 'Not enough CURRENCY to send!'
 
     balances[sender] -= amount
     balances[to] += amount
