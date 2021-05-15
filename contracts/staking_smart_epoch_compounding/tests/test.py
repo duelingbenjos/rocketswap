@@ -852,6 +852,7 @@ class MyTestCase(unittest.TestCase):
         bob_token_balance_2 = self.basic_token.balances["bob"]
         with self.assertRaises(AssertionError):
             self.contract.withdrawYield(environment = env_2, signer="bob", amount=100000)
+
        
 if __name__ == "__main__":
     unittest.main()
