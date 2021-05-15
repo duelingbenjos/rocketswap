@@ -40,7 +40,6 @@ class MyTestCase(unittest.TestCase):
         self.basic_token = self.c.get_contract("con_basic_token")
 
 
-
         self.setupApprovals()
 
 
@@ -106,6 +105,8 @@ class MyTestCase(unittest.TestCase):
         self.currency.transfer(to="pete", amount=1000)
 
         self.contract.setDevWallet(vk="dev_wallet")
+
+        self.contract.approve(signer="bob", to="con_staking_smart_epoch", amount=100000000)
 
 
 
