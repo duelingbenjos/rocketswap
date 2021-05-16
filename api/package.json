@@ -9,7 +9,7 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "RE_LOAD_API=yes nest start",
+    "start": "ts-node src/main.ts",
     "dev": "npx nodemon src/main.ts",
     "start:dev": "nest start --watch",
     "start:dev:wipe": "rm -f database.sqlite && RE_LOAD_API=yes npm run dev",
