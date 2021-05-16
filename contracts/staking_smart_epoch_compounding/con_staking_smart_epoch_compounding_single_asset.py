@@ -1,13 +1,13 @@
 # Imports
 
-import currency
+# import currency
 import con_basic_token
 
 I = importlib
 
 # Setup Tokens
 
-STAKING_TOKEN = currency
+STAKING_TOKEN = con_basic_token
 YIELD_TOKEN = con_basic_token
 
 # State
@@ -71,7 +71,7 @@ def seed():
     meta[
         "type"
     ] = "staking_smart_epoch_compounding_timeramp"  # staking || lp_farming || etcetera ...
-    meta["STAKING_TOKEN"] = "currency"
+    meta["STAKING_TOKEN"] = "con_basic_token"
     meta["YIELD_TOKEN"] = "con_basic_token"
 
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply

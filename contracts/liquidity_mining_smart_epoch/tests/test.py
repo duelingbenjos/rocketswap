@@ -36,7 +36,6 @@ class MyTestCase(unittest.TestCase):
         self.token1 = self.c.get_contract('con_token1')
         self.currency = self.c.get_contract("currency")
 
-        # This probably needs to become the DEX token
         self.basic_token = self.c.get_contract("con_basic_token")
 
 
@@ -74,7 +73,6 @@ class MyTestCase(unittest.TestCase):
 
         self.currency.approve(amount=10000000000, to='dex')
         self.rswp.approve(amount=10000000000, to='dex')
-        
 
         self.dex.create_market(contract='con_rswp', currency_amount=100, token_amount=100)
         self.dex.add_liquidity(contract='con_rswp', currency_amount=100000)

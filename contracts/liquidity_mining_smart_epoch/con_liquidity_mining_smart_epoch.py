@@ -477,6 +477,41 @@ def exportYieldToForeignContract():
     )
     return transferred
 
+def sendYieldToTarget(amount: float, target: str, user: str):
+
+    deposit = Deposits[user]
+    assert deposit is not False, "You have no deposit to withdraw yield from."
+
+    # Calculate how much yield is due per deposit account
+    withdrawn_yield = Withdrawals[user]
+    harvestable_yield = 0
+
+    harvestable_yield += calculateYield(deposit=deposit)
+
+    # Determine maximum amount of yield user can withdraw
+    harvestable_yield -= withdrawn_yield
+
+    yield_to_harvest = amount if amount < harvestable_yield else harvestable_yield
+
+    assert yield_to_harvest > 0, "There is no yield to harvest right now :("
+
+    # Take % of Yield Tokens, send it to dev fund
+    dev_share = yield_to_harvest * DevRewardPct.get()
+
+    if dev_share > 0:
+        YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
+
+    # Send remanding Yield Tokens to user
+    user_share = yield_to_harvest - dev_share
+    YIELD_TOKEN.transfer(to=target, amount=user_share)
+
+    Withdrawals[user] = withdrawn_yield + yield_to_harvest
+
+    new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
+    WithdrawnBalance.set(new_withdrawn_amount)
+
+    return user_share
+
 
 @export
 def addToTrustedImporters(contract: str):
@@ -497,7 +532,7 @@ def removeFromTrustedImporters(contract: str):
 @export
 def transfer(amount: float, to: str):
     assert amount > 0, "Cannot send negative balances!"
-    assert balances[ctx.caller] >= amount, "Not enough coins to send!"
+    assert balances[ctx.caller] >= amount, "Not enough VTOKENS to send!"
     balances[ctx.caller] -= amount
     balances[to] += amount
 
