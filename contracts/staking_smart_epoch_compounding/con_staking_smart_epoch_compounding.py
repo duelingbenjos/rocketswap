@@ -91,9 +91,9 @@ def addStakingTokens(amount: float):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller")
+        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=False)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller")
+        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=False)
 
 
 # This is called FROM the contract to which the yields will be staked.
@@ -110,21 +110,22 @@ def stakeFromContractProfits(contract: str):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller")
+        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=True)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller")
+        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=True)
         
 
 def createNewDeposit(
-    amount: float, user_ctx: str
+    amount: float, user_ctx: str, from_contract: bool
 ):  # user_ctx will either be "caller" or "signer"
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You must stake something."
 
     user = ctx.caller
 
-    # Take the staking tokens from the user's wallet
-    STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
+    # Take the staking tokens from the user's wallet if the user has called this function via addStakingTokens
+    if from_contract is False: 
+        STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     # Update the Staked amount
     staked = StakedBalance.get()
@@ -145,7 +146,7 @@ def createNewDeposit(
 
 @export
 def increaseDeposit(
-    amount: float, user_ctx: str
+    amount: float, user_ctx: str, from_contract: bool
 ):  # user_ctx will either be "caller" or "signer"
 
     user = ctx.caller if user_ctx is "caller" else "signer"
@@ -157,7 +158,7 @@ def increaseDeposit(
     assert deposit is not False, "This user has no deposit to add to."
 
     # Take the staking tokens from the user's wallet
-    if amount > 0:
+    if amount > 0 and from_contract is False:
         STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     withdrawn_yield = Withdrawals[user]
@@ -475,12 +476,12 @@ def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
 
-
 @export
 def recoverYieldToken(amount: float):
     assertOwner()
     assert amount > 0, "Yield token amount must be greater than 0"
     staked_balance = StakedBalance.get()
+    # The yield_balances logic is for single asset staking and should be removed for other types.
     yield_balances = ForeignHash(
         foreign_contract=meta["YIELD_TOKEN"], foreign_name="balances"
     )

@@ -36,9 +36,7 @@ class MyTestCase(unittest.TestCase):
         self.token1 = self.c.get_contract('con_token1')
         self.currency = self.c.get_contract("currency")
 
-        # This probably needs to become the DEX token
         self.basic_token = self.c.get_contract("con_basic_token")
-
 
 
         self.setupApprovals()
@@ -75,7 +73,6 @@ class MyTestCase(unittest.TestCase):
 
         self.currency.approve(amount=10000000000, to='dex')
         self.rswp.approve(amount=10000000000, to='dex')
-        
 
         self.dex.create_market(contract='con_rswp', currency_amount=100, token_amount=100)
         self.dex.add_liquidity(contract='con_rswp', currency_amount=100000)
@@ -106,6 +103,8 @@ class MyTestCase(unittest.TestCase):
         self.currency.transfer(to="pete", amount=1000)
 
         self.contract.setDevWallet(vk="dev_wallet")
+
+        self.contract.approve(signer="bob", to="con_staking_smart_epoch", amount=100000000)
 
 
 
