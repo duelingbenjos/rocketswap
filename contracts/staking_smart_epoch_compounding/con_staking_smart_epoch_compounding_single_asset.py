@@ -1,6 +1,5 @@
 # Imports
 
-# import currency
 import con_basic_token
 
 I = importlib
