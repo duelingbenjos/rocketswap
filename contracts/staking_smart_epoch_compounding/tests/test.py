@@ -984,7 +984,7 @@ class MyTestCase(unittest.TestCase):
             contract="con_rswp", currency_amount=100, token_amount=100
         )
         self.dex.add_liquidity(contract="con_rswp", currency_amount=100000)
-        self.dex.approve_liquidity(contract="con_rswp", to="sys", amount=5000)
+        # self.dex.approve_liquidity(contract="con_rswp", to="sys", amount=5000)
         self.currency.approve(signer="bob", amount=999999999999, to="dex")
         self.rswp.approve(signer="bob", amount=999999999999, to="dex")
         self.rswp.transfer(to="bob", amount=1000)
@@ -999,7 +999,7 @@ class MyTestCase(unittest.TestCase):
         self.basic_token.transfer(to="con_staking_smart_epoch_single_asset", amount=100000)
         self.basic_token.transfer(to="con_liquidity_mining_smart_epoch", amount=100000)
 
-    def test_30_stakeFromContractProfits_liquidity_mining_one_deposit(self):
+    def test_30_stakeFromContractProfits_liquidity_mining_one_deposit_passes(self):
         self.setUpDex()
 
         env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
@@ -1033,15 +1033,13 @@ class MyTestCase(unittest.TestCase):
         # Puts LP in Yield Farming Contract
         bob_lp_balance = self.dex.lp_points["con_rswp", "bob"]
 
-        # after 1 hour, withdraws rewards to staking contract
         self.yield_farm.addStakingTokens(environment=env_0, signer="bob", amount=1000)
 
-        # check that LP rewards have been withdrawn
+        # after 1 hour, withdraws rewards to staking contract
         self.contract_single_asset.stakeFromContractProfits(
             environment=env_1, signer="bob", contract="con_liquidity_mining_smart_epoch"
         )
 
-        # check that LP rewards have been withdrawn
         self.contract_single_asset.stakeFromContractProfits(
             environment=env_2, signer="bob", contract="con_liquidity_mining_smart_epoch"
         )

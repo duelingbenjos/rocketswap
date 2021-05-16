@@ -476,12 +476,12 @@ def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
 
-
 @export
 def recoverYieldToken(amount: float):
     assertOwner()
     assert amount > 0, "Yield token amount must be greater than 0"
     staked_balance = StakedBalance.get()
+    # The yield_balances logic is for single asset staking and should be removed for other types.
     yield_balances = ForeignHash(
         foreign_contract=meta["YIELD_TOKEN"], foreign_name="balances"
     )
