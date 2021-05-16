@@ -134,7 +134,7 @@ Click the small blue *run* button beside change_metadata.
 
 ## Loading the Token to Rocektswap
 This is a simple 2 step process which is covered by some of the other guide articles, links below:
-* Manually transfer your token - [Guide - Adding Funds](guide.md#Adding-Funds)  
-* We also need to provide liquidity for it, both some TAU and your token - [Guide - Liquidity](guide.md#Liquidity-Pools)
+* Manually transfer your token - [Guide - Adding Funds](guides.md#Adding-Funds)  
+* We also need to provide liquidity for it, both some TAU and your token - [Guide - Liquidity](guides.md#Liquidity-Pools)
 
 THATS IT YOU MADE IT!
