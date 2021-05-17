@@ -51,7 +51,7 @@ def seed():
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
-    meta["version"] = "0.0.1"
+    meta["version"] = "0.3"
     meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
     meta["STAKING_TOKEN"] = "con_rswp_lp"
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
@@ -476,6 +476,7 @@ def exportYieldToForeignContract():
         user=user,  # big number - transfers all yield.
     )
     return transferred
+
 
 def sendYieldToTarget(amount: float, target: str, user: str):
 

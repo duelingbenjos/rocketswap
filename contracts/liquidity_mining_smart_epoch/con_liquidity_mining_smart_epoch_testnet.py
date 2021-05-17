@@ -9,7 +9,7 @@ import con_amm_v9
 # Setup Tokens
 
 DEX = con_amm_v9
-LIQUIDITY_TOKEN = "con_rswp_lst001" # TAU/RSWP Pair
+LIQUIDITY_TOKEN = "con_rswp_lst001"  # TAU/RSWP Pair
 YIELD_TOKEN = con_rswp_lst001
 
 # State
@@ -34,6 +34,10 @@ EpochMaxRatioIncrease = (
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
 decimal_converter_var = Variable()
+TrustedImporters = Variable()
+
+# Vtoken
+balances = Hash(default_value=0)
 
 
 @construct
@@ -43,18 +47,19 @@ def seed():
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
-    EpochMaxRatioIncrease.set(1/2)
+    EpochMaxRatioIncrease.set(1 / 2)
     EpochMinTime.set(3600)
+    TrustedImporters.set([])
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
-    meta["version"] = "0.0.1"
+    meta["version"] = "0.3"
     meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
-    meta["STAKING_TOKEN"] = 'currency'
-    meta["YIELD_TOKEN"] = 'con_rswp_lst001'
+    meta["STAKING_TOKEN"] = "con_rswp_lst001"
+    meta["YIELD_TOKEN"] = "con_rswp_lst001"
 
     EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
-    DevRewardPct.set(1/10)
+    DevRewardPct.set(1 / 10)
 
     # The datetime from which you want to allow staking.
     StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
@@ -66,15 +71,27 @@ def seed():
 
 @export
 def addStakingTokens(amount: float):
+    user = ctx.caller
+    deposit = Deposits[user]
+
+    if deposit is False:
+        return createNewDeposit(amount=amount, user_ctx="caller")
+    else:
+        return increaseDeposit(amount=amount, user_ctx="caller")
+
+
+def createNewDeposit(
+    amount: float, user_ctx: str
+):  # user_ctx will either be "caller" or "signer"
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
-    assert amount > 0, "You cannot stake a negative balance."
+    assert amount > 0, "You must stake something."
 
     user = ctx.caller
 
     # Take the staking tokens from the user's wallet
-    # STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
-    DEX.transfer_liquidity_from(contract=LIQUIDITY_TOKEN, to=ctx.this, main_account=user, amount=amount)
-
+    DEX.transfer_liquidity_from(
+        contract=LIQUIDITY_TOKEN, to=ctx.this, main_account=user, amount=amount
+    )
 
     # Update the Staked amount
     staked = StakedBalance.get()
@@ -84,16 +101,62 @@ def addStakingTokens(amount: float):
     # Update the Epoch
     epoch_index = decideIncrementEpoch(new_staked_amount=new_staked_amount)
 
-    if Deposits[user] is False:
-        Deposits[user] = []
-
     # Create a record of the user's deposit
 
-    deposits = Deposits[user]
+    Deposits[user] = {
+        "starting_epoch": epoch_index,
+        "time": now,
+        "amount": amount,
+        "user_yield": 0,
+    }
 
-    deposits.append({"starting_epoch": epoch_index, "time": now, "amount": amount})
+    # mint vtoken equal to the deposit.
+    mintVToken(amount=amount)
+    return Deposits[user]
 
-    Deposits[user] = deposits
+
+@export
+def increaseDeposit(
+    amount: float, user_ctx: str
+):  # user_ctx will either be "caller" or "signer"
+
+    user = ctx.caller if user_ctx is "caller" else "signer"
+    assert OpenForBusiness.get() == True, "This staking pool is not open right now."
+    assert amount > 0, "You cannot stake a negative balance."
+
+    deposit = Deposits[user]
+
+    assert deposit is not False, "This user has no deposit to add to."
+
+    # Take the staking tokens from the user's wallet
+    DEX.transfer_liquidity_from(
+        contract=LIQUIDITY_TOKEN, to=ctx.this, main_account=user, amount=amount
+    )
+
+    withdrawn_yield = Withdrawals[user]
+    user_yield = deposit["user_yield"]
+    existing_stake = deposit["amount"]
+    start_time = False
+
+    user_yield += calculateYield(deposit=deposit)
+    start_time = deposit["time"]
+    existing_stake = deposit["amount"]
+
+    total_deposit_amount = existing_stake + amount
+    global_amount_staked = StakedBalance.get()
+    new_global_staked = global_amount_staked + amount
+    StakedBalance.set(new_global_staked)
+
+    mintVToken(amount=amount)
+
+    Deposits[user] = {
+        "starting_epoch": decideIncrementEpoch(new_staked_amount=new_global_staked),
+        "time": now,
+        "amount": total_deposit_amount,
+        "user_yield": user_yield,
+    }
+
+    return Deposits[user]
 
 
 @export
@@ -101,20 +164,15 @@ def withdrawYield(amount: float):
     assert amount > 0, "You cannot harvest a negative balance"
 
     user = ctx.caller
-    deposits = Deposits[user]
+    deposit = Deposits[user]
 
-    assert deposits is not False, "You have no deposit to withdraw yield from."
+    assert deposit is not False, "You have no deposit to withdraw yield from."
 
     # Calculate how much yield is due per deposit account
     withdrawn_yield = Withdrawals[user]
-    harvestable_yield = 0
+    harvestable_yield = deposit["user_yield"]
 
-    for d in deposits:
-        harvestable_yield += calculateYield(
-            starting_epoch_index=d["starting_epoch"],
-            start_time=d["time"],
-            amount=d["amount"],
-        )
+    harvestable_yield += calculateYield(deposit=deposit)
 
     # Determine maximum amount of yield user can withdraw
     harvestable_yield -= withdrawn_yield
@@ -143,22 +201,16 @@ def withdrawYield(amount: float):
 @export
 def withdrawTokensAndYield():
     user = ctx.caller
-    deposits = Deposits[user]
+    deposit = Deposits[user]
 
-    assert deposits is not False, "You have no deposit to withdraw"
+    assert deposit is not False, "You have no deposit to withdraw"
 
     # Calculate how much yield is due per deposit account
     withdrawn_yield = Withdrawals[user]
-    stake_to_return = 0
-    yield_to_harvest = 0
+    stake_to_return = deposit["amount"]
+    yield_to_harvest = deposit["user_yield"]
 
-    for d in deposits:
-        yield_to_harvest += calculateYield(
-            starting_epoch_index=d["starting_epoch"],
-            start_time=d["time"],
-            amount=d["amount"],
-        )
-        stake_to_return += d["amount"]
+    yield_to_harvest += calculateYield(deposit=deposit)
 
     # Send Staking Tokens to user
     DEX.transfer_liquidity(contract=LIQUIDITY_TOKEN, to=user, amount=stake_to_return)
@@ -184,6 +236,7 @@ def withdrawTokensAndYield():
 
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
+    returnAndBurnVToken(amount=stake_to_return)
     StakedBalance.set(new_staked_amount)
     new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
     WithdrawnBalance.set(new_withdrawn_amount)
@@ -193,7 +246,11 @@ def withdrawTokensAndYield():
 
 
 # This runs over each of the items in the user's Deposit
-def calculateYield(starting_epoch_index: int, start_time, amount: float):
+def calculateYield(deposit):
+    starting_epoch_index = deposit.get("starting_epoch")
+    start_time = deposit.get("time")
+    amount = deposit.get("amount")
+
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
     y = 0
@@ -387,20 +444,132 @@ def assertOwner():
 def emergencyReturnStake():
 
     user = ctx.caller
-    deposits = Deposits[user]
+    deposit = Deposits[user]
 
     assert Deposits[user] is not False, "This account has no deposits to return."
 
-    stake_to_return = 0
-
-    for d in deposits:
-        stake_to_return += d["amount"]
+    stake_to_return = deposit["amount"]
 
     DEX.transfer_liquidity(contract=LIQUIDITY_TOKEN, to=user, amount=stake_to_return)
-
+    returnAndBurnVToken(amount=stake_to_return)
     Deposits[user] = False
     Withdrawals[user] = 0
 
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
+
+
+@export
+def exportYieldToForeignContract():
+    # TrustedImporters = Variable() #
+    calling_contract = ctx.caller
+    user = ctx.signer
+    withdrawn_yield = Withdrawals[user]
+
+    # verify that the contract is calling it is trusted.
+    assert (
+        calling_contract in TrustedImporters.get()
+    ), "The calling contract is not in the trusted list ! :("
+
+    transferred = sendYieldToTarget(
+        amount=999999999999,
+        target=calling_contract,
+        user=user,  # big number - transfers all yield.
+    )
+    return transferred
+
+
+def sendYieldToTarget(amount: float, target: str, user: str):
+
+    deposit = Deposits[user]
+    assert deposit is not False, "You have no deposit to withdraw yield from."
+
+    # Calculate how much yield is due per deposit account
+    withdrawn_yield = Withdrawals[user]
+    harvestable_yield = 0
+
+    harvestable_yield += calculateYield(deposit=deposit)
+
+    # Determine maximum amount of yield user can withdraw
+    harvestable_yield -= withdrawn_yield
+
+    yield_to_harvest = amount if amount < harvestable_yield else harvestable_yield
+
+    assert yield_to_harvest > 0, "There is no yield to harvest right now :("
+
+    # Take % of Yield Tokens, send it to dev fund
+    dev_share = yield_to_harvest * DevRewardPct.get()
+
+    if dev_share > 0:
+        YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
+
+    # Send remanding Yield Tokens to user
+    user_share = yield_to_harvest - dev_share
+    YIELD_TOKEN.transfer(to=target, amount=user_share)
+
+    Withdrawals[user] = withdrawn_yield + yield_to_harvest
+
+    new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
+    WithdrawnBalance.set(new_withdrawn_amount)
+
+    return user_share
+
+
+@export
+def addToTrustedImporters(contract: str):
+    assertOwner()
+    trusted_importers = TrustedImporters.get()
+    trusted_importers.append(contract)
+
+
+@export
+def removeFromTrustedImporters(contract: str):
+    assertOwner()
+    trusted_importers = TrustedImporters.get()
+    trusted_importers.remove(contract)
+    TrustedImporters.set(trusted_importers)
+
+
+# VTOKEN METHODS
+@export
+def transfer(amount: float, to: str):
+    assert amount > 0, "Cannot send negative balances!"
+    assert balances[ctx.caller] >= amount, "Not enough VTOKENS to send!"
+    balances[ctx.caller] -= amount
+    balances[to] += amount
+
+
+@export
+def approve(amount: float, to: str):
+    assert amount > 0, "Cannot send negative balances!"
+    balances[ctx.caller, to] += amount
+
+
+@export
+def transfer_from(amount: float, to: str, main_account: str):
+    assert amount > 0, "Cannot send negative balances!"
+
+    assert (
+        balances[main_account, ctx.caller] >= amount
+    ), "Not enough coins approved to send! You have {} and are trying to spend {}".format(
+        balances[main_account, ctx.caller], amount
+    )
+    assert balances[main_account] >= amount, "Not enough coins to send!"
+    balances[main_account, ctx.caller] -= amount
+    balances[main_account] -= amount
+    balances[to] += amount
+
+
+def returnAndBurnVToken(amount: float):
+    user = ctx.caller
+    this = ctx.this
+    assert (
+        balances[user] >= amount
+    ), "Your VTOKEN balance is too low to unstake, recover your VTOKENS and try again."
+    balances[user] -= amount
+
+
+def mintVToken(amount: float):
+    user = ctx.signer
+    balances[user] += amount
