@@ -14,8 +14,8 @@ export const staking_contracts = process.env.STAKING_CONTRACTS
 	: [
 			"con_rswp_lp_mining_01",
 			"con_rswp_compounding_vtoken_01",
-			"con_rswp_compounding_02",
-			"con_staking_smart_epoch_rswp_rswp_11",
+			// "con_rswp_compounding_02",
+			// "con_staking_smart_epoch_rswp_rswp_11",
 			"con_simple_staking_rswp",
-			"con_yf_rswp3"
+			// "con_yf_rswp3"
 	  ];
