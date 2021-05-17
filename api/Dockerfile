@@ -7,7 +7,6 @@ RUN apk add --no-cache bash
 RUN echo $'\
 echo "Starting API..."\n\
 npm run start:dev:reset \n'\
-> entypoint.sh
 
 COPY package.json .
 RUN npm install --quiet
