@@ -42,8 +42,7 @@ services:
       - ROCKETSWAP_DB_PORT=8081
       - ROCKETSWAP_DB_USERNAME=root
       - ROCKETSWAP_DB_PASSWORD=example
-      - ROCKETSWAP_DB_FIRST_RUN=${ROCKETSWAP_DB_FIRST_RUN}
-      - currBlockNum=7100
+      - currBlockNum=${block}
       - CONTEXT=remote
     network_mode: host
 
