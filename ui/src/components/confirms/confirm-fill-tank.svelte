@@ -1,4 +1,6 @@
 <script>
+    import { getContext } from 'svelte'
+
     //Components
     import Button from '../button.svelte';
 
@@ -24,6 +26,9 @@
     export let differenceInAmount;
     export let closeConfirm;
     export let clearInput;
+    export let resetPanel;
+
+    const { rswpToken } = getContext('rswpContext')
 
     let logoSize = "25px"
     let loading = false;
@@ -31,6 +36,7 @@
     const success = () => {
         finish();
         clearInput();
+        resetPanel();
         setTimeout(getAmmStakeDetails, 2000)
         setTimeout(getAmmStakeDetails, 5000)
         closeConfirm(false);
@@ -115,7 +121,7 @@
             <span class="flex-grow text-primary-dim">{addingMore ? "Adding" : "Removing"}</span>
             <div class="flex-row flex-center-end ">
                 <span class="weight-600">{stringToFixed(differenceInAmount.absoluteValue(), 8)}</span>
-                <TokenLogo tokenMeta={{}} width={logoSize}  margin="0 0 0 10px" />
+                <TokenLogo tokenMeta={$rswpToken} width={logoSize}  margin="0 0 0 10px" />
             </div>
         </div>
         <div class="modal-confirm-buttons flex-col">

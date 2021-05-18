@@ -1,6 +1,9 @@
 <script>
+    import { getContext } from 'svelte'
+
     //Components
     import Button from '../button.svelte';
+    import InputNumber from '../inputs/input-number.svelte'
 
     //Icons
     import TokenLogo from '../../icons/token-logo.svelte'
@@ -17,20 +20,26 @@
 
     //Props
     export let currentFillAmount;
-    export let newFillAmount;
     export let currentDiscount;
-    export let newDiscount;
-    export let addingMore;
-    export let differenceInAmount;
     export let closeConfirm;
+    export let calcNewPercent;
     export let clearInput;
+    export let resetPanel;
+
+    let newDiscount;
+    let differenceInAmount = toBigNumberPrecision(0);
+
+    $: newFillAmount = currentFillAmount.minus(differenceInAmount);
 
     let logoSize = "25px"
     let loading = false;
 
+    const { rswpToken } = getContext('rswpContext')
+
     const success = () => {
         finish();
         clearInput();
+        resetPanel();
         setTimeout(getAmmStakeDetails, 2000)
         setTimeout(getAmmStakeDetails, 5000)
         closeConfirm(false);
@@ -50,11 +59,19 @@
         let args = {
             amount: {"__fixed__": stringToFixed(newFillAmount, 8)}
         }
-        walletService.stakeTokensInAMM(config.ammContractName, args, newDiscount, addingMore, {success, error})
+        walletService.stakeTokensInAMM(config.ammContractName, args, newDiscount, false, {success, error})
         .catch(err => {
             console.log(err)
             finish()
         })
+    }
+    const handleAmountInput = (e) => {
+        if (e.detail.isNaN() || !e.detail){
+            differenceInAmount = toBigNumberPrecision(0)
+        }else{
+            differenceInAmount = e.detail
+        }
+        newDiscount =  calcNewPercent(currentFillAmount.minus(differenceInAmount)).multipliedBy(100)
     }
 </script>
 
@@ -82,18 +99,19 @@
 
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
-        <span class="text-large">Confirm Fill Fuel Tank</span>
+        <span class="text-large">Confirm Remove Rocket Fuel</span>
         <button class="close nostyle" on:click={closeConfirm}>
             <CloseIcon />
         </button>
     </div>
     <div class="details flex-col">
+        <InputNumber placeholder="0.0" on:input={handleAmountInput} startingValue={0} margin="0.25rem 0 1rem"/>
         <div class="flex-row flex-center-spacebetween text-xlarge">
             <span>{stringToFixed(currentDiscount, 2)}%</span>
             <DicrectionalArrowIcon 
                 direction="right" 
                 width="25px" 
-                color={addingMore ? "var(--success-color)" : "var(--error-color)"}
+                color="var(--error-color)"
                 styles="position: relative; top: 4px;" />
             <span>{stringToFixed(newDiscount, 2)}%</span>
         </div>
@@ -112,10 +130,10 @@
             </div>
         </div>
         <div class="flex-row">
-            <span class="flex-grow text-primary-dim">{addingMore ? "Adding" : "Removing"}</span>
+            <span class="flex-grow text-primary-dim">Removing</span>
             <div class="flex-row flex-center-end ">
                 <span class="weight-600">{stringToFixed(differenceInAmount.absoluteValue(), 8)}</span>
-                <TokenLogo tokenMeta={{}} width={logoSize}  margin="0 0 0 10px" />
+                <TokenLogo tokenMeta={$rswpToken} width={logoSize}  margin="0 0 0 10px" />
             </div>
         </div>
         <div class="modal-confirm-buttons flex-col">
@@ -123,7 +141,7 @@
                 style="secondary" 
                 loading={loading} 
                 callback={handleFillTank} 
-                text={`${addingMore ? "ADD" : "REMOVE"} ${config.ammTokenSymbol}`} />
+                text={`REMOVE ${config.ammTokenSymbol}`} />
         </div>
     </div>
 </div>

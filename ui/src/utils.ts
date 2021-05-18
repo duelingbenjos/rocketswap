@@ -329,8 +329,11 @@ export function valuesToBigNumber(obj: any) {
 					property === 'vk' || 
 					property === 'time_updated' || 
 					property === 'hash' || 
-					property === 'token_symbol') {
-				// ignore these values
+					property === 'token_symbol' ||
+					property === '__time__') {
+				if (property === '__time__'){
+					obj[property] = timeArrayToUTC(obj[property])
+				}
 			} else if (typeof obj[property] === 'string') {
 				// Check if item is a string
 				if (!isNaN(parseFloat(obj[property]))) {
@@ -342,10 +345,13 @@ export function valuesToBigNumber(obj: any) {
 				valuesToBigNumber(obj[property])
 			}
 		}
-
     }
   }
   return obj
+}
+
+export const timeArrayToUTC = (ta) => {
+	return new Date(Date.UTC(ta[0], ta[1], ta[2], ta[3], ta[4], ta[5], ta[6]))
 }
 
 export const quoteCalculator = (tokenInfo) => {

@@ -22,6 +22,7 @@ body {
 
 	--color-primary-light: #e4fff8;
 	--color-primary: #24ffbd;
+	--color-primary-inactive: #8BCAB8;
 	--color-primary-dark: #28b389;
 
 	--color-secondary-light: #dcaeff;
@@ -254,6 +255,9 @@ body.light{
 }
 .text-color-secondary{
 	color: var(--color-secondary);
+}
+.text-color-secondary-light{
+	color: var(--color-secondary-light);
 }
 .text-color-highlight{
 	color: var(--text-color-highlight);

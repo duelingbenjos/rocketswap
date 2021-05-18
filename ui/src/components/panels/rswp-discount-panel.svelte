@@ -34,7 +34,7 @@
     $: fuelLevel = tankPercent.multipliedBy(80).plus(20)
     $: tankPercentDisplay = tankPercent.multipliedBy(100)
     $: isfillAmount = fillAmount?.isGreaterThan(0);
-    $: newPercent = calcNewPercet(fillAmount);
+    $: newPercent = calcNewPercent(fillAmount);
     $: newPercentDisplay = newPercent?.multipliedBy(100);
     $: hasStake = $ammFuelTank_stakedAmount.isGreaterThan(1);
     $: addingMore = $ammFuelTank_stakedAmount?.isLessThan(fillAmount);
@@ -43,7 +43,7 @@
     $: insufficientRSWP = fillAmount?.isGreaterThan($rswpBalance) || false;
     $: minimumStakeMet = fillAmount?.isGreaterThanOrEqualTo(minimumStakeRequired);
 
-    const calcNewPercet = (value) => {
+    const calcNewPercent = (value) => {
         if (!value) return null
         const {log_accuracy, multiplier, discount_floor} = ammStakingValues
 
@@ -66,7 +66,7 @@
             fillAmount = null;
             return
         }
-        fillAmount = toBigNumberPrecision(e.detail, 8)
+        fillAmount = toBigNumberPrecision(e.detail, 8).plus($ammFuelTank_stakedAmount)
     }
 
     const openFillTankConfirm = () => toggleFillTankConfirm(true)
@@ -88,12 +88,15 @@
             showRemoveAllStakeConfirm = force;
         }
     }
+
+    const resetPanel = () => {
+        fillAmount = null
+    }
 </script>
 
 <style>
     .panel-container{
         max-width: 300px;
-        height: 364px;
         padding: 20px;
 
         margin: 0;
@@ -105,8 +108,16 @@
         -webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
         -moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
     }
+    p.title{
+        margin: 0;
+        text-shadow: 2px 2px var(--staking-pannel-header-symbols-text-shadow);
+        font-weight: 800;
+    }
     .header{
         margin-bottom: 0;
+    }
+    .info{
+        margin: 1rem 0;
     }
     .fuel-tank-icon{
         position: relative;
@@ -115,9 +126,6 @@
         position: absolute;
         top: 12px;
         left: 25px;
-    }
-    .discount-row{
-        margin: 0 0 -0.5rem;
     }
     .buttons{
         margin-top: 1rem;
@@ -128,11 +136,8 @@
     button.small{
         margin: 0 0 0.25rem;
     }
-    .text-massive{
-        margin: 0rem auto 0;
-    }
     .min-stake-msg{
-        margin: 3px 0 0 0;
+        margin: 0.5rem 0 0 0;
     }
     .staked{
         margin-bottom: 0;
@@ -156,7 +161,9 @@
                 linear-gradient(0deg, var(--fuel-tank-panel-fuel-bg-color) ${fuelLevel}%, rgba(255,255,255,0) ${fuelLevel}%),
                 var(--panel-background-gradient);
         `}>
+        <p class="title text-xlarge text-center">Rocket Fuel</p>
         <div class="flex flex-center-center header">
+            
             <div class="fuel-tank-icon">
                 <FuelTankIcon width="75px" color="var(--text-primary-color)"/>
                 <div class="rocketswap-icon">
@@ -164,52 +171,38 @@
                 </div>
             </div>
         </div>
-        <div class="flex-row flex-align-center discount-row">
-            <span class="flex-grow">Trade Fee Discount:</span>  
-            <span 
-                class="text-massive weight-600" 
-                class:text-error={fillAmount && !addingMore && !same}
-                class:text-success={fillAmount && addingMore && !same}>
-                {stringToFixed(newPercentDisplay ? newPercentDisplay : tankPercentDisplay, 2)}%
-            </span>
-        </div>
-
-
-        <div class="flex-grow flex-col flex-justify-spacearound">
-            {#if !fillAmount || fillAmount.isLessThanOrEqualTo(0)}
-                <div class="staked flex-row">
-                    <span class="flex-grow">Staked:</span>
-                    <span class="weight-600">{stringToFixed($ammFuelTank_stakedAmount, 8)} <strong class="text-shadow text-color-primary">{config.ammTokenSymbol}</strong></span>
-                </div>
-            {:else}
-                <div class="staked flex-row">
-                    <span class="flex-grow">New Staked Amount:</span>
-                    <span class="weight-600">{stringToFixed(fillAmount, 8)} <strong class="text-shadow text-color-primary">{config.ammTokenSymbol}</strong></span>
-                </div>
-            {/if}
-            <div class="flex flex-justify-end">
-                <button class="primary small" on:click={openRemoveAllStakeConfirm} disabled={!hasStake}>remove all</button>
+        <div class="info">
+            <div class="flex-row flex-align-center">
+                {#if !fillAmount}
+                    <span class="flex-grow">Current Trade Fee Discount:</span> 
+                {:else}
+                    <span class="flex-grow">
+                        <strong class="text-color-highlight">NEW</strong> Trade Fee Discount:
+                    </span> 
+                {/if}
+                <span 
+                    class=" weight-600" 
+                    class:text-error={fillAmount && !addingMore && !same}
+                    class:text-success={fillAmount && addingMore && !same}>
+                    {stringToFixed(newPercentDisplay ? newPercentDisplay : tankPercentDisplay, 2)}%
+                </span>
             </div>
-            <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} small={true} bind:clearInput/>
-            <div class="flex-col flex-center-center buttons">
-                <button class="text-color-white primary" on:click={openFillTankConfirm} disabled={!isfillAmount || same || insufficientRSWP}>
-                    {#if isfillAmount}
-                        {#if insufficientRSWP}
-                            {`Insufficient ${config.ammTokenSymbol} Balance`}
-                        {:else}
-                            {#if minimumStakeMet}
-                                {addingMore ? 'Add' : 'Remove'} {stringToFixed(differenceInAmount.absoluteValue(), 8)} {config.ammTokenSymbol}
-                            {:else}
-                                {`Minimum Stake 1361 RSWP`}
-                            {/if}
-                        {/if}
-                    {:else}
-                        Enter New Fuel Amount
-                    {/if}
-                </button>
-                <p class="min-stake-msg text-xsmall text-color-white">Minimum Stake is 1361 RSWP</p>
+            <div class="staked flex-row">
+                <span class="flex-grow">Staked:</span>
+                <span class="weight-600">
+                    {stringToFixed($ammFuelTank_stakedAmount, 8)} 
+                    <strong class="text-shadow text-color-secondary">{config.ammTokenSymbol}</strong>
+                </span>
             </div>
         </div>
+        <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} small={true} bind:clearInput/>
+        <div class="flex-row flex-center-center buttons">
+            <button class="text-color-white primary" on:click={openFillTankConfirm} disabled={!isfillAmount || insufficientRSWP}>
+                Stake
+            </button>
+            <button class="primary outline" on:click={openRemoveAllStakeConfirm} disabled={!hasStake}>REMOVE STAKE</button>
+        </div>
+        <p class="min-stake-msg text-center text-small text-color-white">Minimum Stake is 1361 RSWP</p>
     </div>
 {/if}
 
@@ -224,7 +217,8 @@
                 newFillAmount={fillAmount}
                 {addingMore}
                 {differenceInAmount}
-                {clearInput} />
+                {clearInput} 
+                {resetPanel}/>
         </div>
     </Modal>
 {/if}
@@ -235,12 +229,10 @@
             <ConfirmEmptyTank
                 closeConfirm={toggleRemoveAllStakeConfirm} 
                 currentDiscount={tankPercentDisplay}
-                newDiscount={toBigNumber("0.0")}
                 currentFillAmount={$ammFuelTank_stakedAmount}
-                newFillAmount={toBigNumber("1")}
-                addingMore={false}
-                differenceInAmount={$ammFuelTank_stakedAmount.minus(1)}
-                {clearInput} />
+                {clearInput} 
+                {resetPanel}
+                {calcNewPercent}/>
         </div>
     </Modal>
 {/if}

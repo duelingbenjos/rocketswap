@@ -102,6 +102,7 @@ export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => 
 })
 
 export const rswpMetrics = derived(token_metrics_store, ($token_metrics_store) => {
+	console.log($token_metrics_store[config.ammTokenContract])
 	return  $token_metrics_store[config.ammTokenContract] || null
 })
 
