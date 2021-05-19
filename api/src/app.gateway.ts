@@ -115,10 +115,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 					// log.log("UPDATE", update);
 					this.wss.emit(`tau_usd_price`, update);
 				}
-				break
+				break;
 			case "new_market_update":
 				if (isNewMarketUpdate(update)) {
-					this.wss.emit("new_market_update", update)
+					this.wss.emit("new_market_update", update);
 				}
 		}
 	};

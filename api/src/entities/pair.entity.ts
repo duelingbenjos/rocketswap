@@ -170,6 +170,7 @@ function updateTradeFeed(args: {
 
 export async function savePair(args: {state: IKvp[], handleClientUpdate: handleClientUpdateType;}) {
 	const {state,handleClientUpdate} = args
+	let new_token = false
 	// console.log(state)
 	// { key: "con_amm2.pairs:con_token_test7", value: true },
 	const pair_kvp = state.find((kvp) => kvp.key.split(".")[1].split(":")[0] === "pairs");
@@ -181,11 +182,12 @@ export async function savePair(args: {state: IKvp[], handleClientUpdate: handleC
 	});
 	if (token_entity && !token_entity.has_market) {
 		token_entity.has_market = true;
+		new_token = true
 		await token_entity.save();
-		pair_entity.token_symbol = token_entity.token_symbol;
-		handleClientUpdate({action: "new_market_update", pair: pair_entity})
+		pair_entity.contract_name = contract_name;
 	}
-	pair_entity.contract_name = contract_name;
+	pair_entity.token_symbol = token_entity.token_symbol;
+	if (new_token) handleClientUpdate({action: "new_market_update", pair: pair_entity})
 	await pair_entity.save();
 }
 
