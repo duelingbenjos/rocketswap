@@ -3,6 +3,7 @@ import { AuthenticationPayload } from "../authentication/trollbox.controller";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { UserStakingEntity } from "../entities/user-staking.entity";
 import { BlockDTO } from "./misc.types";
+import { PairEntity } from "../entities/pair.entity";
 
 export type handleClientUpdateType = (update: ClientUpdateType) => {};
 
@@ -44,11 +45,17 @@ export type ClientUpdateType =
 	| UserYieldUpdateType
 	| EpochUpdateType
 	| ClientStakingUpdateType
-	| TauUsdPriceUpdateType;
+	| TauUsdPriceUpdateType
+	| NewMarketType;
 
 export interface ClientStakingUpdateType extends UpdateType {
 	action: "client_staking_update";
 	staking_contract: string;
+}
+
+export interface NewMarketType extends UpdateType {
+	action: "new_market_update";
+	pair: PairEntity;
 }
 
 export interface EpochUpdateType extends UpdateType {
@@ -115,7 +122,8 @@ export type UpdateType = {
 		| "epoch_update"
 		| "user_yield_update"
 		| "client_staking_update"
-		| "tau_usd_price";
+		| "tau_usd_price"
+		| "new_market_update";
 };
 
 export interface TradeUpdateType extends UpdateType {
@@ -163,4 +171,8 @@ export function isEpochUpdate(client_update: ClientUpdateType): client_update is
 
 export function isClientStakingUpdate(client_update: ClientUpdateType): client_update is ClientStakingUpdateType {
 	return (client_update as ClientStakingUpdateType).action === "client_staking_update";
+}
+
+export function isNewMarketUpdate(client_update: ClientUpdateType): client_update is NewMarketType {
+	return (client_update as NewMarketType).action === "new_market_update";
 }
