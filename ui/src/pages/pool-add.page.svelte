@@ -83,7 +83,7 @@
 		if ($selectedToken) balance = $lpBalances[$selectedToken.contract_name]
 
 		let currentLpSharePercent = "0"
-		let newLpSharePercent = "0%"
+		let newLpSharePercent = "0"
 
 		if (balance) {
 			saveStoreValue(lpBalance, balance)

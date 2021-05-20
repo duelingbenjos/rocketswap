@@ -20,7 +20,7 @@
     $: volumeFilter = $homePageTableFilter ? $homePageTableFilter.volume : null;
     $: priceFilter = $homePageTableFilter ? $homePageTableFilter.price : null;
     $: nameFilter = $homePageTableFilter ? $homePageTableFilter.name : null;
-    $: priceChangeFilter = $homePageTableFilter ? $homePageTableFilter.name : null;
+    $: priceChangeFilter = $homePageTableFilter ? $homePageTableFilter.price_change : null;
     $: currentFilter = $homePageTableFilter ? $homePageTableFilter.current : null;
 
     $: results = sortMarketData(marketData, $homePageTableFilter)
@@ -43,14 +43,26 @@
         if (!$homePageTableFilter) return marketData
 
         let r =  marketData.sort((a, b) => {
-            if (currentFilter === "volume" && volumeFilter === "dsc") return a.Volume.isGreaterThan(b.Volume) ? 1 : -1
-            if (currentFilter === "volume" && volumeFilter === "asc") return a.Volume.isLessThan(b.Volume) ? 1 : -1
-            if (currentFilter === "price" && priceFilter === "dsc") return a.Last.isGreaterThan(b.Last) ? 1 : -1
-            if (currentFilter === "price" && priceFilter === "asc") return a.Last.isLessThan(b.Last) ? 1 : -1
-            if (currentFilter === "price_change" && priceChangeFilter === "dsc") return a.vol24Str > b.vol24Str ? 1 : -1
-            if (currentFilter === "price_change" && priceChangeFilter === "asc") return a.vol24Str < b.vol24Str ? 1 : -1
+
+            if (currentFilter === "price_change" && priceChangeFilter === "dsc") return a.PercentPriceIncrease_24h.isGreaterThan(b.PercentPriceIncrease_24h) ? 1 : -1
+            if (currentFilter === "price_change" && priceChangeFilter === "asc") return a.PercentPriceIncrease_24h.isLessThan(b.PercentPriceIncrease_24h) ? 1 : -1
             if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > a.token.token_name ? 1 : -1
             if (currentFilter === "name" && nameFilter === "asc") return a.token.token_name < a.token.token_name ? 1 : -1
+
+            if (currencyToDisplay === "tau"){
+                if (currentFilter === "volume" && volumeFilter === "dsc") return a.BaseVolume.isGreaterThan(b.BaseVolume) ? 1 : -1
+                if (currentFilter === "volume" && volumeFilter === "asc") return a.BaseVolume.isLessThan(b.BaseVolume) ? 1 : -1
+                if (currentFilter === "price" && priceFilter === "dsc") return a.Last.isGreaterThan(b.Last) ? 1 : -1
+                if (currentFilter === "price" && priceFilter === "asc") return a.Last.isLessThan(b.Last) ? 1 : -1
+            }else{
+                if (currentFilter === "volume" && volumeFilter === "dsc") return a.usdVolume.isGreaterThan(b.usdVolume) ? 1 : -1
+                if (currentFilter === "volume" && volumeFilter === "asc") return a.usdVolume.isLessThan(b.usdVolume) ? 1 : -1
+                if (currentFilter === "price" && priceFilter === "dsc") return a.usdPrice.isGreaterThan(b.usdPrice) ? 1 : -1
+                if (currentFilter === "price" && priceFilter === "asc") return a.usdPrice.isLessThan(b.usdPrice) ? 1 : -1
+
+            }
+
+
         })
         return r
     }
@@ -61,7 +73,6 @@
     .panel-container{
         max-width: 850px;
         padding: 18px 20px;
-        
     }
     table {
         width: 100%;
@@ -111,6 +122,9 @@
 
 
     @media screen and (min-width: 430px) {
+        .panel-container{
+            background: var(--home-panel-background-gradient);
+        }
         .mobile-show{
             display: none;
         }
@@ -175,7 +189,7 @@
                 <th>
                     <div class="flex-row flex-align-center">
                             <div class="dropdown">
-                            <select bind:value={type} bind:this={selectElm} on:blur={handleCurrencyTypeChange}>
+                            <select bind:value={type} bind:this={selectElm} on:change={handleCurrencyTypeChange}>
                                     <option value={"tau"}>Price TAU</option>
                                     <option value={"usd"}>Price USD</option>
                             </select>
@@ -230,20 +244,20 @@
                     <td>
                         {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(2)}` : stringToFixed(tokenInfo.Last, 5)}
                         <div
-                            class:text-error={tokenInfo.change === "minus"}
-                            class:text-success={tokenInfo.change === "plus"}
+                            class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
+                            class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
                             class="mobile-show">
-                            {tokenInfo.price24Str}%
+                            {stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%
                         </div>
                     </td>
                     <td
-                        class:text-error={tokenInfo.change === "minus"}
-                        class:text-success={tokenInfo.change === "plus"}
+                        class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
+                        class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
                         class="mobile-hide">
-                        {tokenInfo.price24Str}%
+                        {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : tokenInfo.PercentPriceIncrease_24h.isLessThan(0) ? "-" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
                     </td>
                     <td>
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.Volume, 5))}
+                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
                     </td>
                 </tr>
             {/each}

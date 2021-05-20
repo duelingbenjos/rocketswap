@@ -84,7 +84,7 @@
             'contract': $selectedToken.contract_name,
             'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 8)},
             'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
-            'token_fees': false
+            'token_fees': $payInRswp
         }, $selectedToken, $currencyAmount, { success, error })
     }
 
@@ -95,7 +95,7 @@
             'contract': $selectedToken.contract_name,
             'token_amount': {'__fixed__': stringToFixed($tokenAmount, 8)},
             'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
-            'token_fees': false
+            'token_fees': $payInRswp
         }, $selectedToken, $tokenAmount, { success, error })
     }
 </script>

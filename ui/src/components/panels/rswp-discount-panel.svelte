@@ -198,9 +198,9 @@
         <InputSpecific on:input={handleInput} tokenInfo={$rswpToken} small={true} bind:clearInput/>
         <div class="flex-row flex-center-center buttons">
             <button class="text-color-white primary" on:click={openFillTankConfirm} disabled={!isfillAmount || insufficientRSWP}>
-                Stake
+                ADD FUEL
             </button>
-            <button class="primary outline" on:click={openRemoveAllStakeConfirm} disabled={!hasStake}>REMOVE STAKE</button>
+            <button class="primary outline" on:click={openRemoveAllStakeConfirm} disabled={!hasStake}>REMOVE FUEL</button>
         </div>
         <p class="min-stake-msg text-center text-small text-color-white">Minimum Stake is 1361 RSWP</p>
     </div>

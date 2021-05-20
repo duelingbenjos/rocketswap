@@ -8,6 +8,7 @@
 
     export let startTime
     export let endTime
+    export let horizontal = false
 
     let timer = null
 
@@ -64,6 +65,12 @@
         left: 20px;
         padding: 11px 35px;
     }
+    .time-banner.horizontal{
+        margin: 0;
+        left: unset;
+        padding: 0;
+        align-self: flex-end;
+    }
     .hasNotStarted{
         background: var(--color-primary-inactive);
     }
@@ -74,38 +81,45 @@
         line-height: 1.2;
         margin-left: 12px;
     }
-    .message > p{
+    .message.horizontal{
+        line-height: unset;
+        color: var(--text-primary-color-dim);
+    }
+    .message > span{
         margin: 0;
         text-align: center;
     }
 </style>
 
-<div class="flex-row time-banner" class:hasStarted={hasStarted} class:hasNotStarted={!hasStarted}>
+<div class="flex-row time-banner flex-center-center" 
+    class:hasStarted={hasStarted && !horizontal} 
+    class:hasNotStarted={!hasStarted && !horizontal}
+    class:horizontal={horizontal} >
     {#if !hasStarted}
-        <Clock />
-        <div class="flex-col message">
-            <p>Starts accruing interest in</p>
-            {#if deltaTime.days === 0}
-                <p>{deltaTime.hours} Hours {deltaTime.minutes} Minutes {deltaTime.seconds} Seconds</p>
-            {:else}
-                <p>{deltaTime.days} Days {deltaTime.hours} Hours {deltaTime.minutes} Minutes</p>
-            {/if}
-        </div>
+        <Clock color={horizontal ? "var(--text-primary-color-dim)" : undefined}/>
+            <div class="message" class:flex-col={!horizontal} class:horizontal={horizontal}>
+                <span>Starts accruing interest in</span>
+                {#if deltaTime.days === 0}
+                    <span>{deltaTime.hours} Hours {deltaTime.minutes} Minutes {deltaTime.seconds} Seconds</span>
+                {:else}
+                    <span>{deltaTime.days} Days {deltaTime.hours} Hours {deltaTime.minutes} Minutes</span>
+                {/if}
+            </div>
     {/if}
 
     {#if hasStarted && !hasEnded}
-        <Warning />
-        <div class="flex-col message">
-            <p>Stops accruing interest on </p>
-            <p>{formatLocaleString(endTime)}</p>
+        <Warning color={horizontal ? "var(--text-primary-color-dim)" : undefined}/>
+        <div class="message" class:flex-col={!horizontal} class:horizontal={horizontal}>
+            <span>Stops accruing interest on </span>
+            <span>{formatLocaleString(endTime)}</span>
         </div>
         
     {/if}
 
     {#if hasStarted && hasEnded}
-        <Stop />
-        <div class="flex-col message text-small">
-            <p>No longer accruing interest as of {formatLocaleString(endTime)}</p>
+        <Stop color={horizontal ? "var(--text-primary-color-dim)" : undefined}/>
+        <div class="message" class:text-small={!horizontal} class:text-center={!horizontal} class:horizontal={horizontal}>
+            <span>No longer accruing interest as of {formatLocaleString(endTime)}</span>
         </div>
     {/if}
 </div>

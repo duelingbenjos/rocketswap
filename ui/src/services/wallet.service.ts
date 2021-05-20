@@ -827,7 +827,7 @@ export class WalletService {
 	public async approveBN(contractName, approveAmount, approveTo, callback = undefined) {
 		if (await this.needsApproval(contractName, approveAmount, approveTo)){
 			let args = {
-				amount: { __fixed__: "1000000000" },
+				amount: { __fixed__: "99999999999999999999999999999" },
 				to: approveTo || connectionRequest.contractName
 			}
 			this.sendTransaction(

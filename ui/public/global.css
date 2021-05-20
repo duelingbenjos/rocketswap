@@ -90,6 +90,7 @@ body {
 	--main-background-gradient: linear-gradient(533deg, rgb(63, 24, 136) 0%, #130535 80%);
 
 	--panel-background-gradient: linear-gradient(5deg, rgb(56, 49, 83) 0%, rgb(76, 77, 136) 90%);
+	--home-panel-background-gradient: linear-gradient(5deg, #38315359 0%, #4c4d8899 90%);
 
 	--modal-background-primary: #312a43;
 	--modal-background-secondary: #e400ff12;
@@ -168,6 +169,8 @@ body.light{
 	--main-background-gradient: linear-gradient(#b2adff, rgb(255 0 252 / 8%));
 
 	--panel-background-gradient: linear-gradient(5deg, rgb(248, 245, 255) 10%, #f7f4ff 50%);
+	--home-panel-background-gradient: linear-gradient(5deg, #f8f5ff4d 10%, #f7f4ff99 50%);
+
 	--box-border-color: #0000000f;
 
 	--modal-background-primary: #ffffff;
@@ -752,6 +755,11 @@ button.small{
 	margin: 0 3px;
 }
 
+button.small.squared{
+	border-radius: 4px;
+	padding: 1px 12px;
+}
+
 button.medium{
 	font-size: var(--text-size-small);
 	padding: 2px 12px;
@@ -791,6 +799,7 @@ button.close{
 
 .input-container.small{
 	height: 75px;
+	width: 325px;
 }
 
 .input-row-1 {

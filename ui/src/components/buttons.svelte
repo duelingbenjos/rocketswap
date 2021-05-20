@@ -13,6 +13,7 @@
 	//Misc
 	import { config } from '../config'
 	import { walletBalance, lwc_info, walletIsReady, tokenBalances, rocketState } from '../store'
+	import { toBigNumber } from '../utils'
 
 	//Services
 	import { WalletService } from '../services/wallet.service'
@@ -61,9 +62,13 @@
 		}
 
 		if (buttonFunction === "create" || buttonFunction === "add" || buttonFunction === "swap"){
+			
 			if (!$currencyAmount || !$tokenAmount || !$selectedToken) return true
 			if ($currencyAmount.isEqualTo(0) || $tokenAmount.isEqualTo(0)) return true
-			let tokenBalance = $tokenBalances[$selectedToken.contract_name]
+			let tokenBalance = $tokenBalances[$selectedToken.contract_name] || toBigNumber(0)
+
+			console.log({currencyAmount: $currencyAmount, tokenAmount: $tokenAmount, tokenBalance})
+
 
 			if (typeof $buy === 'undefined'){
 				if ($currencyAmount.isGreaterThan($walletBalance)){

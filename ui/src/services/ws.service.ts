@@ -227,9 +227,8 @@
 		if (this.current_trade_feed === contract_name) return
 		if (this.joinedFeeds[`trade_feed:${contract_name}`]) return
 
-		console.log({contract_name})
-		
 		console.log("joining " + contract_name)
+
 		this.connection.on(`trade_update:${contract_name}`, (event) => this.handleTradeUpdate(event, contract_name))
 		this.connection.emit('join_room', `trade_feed:${contract_name}`)
 		this.current_trade_feed = contract_name
@@ -290,10 +289,10 @@
 	}
 
 	private handleUserYieldFeedUpdate(update){
-		console.log({user_yield_update: update})
+		console.log(JSON.parse(JSON.stringify({user_yield_update: update})))
 		userYieldInfo.update(currentValue => {
 			Object.keys(update).map(val => {
-				if(currentValue[val]) currentValue[val] = valuesToBigNumber(update[val])
+				currentValue[val] = valuesToBigNumber(update[val])
 			})
 			return currentValue
 		})

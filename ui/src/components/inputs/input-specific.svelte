@@ -76,7 +76,6 @@
 	button.primary.small{
 		margin-right: 6px;
 	}
-
 	.input-container {
   		position: relative;
   	}
