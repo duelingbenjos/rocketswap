@@ -201,7 +201,11 @@
             <InfoIcon />
         </div>
         <div class="flex-col flex-center-center header ">
-            <span class="symbols weight-600 text-xlarge">{`${stakingToken.token_symbol} - ${yieldToken.token_symbol}`}</span>
+            <div class="flex-row flex-center-center symbols weight-600 text-xlarge">
+                        {stakingToken.token_symbol}
+                        <DicrectionalArrowIcon direction="right" width="10px" margin="-2px 4px 0" />
+                        {yieldToken.token_symbol}
+            </div>
             <YieldLogo {yieldToken} {stakingToken} />
         </div>
         <div class="time-banner">
@@ -336,7 +340,7 @@
                 </div>
                 <InputSpecific on:input={handleInput} tokenInfo={stakingToken} {getStampCost} small={true} bind:clearInput />   
             </div>
-            <div class="flex-row">
+            <div class="flex-row" style="margin-top: 0.5rem;">
                 <TimeBanner 
                     horizontal={true}
                     startTime={stakingInfo.StartTime.__time__} 
