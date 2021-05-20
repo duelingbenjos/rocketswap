@@ -31,7 +31,8 @@ import {
 	isEpochUpdate,
 	isUserYieldUpdate,
 	isClientStakingUpdate,
-	isTauUsdPriceUpdate
+	isTauUsdPriceUpdate,
+	isNewMarketUpdate
 } from "./types/websocket.types";
 import { log } from "./utils/logger";
 
@@ -113,6 +114,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				if (isTauUsdPriceUpdate(update)) {
 					// log.log("UPDATE", update);
 					this.wss.emit(`tau_usd_price`, update);
+				}
+				break;
+			case "new_market_update":
+				if (isNewMarketUpdate(update)) {
+					this.wss.emit("new_market_update", update);
 				}
 		}
 	};

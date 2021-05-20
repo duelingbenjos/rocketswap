@@ -135,7 +135,10 @@ export class ParserProvider {
 	processAmmBlock = async (args: { fn: string; state: IKvp[]; timestamp: number; hash: string }) => {
 		const { fn, state, timestamp, hash } = args;
 		try {
-			await savePair(state);
+			await savePair({
+				state,
+				handleClientUpdate: this.socketService.handleClientUpdate
+			});
 			await savePairLp(state);
 			await saveUserLp({
 				state,
