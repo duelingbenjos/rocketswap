@@ -39,8 +39,9 @@ export class VolumeService implements OnModuleInit {
 				}
 
 				const last_yesterday_trade = await this.getLastYesterdayTrade(contract_name);
+				log.log({ contract_name });
 				// const last_yesterday_price = par
-				const yesterday_last_price = parseFloat(last_yesterday_trade.price);
+				const yesterday_last_price = parseFloat(last_yesterday_trade?.price) || 0;
 				const trades_last_day = await this.getTradesLastDay(contract_name);
 				const today_last_price = parseFloat(trades_last_day[0]?.price);
 				const { base_volume, volume, high, low } = this.calculateMetrics(trades_last_day);
