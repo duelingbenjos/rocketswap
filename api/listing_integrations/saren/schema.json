@@ -1,0 +1,85 @@
+{
+    "_id": "0xbd4a858139b155219e2c8d10135003fdef720b6b",
+    "community": {
+      "facebook": {
+        "likes": null
+      },
+      "twitter": {
+        "url": "saren_io"
+      },
+      "reddit": {
+        "url": "",
+        "posts48h": null,
+        "comments48h": null,
+        "subscribers": null,
+        "activeAccounts": null
+      },
+      "telegram": {
+        "url": "sarencommunity"
+      },
+      "git": {
+        "urls": [
+          "https://github.com/saren-io"
+        ]
+      },
+      "publicInterest": {
+        "alexaRank": null,
+        "bingMatches": null
+      },
+      "announcements": [
+        "https://blog.saren.io/"
+      ],
+      "forums": [],
+      "chat": [
+        "https://discord.gg/e9qtVrtukg",
+        "https://www.linkedin.com/company/saren-io"
+      ]
+    },
+    "links": {
+      "website": [
+        "https://saren.io/"
+      ],
+      "blockchain": [
+        "https://etherscan.io/token/0xbd4a858139b155219e2c8d10135003fdef720b6b",
+        "https://ethplorer.io/address/0xbd4a858139b155219e2c8d10135003fdef720b6b"
+      ]
+    },
+    "market": {
+      "price": 0.062413407143500244,
+      "marketCap": {
+        "saren": 1872402.2143050074
+      },
+      "volume": 232842.8670028827,
+      "circulatingSupply": {
+        "saren": 30000000
+      },
+      "totalSupply": 1000000000,
+      "change": {
+        "1h": -10.896983363760828,
+        "24h": -10.896983363760828,
+        "7d": 30.967203022429896,
+        "14d": 15.998108619968704,
+        "30d": 3755.4431729337352,
+        "60d": 3755.4431729337352,
+        "200d": 3755.4431729337352,
+        "1y": 3755.4431729337352
+      },
+      "timestamp": "2021-04-20T03:15:01.395Z"
+    },
+    "categories": [
+      "Infrastructure",
+      "Social Media",
+      "Decentralized Finance (DeFi)"
+    ],
+    "name": "Saren",
+    "platform": "ethereum",
+    "contractAddress": "0xbd4a858139b155219e2c8d10135003fdef720b6b",
+    "symbol": "SAR",
+    "description": "We aim to build decentralised tools for the cryptocurrency community that are more engaging than the current apps.",
+    "logos": {
+      "thumb": "https://saren.io/assets/icon.png",
+      "small": "https://saren.io/assets/icon.png",
+      "large": "https://saren.io/assets/icon.png"
+    },
+    "genesisDate": "2021-03-30",
+  }
