@@ -16,7 +16,7 @@ export class GetTradeHistoryDTO {
 
 export class GetMarketSummaryDTO {
 	@ApiProperty()
-	market_name: string;
+	contract_name: string;
 
 }
 
@@ -36,6 +36,11 @@ export class GetPairsInfoDTO {
 }
 
 export class GetBalancesDTO {
+    @ApiProperty()
+	vk: string;
+}
+
+export class GetUserStakingInfoDTO {
     @ApiProperty()
 	vk: string;
 }

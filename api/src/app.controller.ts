@@ -1,15 +1,26 @@
 import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { CircularRelationsError } from "typeorm";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
 import { MarketcapEntity } from "./entities/marketcap.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { StakingMetaEntity } from "./entities/staking-meta.entity";
+import { TauMarketEntity } from "./entities/tau-market.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
+import { UserStakingEntity } from "./entities/user-staking.entity";
 import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
-import { GetBalancesDTO, GetMarketSummaryDTO, GetPairsInfoDTO, GetTokenDTO, GetTradeHistoryDTO, GetUserLpBalanceDTO } from "./types/dto";
+import {
+	GetBalancesDTO,
+	GetMarketSummaryDTO,
+	GetPairsInfoDTO,
+	GetTokenDTO,
+	GetTradeHistoryDTO,
+	GetUserLpBalanceDTO,
+	GetUserStakingInfoDTO
+} from "./types/dto";
 import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
@@ -43,11 +54,35 @@ export class AppController {
 		}
 	}
 
-	@Get("get_market_summary")
-	public async getMarketSummary(@Query() params: GetMarketSummaryDTO) {
-		const { market_name } = params;
+	@Get("user_staking_info/:vk")
+	public async getUserStakingInfo(@Param() params: GetUserStakingInfoDTO) {
+		const { vk } = params;
 		try {
-			return await VolumeMetricsEntity.findOne(market_name);
+			const ents = await UserStakingEntity.find({ where: { vk } });
+			const user_staking_info = ents.reduce((accum, current_val) => {
+				accum[current_val.staking_contract] = current_val;
+				return accum;
+			}, {});
+			return user_staking_info;
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
+	@Get("get_market_summary/:contract_name")
+	public async getMarketSummary(@Query() params: GetMarketSummaryDTO) {
+		const { contract_name } = params;
+		try {
+			return await VolumeMetricsEntity.findOne(contract_name);
+		} catch (err) {
+			log.error(err);
+		}
+	}
+
+	@Get("tau_last_price")
+	public async getTauLastPrice() {
+		try {
+			return await TauMarketEntity.findOne('usd_price');
 		} catch (err) {
 			log.error(err);
 		}
@@ -65,7 +100,7 @@ export class AppController {
 	@Get("get_market_summaries_w_token")
 	public async getMarketSummariesWToken() {
 		try {
-			return await VolumeMetricsEntity.find({relations:['token']});
+			return await VolumeMetricsEntity.find({ relations: ["token"] });
 		} catch (err) {
 			log.error(err);
 		}
@@ -95,7 +130,7 @@ export class AppController {
 			throw new HttpException(err, 500);
 		}
 	}
-	
+
 	@Get("token_list")
 	public async getTokenList() {
 		try {
