@@ -5,7 +5,7 @@
     import TokenLogo from '../../icons/token-logo.svelte'
 
 	//Stores
-	import { tokenBalances } from '../../store'
+	import { tokenBalances, lpBalances } from '../../store'
 
 	//Services
 	//import { WalletService } from '../../services/wallet.service'
@@ -17,7 +17,8 @@
 
 	//Props
     export let label = null
-    export let tokenInfo
+	export let tokenInfo
+	export let isLpToken = false
     export let getStampCost
 	export let small = false;
 	export let short = false;
@@ -34,7 +35,13 @@
 	let pressedMaxValue = false;
 
     $: inputValue = null;
-    $: balance = $tokenBalances[tokenInfo.contract_name] ? $tokenBalances[tokenInfo.contract_name] : toBigNumber("0");
+	$: balance = getBalance($tokenBalances, $lpBalances)
+	
+	const getBalance = () => {
+		if (isLpToken && $lpBalances[tokenInfo.contract_name]) return $lpBalances[tokenInfo.contract_name]
+		if (!isLpToken && $tokenBalances[tokenInfo.contract_name]) return $tokenBalances[tokenInfo.contract_name]
+		return toBigNumber("0")
+	}
 
 	const handleInputChange = (e) => {
 		let validateValue = e.target.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1')
@@ -112,7 +119,7 @@
 				<button on:click={handleMaxInput} class="primary small">MAX</button> 
 			{/if}
 			<TokenLogo tokenMeta={tokenInfo} width={small ? "20px" : "23px"} margin="0 3px 0 0" />
-			<span class="input-token-label text-xlarge" class:small={small}> {tokenInfo.token_symbol} </span>
+			<span class="input-token-label text-xlarge" class:small={small}> {`${tokenInfo.token_symbol}${isLpToken ? " LP" : ""}`} </span>
 		</div>
 	</div>
 </div>

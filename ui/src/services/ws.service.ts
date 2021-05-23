@@ -285,7 +285,8 @@
 
 	private handleUserYieldFeed(payload) {
 		console.log(JSON.parse(JSON.stringify({user_yield_list: payload})))
-		userYieldInfo.set(valuesToBigNumber(payload))
+		if (payload) userYieldInfo.set(valuesToBigNumber(payload))
+		
 	}
 
 	private handleUserYieldFeedUpdate(update){

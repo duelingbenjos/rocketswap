@@ -43,6 +43,7 @@ export class WalletService {
 	private installChecker = null;
 	private Lamden = LamdenJS;
 	private keystore = null;
+	private maxApprovalAmount = "99999999999999999999999999999"
 
 	public static getInstance() {
 		if (!WalletService._instance) {
@@ -583,21 +584,32 @@ export class WalletService {
 		}
 	}
 
-	public async stakeTokens(stakingContractName, args, stakingToken, yieldToken, callbacks = undefined) {
+	public async stakeTokens(stakingContractName, args, stakingToken, yieldToken, isLpToken, callbacks = undefined) {
 		let txList = [{contract: stakingContractName, method: "addStakingTokens"}]
-		if (await this.needsApproval(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)){
-			txList.push({contract: stakingToken.contract_name, method: "approve"})
+		if (isLpToken){
+			if (await this.needsApproval_LP(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)){
+				txList.push({contract: config.ammContractName, method: "approve_liquidity"})
+			}
+		}else{
+			if (await this.needsApproval(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)){
+				txList.push({contract: stakingToken.contract_name, method: "approve"})
+			}
 		}
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
-			let results = await this.callApprove(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)
+			let results;
+			if (isLpToken){
+				results = await this.callApprove_LP(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)
+			}else{
+				results = await this.callApprove(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)
+			}
 			if (results){
 				this.sendTransaction(
 					stakingContractName, 
 					"addStakingTokens", 
 					args, 
 					callbacks, 
-					(res) => this.handleStakeTokens(res, stakingToken, yieldToken, callbacks)
+					(res) => this.handleStakeTokens(res, stakingToken, yieldToken, isLpToken, callbacks)
 				)
 			}else{
 				if (callbacks) callbacks.error()
@@ -605,13 +617,13 @@ export class WalletService {
 		}
 	}
 
-	private handleStakeTokens = (res, stakingToken, yieldToken, callbacks = undefined) => {
+	private handleStakeTokens = (res, stakingToken, yieldToken, isLpToken, callbacks = undefined) => {
 		let status = this.txResult(res.data, callbacks)
 		if (status === 'success') {
 			this.toastService.addToast({ 
 				icon: "gaugePlus",
 				heading: `Tokens Staked!`,
-				text: `You have staked ${stakingToken.token_symbol} and will start to accumulate ${yieldToken.token_symbol}.`, 
+				text: `You have staked ${stakingToken.token_symbol}${isLpToken ? " LP" : ""} and will start to accumulate ${yieldToken.token_symbol}.`, 
 				type: 'success',
 				duration: 5000,
 				link:{
@@ -731,6 +743,61 @@ export class WalletService {
 		}
 	}
 
+	public async compoundYield(singleAssetContractName, args, stakingToken, yieldToken, callbacks = undefined) {
+		let txList = [{contract: singleAssetContractName, method: "stakeFromContractProfits"}]
+		if (await this.needsApproval(stakingToken.contract_name, args.amount.__fixed__, singleAssetContractName)){
+			txList.push({contract: yieldToken.contract_name, method: "approve"})
+		}
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			let results = await this.callApprove(yieldToken.contract_name, this.maxApprovalAmount, singleAssetContractName)
+			if (results){
+				this.sendTransaction(
+					singleAssetContractName, 
+					"stakeFromContractProfits", 
+					args, 
+					callbacks, 
+					(res) => this.handleCompoundYield(res, yieldToken, callbacks)
+				)
+			}else{
+				if (callbacks) callbacks.error()
+			}
+		}
+	}
+
+	public async compoundSelf(singleAssetContractName, args, yieldToken, callbacks = undefined) {
+		let txList = [{contract: singleAssetContractName, method: "addStakingTokens"}]
+		let totalStampsNeeded = await this.estimateTxCosts(txList)
+		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			this.sendTransaction(
+				singleAssetContractName, 
+				"addStakingTokens", 
+				args, 
+				callbacks, 
+				(res) => this.handleCompoundYield(res, yieldToken, callbacks)
+			)
+		}
+	}
+
+	private handleCompoundYield = (res, yieldToken, callbacks = undefined) => {
+		let status = this.txResult(res.data, callbacks)
+		if (status === 'success') {
+			this.toastService.addToast({ 
+				icon: "gaugePlus",
+				heading: `Tokens Staked!`,
+				text: `You have staked ${yieldToken.token_symbol} and will start to accumulate more ${yieldToken.token_symbol}.`, 
+				type: 'success',
+				duration: 5000,
+				link:{
+					href: createBlockExplorerLink("transactions", res.data.txHash),
+					icon: "popout",
+					text: "explorer"
+				}
+			})
+			if (callbacks) callbacks.success()
+		}
+	}
+
 
 
 	private handleTxErrors(errors, callbacks = undefined){
@@ -802,6 +869,11 @@ export class WalletService {
 		}
 	}
 
+	public needsApproval = async (contract, amount, approvalTo = undefined) => {
+		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract, approvalTo)
+		return approvedAmount.isLessThan(amount)
+	}
+
 	public getApprovedAmount = async (vk, contract, approvalTo) => {
 		let keyList = [
 			{
@@ -819,15 +891,34 @@ export class WalletService {
 		return approval
 	}
 
-	public needsApproval = async (contract, amount, approvalTo = undefined) => {
-		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract, approvalTo)
+	public needsApproval_LP = async (tokenContract, amount, approvalTo = undefined) => {
+		let approvedAmount = await this.getApprovedAmount_LP(get(walletAddress), tokenContract, approvalTo)
 		return approvedAmount.isLessThan(amount)
+	}
+
+	public getApprovedAmount_LP = async (vk, tokenContract, approvalTo) => {
+		let keyList = [
+			{
+				"contractName": config.ammContractName,
+				"variableName": "lp_points",
+				"key": `${tokenContract}:${vk}:${approvalTo}`
+			}
+		]
+		let res = await this.blockExplorerService.getKeys(keyList)
+		console.log({getApprovedAmount_LP: res})
+		let approval = res[`${keyList[0].contractName}.${keyList[0].variableName}:${keyList[0].key}`]
+		console.log({approval})
+		if (!approval) return toBigNumber('0')
+		if (typeof approval?.__fixed__ !== 'undefined') approval = toBigNumber(approval.__fixed__)
+		else approval = toBigNumber(approval)
+		if (approval.isNaN()) approval = toBigNumber('0')
+		return approval
 	}
 
 	public async approveBN(contractName, approveAmount, approveTo, callback = undefined) {
 		if (await this.needsApproval(contractName, approveAmount, approveTo)){
 			let args = {
-				amount: { __fixed__: "99999999999999999999999999999" },
+				amount: { __fixed__: this.maxApprovalAmount },
 				to: approveTo || connectionRequest.contractName
 			}
 			this.sendTransaction(
@@ -845,15 +936,75 @@ export class WalletService {
 	private callApprove (contract, amount, to = undefined) {
 		return new Promise((resolve) => {
 			this.approveBN(contract, amount, to, (res, err) => {
-				if (err || !res) resolve(false)
-				if (res === true) resolve(true)
-				else {
-					if (res.status === "Transaction Cancelled") {
-						this.handleTxErrors(res.data.errors)
-						resolve(false)
+				if (err || !res) {
+					this.handleTxErrors(["Unknown Error."])
+					resolve(false)
+				}else{
+					if (res === true) resolve(true)
+					else {
+						if (res.status === "Transaction Cancelled") {
+							this.handleTxErrors(res.data.errors)
+							resolve(false)
+							return
+						}
+						if (res?.data?.txBlockResult?.status === 0) resolve(true)
+						else {
+							if (res?.data?.resultInfo?.returnResult){
+								this.handleTxErrors([res?.data?.resultInfo?.returnResult])
+							}else{
+								this.handleTxErrors(res.data.resultInfo.errorInfo)
+							}
+							resolve(false)
+						}
 					}
-					if (res?.data?.txBlockResult?.status === 0) resolve(true)
-					else resolve(false)
+				}
+			})
+		})
+	}
+
+	public async approveBN_LP(contractName, approveAmount, approveTo, callback = undefined) {
+		if (await this.needsApproval_LP(contractName, approveAmount, approveTo)){
+			let args = {
+				amount: { __fixed__: this.maxApprovalAmount },
+				to: approveTo,
+				contract: contractName
+			}
+			this.sendTransaction(
+				config.ammContractName, 
+				"approve_liquidity", 
+				args, 
+				null, 
+				callback
+			)
+		} else {
+			if (callback) callback(true)
+		}
+	}
+
+	private callApprove_LP (contract, amount, to) {
+		return new Promise((resolve) => {
+			this.approveBN_LP(contract, amount, to, (res, err) => {
+				if (err || !res) {
+					this.handleTxErrors(["Unknown Error."])
+					resolve(false)
+				}else{
+					if (res === true) resolve(true)
+					else {
+						if (res.status === "Transaction Cancelled") {
+							this.handleTxErrors(res.data.errors)
+							resolve(false)
+							return
+						}
+						if (res?.data?.txBlockResult?.status === 0) resolve(true)
+						else {
+							if (res?.data?.resultInfo?.returnResult){
+								this.handleTxErrors([res?.data?.resultInfo?.returnResult])
+							}else{
+								this.handleTxErrors(res.data.resultInfo.errorInfo)
+							}
+							resolve(false)
+						}
+					}
 				}
 			})
 		})

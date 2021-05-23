@@ -2,19 +2,18 @@
     import { setContext, onDestroy } from 'svelte'
     
     //Icons 
-    import YieldLogo from '../../icons/yield-logo.svelte'
     import HelpFilled from '../../icons/help-filled.svelte'
     import InfoIcon from '../../icons/info.svelte'
-    import DicrectionalArrowIcon from '../../icons/directional-arrow.svelte'
-
 
     // Components
     import InputSpecific from '../inputs/input-specific.svelte'
     import ConfirmStakingToken from '../confirms/confirm-staking-stake.svelte'
     import ConfirmRemoveStake from '../confirms/confirm-staking-remove.svelte'
     import ConfirmWithdrawStake from '../confirms/confirm-staking-withdraw.svelte'
+    import ConfirmCompoundStake from '../confirms/confirm-staking-compound.svelte'
     import Modal from '../misc/modal.svelte'
     import TimeBanner from './time-banner.svelte'
+    import StakingPanelHeader from '../misc/staking-panel-header.svelte'
 
     //Services
 	import { WalletService } from '../../services/wallet.service'
@@ -23,6 +22,7 @@
     // Misc
     import { userYieldInfo, tabHidden } from "../../store"  
     import { toBigNumberPrecision, toBigNumber, stakingCalculator, stringToFixed } from "../../utils"  
+    import { config } from "../../config"  
 
     setContext('stakingPanelContext', {
 		getStampCost
@@ -36,6 +36,7 @@
     let showStakingConfirm = false;
     let showRemoveStakeConfirm = false;
     let showWithdrawStakeConfirm = false;
+    let showCompoundStakeConfirm = false;
     let clearInput
     let timer_yieldUpdate = null;
 
@@ -52,7 +53,9 @@
     $: stakingToken = stakingInfo?.staking_token || null;
     $: yieldToken = stakingInfo?.yield_token || null;
     $: hasBothTokens = yieldToken && stakingToken;
-    $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null
+    $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null;
+    $: isLpToken = stakingContractType === "liquidity_mining_smart_epoch"
+    $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType !== "staking_simple" : false;
 
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
 
@@ -110,6 +113,17 @@
             showWithdrawStakeConfirm = force;
         }
     }
+
+    const openCompoundStakingConfirm = () => toggleCompoundStakingConfirm(true)
+    const toggleCompoundStakingConfirm = (e, force = null) => {
+        if (force === null){
+            if (showCompoundStakeConfirm) showCompoundStakeConfirm = false
+            else showCompoundStakeConfirm = true
+        }else{
+            showCompoundStakeConfirm = force;
+        }
+        console.log({showCompoundStakeConfirm})
+    }
 </script>
 
 <style>
@@ -134,21 +148,6 @@
         width: 100%;
         max-width: unset;
         margin: 1rem 0;
-    }
-    .header{
-        position: relative;
-        margin-bottom: 1rem;
-    }
-    .logos-symbols{
-        margin-right: 20px;
-    }
-    .symbols{
-        text-shadow: 2px 2px var(--staking-pannel-header-symbols-text-shadow);
-        margin-bottom: -10px;
-    }
-    .symbols-horizontal{
-        text-shadow: 2px 2px var(--staking-pannel-header-symbols-text-shadow);
-        margin-top: 0.5rem;
     }
     .symbol{
         margin-left: 4px;
@@ -200,14 +199,7 @@
         <div class="info-icon">
             <InfoIcon />
         </div>
-        <div class="flex-col flex-center-center header ">
-            <div class="flex-row flex-center-center symbols weight-600 text-xlarge">
-                        {stakingToken.token_symbol}
-                        <DicrectionalArrowIcon direction="right" width="10px" margin="-2px 4px 0" />
-                        {yieldToken.token_symbol}
-            </div>
-            <YieldLogo {yieldToken} {stakingToken} />
-        </div>
+        <StakingPanelHeader {yieldToken} {stakingToken} {stakingContractType}/>
         <div class="time-banner">
             <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
         </div>
@@ -227,29 +219,28 @@
                     <strong class="symbol text-color-secondary">{yieldToken.token_symbol}</strong>
                 </div>
             </div>
-            <div class="flex-row flex-center-end">
-                <div class="withdraw-button flex flex-justify-end">
-                    {#if currentYield.isGreaterThan(0)}
-                        <button 
-                            class="margin-0 outline small squared" 
-                            style="margin-right: 3px;"
-                            disabled={currentYield.isEqualTo(0)}
-                            on:click={openWithdrawStakingConfirm}>
-                            COMPOUND
-                        </button>
-                    {/if}
-                </div>  
-                <div class="withdraw-button flex flex-justify-end">
-                    {#if currentYield.isGreaterThan(0)}
+            {#if currentYield.isGreaterThan(0)}
+                <div class="flex-row flex-center-end">
+                    <div class="withdraw-button flex flex-justify-end">
+                        {#if showCompoundButton}
+                            <button 
+                                class="margin-0 outline small squared" 
+                                style="margin-right: 3px;"
+                                on:click={openCompoundStakingConfirm}>
+                                COMPOUND
+                            </button>
+                        {/if}
+                    </div>  
+                    <div class="withdraw-button flex flex-justify-end">
                         <button 
                             class="margin-0 primary small squared" 
                             disabled={currentYield.isEqualTo(0)}
                             on:click={openWithdrawStakingConfirm}>
                             WITHDRAW {yieldToken.token_symbol}
                         </button>
-                    {/if}
-                </div>  
-            </div>
+                    </div> 
+                </div>
+            {/if}
             <div class="flex-row staked">
                 <span class="flex-grow ">Staked:</span>
                 <div class="flex-row">
@@ -274,7 +265,14 @@
                 </div>
             </div>
         </div>
-        <InputSpecific on:input={handleInput} tokenInfo={stakingToken} {getStampCost} small={true} bind:clearInput/>
+        
+        <InputSpecific 
+            on:input={handleInput} 
+            tokenInfo={stakingToken} 
+            {isLpToken}
+            {getStampCost} 
+            small={true} 
+            bind:clearInput/>
         <div class="flex-row flex-center-center buttons">
             <button class="primary" on:click={openStakingConfirm} disabled={loading || !validStakingAmount}>STAKE</button>
             <button class="primary outline" on:click={openRemoveStakingConfirm} disabled={loading || !hasStake}>REMOVE STAKE</button>
@@ -283,14 +281,7 @@
     {:else}
         <div class="flex-col panel-container horizontal">
             <div class="flex-row">
-                <div class="logos-symbols flex-col flex-center-center">
-                    <YieldLogo {yieldToken} {stakingToken} margin="0"/>
-                    <div class="flex-row flex-center-center symbols-horizontal weight-600 text-large">
-                        {stakingToken.token_symbol}
-                        <DicrectionalArrowIcon direction="right" width="10px" margin="0 4px" />
-                        {yieldToken.token_symbol}
-                    </div>
-                </div>
+                <StakingPanelHeader {yieldToken} {stakingToken} {stakingContractType} {horizontal}/>
                 <div class="flex-row flex-grow flex-justify-spaceevenly">
                     <div class="flex-col detail-col">
                         <span>APY:</span>
@@ -327,7 +318,7 @@
                                 <strong class="symbol-horizontal text-color-secondary">{yieldToken.token_symbol}</strong>
                             </span>
                         </div>
-                        {#if currentYield.isGreaterThan(0)}
+                        {#if showCompoundButton}
                             <button 
                                 class="primary small squared" 
                                 style="width: 125px;" 
@@ -338,7 +329,13 @@
                         {/if}
                     </div>
                 </div>
-                <InputSpecific on:input={handleInput} tokenInfo={stakingToken} {getStampCost} small={true} bind:clearInput />   
+                <InputSpecific 
+                    on:input={handleInput} 
+                    tokenInfo={stakingToken} 
+                    {isLpToken}
+                    {getStampCost} 
+                    small={true} 
+                    bind:clearInput/>   
             </div>
             <div class="flex-row" style="margin-top: 0.5rem;">
                 <TimeBanner 
@@ -346,13 +343,14 @@
                     startTime={stakingInfo.StartTime.__time__} 
                     endTime={stakingInfo.EndTime.__time__} />
                 <div class="flex-row flex-grow flex-center-end buttons-horizontal">
-                    <button 
-                        class="primary outline" 
-                        style="margin-right: 10px;"
-                        on:click={openWithdrawStakingConfirm} 
-                        disabled={currentYield.isEqualTo(0)}>
-                        COMPOUND
-                    </button>
+                    {#if showCompoundButton && currentYield.isGreaterThan(0)}
+                        <button 
+                            class="primary outline" 
+                            style="margin-right: 10px;"
+                            on:click={openCompoundStakingConfirm}>
+                            COMPOUND
+                        </button>
+                    {/if}
                     <button 
                         class="primary outline" 
                         on:click={openStakingConfirm} 
@@ -385,6 +383,7 @@
                 {stakingInfo}
                 {stakingToken} 
                 {yieldToken} 
+                {isLpToken}
                 {stakingAmount}
                 {clearInput} />
         </div>
@@ -415,6 +414,19 @@
                 {stakingToken} 
                 {yieldToken} 
                 {clearInput}
+                {currentYield}  />
+        </div>
+    </Modal>
+{/if}
+
+{#if showCompoundStakeConfirm}
+    <Modal toggleModal={toggleCompoundStakingConfirm} open={openCompoundStakingConfirm}>
+        <div slot="main">
+            <ConfirmCompoundStake 
+                closeConfirm={toggleCompoundStakingConfirm} 
+                {stakingInfo}
+                {stakingToken}
+                {yieldToken}
                 {currentYield}  />
         </div>
     </Modal>

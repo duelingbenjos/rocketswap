@@ -67,7 +67,6 @@
     }
     .panels{
         flex-direction: column;
-        align-items: center;
         box-sizing: border-box;
         flex-wrap: wrap;
     }
@@ -92,7 +91,6 @@
     @media screen and (min-width: 650px) {
         .panels{
             flex-direction: row;
-            align-items: center;
             justify-content: space-evenly;
         }
     }

@@ -20,6 +20,7 @@
     export let stakingToken;
     export let yieldToken;
     export let stakingAmount;
+    export let isLpToken;
     export let closeConfirm;
     export let clearInput;
 
@@ -38,6 +39,7 @@
 
     const error = () => {
         finish()
+        closeConfirm(false);
     }
 
     const finish = () => {
@@ -50,7 +52,7 @@
         let args = {
             amount: {"__fixed__": stringToFixed(stakingAmount, 8)}
         }
-        walletService.stakeTokens(stakingInfo.contract_name, args, stakingToken, yieldToken, {success, error})
+        walletService.stakeTokens(stakingInfo.contract_name, args, stakingToken, yieldToken, isLpToken, {success, error})
         .catch(err => {
             console.log(err)
             finish()
@@ -90,7 +92,7 @@
 
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
-        <span class="text-large">Confirm Staking</span>
+        <span class="text-large">Confirm Staking {isLpToken}</span>
         <button class="close nostyle" on:click={closeConfirm}>
             <CloseIcon />
         </button>

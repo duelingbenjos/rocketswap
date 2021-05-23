@@ -5,7 +5,7 @@ const CURRENCY_NAME = 'Lamden Testnet Token'
 const AMM_CONTRACT_NAME = 'con_amm_v9'
 const AMM_TOKEN_CONTRACT = 'con_rswp_lst001'
 const AMM_TOKEN_SYMBOL = 'RSWP'
-const AMM_TOKEN_YIELD_CONTRACT = 'con_staking_smart_epoch_rswp_rswp_11'
+const AMM_TOKEN_YIELD_CONTRACT = 'con_rswp_compounding_vtoken_01'
 const AMM_TOKEN_STAKING_CONTRACT = 'con_simple_staking_rswp'
 const AMM_FEE = '0.003'
 const AMM_TOKEN_DISCOUNT = '0.75'
@@ -34,7 +34,9 @@ export const stamps = {
   create_liquidity: 85,
   add_liquidity: 85,
   remove_liquidity: 80,
+  approve_liquidity: 80,
   addStakingTokens: 120,
+  stakeFromContractProfits: 150,
   withdrawTokensAndYield: 150,
   withdrawYield: 150,
   stake: 200,
