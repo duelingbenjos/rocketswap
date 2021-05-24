@@ -1,3 +1,58 @@
+# Fields to add as meta_standards
+
+``` typescript
+
+// meta fields :
+ twitter : string
+ reddit : string
+ telegram : string
+ git : string[]
+ announcements : string // medium link
+ chat: string[]
+ website : string
+ categories : string[] // need to figure out what the category types are
+ name : string // "Rocketswap"
+ description : string // "We aim to build decentralised tools for the cryptocurrency community that are more engaging than the current apps."
+
+ genesisDate: string // "2021-03-30"
+ blockchain: string[] // link to TauHQ contract info
+
+
+// market metrics :
+price : number // Eth or USD ?
+marketCap : number // Eth or USD ?
+volume : number // ?
+totalSupply: number
+change :{
+    '1h' : number
+    '24h' : number
+    '7d' : number
+    '14d' : number
+    '30d' : number
+    '60d' : number
+    '200d' : number
+    '1y' : number
+}  // (pct I'm assuming.)
+timestamp: string // eg - "2021-04-20T03:15:01.395Z"
+
+// computed :
+
+ platform : string // Lamden
+ contract_address : string // con_rswp_lst001
+ symbol : string // RSWP
+
+ logos : {
+    thumb : string,
+    small : string,
+    large : string
+}
+  
+```
+
+
+
+original schema
+```json
 {
     "_id": "0xbd4a858139b155219e2c8d10135003fdef720b6b",
     "community": {
@@ -83,3 +138,5 @@
     },
     "genesisDate": "2021-03-30"
   }
+
+```
