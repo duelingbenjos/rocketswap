@@ -19,7 +19,7 @@ export interface IContractingTime {
 	__time__: [number, number, number, number, number, number];
 }
 
-export type StakingType = "staking_simple" | "staking_smart_epoch" | "staking_smart_epoch_compounding_timeramp";
+export type StakingType = "staking_simple" | "staking_smart_epoch" | "staking_smart_epoch_compounding_timeramp" | "liquidity_mining_smart_epoch";
 
 export interface ITimeRampValue {
 	lower: number;

@@ -143,7 +143,8 @@ export class SocketService {
 				total_staked
 			};
 
-			if (meta_entity.meta.type === "staking_smart_epoch_compounding_timeramp")
+			if (meta_entity.meta.type === "staking_smart_epoch_compounding_timeramp" && user_entity.deposits[0])
+				// log.log(user_entity)
 				user_entity.yield_info.user_reward_rate = getUserRewardRate(meta_entity, user_entity.deposits[0]);
 
 			await user_entity.save();

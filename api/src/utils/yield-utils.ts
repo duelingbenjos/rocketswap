@@ -19,7 +19,6 @@ export function calculateSmartEpochYield(args: {
 
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
-
 	const fitTime = (time: number): number => {
 		if (time < start_time) time = start_time;
 		else if (time > end_time) time = end_time;
@@ -182,7 +181,7 @@ export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: num
 		return stakingTimeWindowIsActive(meta) ? total - dev_fee : 0;
 	}
 
-	if (meta.meta.type === "staking_smart_epoch") {
+	if (meta.meta.type === "staking_smart_epoch" || meta.meta.type === 'liquidity_mining_smart_epoch') {
 		const emission_rate_per_hour = meta.EmissionRatePerHour;
 		const total_emission_rate_per_second = getEmissionRatePerSecond(emission_rate_per_hour);
 		const share_of_pool = total_staked / meta.StakedBalance;

@@ -99,9 +99,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			case "client_staking_update":
 				if (isClientStakingUpdate(update)) {
 					// log.log("EPOCH_UPDATE", update);
-					setTimeout(async () => {
+					// setTimeout(async () => {
 						await this.socketService.sendClientStakingUpdates(update.staking_contract);
-					}, 2000);
+					// }, 2000);
 					// this.wss.emit(`epoch_update`, update);
 				}
 				break;

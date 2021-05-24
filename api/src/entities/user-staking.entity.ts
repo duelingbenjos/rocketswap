@@ -74,9 +74,10 @@ export async function updateUserStakingInfo(args: {
 		entity.withdrawals = 0;
 		entity.deposits = [];
 		entity.yield_info = null;
+		log.warn("WITHDRAW TOKENS AND YIELD CALLED")
 	}
+	await entity.save();
 	handleClientUpdate({ action: "client_staking_update", staking_contract });
-	return await entity.save();
 }
 
 export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingEntity; epochs: StakingEpochEntity[] }) {
@@ -97,12 +98,13 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			calcFn = calculateSimpleYield;
 		} else if (staking_contract_type === "staking_smart_epoch_compounding_timeramp") {
 			calcFn = calculateSmartCompoundingYield;
-		} else if (staking_contract_type === "staking_smart_epoch") {
+		} else if (staking_contract_type === "staking_smart_epoch" || staking_contract_type === "liquidity_mining_smart_epoch") {
 			calcFn = calculateSmartEpochYield;
 		}
 		if (meta.contract_name === "con_rswp_compounding_01") {
 			// log.log({ meta });
 		}
+		log.log(d)
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,
