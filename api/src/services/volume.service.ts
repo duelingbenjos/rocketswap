@@ -57,7 +57,7 @@ export class VolumeService implements OnModuleInit {
 				token_metrics_entity.Bid = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.Ask = trades_last_day.length ? today_last_price : yesterday_last_price;
 				token_metrics_entity.PercentPriceIncrease_24h =
-					((token_metrics_entity.Last - token_metrics_entity.PrevDay) / token_metrics_entity.PrevDay) * 100;
+					((token_metrics_entity.Last - token_metrics_entity.PrevDay) / token_metrics_entity.PrevDay) * 100 || 0;
 				proms.push(token_metrics_entity.save());
 			}
 			await Promise.all(proms);
