@@ -25,6 +25,7 @@
 
     let logoSize = "30px"
     let loading = false;
+    const yieldAmount = currentYield
 
     $: singleAssetContract = stakingInfo.contract_name === config.ammTokenYieldContract
 
@@ -47,7 +48,7 @@
         let args = {
             contract: stakingInfo.contract_name
         }
-        walletService.compoundYield(config.ammTokenYieldContract, args, stakingToken, yieldToken, {success, error})
+        walletService.compoundYield(config.ammTokenYieldContract, args, yieldAmount, stakingToken, yieldToken, {success, error})
         .catch(err => {
             console.log(err)
             finish()
@@ -113,7 +114,7 @@
         <div class="flex-row">
             <span class="flex-grow text-primary-dim">Yield Amount:</span>
             <div class="flex-row">
-                <span>{stringToFixed(currentYield, 8)}
+                <span>{stringToFixed(yieldAmount, 8)}
                     <strong class="symbol text-color-secondary">{yieldToken.token_symbol}</strong>
                 </span>
             </div>

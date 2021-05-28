@@ -1,5 +1,6 @@
 <script>
     import { setContext, onDestroy } from 'svelte'
+    import { fade } from 'svelte/transition';
     
     //Icons 
     import HelpFilled from '../../icons/help-filled.svelte'
@@ -14,6 +15,7 @@
     import Modal from '../misc/modal.svelte'
     import TimeBanner from './time-banner.svelte'
     import StakingPanelHeader from '../misc/staking-panel-header.svelte'
+    import StakingPanelInfo from './staking-panel-info.svelte'
 
     //Services
 	import { WalletService } from '../../services/wallet.service'
@@ -40,6 +42,8 @@
     let clearInput
     let timer_yieldUpdate = null;
 
+    let showInfo = false;
+
     $: log = console.log({stakingInfo})
     $: stakingCalcs = stakingCalculator(stakingInfo);
 
@@ -56,7 +60,7 @@
     $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null;
     $: isLpToken = stakingContractType === "liquidity_mining_smart_epoch"
     $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType !== "staking_simple" : false;
-
+    $: useTimeRamp = stakingInfo.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
 
     onDestroy(() => {
@@ -124,6 +128,8 @@
         }
         console.log({showCompoundStakeConfirm})
     }
+
+    const toggleInfo = () => showInfo = !showInfo;
 </script>
 
 <style>
@@ -159,6 +165,8 @@
         position: absolute;
         top: 13px;
         right: 13px;
+        cursor: pointer;
+        z-index: 1;
     }
     .info-icon-horizontal{
         position: relative;
@@ -195,89 +203,96 @@
 
 {#if hasBothTokens}
     {#if !horizontal}
-    <div class="panel-container text-small">
-        <div class="info-icon">
-            <InfoIcon />
-        </div>
-        <StakingPanelHeader {yieldToken} {stakingToken} {stakingContractType}/>
-        <div class="time-banner">
-            <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
-        </div>
-        <div class="info">
-            <div class="flex-row">
-                <span class="flex-grow">Annual Percentage Yield:</span>
-                <div class="flex-col flex-align-end ">
-                    <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
-                    <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
-                </div>
+        <div class="panel-container text-small">
+            <div class="info-icon" on:click={toggleInfo}>
+                <InfoIcon />
             </div>
+            <StakingPanelHeader {yieldToken} {stakingToken} {stakingContractType}/>
+            <div class="time-banner">
+                <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
+            </div>
+            {#if showInfo}
+                <StakingPanelInfo {toggleInfo}/>
+            {:else}
+                <div class="info" in:fade>
+                    <div class="flex-row">
+                        <span class="flex-grow">Annual Percentage Yield:</span>
+                        <div class="flex-col flex-align-end ">
+                            <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
+                            <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
+                        </div>
+                    </div>
 
-            <div class="flex-row earned">
-                <span class="flex-grow ">Earned:</span>
-                <div class="flex-row">
-                    <span class="flex-grow text-primary-dimmer">{stringToFixed(currentYield, 8)}</span>
-                    <strong class="symbol text-color-secondary">{yieldToken.token_symbol}</strong>
+                    <div class="flex-row earned">
+                        <span class="flex-grow ">Earned:</span>
+                        <div class="flex-row">
+                            <span class="flex-grow text-primary-dimmer">{stringToFixed(currentYield, 8)}</span>
+                            <strong class="symbol text-color-secondary">{yieldToken.token_symbol}</strong>
+                        </div>
+                    </div>
+                    {#if currentYield.isGreaterThan(0)}
+                        <div class="flex-row flex-center-end">
+                            <div class="withdraw-button flex flex-justify-end">
+                                {#if showCompoundButton}
+                                    <button 
+                                        class="margin-0 outline small squared" 
+                                        style="margin-right: 3px;"
+                                        on:click={openCompoundStakingConfirm}>
+                                        COMPOUND
+                                    </button>
+                                {/if}
+                            </div>  
+                            <div class="withdraw-button flex flex-justify-end">
+                                <button 
+                                    class="margin-0 primary small squared" 
+                                    disabled={currentYield.isEqualTo(0)}
+                                    on:click={openWithdrawStakingConfirm}>
+                                    WITHDRAW {yieldToken.token_symbol}
+                                </button>
+                            </div> 
+                        </div>
+                    {/if}
+                    <div class="flex-row staked">
+                        <span class="flex-grow ">Staked:</span>
+                        <div class="flex-row">
+                            <span class="flex-grow text-primary-dimmer">{stringToFixed(totalStaked, 8)}</span>
+                            <strong class="symbol text-color-secondary">{stakingToken.token_symbol}</strong>
+                        </div>
+                    </div>
+                    {#if useTimeRamp}
+                        <div class="flex-row">
+                            <div class="flex-row flex-grow">
+                                Reward Rate:
+                                <HelpFilled 
+                                    margin={"0 0 0 4px"}
+                                    tooltip={[
+                                        "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
+                                        "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
+                                    ]}
+                                />
+                            </div>
+                            <div class="flex-col flex-align-end ">
+                                <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
+                                <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
+                            </div>
+                        </div>
+                    {/if}
                 </div>
-            </div>
-            {#if currentYield.isGreaterThan(0)}
-                <div class="flex-row flex-center-end">
-                    <div class="withdraw-button flex flex-justify-end">
-                        {#if showCompoundButton}
-                            <button 
-                                class="margin-0 outline small squared" 
-                                style="margin-right: 3px;"
-                                on:click={openCompoundStakingConfirm}>
-                                COMPOUND
-                            </button>
-                        {/if}
-                    </div>  
-                    <div class="withdraw-button flex flex-justify-end">
-                        <button 
-                            class="margin-0 primary small squared" 
-                            disabled={currentYield.isEqualTo(0)}
-                            on:click={openWithdrawStakingConfirm}>
-                            WITHDRAW {yieldToken.token_symbol}
-                        </button>
-                    </div> 
+                
+                <InputSpecific 
+                    on:input={handleInput} 
+                    tokenInfo={stakingToken} 
+                    {isLpToken}
+                    {getStampCost} 
+                    small={true} 
+                    bind:clearInput/>
+                    
+                <div class="flex-row flex-center-center buttons">
+                    <button class="primary" on:click={openStakingConfirm} disabled={loading || !validStakingAmount}>STAKE</button>
+                    <button class="primary outline" on:click={openRemoveStakingConfirm} disabled={loading || !hasStake}>REMOVE STAKE</button>
                 </div>
             {/if}
-            <div class="flex-row staked">
-                <span class="flex-grow ">Staked:</span>
-                <div class="flex-row">
-                    <span class="flex-grow text-primary-dimmer">{stringToFixed(totalStaked, 8)}</span>
-                    <strong class="symbol text-color-secondary">{stakingToken.token_symbol}</strong>
-                </div>
-            </div>
-            <div class="flex-row">
-                <div class="flex-row flex-grow">
-                    Reward Rate:
-                    <HelpFilled 
-                        margin={"0 0 0 4px"}
-                        tooltip={[
-                            "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
-                            "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
-                        ]}
-                    />
-                </div>
-                <div class="flex-col flex-align-end ">
-                    <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
-                    <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
-                </div>
-            </div>
         </div>
-        
-        <InputSpecific 
-            on:input={handleInput} 
-            tokenInfo={stakingToken} 
-            {isLpToken}
-            {getStampCost} 
-            small={true} 
-            bind:clearInput/>
-        <div class="flex-row flex-center-center buttons">
-            <button class="primary" on:click={openStakingConfirm} disabled={loading || !validStakingAmount}>STAKE</button>
-            <button class="primary outline" on:click={openRemoveStakingConfirm} disabled={loading || !hasStake}>REMOVE STAKE</button>
-        </div>
-    </div>
     {:else}
         <div class="flex-col panel-container horizontal">
             <div class="flex-row">

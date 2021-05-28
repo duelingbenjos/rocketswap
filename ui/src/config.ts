@@ -36,7 +36,7 @@ export const stamps = {
   remove_liquidity: 80,
   approve_liquidity: 80,
   addStakingTokens: 120,
-  stakeFromContractProfits: 150,
+  stakeFromContractProfits: 1000,
   withdrawTokensAndYield: 150,
   withdrawYield: 150,
   stake: 200,

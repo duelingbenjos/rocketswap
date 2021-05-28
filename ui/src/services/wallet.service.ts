@@ -225,8 +225,8 @@ export class WalletService {
 		}
 	}
 
-	private sendTransaction = async (contractName, method, args, callbacks, callback) => {
-		let stampCost = await this.getStampCost(contractName, method)
+	private sendTransaction = async (contractName, method, args, callbacks, callback, stampCost = undefined) => {
+		if (!stampCost) stampCost = await this.getStampCost(contractName, method)
 		if (this.userHasSufficientStamps(stampCost, callbacks)){
 			if (this.keystore){
 				let networkInfo = {
@@ -743,9 +743,10 @@ export class WalletService {
 		}
 	}
 
-	public async compoundYield(singleAssetContractName, args, stakingToken, yieldToken, callbacks = undefined) {
+	public async compoundYield(singleAssetContractName, args, amount, stakingToken, yieldToken, callbacks = undefined) {
+		console.log({singleAssetContractName, args, stakingToken, yieldToken})
 		let txList = [{contract: singleAssetContractName, method: "stakeFromContractProfits"}]
-		if (await this.needsApproval(stakingToken.contract_name, args.amount.__fixed__, singleAssetContractName)){
+		if (await this.needsApproval(stakingToken.contract_name, amount, singleAssetContractName)){
 			txList.push({contract: yieldToken.contract_name, method: "approve"})
 		}
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
@@ -757,7 +758,8 @@ export class WalletService {
 					"stakeFromContractProfits", 
 					args, 
 					callbacks, 
-					(res) => this.handleCompoundYield(res, yieldToken, callbacks)
+					(res) => this.handleCompoundYield(res, yieldToken, callbacks),
+					1000
 				)
 			}else{
 				if (callbacks) callbacks.error()

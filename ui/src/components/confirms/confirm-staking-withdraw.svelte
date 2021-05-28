@@ -26,10 +26,11 @@
 
     let logoSize = "30px"
     let loading = false;
+    const yieldAmount = currentYield
 
     $: isAMMTokenFarmContract = config.ammTokenContract === stakingInfo.contract_name
-    $: withdrawAmount = currentYield;
-    $: withdrawAmountOverBalance = withdrawAmount.isGreaterThan(currentYield);
+    $: withdrawAmount = yieldAmount;
+    $: withdrawAmountOverBalance = withdrawAmount.isGreaterThan(yieldAmount);
     $: withdrawAmountLessFee = isAMMTokenFarmContract ? withdrawAmount?.multipliedBy(0.9) || toBigNumber("0") : withdrawAmount;
 
     const handleAmountInput = (e) => {
@@ -105,7 +106,7 @@
             <TokenLogo tokenMeta={yieldToken} width={logoSize}  margin="0 10px 0 0" />
             {yieldToken.token_symbol}
         </div>
-        <InputNumber placeholder="0" on:input={handleAmountInput} startingValue={stringToFixed(currentYield, 8)} margin="0.25rem 0 1rem"/>
+        <InputNumber placeholder="0" on:input={handleAmountInput} startingValue={stringToFixed(yieldAmount, 8)} margin="0.25rem 0 1rem"/>
     </div>
     {#if stakingInfo.contract_name === config.ammTokenStakingContract}
         <p class="text-xsmall sub-text text-primary-dim">
@@ -115,7 +116,7 @@
     <div class="flex-col modal-confirm-details-box text-small weight-400">
          <div class="flex-row">
             <span><strong class="symbol-horizontal text-color-secondary">{yieldToken.token_symbol}</strong> Earned:</span>
-            <span class="weight-600 flex-grow text-align-right">{stringToFixed(currentYield, 8)}</span>
+            <span class="weight-600 flex-grow text-align-right">{stringToFixed(yieldAmount, 8)}</span>
         </div>
         <div class="flex-row">
             <span>Get:</span>

@@ -41,9 +41,8 @@
     const sortMarketData = () => {
         if (!marketData) return []
         if (!$homePageTableFilter) return marketData
-
+        return marketData
         let r =  marketData.sort((a, b) => {
-
             if (currentFilter === "price_change" && priceChangeFilter === "dsc") return a.PercentPriceIncrease_24h.isGreaterThan(b.PercentPriceIncrease_24h) ? 1 : -1
             if (currentFilter === "price_change" && priceChangeFilter === "asc") return a.PercentPriceIncrease_24h.isLessThan(b.PercentPriceIncrease_24h) ? 1 : -1
             if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > a.token.token_name ? 1 : -1
@@ -61,8 +60,6 @@
                 if (currentFilter === "price" && priceFilter === "asc") return a.usdPrice.isLessThan(b.usdPrice) ? 1 : -1
 
             }
-
-
         })
         return r
     }
@@ -170,7 +167,7 @@
 </style>
 
 <div class="panel-container">
-    {#if results}
+    {#if results.length > 0}
         <table>
             <tr class="headings">
                 <th>#</th>
@@ -241,6 +238,7 @@
                             <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
                         </div>
                     </td>
+                    
                     <td>
                         {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(2)}` : stringToFixed(tokenInfo.Last, 5)}
                         <div
@@ -249,12 +247,13 @@
                             class="mobile-show">
                             {stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%
                         </div>
+                    
                     </td>
                     <td
                         class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
                         class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
                         class="mobile-hide">
-                        {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : tokenInfo.PercentPriceIncrease_24h.isLessThan(0) ? "-" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
+                        {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
                     </td>
                     <td>
                         {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}

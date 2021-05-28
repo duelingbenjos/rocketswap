@@ -330,7 +330,8 @@ export function valuesToBigNumber(obj: any) {
 					property === 'time_updated' || 
 					property === 'hash' || 
 					property === 'token_symbol' ||
-					property === '__time__') {
+					property === '__time__' ||
+					property === 'TimeStamp') {
 				if (property === '__time__'){
 					obj[property] = timeArrayToUTC(obj[property])
 				}
