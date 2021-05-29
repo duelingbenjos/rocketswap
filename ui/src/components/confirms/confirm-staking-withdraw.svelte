@@ -54,7 +54,7 @@
     const handleWithdrawStakedTokens = () => {
         loading = true;
         let args = {
-            amount: {"__fixed__": stringToFixed(withdrawAmount, 8)}
+            amount: {"__fixed__": stringToFixed(withdrawAmount.dividedBy(90).multipliedBy(100), 8)}
         }
         if (stakingInfo.contract_name === config.ammTokenStakingContract) {
             args.amount.__fixed__ = stringToFixed(withdrawAmount.dividedBy(90).multipliedBy(100), 8)
