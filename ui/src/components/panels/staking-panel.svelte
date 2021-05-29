@@ -61,7 +61,7 @@
     $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null;
     $: isLpToken = stakingContractType === "liquidity_mining_smart_epoch"
     $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType !== "staking_simple" : false;
-    $: useTimeRamp = stakingInfo.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
+    $: useTimeRamp = stakingInfo?.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
 
     onDestroy(() => {
@@ -213,7 +213,7 @@
                 <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
             </div>
             {#if showInfo}
-                <StakingPanelInfo {toggleInfo}/>
+                <StakingPanelInfo {toggleInfo} {stakingInfo}/>
             {:else}
                 <div class="info" in:fade>
                     <div class="flex-row">
@@ -273,7 +273,7 @@
                                 />
                             </div>
                             <div class="flex-col flex-align-end ">
-                                <span class="weight-600">{rewardRate} %</span>
+                                <span class="weight-600">{rewardRate || 0} %</span>
                                 <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
                             </div>
                         </div>
