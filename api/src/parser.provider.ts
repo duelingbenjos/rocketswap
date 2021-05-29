@@ -14,7 +14,7 @@ import blockgrabber from "./blockgrabber";
 import { log } from "./utils/logger";
 import { savePrice } from "./entities/price.entity";
 import { StakingService } from "./services/staking.service";
-import { nanoid } from 'nanoid'
+import { nanoid } from "nanoid";
 
 @Injectable()
 export class ParserProvider {
@@ -126,6 +126,10 @@ export class ParserProvider {
 					hash,
 					fn
 				});
+				this.addToActionQue(saveUserLp, {
+					state,
+					handleClientUpdate: this.socketService.handleClientUpdate
+				});
 			}
 		} catch (err) {
 			log.error(err);
@@ -208,7 +212,7 @@ export class ParserProvider {
 
 	private startBlockgrabber = (skip_wipe: boolean = false) => {
 		let id = nanoid(7);
-		ParserProvider.blockgrabber_active_instance_id = id
+		ParserProvider.blockgrabber_active_instance_id = id;
 		blockgrabber(this.handleNewBlock, skip_wipe, id);
 	};
 }
