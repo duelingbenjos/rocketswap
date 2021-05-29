@@ -352,7 +352,7 @@ export function valuesToBigNumber(obj: any) {
 }
 
 export const timeArrayToUTC = (ta) => {
-	return new Date(Date.UTC(ta[0], ta[1], ta[2], ta[3], ta[4], ta[5], ta[6]))
+	return new Date(Date.UTC(ta[0], ta[1] -1, ta[2], ta[3], ta[4], ta[5], ta[6]))
 }
 
 export const quoteCalculator = (tokenInfo) => {
