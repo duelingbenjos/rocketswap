@@ -33,7 +33,7 @@
     export let stakingInfo;
     export let horizontal = false;
 
-    let stakingAmount = toBigNumber("10");
+    let stakingAmount = toBigNumber("0");
     let loading = false;
     let showStakingConfirm = false;
     let showRemoveStakeConfirm = false;
