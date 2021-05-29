@@ -92,7 +92,7 @@
 
 <div class="modal-style">
     <div class="flex-row modal-confirm-header">
-        <span class="text-large">Confirm Staking {isLpToken}</span>
+        <span class="text-large">Confirm Staking</span>
         <button class="close nostyle" on:click={closeConfirm}>
             <CloseIcon />
         </button>
