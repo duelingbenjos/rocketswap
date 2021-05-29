@@ -51,6 +51,7 @@
     $: totalStaked = userYield ? userYield.total_staked : toBigNumber("0");
     $: additionalYield = userYield ? stakingCalcs.calcNewYeild(userYield) : toBigNumber("0");
     $: currentYield = userYield ? userYield.current_yield.plus(additionalYield) : toBigNumber("0");
+    $: rewardRate = userYield ? userYield.user_reward_rate : toBigNumber("0")
     $: hasStake = totalStaked?.isGreaterThan(0) || false;
     $: startTimer = !startTimer && currentYield.isGreaterThan(0) ? startUpdater() : null;
 
@@ -272,7 +273,7 @@
                                 />
                             </div>
                             <div class="flex-col flex-align-end ">
-                                <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
+                                <span class="weight-600">{rewardRate} %</span>
                                 <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
                             </div>
                         </div>
