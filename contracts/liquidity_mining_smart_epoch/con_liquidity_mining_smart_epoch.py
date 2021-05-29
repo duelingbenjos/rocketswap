@@ -519,6 +519,7 @@ def addToTrustedImporters(contract: str):
     assertOwner()
     trusted_importers = TrustedImporters.get()
     trusted_importers.append(contract)
+    TrustedImporters.set(trusted_importers)
 
 
 @export
