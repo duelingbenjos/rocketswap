@@ -331,7 +331,7 @@ export function valuesToBigNumber(obj: any) {
 					property === 'hash' || 
 					property === 'token_symbol' ||
 					property === '__time__' ||
-					property === 'TimeStamp') {
+					property === 'TimeStamp' || property === "DevRewardWallet") {
 				if (property === '__time__'){
 					obj[property] = timeArrayToUTC(obj[property])
 				}
