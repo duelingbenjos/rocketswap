@@ -305,17 +305,23 @@
                             <span class="weight-600">{`${stringToFixed(stakingCalcs.emissionRatePerYear, 8)}%`}</span>
                             <!-- <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span> -->
                         </div>
-                        <div class="flex-row flex-align-center">
-                            <span>Reward Rate:</span>
-                            <HelpFilled 
-                                margin={"0 0 0 4px"}
-                                tooltip={[
-                                    "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
-                                    "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
-                                ]}
-                            />
+                        {#if useTimeRamp}
+                        <div>
+                            <div class="flex-row flex-align-center">
+                                <span>Reward Rate:</span>
+                                <HelpFilled 
+                                    margin={"0 0 0 4px"}
+                                    tooltip={[
+                                        "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
+                                        "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
+                                    ]}
+                                />
+                            </div>
+                            <div>
+                                <span class="weight-600">{rewardRate || 0} %</span>
+                            </div>
                         </div>
-                        
+                        {/if}
                     </div>
                     <div class="flex-col detail-col">
                         <span>Staked: </span>
