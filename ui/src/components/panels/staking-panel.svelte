@@ -267,8 +267,9 @@
                                 <HelpFilled 
                                     margin={"0 0 0 4px"}
                                     tooltip={[
+                                        "The reward rate increases the longer you stay in the pool. If you remove your stake, the reward rate will reset. Reward rate increases by 10% each day, to a maximum of 100%.",
                                         "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
-                                        "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
+                                        "Your Yield Per Hour will be. ( 1000 / 4000 ) * 3000 * 10% = 75 RSWP per hour"
                                     ]}
                                 />
                             </div>
@@ -312,8 +313,9 @@
                                 <HelpFilled 
                                     margin={"0 0 0 4px"}
                                     tooltip={[
+                                        "The reward rate increases the longer you stay in the pool. If you remove your stake, the reward rate will reset. Reward rate increases by 10% each day, to a maximum of 100%.",
                                         "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
-                                        "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
+                                        "Your Yield Per Hour will be. ( 1000 / 4000 ) * 3000 * 10% = 75 RSWP per hour"
                                     ]}
                                 />
                             </div>
