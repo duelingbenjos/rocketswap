@@ -41,7 +41,7 @@
     const sortMarketData = () => {
         if (!marketData) return []
         if (!$homePageTableFilter) return marketData
-        return marketData
+
         let r =  marketData.sort((a, b) => {
             if (currentFilter === "price_change" && priceChangeFilter === "dsc") return a.PercentPriceIncrease_24h.isGreaterThan(b.PercentPriceIncrease_24h) ? 1 : -1
             if (currentFilter === "price_change" && priceChangeFilter === "asc") return a.PercentPriceIncrease_24h.isLessThan(b.PercentPriceIncrease_24h) ? 1 : -1
