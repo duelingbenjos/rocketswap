@@ -124,9 +124,6 @@ export function calculateSmartCompoundingYield(args: {
 	let step_offset_ms = (step_offset ? step_offset[1] + daysToSeconds(step_offset[0]) : 0) * 1000;
 	log.warn({ step_offset_ms });
 	let deposit_start_step_adjusted = datetimeToUnix(deposit_start_time) + step_offset_ms;
-	log.warn({ deposit_start_step_adjusted });
-	log.warn({ deposit_start_time });
-	log.warn({ dep_start_time: datetimeToUnix(deposit_start_time) });
 	amount = parseFloat(amount.__fixed__);
 
 	let this_epoch_index = starting_epoch_index;
@@ -137,9 +134,6 @@ export function calculateSmartCompoundingYield(args: {
 		let this_epoch = epochs[this_epoch_index];
 		let next_epoch = epochs[this_epoch_index + 1];
 
-		log.warn({ this_epoch_time: datetimeToUnix(this_epoch.time) });
-		log.warn({ dateNowUtc: dateNowUtc() });
-		log.warn({ 1: fitTime(dateNowUtc()) - fitTime(deposit_start_step_adjusted) });
 		if (meta.UseTimeRamp) {
 			let time_ramp_delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(this_epoch.time)) + step_offset_ms;
 			step_multiplier = findTimeRampStep(meta.TimeRampValues, time_ramp_delta);
@@ -239,6 +233,7 @@ function daysToSeconds(days: number): number {
 export function getUserRewardRate(meta: StakingMetaEntity, deposit: IStakingDeposit) {
 	let time_ramp_values = meta.TimeRampValues;
 	let step_offset = deposit.step_offset?.__delta__;
+	log.log({step_offset})
 	let step_offset_ms = (step_offset ? step_offset[1] + daysToSeconds(step_offset[0]) : 0) * 1000;
 	let time_ramp_delta = fitTime(dateNowUtc(), meta) - fitTime(datetimeToUnix(deposit.time), meta) + step_offset_ms;
 	let step_multiplier = findTimeRampStep(meta.TimeRampValues, time_ramp_delta) * 100;
@@ -246,11 +241,12 @@ export function getUserRewardRate(meta: StakingMetaEntity, deposit: IStakingDepo
 }
 
 function findTimeRampStep(time_ramp_values: ITimeRampValue[], delta_ms: number): number {
+	log.warn({delta_ms})
 	let time_step = time_ramp_values.find((step) => {
-		daysToMs(step.lower) < delta_ms && daysToMs(step.upper) > delta_ms;
+		// daysToMs(step.lower) <= delta_ms && daysToMs(step.upper) >= delta_ms;
 		let ms_lower = daysToMs(step.lower);
 		let ms_upper = daysToMs(step.upper);
-		return ms_lower < delta_ms && ms_upper > delta_ms;
+		return ms_lower <= delta_ms && ms_upper >= delta_ms;
 	});
 	if (!time_step) time_step = time_ramp_values[time_ramp_values.length - 1];
 	return time_step.multiplier.__fixed__ ? parseFloat(time_step.multiplier.__fixed__) : time_step.multiplier;
