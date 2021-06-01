@@ -12,6 +12,7 @@ import { handleClientUpdateType } from "../types/websocket.types";
 import { getVal } from "../utils/utils";
 import { updateUserStakingInfo } from "../entities/user-staking.entity";
 import { SocketService } from "./socket.service";
+import { LpPointsEntity } from "../entities/lp-points.entity";
 
 @Injectable()
 export class StakingService implements OnModuleInit {
@@ -63,8 +64,33 @@ export class StakingService implements OnModuleInit {
 			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			return await this.getRSWPStakingROI(meta_entity);
+		} else if (meta.type === "liquidity_mining_smart_epoch") {
+			return await this.getLiqMiningROI(meta_entity);
 		}
 	};
+
+	getLiqMiningROI = async (meta_entity: StakingMetaEntity) => {
+		log.warn("getLiqMiningROI CALLED")
+		// Get value of LP token
+		const staking_token = meta_entity.meta.STAKING_TOKEN;
+		const reward_token = meta_entity.meta.YIELD_TOKEN;
+
+		const [staking_token_pair_entity, reward_token_pair_entity] = await Promise.all([
+			PairEntity.findOne(staking_token),
+			PairEntity.findOne(reward_token)
+		]);
+		if (!staking_token_pair_entity) {
+			log.warn(`cannot calculate ROI for ${staking_token}, PairEntity not found.`);
+			return 0;
+		}
+		const tau_lp_total = Number(staking_token_pair_entity.reserves[0]);
+		const single_lp_value = (tau_lp_total / Number(staking_token_pair_entity.lp)) * 2;
+		const total_staked_value = single_lp_value * meta_entity.StakedBalance
+		
+		const reward_value_per_year = Number(reward_token_pair_entity.price) * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour)
+		return Math.round(reward_value_per_year / total_staked_value * 100)
+	};
+	
 
 	getRSWPStakingROI = async (meta_entity: StakingMetaEntity) =>
 		Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
