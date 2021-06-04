@@ -87,7 +87,7 @@ export class StakingService implements OnModuleInit {
 		const single_lp_value = (tau_lp_total / Number(staking_token_pair_entity.lp)) * 2;
 		const total_staked_value = single_lp_value * meta_entity.StakedBalance
 		
-		const reward_value_per_year = Number(reward_token_pair_entity.price) * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour)
+		const reward_value_per_year = Number(reward_token_pair_entity?.price) || 1 * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour)
 		return Math.round(reward_value_per_year / total_staked_value * 100)
 	};
 	
