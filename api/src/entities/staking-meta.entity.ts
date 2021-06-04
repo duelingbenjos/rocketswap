@@ -15,6 +15,12 @@ export class StakingMetaEntity extends BaseEntity {
 	@Column({ nullable: true, type: "simple-json" })
 	meta: { type: StakingType; version: string; YIELD_TOKEN: string; STAKING_TOKEN: string }; // Version Number of the staking contract
 
+	@Column({nullable: true})
+	YIELD_TOKEN: string
+
+	@Column({nullable: true})
+	STAKING_TOKEN: string
+
 	@Column({ nullable: true })
 	EmissionRatePerHour: number;
 
