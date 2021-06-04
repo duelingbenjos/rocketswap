@@ -1,6 +1,7 @@
 import { IKvp } from "../types/misc.types";
 import BigNumber from "bignumber.js";
 import { TokenEntity } from "../entities/token.entity";
+import { log } from "./logger";
 
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;
@@ -62,6 +63,11 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 	} else {
 		return val;
 	}
+}
+
+export function getNumber(value: any) {
+	let return_val = value.__fixed__ ? Number(value.__fixed__) : Number(value);
+	return return_val
 }
 
 export function getContractName(state: IKvp[]) {
