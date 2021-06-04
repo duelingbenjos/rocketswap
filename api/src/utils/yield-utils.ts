@@ -1,10 +1,10 @@
-import { kStringMaxLength } from "buffer";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { IStakingDeposit, UserStakingEntity } from "../entities/user-staking.entity";
 import { IContractingTime, ITimeRampValue } from "../types/misc.types";
 import { log } from "./logger";
 import { dateNowUtc } from "./utils";
+
 
 export function calculateSmartEpochYield(args: {
 	starting_epoch_index: number;
@@ -15,7 +15,6 @@ export function calculateSmartEpochYield(args: {
 	meta: StakingMetaEntity;
 }): number {
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta } = args;
-	if (meta.contract_name === "con_rswp_compounding_01") log.log(epochs);
 
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
