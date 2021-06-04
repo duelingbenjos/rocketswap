@@ -110,7 +110,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 		if (meta.contract_name === "con_rswp_compounding_01") {
 			// log.log({ meta });
 		}
-		log.log(d);
+		// log.log(d);
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,

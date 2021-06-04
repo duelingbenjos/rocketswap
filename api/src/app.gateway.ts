@@ -141,7 +141,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async handleJoinRoom(client: Socket, room: string) {
 		client.join(room);
 		client.emit("joined_room", room);
-		log.log({ joined: room });
+		// log.log({ joined: room });
 		const [prefix, subject] = room.split(":");
 		switch (prefix) {
 			case "price_feed":
