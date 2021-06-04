@@ -5,6 +5,7 @@ import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { StakingEpochEntity } from "./staking-epoch.entity";
 import { StakingMetaEntity } from "./staking-meta.entity";
 import { calculateSimpleYield, calculateSmartCompoundingYield, calculateSmartEpochYield } from "../utils/yield-utils";
+import { getNumber } from "../utils/utils";
 
 @Entity()
 export class UserStakingEntity extends BaseEntity {
@@ -26,8 +27,8 @@ export class UserStakingEntity extends BaseEntity {
 	@Column({ nullable: true, type: "simple-json" })
 	yield_info: IUserYieldInfo;
 
-	@Column({nullable: true})
-	user_reward_rate?: number
+	@Column({ nullable: true })
+	user_reward_rate?: number;
 }
 
 export interface IStakingDeposit {
@@ -37,6 +38,7 @@ export interface IStakingDeposit {
 	step_offset?: {
 		__delta__: [number, number];
 	};
+	user_yield?: number;
 }
 
 export async function updateUserStakingInfo(args: {
@@ -74,7 +76,7 @@ export async function updateUserStakingInfo(args: {
 		entity.withdrawals = 0;
 		entity.deposits = [];
 		entity.yield_info = null;
-		log.warn("WITHDRAW TOKENS AND YIELD CALLED")
+		log.warn("WITHDRAW TOKENS AND YIELD CALLED");
 	}
 	await entity.save();
 	handleClientUpdate({ action: "client_staking_update", staking_contract });
@@ -84,7 +86,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 	let { meta, user, epochs } = args;
 	let { DevRewardPct } = meta;
 	let { deposits, withdrawals } = user;
-	
+
 	let harvestable_yield = 0;
 	for (let d of deposits) {
 		let calcFn: Function;
@@ -100,11 +102,15 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			calcFn = calculateSmartCompoundingYield;
 		} else if (staking_contract_type === "staking_smart_epoch" || staking_contract_type === "liquidity_mining_smart_epoch") {
 			calcFn = calculateSmartEpochYield;
-		}
+			if (deposits[0].user_yield) harvestable_yield += getNumber(deposits[0].user_yield)
+		} 
+		// else if (staking_contract_type === "liquidity_mining_smart_epoch") {
+		// 	if (deposits[0].user_yield) calcFn = calculateSmartEpochLiqMiningYield;
+		// }
 		if (meta.contract_name === "con_rswp_compounding_01") {
 			// log.log({ meta });
 		}
-		log.log(d)
+		log.log(d);
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,
@@ -113,7 +119,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			epochs,
 			meta,
 			step_offset: d.step_offset?.__delta__
-		}); 
+		});
 	}
 
 	harvestable_yield -= withdrawals;
