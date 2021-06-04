@@ -13,11 +13,13 @@ export const staking_contracts = process.env.STAKING_CONTRACTS
 	? process.env.STAKING_CONTRACTS.split(",")
 	: [
 			"con_rswp_lp_mining_02",
-			"con_rswp_compounding_vtoken_01",
+			// "con_rswp_compounding_vtoken_01",
 			"con_rswp_compounding_vtoken_02",
 			"con_liq_mining_poop",
-			// "con_rswp_compounding_02",
+			"con_staking_poop_poop_1",
+			"con_liq_mining_weth_tau_1"
+			// "con_rswp_compounding_vtoken_03",
 			// "con_staking_smart_epoch_rswp_rswp_11",
-			"con_simple_staking_rswp",
+			// "con_simple_staking_rswp",
 			// "con_yf_rswp3"
 	  ];
