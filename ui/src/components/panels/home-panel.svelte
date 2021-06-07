@@ -240,7 +240,7 @@
                     </td>
                     
                     <td>
-                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(2)}` : stringToFixed(tokenInfo.Last, 5)}
+                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(8).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 5)}
                         <div
                             class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
                             class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
