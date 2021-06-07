@@ -305,7 +305,7 @@ def calculateYield(deposit):
     step_offset = deposit.get("step_offset")
 
     if step_offset is not None:
-        deposit_start_time = deposit_start_time + step_offset
+        deposit_start_time
     else:
         step_offset = now - now  # now - now // 0 delta
 

@@ -1,13 +1,13 @@
 # Imports
 
-import con_rswp_lst001
+import con_poop_lst001
 
 I = importlib
 
 # Setup Tokens
 
-STAKING_TOKEN = con_rswp_lst001
-YIELD_TOKEN = con_rswp_lst001
+STAKING_TOKEN = con_poop_lst001
+YIELD_TOKEN = con_poop_lst001
 
 # State
 
@@ -47,7 +47,7 @@ def seed():
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(1/2)
-    EpochMinTime.set(30 * 60)  # 30 mins
+    EpochMinTime.set(0)  # 30 mins
     UseTimeRamp.set(False)
 
     TimeRampValues.set(
@@ -65,16 +65,16 @@ def seed():
         ]
     )
 
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 10}
 
     meta["version"] = "0.3"
     meta[
         "type"
     ] = "staking_smart_epoch_compounding_timeramp"  # staking || lp_farming || etcetera ...
-    meta["STAKING_TOKEN"] = "con_rswp_lst001"
-    meta["YIELD_TOKEN"] = "con_rswp_lst001"
+    meta["STAKING_TOKEN"] = "con_poop_lst001"
+    meta["YIELD_TOKEN"] = "con_poop_lst001"
 
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
+    EmissionRatePerHour.set(10)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(1 / 10)
 
     # The datetime from which you want to allow staking.

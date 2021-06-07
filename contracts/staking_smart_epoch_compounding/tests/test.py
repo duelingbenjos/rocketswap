@@ -33,7 +33,9 @@ class MyTestCase(unittest.TestCase):
             code = f.read()
             self.c.submit(code, name="con_staking_smart_epoch_single_asset")
 
-        self.contract_single_asset = self.c.get_contract("con_staking_smart_epoch_single_asset")
+        self.contract_single_asset = self.c.get_contract(
+            "con_staking_smart_epoch_single_asset"
+        )
 
         with open("../dex.py") as f:
             dex = f.read()
@@ -856,6 +858,145 @@ class MyTestCase(unittest.TestCase):
 
         self.assertAlmostEqual(bob_deposits["amount"], 740)
 
+    def test_23a_time_ramps_give_appropriate_yield(self):
+
+        env_0 = {"now": Datetime(year=2021, month=12, day=31, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=2, hour=0)}
+        env_3 = {"now": Datetime(year=2021, month=1, day=3, hour=0)}
+        env_4 = {"now": Datetime(year=2021, month=1, day=4, hour=0)}
+        env_5 = {"now": Datetime(year=2021, month=1, day=5, hour=0)}
+        env_6 = {"now": Datetime(year=2021, month=1, day=6, hour=0)}
+        env_7 = {"now": Datetime(year=2021, month=1, day=7, hour=0)}
+
+        self.contract.toggleTimeRamp(on=True)
+        self.contract.setTimeRampValues(data =
+            [
+                {"lower": 0, "upper": 1, "multiplier": 0.1},
+                {"lower": 1, "upper": 2, "multiplier": 0.2},
+                {"lower": 2, "upper": 3, "multiplier": 0.3},
+                {"lower": 3, "upper": 4, "multiplier": 0.4},
+                {"lower": 4, "upper": 5, "multiplier": 0.5},
+                {"lower": 10, "upper": 100, "multiplier": 1},
+            ]
+        )
+        self.contract.setDevRewardPct(amount=0)
+        self.contract.changeAmountPerHour(amount_per_hour=10)
+
+        # deposit amount = 10
+        self.contract.addStakingTokens(environment=env_1, signer="bob", amount=10)
+
+        # deposit amount = 
+        # 10 + (10 * 24) * 0.2 + 10 = 44
+        self.contract.addStakingTokens(environment=env_2, signer="bob", amount=10)
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits["amount"], 68)
+
+        # deposit amount = 68
+        # yield due = 68 + (10 * 24) * 0.3 + 10
+        self.contract.addStakingTokens(environment=env_3, signer="bob", amount=10)
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits["amount"], 150)
+
+        # deposit amount = 150
+        # yield due = 150 + (10 * 24) * 0.4 + 10
+        self.contract.addStakingTokens(environment=env_4, signer="bob", amount=10)
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits["amount"], 256)
+
+        # deposit amount = 256
+        # yield due = 256 + (10 * 24) * 0.5 + 10
+        self.contract.addStakingTokens(environment=env_5, signer="bob", amount=10)
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits["amount"], 386)
+
+        # deposit amount = 386
+        # yield due = 386 + (10 * 24) * 1 + 10
+        self.contract.addStakingTokens(environment=env_6, signer="bob", amount=10)
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits["amount"], 636)
+
+        # deposit amount = 636
+        # yield due = 636 + (10 * 24) * 1 + 10
+        self.contract.addStakingTokens(environment=env_7, signer="bob", amount=10)
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits["amount"], 886)
+
+    # def test_23b_time_ramps_gives_right_level_when_multiple_deposits_before_start_date(self):
+
+    #     env_0 = {"now": Datetime(year=2020, month=12, day=31, hour=0)}
+    #     env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+    #     env_2 = {"now": Datetime(year=2021, month=1, day=2, hour=0)}
+    #     env_3 = {"now": Datetime(year=2021, month=1, day=3, hour=0)}
+    #     env_4 = {"now": Datetime(year=2021, month=1, day=4, hour=0)}
+    #     env_5 = {"now": Datetime(year=2021, month=1, day=5, hour=0)}
+    #     env_6 = {"now": Datetime(year=2021, month=1, day=6, hour=0)}
+    #     env_7 = {"now": Datetime(year=2021, month=1, day=7, hour=0)}
+
+    #     self.contract.toggleTimeRamp(on=True)
+    #     self.contract.setStartTime(year=2021, month=1, day=1, hour=0)
+    #     self.contract.setTimeRampValues(data =
+    #         [
+    #             {"lower": 0, "upper": 1, "multiplier": 0.1},
+    #             {"lower": 1, "upper": 2, "multiplier": 0.2},
+    #             {"lower": 2, "upper": 3, "multiplier": 0.3},
+    #             {"lower": 3, "upper": 4, "multiplier": 0.4},
+    #             {"lower": 4, "upper": 5, "multiplier": 0.5},
+    #             {"lower": 10, "upper": 100, "multiplier": 1},
+    #         ]
+    #     )
+    #     self.contract.setDevRewardPct(amount=0)
+    #     self.contract.changeAmountPerHour(amount_per_hour=10)
+
+    #     # deposit amount = 5
+    #     self.contract.addStakingTokens(environment=env_0, signer="bob", amount=5)
+
+    #     # deposit amount = 10
+    #     self.contract.addStakingTokens(environment=env_1, signer="bob", amount=5)
+
+    #     # deposit amount = 
+    #     # 10 + (10 * 24) * 0.2 + 10 = 44
+    #     self.contract.addStakingTokens(environment=env_2, signer="bob", amount=10)
+    #     bob_deposits = self.contract.Deposits["bob"]
+    #     self.assertAlmostEqual(bob_deposits["amount"], 68)
+
+    def test_23c_time_ramps_gives_right_level_when_deposit_before_start_date(self):
+
+        env_0 = {"now": Datetime(year=2020, month=12, day=31, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=2, hour=0)}
+        env_3 = {"now": Datetime(year=2021, month=1, day=3, hour=0)}
+        env_4 = {"now": Datetime(year=2021, month=1, day=4, hour=0)}
+        env_5 = {"now": Datetime(year=2021, month=1, day=5, hour=0)}
+        env_6 = {"now": Datetime(year=2021, month=1, day=6, hour=0)}
+        env_7 = {"now": Datetime(year=2021, month=1, day=7, hour=0)}
+
+        self.contract.toggleTimeRamp(on=True)
+        self.contract.setStartTime(year=2021, month=1, day=1, hour=0)
+        self.contract.setTimeRampValues(data =
+            [
+                {"lower": 0, "upper": 1, "multiplier": 0.1},
+                {"lower": 1, "upper": 2, "multiplier": 0.2},
+                {"lower": 2, "upper": 3, "multiplier": 0.3},
+                {"lower": 3, "upper": 4, "multiplier": 0.4},
+                {"lower": 4, "upper": 5, "multiplier": 0.5},
+                {"lower": 10, "upper": 100, "multiplier": 1},
+            ]
+        )
+        self.contract.setDevRewardPct(amount=0)
+        self.contract.changeAmountPerHour(amount_per_hour=10)
+
+        # deposit amount = 5
+        self.contract.addStakingTokens(environment=env_0, signer="bob", amount=10)
+
+
+        # deposit amount = 
+        # 10 + (10 * 24) * 0.2 + 10 = 44
+        self.contract.addStakingTokens(environment=env_2, signer="bob", amount=10)
+        bob_deposits = self.contract.Deposits["bob"]
+        self.assertAlmostEqual(bob_deposits["amount"], 68)
+
+
     def test_24_compounding_gives_correct_deposit_balance(self):
 
         env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
@@ -971,7 +1112,13 @@ class MyTestCase(unittest.TestCase):
         bob_token_balance = self.contract.balances["bob"]
         self.assertAlmostEqual(bob_token_balance, 10)
 
-        self.contract.transfer_from(environment=env_2, signer="con_staking_smart_epoch", amount=10, to="con_staking_smart_epoch", main_account="bob")
+        self.contract.transfer_from(
+            environment=env_2,
+            signer="con_staking_smart_epoch",
+            amount=10,
+            to="con_staking_smart_epoch",
+            main_account="bob",
+        )
 
         contract_token_balance = self.contract.balances["con_staking_smart_epoch"]
 
@@ -994,9 +1141,13 @@ class MyTestCase(unittest.TestCase):
             to="con_liquidity_mining_smart_epoch",
             amount=1000,
         )
-        self.yield_farm.addToTrustedImporters(contract="con_staking_smart_epoch_single_asset")
+        self.yield_farm.addToTrustedImporters(
+            contract="con_staking_smart_epoch_single_asset"
+        )
         self.yield_farm.setDevRewardPct(amount=0)
-        self.basic_token.transfer(to="con_staking_smart_epoch_single_asset", amount=100000)
+        self.basic_token.transfer(
+            to="con_staking_smart_epoch_single_asset", amount=100000
+        )
         self.basic_token.transfer(to="con_liquidity_mining_smart_epoch", amount=100000)
 
     def test_30_stakeFromContractProfits_liquidity_mining_one_deposit_passes(self):
@@ -1008,7 +1159,6 @@ class MyTestCase(unittest.TestCase):
         # bob stakes LP
         self.dex.add_liquidity(signer="bob", contract="con_rswp", currency_amount=1000)
 
-
         self.yield_farm.addStakingTokens(environment=env_0, signer="bob", amount=1000)
 
         # after 1 hour, withdraws rewards to staking contract
@@ -1018,7 +1168,7 @@ class MyTestCase(unittest.TestCase):
         # check that staking contract has received his deposit.
         bob_deposit = self.contract_single_asset.Deposits["bob"]
         self.assertAlmostEquals(bob_deposit["amount"], 3000)
-        
+
     def test_31_stakeFromContractProfits_liquidity_mining_two_deposits_passes(self):
         self.setUpDex()
         self.contract_single_asset.changeAmountPerHour(amount_per_hour=0)
@@ -1060,7 +1210,9 @@ class MyTestCase(unittest.TestCase):
 
         with self.assertRaises(AssertionError):
             self.contract_single_asset.stakeFromContractProfits(
-                environment=env_1, signer="bob", contract="con_liquidity_mining_smart_epoch"
+                environment=env_1,
+                signer="bob",
+                contract="con_liquidity_mining_smart_epoch",
             )
 
 
