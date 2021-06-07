@@ -35,7 +35,7 @@ services:
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
       - CONTEXT=remote
-      - STAKING_CONTRACTS=con_simple_staking_tau_rswp_001
+      - STAKING_CONTRACTS=con_simple_staking_tau_rswp_001,con_staking_rswp_rswp,con_liq_mining_rswp_gold,con_liq_mining_gold_gold
 
   docs:
     build: ./docs
