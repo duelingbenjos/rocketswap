@@ -86,7 +86,9 @@
     }
 
     const handleInput = (e) => {
+        
         stakingAmount = toBigNumberPrecision(e.detail, 8)
+        console.log({e, stakingAmount: stakingAmount.toString(), validStakingAmount})
     }
 
     const openStakingConfirm = () => toggleStakingConfirm(true)
@@ -209,12 +211,13 @@
                 <InfoIcon />
             </div>
             <StakingPanelHeader {yieldToken} {stakingToken} {stakingContractType}/>
-            <div class="time-banner">
-                <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
-            </div>
+
             {#if showInfo}
-                <StakingPanelInfo {toggleInfo} {stakingInfo}/>
+                <StakingPanelInfo {toggleInfo} {stakingInfo} {yieldToken} {stakingToken} {stakingContractType}/>
             {:else}
+                <div class="time-banner">
+                    <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
+                </div>
                 <div class="info" in:fade>
                     <div class="flex-row">
                         <span class="flex-grow">Annual Percentage Yield:</span>
@@ -257,7 +260,7 @@
                         <span class="flex-grow ">Staked:</span>
                         <div class="flex-row">
                             <span class="flex-grow text-primary-dimmer">{stringToFixed(totalStaked, 8)}</span>
-                            <strong class="symbol text-color-secondary">{stakingToken.token_symbol}</strong>
+                            <strong class="symbol text-color-secondary">{`${stakingToken.token_symbol}${stakingContractType === "liquidity_mining_smart_epoch" ? " LP" : ""}`}</strong>
                         </div>
                     </div>
                     {#if useTimeRamp}
@@ -284,6 +287,7 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
+                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 
@@ -330,7 +334,7 @@
                         <div class="flex-row">
                             <span class="text-primary-dimmer">
                                 {stringToFixed(totalStaked, 8)}
-                                <strong class="symbol-horizontal text-color-secondary">{stakingToken.token_symbol}</strong>
+                                <strong class="symbol-horizontal text-color-secondary">{`${stakingToken.token_symbol}${stakingContractType === "liquidity_mining_smart_epoch" ? " LP" : ""}`}</strong>
                             </span>
                         </div>
                     </div>
@@ -356,6 +360,7 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
+                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 

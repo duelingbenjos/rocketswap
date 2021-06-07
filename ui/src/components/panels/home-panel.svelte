@@ -45,8 +45,8 @@
         let r =  marketData.sort((a, b) => {
             if (currentFilter === "price_change" && priceChangeFilter === "dsc") return a.PercentPriceIncrease_24h.isGreaterThan(b.PercentPriceIncrease_24h) ? 1 : -1
             if (currentFilter === "price_change" && priceChangeFilter === "asc") return a.PercentPriceIncrease_24h.isLessThan(b.PercentPriceIncrease_24h) ? 1 : -1
-            if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > a.token.token_name ? 1 : -1
-            if (currentFilter === "name" && nameFilter === "asc") return a.token.token_name < a.token.token_name ? 1 : -1
+            if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > b.token.token_name ? 1 : -1
+            if (currentFilter === "name" && nameFilter === "asc") return a.token.token_name < b.token.token_name ? 1 : -1
 
             if (currencyToDisplay === "tau"){
                 if (currentFilter === "volume" && volumeFilter === "dsc") return a.BaseVolume.isGreaterThan(b.BaseVolume) ? 1 : -1
@@ -240,7 +240,7 @@
                     </td>
                     
                     <td>
-                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(2)}` : stringToFixed(tokenInfo.Last, 5)}
+                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(8).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 5)}
                         <div
                             class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
                             class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}

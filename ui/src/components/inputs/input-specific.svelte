@@ -71,7 +71,7 @@
 
 		inputElm.value = stringToFixed(adjustedValue, 8)
 		pressedMaxValue = true;
-		dispatchEvent(inputValue)
+		dispatchEvent(adjustedValue)
 	}
 	
 	const dispatchEvent = (value) => dispatch('input', value)
@@ -118,7 +118,7 @@
         	{#if !pressedMaxValue}
 				<button on:click={handleMaxInput} class="primary small">MAX</button> 
 			{/if}
-			<TokenLogo tokenMeta={tokenInfo} width={small ? "20px" : "23px"} margin="0 3px 0 0" />
+			<TokenLogo tokenMeta={tokenInfo} stakingContractType={isLpToken?"liquidity_mining_smart_epoch":""} width={small ? "20px" : "23px"} margin="0 3px 0 0" lpBottom={"-3px"}/>
 			<span class="input-token-label text-xlarge" class:small={small}> {`${tokenInfo.token_symbol}${isLpToken ? " LP" : ""}`} </span>
 		</div>
 	</div>

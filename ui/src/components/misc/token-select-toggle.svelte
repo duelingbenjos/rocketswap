@@ -176,7 +176,7 @@
 {:else}
     <button class="select-token flex-row" on:click={openTokenSelect}>
     	{#if $selectedToken}
-			<TokenLogo tokenMeta={$selectedToken} width="21px" margin="0 3px" />
+			<TokenLogo tokenMeta={$selectedToken} width="21px" margin="0 3px" lpBottom={"0"}/>
 		{/if}
         <span class="input-token-label has-token">{$selectedToken.token_symbol.toUpperCase()}</span> 
         <div class="chevron">
@@ -208,7 +208,7 @@
                                 <div class="select-wrapper flex-row">
                                     <button on:click={() => selectToken(token)} class="nostyle button-item">
                                         <div class="token-name-logo flex-row">
-                                            <TokenLogo tokenMeta={token} width={'27px'} />
+                                            <TokenLogo tokenMeta={token} width={'27px'} lpBottom={"-2px"}/>
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
                                             {#if token.contract_name === selected_contract}
                                                 <SelectedArrow width="10px" margin="0 8px" direction="left"/>
