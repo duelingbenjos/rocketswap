@@ -34,11 +34,11 @@
                     <DicrectionalArrowIcon direction="right" width="10px" margin="-2px 4px 0" />
                     {yieldToken.token_symbol}
         </div>
-        <YieldLogo {yieldToken} {stakingToken} />
+        <YieldLogo {yieldToken} {stakingContractType} {stakingToken} />
     </div>
 {:else}
     <div class="logos-symbols flex-col flex-center-center">
-        <YieldLogo {yieldToken} {stakingToken} margin="0"/>
+        <YieldLogo {yieldToken} {stakingToken} {stakingContractType} margin="0"/>
         <div class="flex-row flex-center-center symbols-horizontal weight-600 text-large">
             {`${stakingToken.token_symbol}${stakingContractType === "liquidity_mining_smart_epoch" ? " LP" : ""}`}
             <DicrectionalArrowIcon direction="right" width="10px" margin="0 4px" />

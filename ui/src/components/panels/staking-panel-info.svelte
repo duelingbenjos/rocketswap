@@ -1,66 +1,85 @@
 <script>
-  import { fade } from 'svelte/transition'
-  import { onMount, setContext } from 'svelte'
+	import { fade } from 'svelte/transition'
+	import { onMount, setContext } from 'svelte'
 
-  export let toggleInfo
-  export let stakingInfo
+	// Icons
+	import TokenLogo from '../../icons/token-logo.svelte'
 
-  let info = []
+	// Misc 
+	import { formatAccountAddress, stringToFixed } from '../../utils' 
 
-  let wantedValues = [
-    'ROI_yearly',
-    'contract_name',
-    'DevRewardWallet',
-    'StakedBalance',
-    'EmissionRatePerHour',
-    'DevRewardPct',
-    'OpenForBusiness',
-    'EpochMaxRatioIncrease',
-    'WithdrawnBalance',
-    'meta'
-  ]
+	export let toggleInfo
+	export let stakingInfo
+	export let yieldToken
+	export let stakingToken
+	export let stakingContractType
 
-  function processStakingInfo(stakingInfo) {
-    let keys = Object.keys(stakingInfo).filter((key) => wantedValues.includes(key))
-    return keys.reduce((accum, curr) => {
-      if (curr === 'meta') {
-        let meta_keys = Object.keys(stakingInfo[curr])
-        let meta = stakingInfo[curr]
-        meta_keys.forEach((key) => {
-          accum.push({
-            key: `meta.${key}`,
-            value: meta[key]
-          })
-        })
-      } else {
-        accum.push({ key: curr, value: stakingInfo[curr] })
-      }
-      return accum
-    }, [])
-  }
+	const tauhqURL = "https://www.tauhq.com"
 
-  onMount(() => {
-    console.log({ stakingInfo })
-    info = processStakingInfo(stakingInfo)
-    console.log(info)
-  })
+
 </script>
 
-<div class="wrap" in:fade>
-  {#each info as i}
-    <b>{i.key} : </b> {i.value} <br />
-  {/each}
-  <div class="flex-row flex-center-center">
-    <button class="primary" on:click={toggleInfo}>CLOSE</button>
-  </div>
-</div>
-
 <style>
-  .wrap {
-    word-wrap: break-word;
-  }
-
-  b {
-    color: var(--color-secondary);
-  }
+	.wrap {
+		word-wrap: break-word;
+	}
+	p{
+		margin: 0;
+	}
+	a {
+		color: var(--color-secondary);
+	}
+	span{
+		color: var(--text-primary-color-dim);
+	}
+	button{
+		margin-top: 1rem;
+	}
+	.staking-detail{
+		margin: 2rem 0 1rem;
+	}
 </style>
+
+{#if stakingInfo}
+	<div class="wrap" in:fade={{}}>
+		<p class="staking-detail">
+			Stake
+			<a href="{`${tauhqURL}/contracts/${stakingToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
+				{`${stakingToken.token_symbol}${stakingInfo.meta.type === "liquidity_mining_smart_epoch" ? " LP" : ""}`}
+				<TokenLogo tokenMeta={stakingToken} {stakingContractType} width="22px" inline={true} margin="0 3px 0 2px" lpBottom={"0"}/> 
+			</a>
+			in this contract and you will yield {stringToFixed(stakingInfo.EmissionRatePerHour, 8)}
+			<a href="{`${tauhqURL}/contracts/${yieldToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
+				{yieldToken.token_symbol}
+				<TokenLogo tokenMeta={yieldToken} inline={true} width="22px" margin="0 3px 0 0" lpBottom={"0"}/>  
+			</a>
+			per hour for each
+			<a href="{`${tauhqURL}/contracts/${stakingToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
+				{`${stakingToken.token_symbol}${stakingInfo.meta.type === "liquidity_mining_smart_epoch" ? " LP" : ""}`}
+				<TokenLogo tokenMeta={stakingToken} {stakingContractType} inline={true} width="22px" margin="0 3px 0 0" lpBottom={"0"}/> 
+			</a>
+			you stake.
+		</p>
+		<p>
+			<span>Contrat Name:</span>
+			<a href="{`${tauhqURL}/contracts/${stakingInfo.contract_name}`}" target="_blank" rel="noopener noreferrer">{stakingInfo.contract_name}</a>
+		</p>
+		<p>
+			<span>Contrat Type:</span> {stakingInfo.meta.type}
+		</p>
+		<p>
+			<span>Dev Reward Wallet: </span>
+			<a href="{`${tauhqURL}/addresses/${stakingInfo.DevRewardWallet}`}" target="_blank" rel="noopener noreferrer">
+				{formatAccountAddress(stakingInfo.DevRewardWallet, 8, 5)}
+			</a>
+		</p>
+		<p class="text-primary-dim">
+			The developer will earn {stringToFixed(stakingInfo.DevRewardPct, 2)}% of the tokens you withdraw.
+		</p>
+
+		<div class="flex-row flex-center-center">
+			<button class="primary" on:click={toggleInfo}>CLOSE</button>
+		</div>
+	</div>
+{/if}
+
