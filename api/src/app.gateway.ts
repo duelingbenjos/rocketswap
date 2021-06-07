@@ -32,7 +32,8 @@ import {
 	isUserYieldUpdate,
 	isClientStakingUpdate,
 	isTauUsdPriceUpdate,
-	isNewMarketUpdate
+	isNewMarketUpdate,
+	isStakingPanelUpdate
 } from "./types/websocket.types";
 import { log } from "./utils/logger";
 
@@ -100,7 +101,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				if (isClientStakingUpdate(update)) {
 					// log.log("EPOCH_UPDATE", update);
 					// setTimeout(async () => {
-						await this.socketService.sendClientStakingUpdates(update.staking_contract);
+					await this.socketService.sendClientStakingUpdates(update.staking_contract);
 					// }, 2000);
 					// this.wss.emit(`epoch_update`, update);
 				}
@@ -120,6 +121,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 				if (isNewMarketUpdate(update)) {
 					this.wss.emit("new_market_update", update);
 				}
+				break;
+			// case "staking_panel_update":
+			// 	if (isStakingPanelUpdate(update)) {
+			// 		this.wss.emit("staking_panel_update", update);
+			// 	}
+			// 	break;
 		}
 	};
 
