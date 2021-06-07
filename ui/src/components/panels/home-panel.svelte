@@ -45,8 +45,8 @@
         let r =  marketData.sort((a, b) => {
             if (currentFilter === "price_change" && priceChangeFilter === "dsc") return a.PercentPriceIncrease_24h.isGreaterThan(b.PercentPriceIncrease_24h) ? 1 : -1
             if (currentFilter === "price_change" && priceChangeFilter === "asc") return a.PercentPriceIncrease_24h.isLessThan(b.PercentPriceIncrease_24h) ? 1 : -1
-            if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > a.token.token_name ? 1 : -1
-            if (currentFilter === "name" && nameFilter === "asc") return a.token.token_name < a.token.token_name ? 1 : -1
+            if (currentFilter === "name" && nameFilter === "dsc") return a.token.token_name > b.token.token_name ? 1 : -1
+            if (currentFilter === "name" && nameFilter === "asc") return a.token.token_name < b.token.token_name ? 1 : -1
 
             if (currencyToDisplay === "tau"){
                 if (currentFilter === "volume" && volumeFilter === "dsc") return a.BaseVolume.isGreaterThan(b.BaseVolume) ? 1 : -1
