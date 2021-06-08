@@ -7,6 +7,7 @@ import { BalanceEntity } from "../entities/balance.entity";
 import { ParserProvider } from "../parser.provider";
 import { PairEntity } from "../entities/pair.entity";
 import { CoinGeckoAPIService } from "./coingecko.service";
+import { StakingMetaEntity } from "../entities/staking-meta.entity";
 
 @Injectable()
 export class MarketcapService implements OnModuleInit {
@@ -52,17 +53,41 @@ export class MarketcapService implements OnModuleInit {
 async function calculateCirculatingSupply(token: TokenEntity) {
 	const dev_wallet = await BalanceEntity.findOne(token.developer);
 	let circulating_supply = Number(token.base_supply) - Number(dev_wallet.balances[token.contract_name]);
-	if (token.contract_name === ParserProvider.amm_meta_entity.TOKEN_CONTRACT) {
-		const proms: Promise<BalanceEntity>[] = [];
-		for (let staking_contract of staking_contracts) {
-			proms.push(BalanceEntity.findOne(staking_contract));
+	let circulating_in_staking_contract = 0;
+
+	const staking_contracts = await StakingMetaEntity.find({
+		where: [{ STAKING_TOKEN: token.contract_name }, { YIELD_TOKEN: token.contract_name }]
+	});
+
+	/** Find all staking contracts with token as reward
+	 * 	remove this value from the circulating supply
+	 */
+
+	const staking_contracts_token_yield = staking_contracts.filter((contract) => contract.STAKING_TOKEN === token.contract_name);
+
+	const proms = [];
+	staking_contracts_token_yield.forEach((staking_meta) => {
+		proms.push(BalanceEntity.findOne(staking_meta.contract_name));
+	});
+	const staking_contract_balances = await Promise.all(proms);
+
+	staking_contract_balances.forEach((staking_balance) => {
+		if (staking_balance?.balances && staking_balance.balances[token.contract_name]) {
+			circulating_supply -= Number(staking_balance.balances[token.contract_name]);
 		}
-		const staking_contract_balances = await Promise.all(proms);
-		staking_contract_balances.forEach((staking_balance) => {
-			if (staking_balance?.balances && staking_balance.balances[token.contract_name]) {
-				circulating_supply -= Number(staking_balance.balances[token.contract_name]);
-			}
-		});
-	}
+	});
+
+	/** Find all staking contracts with token as staking and yield collateral
+	 * 	add this value to the circulating supply
+	 */
+
+	const staking_contracts_token_staking = staking_contracts.filter(
+		(contract) => contract.YIELD_TOKEN === contract.STAKING_TOKEN && contract.YIELD_TOKEN === token.contract_name
+	);
+
+	staking_contracts_token_staking.forEach((staking_meta) => {
+		circulating_supply += staking_meta.StakedBalance;
+	});
+
 	return circulating_supply;
 }

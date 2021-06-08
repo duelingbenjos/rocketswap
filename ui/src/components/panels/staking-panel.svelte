@@ -86,7 +86,9 @@
     }
 
     const handleInput = (e) => {
+        
         stakingAmount = toBigNumberPrecision(e.detail, 8)
+        console.log({e, stakingAmount: stakingAmount.toString(), validStakingAmount})
     }
 
     const openStakingConfirm = () => toggleStakingConfirm(true)
@@ -209,12 +211,13 @@
                 <InfoIcon />
             </div>
             <StakingPanelHeader {yieldToken} {stakingToken} {stakingContractType}/>
-            <div class="time-banner">
-                <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
-            </div>
+
             {#if showInfo}
-                <StakingPanelInfo {toggleInfo} {stakingInfo}/>
+                <StakingPanelInfo {toggleInfo} {stakingInfo} {yieldToken} {stakingToken} {stakingContractType}/>
             {:else}
+                <div class="time-banner">
+                    <TimeBanner startTime={stakingInfo.StartTime.__time__} endTime={stakingInfo.EndTime.__time__} />
+                </div>
                 <div class="info" in:fade>
                     <div class="flex-row">
                         <span class="flex-grow">Annual Percentage Yield:</span>
@@ -257,7 +260,7 @@
                         <span class="flex-grow ">Staked:</span>
                         <div class="flex-row">
                             <span class="flex-grow text-primary-dimmer">{stringToFixed(totalStaked, 8)}</span>
-                            <strong class="symbol text-color-secondary">{stakingToken.token_symbol}</strong>
+                            <strong class="symbol text-color-secondary">{`${stakingToken.token_symbol}${stakingContractType === "liquidity_mining_smart_epoch" ? " LP" : ""}`}</strong>
                         </div>
                     </div>
                     {#if useTimeRamp}
@@ -267,8 +270,9 @@
                                 <HelpFilled 
                                     margin={"0 0 0 4px"}
                                     tooltip={[
+                                        "Your reward rate increases the longer you stay in the pool. If you remove your stake, the reward rate will reset. Reward rate increases by 10% each day, to a maximum of 100%.",
                                         "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
-                                        "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
+                                        "Your Yield Per Hour will be. ( 1000 / 4000 ) * 3000 * 10% = 75 RSWP per hour"
                                     ]}
                                 />
                             </div>
@@ -283,6 +287,7 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
+                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 
@@ -312,8 +317,9 @@
                                 <HelpFilled 
                                     margin={"0 0 0 4px"}
                                     tooltip={[
+                                        "Your reward rate increases the longer you stay in the pool. If you remove your stake, the reward rate will reset. Reward rate increases by 10% each day, to a maximum of 100%.",
                                         "Example : If your stake is 1,000, there is 4,000 staked globally, Global emission Rate is 3000 / hour, your reward rate is 10%.",
-                                        "Your Yield Per Hour will be. 1000 / 4000 3000 10% = 75"
+                                        "Your Yield Per Hour will be. ( 1000 / 4000 ) * 3000 * 10% = 75 RSWP per hour"
                                     ]}
                                 />
                             </div>
@@ -328,7 +334,7 @@
                         <div class="flex-row">
                             <span class="text-primary-dimmer">
                                 {stringToFixed(totalStaked, 8)}
-                                <strong class="symbol-horizontal text-color-secondary">{stakingToken.token_symbol}</strong>
+                                <strong class="symbol-horizontal text-color-secondary">{`${stakingToken.token_symbol}${stakingContractType === "liquidity_mining_smart_epoch" ? " LP" : ""}`}</strong>
                             </span>
                         </div>
                     </div>
@@ -354,6 +360,7 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
+                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 

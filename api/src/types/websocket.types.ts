@@ -176,3 +176,7 @@ export function isClientStakingUpdate(client_update: ClientUpdateType): client_u
 export function isNewMarketUpdate(client_update: ClientUpdateType): client_update is NewMarketType {
 	return (client_update as NewMarketType).action === "new_market_update";
 }
+
+export function isStakingPanelUpdate(client_update: ClientUpdateType): client_update is StakingMetaUpdateType {
+	return (client_update as StakingMetaUpdateType).action === "staking_panel_update";
+}

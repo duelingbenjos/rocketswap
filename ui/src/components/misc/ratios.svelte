@@ -12,6 +12,11 @@
     const { selectedToken, buy } = pageStores
 
     $: tokenSymbol = $selectedToken?.token_symbol || "—";
+    
+    pageStats.subscribe(curr => {
+        console.log(JSON.parse(JSON.stringify(curr)))
+        console.log(curr)
+    })
 </script>
 
 <style>

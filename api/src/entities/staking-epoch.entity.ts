@@ -81,7 +81,6 @@ export async function updateEpoch(args: {
 	entity.real_staked_balance = real_staked_balance;
 	entity.timestamp = timestamp;
 	entity.hash = hash;
-	log.log({ amt_per_hr });
 	if (amt_per_hr) {
 		entity.amt_per_hr = amt_per_hr.__fixed__ ? amt_per_hr.__fixed__ : amt_per_hr;
 	}

@@ -90,6 +90,8 @@ def addStakingTokens(amount: float):
     user = ctx.caller
     deposit = Deposits[user]
 
+    assert amount > 0, "You must stake some tokens."
+
     if deposit is False:
         return createNewDeposit(amount=amount, user_ctx="caller", from_contract=False)
     else:
@@ -162,34 +164,18 @@ def increaseDeposit(
         STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     withdrawn_yield = Withdrawals[user]
-    yield_to_harvest = 0
     existing_stake = 0
-    user_yield_share = 0
     start_time = False
 
-    yield_to_harvest += calculateYield(deposit=deposit)
     start_time = deposit["time"]
     existing_stake = deposit["amount"]
 
-    yield_to_harvest -= withdrawn_yield
-
-    if yield_to_harvest > 0:
-
-        # Take % of Yield Tokens, send it to dev fund
-        dev_share = yield_to_harvest * DevRewardPct.get()
-        if dev_share > 0:
-            YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
-
-        # Send remanding Yield Tokens to user
-        user_yield_share = yield_to_harvest - dev_share
-
-    total_deposit_amount = user_yield_share + existing_stake + amount
+    total_deposit_amount = existing_stake + amount
     global_amount_staked = StakedBalance.get()
-    new_global_staked = global_amount_staked + user_yield_share + amount
+    new_global_staked = global_amount_staked + amount
     StakedBalance.set(new_global_staked)
-    WithdrawnBalance.set(WithdrawnBalance.get() + yield_to_harvest)
 
-    mintVToken(amount=user_yield_share + amount)
+    mintVToken(amount=amount)
 
     Withdrawals[user] = 0
     Deposits[user] = {
@@ -305,7 +291,7 @@ def calculateYield(deposit):
     step_offset = deposit.get("step_offset")
 
     if step_offset is not None:
-        deposit_start_time
+        deposit_start_time = deposit_start_time + step_offset
     else:
         step_offset = now - now  # now - now // 0 delta
 
