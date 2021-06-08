@@ -393,9 +393,11 @@
                         disabled={loading || !hasStake}>
                         REMOVE STAKE
                     </button>
+                    <!--
                     <div class="info-icon-horizontal">
                         <InfoIcon />
                     </div>
+                    -->
                 </div>
             </div>
             
