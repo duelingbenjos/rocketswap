@@ -17,7 +17,8 @@ export const staking_contracts = process.env.STAKING_CONTRACTS
 			"con_rswp_compounding_vtoken_02",
 			"con_liq_mining_poop",
 			"con_staking_poop_poop_1",
-			"con_liq_mining_weth_tau_1"
+			"con_liq_mining_weth_tau_1",
+			"con_staking_smurf_burp"
 			// "con_rswp_compounding_vtoken_03",
 			// "con_staking_smart_epoch_rswp_rswp_11",
 			// "con_simple_staking_rswp",
