@@ -329,8 +329,11 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
         if new_staked_amount >= this_epoch_staked
         else this_epoch_staked
     )
-    dif = bigger - smaller
+    dif = bigger - smaller    
+    if this_epoch_staked is 0 :
+        return true
     return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
+    
 
 
 def incrementEpoch(new_staked_amount: float):
@@ -456,6 +459,7 @@ def emergencyReturnStake():
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
+    decideIncrementEpoch(new_staked_amount=new_staked_amount)
 
 
 @export
