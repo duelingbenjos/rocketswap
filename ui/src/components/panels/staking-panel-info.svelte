@@ -53,12 +53,12 @@
 				{yieldToken.token_symbol}
 				<TokenLogo tokenMeta={yieldToken} inline={true} width="22px" margin="0 3px 0 0" lpBottom={"0"}/>  
 			</a>
-			per hour for each
+			distributed proportionally to the 
 			<a href="{`${tauhqURL}/contracts/${stakingToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
 				{`${stakingToken.token_symbol}${stakingInfo.meta.type === "liquidity_mining_smart_epoch" ? " LP" : ""}`}
 				<TokenLogo tokenMeta={stakingToken} {stakingContractType} inline={true} width="22px" margin="0 3px 0 0" lpBottom={"0"}/> 
 			</a>
-			you stake.
+			in the staking pool.
 		</p>
 		<p>
 			<span>Contrat Name:</span>
