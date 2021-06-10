@@ -65,7 +65,7 @@ export class StakingService implements OnModuleInit {
 			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			return await this.getRSWPStakingROI(meta_entity);
-		} else if (meta.type === "staking_smart_epoch_compounding_timeramp") {
+		} else if (meta.type === "staking_smart_epoch_compounding_timeramp" || meta.type === "staking_smart_epoch") {
 			return await this.getSmartEpochCompoundingROI(meta_entity);
 		} else if (meta.type === "liquidity_mining_smart_epoch") {
 			return await this.getLiqMiningROI(meta_entity);
@@ -73,8 +73,6 @@ export class StakingService implements OnModuleInit {
 	};
 
 	getLiqMiningROI = async (meta_entity: StakingMetaEntity) => {
-		log.warn("getLiqMiningROI CALLED");
-		log.log(meta_entity.contract_name)
 		// Get value of LP token
 		const staking_token = meta_entity.STAKING_TOKEN;
 		const reward_token = meta_entity.YIELD_TOKEN;
@@ -88,16 +86,11 @@ export class StakingService implements OnModuleInit {
 			return 0;
 		}
 		const tau_lp_total = Number(staking_token_pair_entity.reserves[0]);
-		log.log({tau_lp_total})
 		const single_lp_value = (tau_lp_total / Number(staking_token_pair_entity.lp)) * 2;
-		log.log({single_lp_value})
 		const total_staked_value = single_lp_value * meta_entity.StakedBalance;
-		log.log({total_staked_value})
 		let reward_token_price = reward_token_pair_entity ? reward_token_pair_entity?.price : 1
 		const reward_value_per_year =
 			Number(reward_token_price) * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour);
-		log.log({reward_value_per_year})
-		log.log(Math.round((reward_value_per_year / total_staked_value) * 100))
 		return Math.round((reward_value_per_year / total_staked_value) * 100);
 	};
 
