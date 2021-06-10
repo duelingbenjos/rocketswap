@@ -1,7 +1,6 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { log } from "../utils/logger";
 import { TokenEntity } from "../entities/token.entity";
-import { config, staking_contracts } from "../config";
 import { MarketcapEntity } from "../entities/marketcap.entity";
 import { BalanceEntity } from "../entities/balance.entity";
 import { ParserProvider } from "../parser.provider";
@@ -56,7 +55,7 @@ async function calculateCirculatingSupply(token: TokenEntity) {
 	let circulating_in_staking_contract = 0;
 
 	const staking_contracts = await StakingMetaEntity.find({
-		where: [{ STAKING_TOKEN: token.contract_name }, { YIELD_TOKEN: token.contract_name }]
+		where: [{ STAKING_TOKEN: token.contract_name }]
 	});
 
 	/** Find all staking contracts with token as reward
