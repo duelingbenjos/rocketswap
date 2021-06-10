@@ -28,6 +28,10 @@ export function calculateSmartEpochYield(args: {
 	let this_epoch_index = starting_epoch_index;
 	let y = 0;
 
+	log.log(epochs)
+
+	log.log({starting_epoch_index})
+
 	while (this_epoch_index <= current_epoch_index) {
 		let this_epoch = epochs[this_epoch_index];
 		let next_epoch = epochs[this_epoch_index + 1];
@@ -43,6 +47,9 @@ export function calculateSmartEpochYield(args: {
 		}
 
 		const delta_seconds = delta / 1000;
+		log.log({this_epoch_index})
+		log.log({this_epoch})
+		log.log(meta.contract_name)
 		let pct_share_of_stake = amount / this_epoch.amount_staked;
 		let global_yield_this_epoch = delta_seconds * getEmissionRatePerSecond(this_epoch.amt_per_hr);
 		let deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake;
@@ -149,7 +156,7 @@ export function calculateSmartCompoundingYield(args: {
 		} else {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
 		}
-
+		
 		const delta_seconds = delta / 1000;
 		let pct_share_of_stake = amount / this_epoch.amount_staked;
 		let global_yield_this_epoch = delta_seconds * getEmissionRatePerSecond(this_epoch.amt_per_hr);
@@ -161,6 +168,7 @@ export function calculateSmartCompoundingYield(args: {
 }
 
 export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: number, user_entity: UserStakingEntity) {
+	if (!meta) return 0
 	if (meta.meta.type === "staking_simple") {
 		const deposit_total = user_entity.deposits.reduce((accum, dep) => {
 			return (accum += parseFloat(dep.amount.__fixed__));
