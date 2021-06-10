@@ -1,4 +1,4 @@
-import { getContractName } from "../utils/utils";
+import { arrFromStr, getContractName } from "../utils/utils";
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { IKvp } from "../types/misc.types";
 import { log } from "../utils/logger";
@@ -52,6 +52,8 @@ export class AddTokenDto {
 	token_base64_png?: string;
 	token_logo_url?: string;
 	operator?: string;
+	custodian_addresses?: string[];
+	burn_addresses?: string[];
 }
 
 export const saveToken = async (add_token_dto: AddTokenDto) => {
@@ -117,6 +119,12 @@ export function prepareAddToken(state: IKvp[]): AddTokenDto {
 	const token_base64_png = state.find((kvp) => kvp.key === `${contract_name}.metadata:token_logo_base64_png`)?.value || "";
 	const token_logo_url = state.find((kvp) => kvp.key === `${contract_name}.metadata:token_logo_url`)?.value || "";
 
+	const burn_addresses_raw = state.find((kvp) => kvp.key === `${contract_name}.metadata:burn_addresses`)?.value || "";
+	const custodian_addresses_raw = state.find((kvp) => kvp.key === `${contract_name}.metadata:custodian_addresses`)?.value || "";
+
+	const burn_addresses = burn_addresses_raw ? arrFromStr(burn_addresses_raw) : [];
+	const custodian_addresses = custodian_addresses_raw ? arrFromStr(custodian_addresses_raw) : [];
+
 	const base_supply = supply_kvp?.value;
 	const token_seed_holder = supply_kvp?.key.split(":")[1];
 	return {
@@ -129,14 +137,16 @@ export function prepareAddToken(state: IKvp[]): AddTokenDto {
 		token_base64_svg,
 		token_base64_png,
 		token_logo_url,
-		operator
+		operator,
+		custodian_addresses,
+		burn_addresses
 	};
 }
 
 export async function saveTokenUpdate(state: IKvp[]) {
+	let contract_name = state[0].key.split(".")[0];
+	const entity = await TokenEntity.findOne({ contract_name });
 	state.forEach(async (change) => {
-		let contract_name = change.key.split(".")[0];
-		const entity = await TokenEntity.findOne({ contract_name });
 		if (entity) {
 			if (change.key.includes(".metadata:token_logo_base64_svg")) entity.token_base64_svg = change.value;
 			if (change.key.includes(".metadata:token_logo_base64_png")) entity.token_base64_png = change.value;
