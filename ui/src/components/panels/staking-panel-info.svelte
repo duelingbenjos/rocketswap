@@ -61,11 +61,11 @@
 			in the staking pool.
 		</p>
 		<p>
-			<span>Contrat Name:</span>
+			<span>Contract Name:</span>
 			<a href="{`${tauhqURL}/contracts/${stakingInfo.contract_name}`}" target="_blank" rel="noopener noreferrer">{stakingInfo.contract_name}</a>
 		</p>
 		<p>
-			<span>Contrat Type:</span> {stakingInfo.meta.type}
+			<span>Contract Type:</span> {stakingInfo.meta.type}
 		</p>
 		<p>
 			<span>Dev Reward Wallet: </span>
