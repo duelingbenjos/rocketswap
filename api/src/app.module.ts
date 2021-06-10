@@ -71,11 +71,15 @@ const db_options: TypeOrmModuleOptions = {
 			}
 		})
 	],
+	exports: [
+		ParserProvider
+	],
 	controllers: [AppController, TrollboxController],
 	providers: [
-		AppGateway,
 		ParserProvider,
+		AppGateway,
 		SocketService,
+		StakingService,
 		TokensService,
 		RefreshTokensRepository,
 		JWTGuard,
@@ -87,7 +91,6 @@ const db_options: TypeOrmModuleOptions = {
 		VolumeService,
 		MarketcapService,
 		CoinGeckoAPIService,
-		StakingService
 	]
 })
 export class AppModule {}

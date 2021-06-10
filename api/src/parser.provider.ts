@@ -1,8 +1,8 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
 import { BlockDTO, IKvp } from "./types/misc.types";
-import { config, staking_contracts } from "./config";
+import { config } from "./config";
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity";
-import { getContractCode, getContractName, validateTokenContract } from "./utils/utils";
+import { getContractCode, getContractName, isValidStakingContract, validateTokenContract } from "./utils/utils";
 import { saveTransfer, updateBalance } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
@@ -15,6 +15,7 @@ import { log } from "./utils/logger";
 import { savePrice } from "./entities/price.entity";
 import { StakingService } from "./services/staking.service";
 import { nanoid } from "nanoid";
+import { getStakingMetaList, StakingMetaEntity } from "./entities/staking-meta.entity";
 
 @Injectable()
 export class ParserProvider {
@@ -25,15 +26,18 @@ export class ParserProvider {
 	public static amm_meta_entity: AmmMetaEntity;
 
 	constructor(
-		private readonly socketService: SocketService,
 		private readonly authService: AuthService,
-		private readonly stakingService: StakingService
+		@Inject(forwardRef(() => StakingService))
+		private readonly stakingService: StakingService,
+		@Inject(forwardRef(() => SocketService))
+		private readonly socketService: SocketService
 	) {}
 
+	private staking_contract_list_all: string[] = [];
+	private staking_contract_list_active: string[] = []
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
 	private action_que_processing: boolean;
-	private logger: Logger = new Logger("ParserProvider");
 
 	public static updateLastChecked = (time_delta: number = 0) => {
 		ParserProvider.blockgrabber_last_update = time_delta + Date.now();
@@ -41,6 +45,7 @@ export class ParserProvider {
 
 	async onModuleInit() {
 		this.updateTokenList();
+		this.addToActionQue(this.updateStakingContractList);
 		ParserProvider.amm_meta_entity = await AmmMetaEntity.findOne();
 
 		this.startBlockgrabber(false);
@@ -55,7 +60,16 @@ export class ParserProvider {
 				this.startBlockgrabber(true);
 			}
 		}, 5000);
+		setInterval(() => {
+			this.addToActionQue(this.updateStakingContractList);
+		}, 10000);
 	}
+
+	private updateStakingContractList = async (): Promise<void> => {
+		const staking_list_update = await getStakingMetaList();
+		this.staking_contract_list_all = staking_list_update.all;
+		this.staking_contract_list_active = staking_list_update.active
+	};
 
 	public handleNewBlock = async (block: BlockDTO) => {
 		await this.parseBlock(block);
@@ -84,17 +98,18 @@ export class ParserProvider {
 					});
 					this.addToActionQue(this.refreshAmmMeta);
 				}
-				if (staking_contracts.includes(submitted_contract_name)) {
+				if (token_is_valid) {
+					const add_token_dto = prepareAddToken(state);
+					this.addToActionQue(saveToken, add_token_dto);
+					this.addToActionQue(this.updateTokenList);
+				}
+				if (isValidStakingContract(state, submitted_contract_name)) {
 					this.addToActionQue(this.stakingService.updateStakingContractMeta, {
 						state,
 						handleClientUpdate: this.socketService.handleClientUpdate,
 						staking_contract: submitted_contract_name
 					});
-				}
-				if (token_is_valid) {
-					const add_token_dto = prepareAddToken(state);
-					this.addToActionQue(saveToken, add_token_dto);
-					this.addToActionQue(this.updateTokenList);
+					this.addToActionQue(this.updateStakingContractList);
 				}
 				return;
 			} else if (contract_name === config.contractName) {
@@ -117,7 +132,7 @@ export class ParserProvider {
 						this.authService.authenticate(state);
 						break;
 				}
-			} else if (staking_contracts.includes(contract_name)) {
+			} else if (this.staking_contract_list_all.includes(contract_name)) {
 				this.addToActionQue(this.stakingService.updateStakingContractMeta, {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate,
@@ -180,7 +195,7 @@ export class ParserProvider {
 					await action();
 				}
 				this.action_que.splice(0, 1);
-				this.executeActionQue(action_que);
+				await this.executeActionQue(action_que);
 			} else {
 				this.action_que_processing = false;
 			}
@@ -198,6 +213,14 @@ export class ParserProvider {
 			this.action_que_processing = true;
 			this.executeActionQue(this.action_que);
 		}
+	};
+
+	public getAllStakingContracts = () => {
+		return this.staking_contract_list_all;
+	};
+
+	public getActiveStakingContracts = () => {
+		return this.staking_contract_list_active;
 	};
 
 	private updateTokenList = async (): Promise<void> => {

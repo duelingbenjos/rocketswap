@@ -1,6 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { getUserRewardRate, getUserYieldPerSecond } from "../utils/yield-utils";
-import { staking_contracts } from "../config";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { getUserYield, UserStakingEntity } from "../entities/user-staking.entity";
@@ -12,8 +11,10 @@ import {
 	IUserYieldPayload
 } from "../types/websocket.types";
 import { log } from "../utils/logger";
+import { ParserProvider } from "../parser.provider";
 @Injectable()
 export class SocketService {
+	constructor(private readonly parserProvider: ParserProvider) {}
 	private logger: Logger = new Logger("SocketService");
 
 	public handleClientUpdate: handleClientUpdateType = null;
@@ -24,7 +25,7 @@ export class SocketService {
 	public staking_panel_clients: string[] = [];
 
 	async afterInit() {
-		const staking_entities = await StakingMetaEntity.find();
+		const staking_entities = await StakingMetaEntity.find({ where: { OpenForBusiness: true } });
 		this.staking_epochs = staking_entities.reduce((accum, entity) => {
 			accum[entity.contract_name] = entity.Epoch.index;
 			return accum;
@@ -54,7 +55,7 @@ export class SocketService {
 		try {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			const payload = await staking_entities
-				.filter((ent) => staking_contracts.includes(ent.staking_contract))
+				.filter((ent) => this.parserProvider.getActiveStakingContracts().includes(ent.staking_contract))
 				.reduce(async (accumP, user_entity) => {
 					const accum = await accumP;
 					if (
@@ -126,10 +127,12 @@ export class SocketService {
 				}
 			});
 			epoch_entities_filtered.sort((a, b) => a.epoch_index - b.epoch_index);
-			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract } });
+			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract, OpenForBusiness: true } });
+			if (!meta_entity) return;
 			const total_staked = user_entity.deposits.reduce((accum, deposit) => {
 				return (accum += parseFloat(deposit.amount.__fixed__));
 			}, 0);
+			log.log(epoch_entities_filtered.length)
 			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities_filtered });
 			const yield_per_sec = user_entity.deposits.length ? getUserYieldPerSecond(meta_entity, total_staked, user_entity) : 0;
 			const time_updated = Date.now();

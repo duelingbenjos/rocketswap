@@ -86,7 +86,6 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 	let { meta, user, epochs } = args;
 	let { DevRewardPct } = meta;
 	let { deposits, withdrawals } = user;
-
 	let harvestable_yield = 0;
 	for (let d of deposits) {
 		let calcFn: Function;
@@ -102,8 +101,8 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			calcFn = calculateSmartCompoundingYield;
 		} else if (staking_contract_type === "staking_smart_epoch" || staking_contract_type === "liquidity_mining_smart_epoch") {
 			calcFn = calculateSmartEpochYield;
-			if (deposits[0].user_yield) harvestable_yield += getNumber(deposits[0].user_yield)
-		} 
+			if (deposits[0].user_yield) harvestable_yield += getNumber(deposits[0].user_yield);
+		}
 		// else if (staking_contract_type === "liquidity_mining_smart_epoch") {
 		// 	if (deposits[0].user_yield) calcFn = calculateSmartEpochLiqMiningYield;
 		// }
@@ -111,6 +110,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			// log.log({ meta });
 		}
 		// log.log(d);
+		log.log({contract: meta.contract_name})
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,

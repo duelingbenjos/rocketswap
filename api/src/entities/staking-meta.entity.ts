@@ -1,5 +1,6 @@
 import { IContractingTime, ITimeRampValue, StakingType } from "../types/misc.types";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
+import { log } from "../utils/logger";
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -15,11 +16,11 @@ export class StakingMetaEntity extends BaseEntity {
 	@Column({ nullable: true, type: "simple-json" })
 	meta: { type: StakingType; version: string; YIELD_TOKEN: string; STAKING_TOKEN: string }; // Version Number of the staking contract
 
-	@Column({nullable: true})
-	YIELD_TOKEN: string
+	@Column({ nullable: true })
+	YIELD_TOKEN: string;
 
-	@Column({nullable: true})
-	STAKING_TOKEN: string
+	@Column({ nullable: true })
+	STAKING_TOKEN: string;
 
 	@Column({ nullable: true })
 	EmissionRatePerHour: number;
@@ -68,3 +69,14 @@ export class StakingMetaEntity extends BaseEntity {
 	@Column({ nullable: true })
 	ROI_yearly: number = 0;
 }
+
+export const getStakingMetaList = async () => {
+	const list = await StakingMetaEntity.find();
+	return {
+		all: list.map((staking_entity) => staking_entity.contract_name),
+		active: list.reduce((accum, value) => {
+			if (value.OpenForBusiness) accum.push(value.contract_name);
+			return accum;
+		}, [])
+	};
+};

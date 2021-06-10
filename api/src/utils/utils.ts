@@ -2,6 +2,7 @@ import { IKvp } from "../types/misc.types";
 import BigNumber from "bignumber.js";
 import { TokenEntity } from "../entities/token.entity";
 import { log } from "./logger";
+import { config } from "../config";
 
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;
@@ -33,16 +34,25 @@ export function validateTokenContract(contract: string): boolean {
 	return missing_idx > -1 ? false : true;
 }
 
-// export function validateStakingContract(contract: string): boolean {
-// 	const required_fields = [
-// 		"def addStakingTokens",
-// 		"def withdrawYield",
-// 		"def withdrawTokensAndYield",
-// 	];
-// 	let missing = required_fields.map((field) => contract.includes(field));
-// 	let missing_idx = missing.findIndex((field) => field === false);
-// 	return missing_idx > -1 ? false : true;
-// }
+export const isValidStakingContract = (state: IKvp[], submitted_contract_name: string) => {
+	let owner_is_staking_contract_submittor = state.find(
+		(s) => s.key === `${submitted_contract_name}.Owner` && s.value === config.staking_contract_submittor
+	);
+
+	if (owner_is_staking_contract_submittor) {
+		const code = getContractCode(state);
+		return validateStakingContract(code);
+	}
+	return false;
+};
+
+export function validateStakingContract(contract: string): boolean {
+	const required_fields = ["def addStakingTokens", "def withdrawTokensAndYield"];
+	let missing = required_fields.map((field) => contract.includes(field));
+	let missing_idx = missing.findIndex((field) => field === false);
+	return missing_idx > -1 ? false : true;
+}
+
 
 export function getKey(state: IKvp[], idx_1: number, idx_2: number) {
 	return state[idx_1].key.split(":")[idx_2];
@@ -67,7 +77,7 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 
 export function getNumber(value: any) {
 	let return_val = value.__fixed__ ? Number(value.__fixed__) : Number(value);
-	return return_val
+	return return_val;
 }
 
 export function getContractName(state: IKvp[]) {
@@ -123,3 +133,5 @@ export function dateNowUtc() {
 	}
 	return Date.now();
 }
+
+export const arrFromStr = (str: string, delimiter: string = ","): string[] => str.split(delimiter);

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { NameEntity } from "../entities/name.entity";
 import { IKvp } from "../types/misc.types";
 import { config } from "../config";
@@ -10,6 +10,7 @@ import { SocketService } from "../services/socket.service";
 export class AuthService {
 	public constructor(
 		private readonly tokenService: TokensService,
+		@Inject(forwardRef(() => SocketService))
 		private readonly socket: SocketService
 	) {}
 

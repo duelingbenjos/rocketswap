@@ -197,7 +197,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	private async handleJoinStakingPanel(client: Socket) {
-		const staking_entities = await StakingMetaEntity.find();
+		const staking_entities = await StakingMetaEntity.find({ where: { OpenForBusiness: true } });
 		let response = staking_entities.map(async (entity) => {
 			return new Promise(async (resolver) => {
 				const staking_token = await TokenEntity.findOne({ contract_name: entity.meta.STAKING_TOKEN });

@@ -1,8 +1,7 @@
 import axios from "axios";
 // import { SocketService } from "./socket.service";
 import { log } from "../utils/logger";
-import { Injectable, OnModuleInit } from "@nestjs/common";
-import { staking_contracts } from "../config";
+import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { ParserProvider } from "../parser.provider";
 import { PairEntity } from "../entities/pair.entity";
@@ -16,7 +15,12 @@ import { LpPointsEntity } from "../entities/lp-points.entity";
 
 @Injectable()
 export class StakingService implements OnModuleInit {
-	constructor(private readonly socketService: SocketService) {}
+	constructor(
+		@Inject(forwardRef(() => SocketService))
+		private readonly socketService: SocketService,
+		@Inject(forwardRef(() => ParserProvider))
+		private readonly parserProvider: ParserProvider
+	) {}
 
 	async onModuleInit() {
 		Promise.resolve(this.updateROI());
@@ -27,9 +31,9 @@ export class StakingService implements OnModuleInit {
 
 	updateROI = async () => {
 		// log.debug("UPDATE ROI CALLED")
-		// log.log({staking_contracts})
-		for (let contract_name of staking_contracts) {
-			const meta_entity = await StakingMetaEntity.findOne(contract_name);
+		// log.log({staking_contracts: this.parserProvider.getAllStakingContracts()})
+		for (let contract_name of this.parserProvider.getActiveStakingContracts()) {
+			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name, OpenForBusiness: true } });
 			// log.debug({meta_entity})
 			if (meta_entity) {
 				const ROI = await this.decideROI(meta_entity);
@@ -88,9 +92,8 @@ export class StakingService implements OnModuleInit {
 		const tau_lp_total = Number(staking_token_pair_entity.reserves[0]);
 		const single_lp_value = (tau_lp_total / Number(staking_token_pair_entity.lp)) * 2;
 		const total_staked_value = single_lp_value * meta_entity.StakedBalance;
-		let reward_token_price = reward_token_pair_entity ? reward_token_pair_entity?.price : 1
-		const reward_value_per_year =
-			Number(reward_token_price) * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour);
+		let reward_token_price = reward_token_pair_entity ? reward_token_pair_entity?.price : 1;
+		const reward_value_per_year = Number(reward_token_price) * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour);
 		return Math.round((reward_value_per_year / total_staked_value) * 100);
 	};
 
@@ -205,20 +208,22 @@ export class StakingService implements OnModuleInit {
 				if (kvp.key.includes("Epochs")) {
 					const index = parseInt(kvp.key.split(":")[1]);
 					const { staked, time, emission_rate_per_tau, amt_per_hr } = kvp.value;
-					await updateEpoch({
-						staking_contract,
-						epoch_index: index,
-						time,
-						amount_staked: staked,
-						emission_rate_per_tau,
-						amt_per_hr,
-						fn,
-						real_staked_balance: entity.StakedBalance,
-						previous_staked_balance,
-						timestamp,
-						hash,
-						handleClientUpdate
-					});
+					Promise.resolve(
+						updateEpoch({
+							staking_contract,
+							epoch_index: index,
+							time,
+							amount_staked: staked,
+							emission_rate_per_tau,
+							amt_per_hr,
+							fn,
+							real_staked_balance: entity.StakedBalance,
+							previous_staked_balance,
+							timestamp,
+							hash,
+							handleClientUpdate
+						})
+					);
 					entity.Epoch = {
 						index,
 						staked,
