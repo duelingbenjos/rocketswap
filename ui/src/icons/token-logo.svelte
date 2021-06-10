@@ -6,6 +6,7 @@
     export let margin = '0 10px';
     export let inline = false;
     export let lpBottom = "-6px";
+    export let lpFontSize;
     export let stakingContractType = ""
 
     let height = width;
@@ -53,7 +54,7 @@
 <div style={`margin: ${margin}; width: ${width}; height: ${height};`}>
     {#if stakingContractType === "liquidity_mining_smart_epoch"}
         <p style={`
-        font-size: ${widthNum <= 27 ? "8px" : "var(--text-size-small)"};
+        font-size: ${lpFontSize ? lpFontSize : widthNum <= 27 ? "8px" : "var(--text-size-small)"};
         padding: ${widthNum <= 27 ? "0px 3px" : "0px 5px"};
         bottom: ${lpBottom}
         `}>LP</p>
