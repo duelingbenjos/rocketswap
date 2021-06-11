@@ -6,6 +6,7 @@ import { LessThan, MoreThan } from "typeorm";
 import { TokenEntity } from "../entities/token.entity";
 import { VolumeMetricsEntity } from "../entities/volume-metrics.entity";
 import { config } from "../config";
+import { PairEntity } from "../entities/pair.entity";
 
 @Injectable()
 export class VolumeService implements OnModuleInit {
@@ -23,19 +24,23 @@ export class VolumeService implements OnModuleInit {
 			for (let token of tokens) {
 				const { contract_name } = token;
 
-				let token_metrics_entity = await VolumeMetricsEntity.findOne(contract_name);
-				if (!token_metrics_entity) {
-					token_metrics_entity = new VolumeMetricsEntity();
-					token_metrics_entity.contract_name = contract_name;
-					token_metrics_entity.MarketName = `${config.currencySymbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
-					token_metrics_entity.token_symbol = token.token_symbol;
+				let volume_metrics_entity = await VolumeMetricsEntity.findOne(contract_name);
+				if (!volume_metrics_entity) {
+					volume_metrics_entity = new VolumeMetricsEntity();
+					volume_metrics_entity.contract_name = contract_name;
+					volume_metrics_entity.MarketName = `${config.currencySymbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
+					volume_metrics_entity.token_symbol = token.token_symbol;
 				}
-				if (!token_metrics_entity.token_attached) {
+				if (!volume_metrics_entity.token_attached) {
 					const token_entity = await TokenEntity.findOne({ where: { contract_name } });
 					if (token_entity) {
-						token_metrics_entity.token = token_entity;
-						token_metrics_entity.token_attached = true;
+						volume_metrics_entity.token = token_entity;
+						volume_metrics_entity.token_attached = true;
 					}
+				}
+				if (!volume_metrics_entity.pair) {
+					let pair = await PairEntity.findOne(contract_name);
+					if (pair) volume_metrics_entity.pair = pair;
 				}
 
 				const last_yesterday_trade = await this.getLastYesterdayTrade(contract_name);
@@ -47,18 +52,18 @@ export class VolumeService implements OnModuleInit {
 				const { base_volume, volume, high, low } = this.calculateMetrics(trades_last_day);
 
 				// log.log({trades_last_day})
-				token_metrics_entity.Volume = trades_last_day.length ? volume : 0;
-				token_metrics_entity.BaseVolume = trades_last_day.length ? base_volume : 0;
-				token_metrics_entity.High = trades_last_day.length ? high : yesterday_last_price;
-				token_metrics_entity.Low = trades_last_day.length ? low : yesterday_last_price;
-				token_metrics_entity.PrevDay = yesterday_last_price || 0;
-				token_metrics_entity.TimeStamp = Date.now();
-				token_metrics_entity.Last = trades_last_day.length ? today_last_price : yesterday_last_price;
-				token_metrics_entity.Bid = trades_last_day.length ? today_last_price : yesterday_last_price;
-				token_metrics_entity.Ask = trades_last_day.length ? today_last_price : yesterday_last_price;
-				token_metrics_entity.PercentPriceIncrease_24h =
-					((token_metrics_entity.Last - token_metrics_entity.PrevDay) / token_metrics_entity.PrevDay) * 100 || 0;
-				proms.push(token_metrics_entity.save());
+				volume_metrics_entity.Volume = trades_last_day.length ? volume : 0;
+				volume_metrics_entity.BaseVolume = trades_last_day.length ? base_volume : 0;
+				volume_metrics_entity.High = trades_last_day.length ? high : yesterday_last_price;
+				volume_metrics_entity.Low = trades_last_day.length ? low : yesterday_last_price;
+				volume_metrics_entity.PrevDay = yesterday_last_price || 0;
+				volume_metrics_entity.TimeStamp = Date.now();
+				volume_metrics_entity.Last = trades_last_day.length ? today_last_price : yesterday_last_price;
+				volume_metrics_entity.Bid = trades_last_day.length ? today_last_price : yesterday_last_price;
+				volume_metrics_entity.Ask = trades_last_day.length ? today_last_price : yesterday_last_price;
+				volume_metrics_entity.PercentPriceIncrease_24h =
+					((volume_metrics_entity.Last - volume_metrics_entity.PrevDay) / volume_metrics_entity.PrevDay) * 100 || 0;
+				proms.push(volume_metrics_entity.save());
 			}
 			await Promise.all(proms);
 		} catch (err) {
