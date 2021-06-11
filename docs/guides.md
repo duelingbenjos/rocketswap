@@ -155,4 +155,28 @@ All tokens must be manually added to the Lamden Wallet.  To do so follow these s
 1. [Download](https://chrome.google.com/webstore/detail/lamden-wallet-browser-ext/fhfffofbcgbjjojdnpcfompojdjjhdim) the Lamden Wallet into Chrome if you don't have it already. And follow the step-by step-instructions to create a wallet.
 2. From the main `accounts` page click the `ACCOUNTS & TOKENS` button
 3. From the `What to add` dropdown click `Token`
-4. Enter the Tokens Contract Name in the `Contract Name` input box.  If you don't know the contract name you can find it by visiting the token's Swap page on [Rocketswap](https://rocketswap.exchange).  You'll find the contract name in the address bar (contract names always begin with "con_") `https://rocketswap.exchange/#/con_rswp_lst001`
+4. Enter the Tokens Contract Name in the `Contract Name` input box.  If you don't know the contract name you can find it by visiting the token's Swap page on [Rocketswap](https://rocketswap.exchange).  You'll find the contract name in the address bar (contract names always begin with "con_") `https://rocketswap.exchange/#/con_rswp_lst001`    
+
+## Rocket Farm
+
+Rocket Farm is the Rocketswap yield farm.  Yield farming is similar to staking, in that you add either Tokens or Liquidity Points to a yield farming contract and in return you are rewarded the token specified in the contract details.     
+
+1. Lets look at an example below:    
+    A. Information button provides a plain english explaination of the yield emissions and how your portion is calculated if you stake. This also shows the contract name, contract type(explained later) and developer rewards.    
+    B. APY or Annual Percentage Yield. This figure is the return on the amount invested which is calculated in Lamden TAU    
+    C. Earned is exactly what it says. The amount earned from yield farming in this contract which is available to either compound or withdraw    
+    D. *Compound* button (if enabled for contract) allows you to compound earned tokens back into the contract (google 'compounding' for better definitions on this)    
+    E. *Withdraw* button (if enabled for contract) allows you to withdraw earned tokens back to your wallet while maintaining your yield farm stake    
+    F. Staked tells you how much you currently have staked in the particular contract     
+    G. *STAKE* button allows you to add to a stake, either new, or adding to an existing stake    
+    H. *REMOVE STAKE* button removes a stake in total from the contract including and earned emissions    
+    
+![farm1](./static/Farm1.png ':size=1000')    
+
+#### Contract Types
+
+As mentioned at 1A, Rocketswap farms can use a number of different types of yield farming emission type:   
+`staking_simple` - reward emissions are a fixed amount    
+`staking_smart_epoch` - yield farm emission contract for tokens with a dynamic emission rate    
+`liquidity_mining_smart_epoch` - yield farm contract for liquidity points with a dynamic emission rate    
+`staking_smart_epoch_compounding_timeramp` - dynamic emission rate which includes compounding option and a ramp up to full rewards defined at an individual contract level. e.g it might reward only 10% of your normal reward but ramps up 10% over 10 days to the full normal reward amount     
