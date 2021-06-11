@@ -137,4 +137,25 @@ This is a simple 2 step process which is covered by some of the other guide arti
 * Manually transfer your token - [Guide - Adding Funds](guides.md#Adding-Funds)  
 * We also need to provide liquidity for it, both some TAU and your token - [Guide - Liquidity](guides.md#Liquidity-Pools)
 
-THATS IT YOU MADE IT!
+## LST002 Token Metadata on Rocketswap
+The following metadata requirements ensure that the token metrics are displayed. Failure to apply metadata for both burn addresses and custodian wallets will cause Rocketswap to skip the coin for market capitalisation calculations.    
+
+#### Burn Addresses
+**Key:** `burn_addresses`    
+**Value Format:** comma separated string     
+**Format Example:** `00000000BURN00000000, 0000000000BURNME000000000`    
+
+#### Custodian Addresses    
+**Key:** `custodian_addresses`    
+**Value Format:** comma separated string     
+**Format Example:** `e5ca5c81e2565bbe9e94e81be1b898053a9d14d3ad702dd00214b65d853679bc, e5ca5c81e2565bbe9e94e81be1b898053a9d14d3ad702dd00214b65d853679bd`    
+
+LST002 Metadata can be applied from within the Lamden wallet. To apply this proceed as follows:    
+1. Click the *Smart Contracts* menu option in the Lamden Wallet
+2. Open the smart contract you would like to change the metadata for
+3. Once open, sroll down to wallet section *Contract Methods*, below this should be *change_metadata*
+4. Within *change_metadata* input the required key and the relevant value for your contract (burn and custodian addresses)
+5. Click run
+6. Repeat the process for the other metadata change
+
+
