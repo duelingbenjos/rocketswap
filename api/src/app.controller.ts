@@ -1,5 +1,6 @@
 import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { pairs, VirtualTimeScheduler } from "rxjs";
 import { CircularRelationsError } from "typeorm";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
@@ -82,7 +83,7 @@ export class AppController {
 	@Get("tau_last_price")
 	public async getTauLastPrice() {
 		try {
-			return await TauMarketEntity.findOne('usd_price');
+			return await TauMarketEntity.findOne("usd_price");
 		} catch (err) {
 			log.error(err);
 		}
@@ -100,7 +101,28 @@ export class AppController {
 	@Get("get_market_summaries_w_token")
 	public async getMarketSummariesWToken() {
 		try {
-			return await VolumeMetricsEntity.find({ relations: ["token"] });
+			let res = await VolumeMetricsEntity.find({ relations: ["token"] });
+
+			const fields = ["contract_name", "token_symbol", "Volume", "PrevDay", "BaseVolume", "PercentPriceIncrease_24h", "Last"];
+			const token_fields = ["token_symbol", "token_name", "token_base64_svg", "token_base64_png", "token_logo_url"];
+
+			let return_arr = res.reduce((accum, value) => {
+				let obj: any = {};
+
+				fields.forEach((f) => (obj[f] = value[f]));
+
+				obj.reserves = value.pair ? value.pair.reserves : [0, 0];
+				obj.token = value.token
+					? token_fields.reduce((a, v) => {
+							a[v] = value.token[v];
+							return a;
+					  }, {})
+					: {};
+				accum.push(obj)
+				return accum;
+			}, []);
+
+			return return_arr;
 		} catch (err) {
 			log.error(err);
 		}
