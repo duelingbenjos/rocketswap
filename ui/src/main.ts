@@ -3,6 +3,7 @@ import Swap from './pages/swap.page.svelte'
 import Pools from './pages/pool.page.svelte'
 import RSWP from './pages/rswp.page.svelte'
 import Farm from './pages/farm.page.svelte'
+import Help from './pages/help.page.svelte'
 import CreatePool from './pages/pool-create.page.svelte'
 import AddPool from './pages/pool-add.page.svelte'
 import RemovePool from './pages/pool-remove.page.svelte'
@@ -31,6 +32,10 @@ routes.set({
   '/farm/': {
     $$component: Farm,
     $$name: 'Farm'
+  },
+  '/help/': {
+    $$component: Help,
+    $$name: 'Help'
   },
   '/pool-create/': {
     $$component: CreatePool,

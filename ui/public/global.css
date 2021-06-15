@@ -105,6 +105,8 @@ body {
 	--toast-background-error: var(--error-color-dark);
 	--toast-icon-color: var(--text-primary-color-dim);
 
+	--faq-item-background: #2B284B;
+
 	--wallet-info-text: var(--text-primary-color-dim);
 
 	--lamden-logo-color: #FFF;
@@ -201,6 +203,8 @@ body.light{
 	--small-box-background: #2b284b00;
 	--price-color-buy: var(--color-primary-dark);
 
+	--faq-item-background: #a39cea;
+
 	background-image: var(--main-background-gradient);
 	background-blend-mode: none;
 }
@@ -242,6 +246,10 @@ body.light{
 
 .text-center{
 	text-align: center;
+}
+
+.text-left{
+	text-align: left;
 }
 
 .text-justify{
@@ -437,6 +445,9 @@ body.light{
 
 .flex-justify-spacearound{
 	justify-content: space-around;
+}
+.flex-justify-spacebetween{
+	justify-content: space-between;
 }
 
 .number{

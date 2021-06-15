@@ -86,7 +86,7 @@
 			This 
 			<a href="{`${tauhqURL}/addresses/${stakingInfo.DevRewardWallet}`}" target="_blank" rel="noopener noreferrer">
 				developer wallet
-			</a> will earn {stringToFixed(stakingInfo.DevRewardPct, 2)}% of the tokens you withdraw.
+			</a> will earn {stringToFixed(stakingInfo.DevRewardPct.multipliedBy(100), 1)}% of the tokens you withdraw.
 		</p>
 
 		<div class="flex-row flex-center-center">
