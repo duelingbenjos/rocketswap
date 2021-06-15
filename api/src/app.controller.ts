@@ -101,7 +101,7 @@ export class AppController {
 	@Get("get_market_summaries_w_token")
 	public async getMarketSummariesWToken() {
 		try {
-			let res = await VolumeMetricsEntity.find({ relations: ["token"] });
+			let res = await VolumeMetricsEntity.find({ relations: ["token", "pair"] });
 
 			const fields = ["contract_name", "token_symbol", "Volume", "PrevDay", "BaseVolume", "PercentPriceIncrease_24h", "Last"];
 			const token_fields = ["token_symbol", "token_name", "token_base64_svg", "token_base64_png", "token_logo_url"];
