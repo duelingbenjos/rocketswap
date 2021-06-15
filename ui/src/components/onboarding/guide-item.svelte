@@ -11,6 +11,10 @@
         border-radius: 8px;
         width: 110px;
         height: 90px;
+
+        box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		-webkit-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
+		-moz-box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);
     }
     .icon{
         width: 35px;
