@@ -132,7 +132,7 @@ Click the small blue *run* button beside change_metadata.
 3. You token will now appear in your wallet and you can transfer it to others, or to your other wallets!
 13. Optional — loading to RocketSwap (Covered in two parts within the guide sections)
 
-## Loading the Token to Rocektswap
+## Loading the Token to Rocketswap
 This is a simple 2 step process which is covered by some of the other guide articles, links below:
 * Manually transfer your token - [Guide - Adding Funds](guides.md#Adding-Funds)  
 * We also need to provide liquidity for it, both some TAU and your token - [Guide - Liquidity](guides.md#Liquidity-Pools)
