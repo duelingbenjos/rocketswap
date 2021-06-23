@@ -4,7 +4,6 @@
     // Components
     import PulseSpinner from '../pulse-spinner.svelte'
     import TokenLogo from '../../icons/token-logo.svelte'
-    import TradeRocket from '../misc/trade-rocket.svelte'
 
     // Icons
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
@@ -24,7 +23,7 @@
     $: priceChangeFilter = $homePageTableFilter ? $homePageTableFilter.price_change : null;
     $: currentFilter = $homePageTableFilter ? $homePageTableFilter.current : null;
 
-    $: results = sortMarketData(marketData, $homePageTableFilter)
+    $: results = [...sortMarketData(marketData, $homePageTableFilter)]
 
     const handleCurrencyTypeChange = () => setCurrencyType(type)
 
@@ -54,15 +53,15 @@
                 if (currentFilter === "volume" && volumeFilter === "asc") return a.BaseVolume.isLessThan(b.BaseVolume) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "dsc") return a.Last.isGreaterThan(b.Last) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "asc") return a.Last.isLessThan(b.Last) ? 1 : -1
-                if (currentFilter === "liquidity" && priceFilter === "dsc") return a.tauLiquidity.isGreaterThan(b.tauLiquidity) ? 1 : -1
-                if (currentFilter === "liquidity" && priceFilter === "asc") return a.tauLiquidity.isLessThan(b.tauLiquidity) ? 1 : -1
+                if (currentFilter === "liquidity" && liquidityFilter === "dsc") return a.tauLiquidity.isGreaterThan(b.tauLiquidity) ? 1 : -1
+                if (currentFilter === "liquidity" && liquidityFilter === "asc") return a.tauLiquidity.isLessThan(b.tauLiquidity) ? 1 : -1
             }else{
                 if (currentFilter === "volume" && volumeFilter === "dsc") return a.usdVolume.isGreaterThan(b.usdVolume) ? 1 : -1
                 if (currentFilter === "volume" && volumeFilter === "asc") return a.usdVolume.isLessThan(b.usdVolume) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "dsc") return a.usdPrice.isGreaterThan(b.usdPrice) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "asc") return a.usdPrice.isLessThan(b.usdPrice) ? 1 : -1
-                if (currentFilter === "liquidity" && priceFilter === "dsc") return a.usdLiquidity.isGreaterThan(b.usdLiquidity) ? 1 : -1
-                if (currentFilter === "liquidity" && priceFilter === "asc") return a.usdLiquidity.isLessThan(b.usdLiquidity) ? 1 : -1
+                if (currentFilter === "liquidity" && liquidityFilter === "dsc") return a.usdLiquidity.isGreaterThan(b.usdLiquidity) ? 1 : -1
+                if (currentFilter === "liquidity" && liquidityFilter === "asc") return a.usdLiquidity.isLessThan(b.usdLiquidity) ? 1 : -1
             }
         })
         return r
@@ -92,6 +91,7 @@
     }
     th{
         text-align: left;
+        padding: 0 8px;
         font-weight: 100;
     }
     td{
@@ -108,9 +108,7 @@
     a{
         text-decoration: underline;
     }
-    a:hover{
-        color: var(--color-primary);
-    }
+
     select{
         width: unset;
         padding: 0px 5px 0px 7px;
@@ -122,17 +120,19 @@
     }
     button{
         align-items: center;
+        width: max-content;
     }
     .sub-heading{
         align-self: flex-start;
         margin-top: -5px;
     }
-
-
-    @media screen and (min-width: 490px) {
+    @media screen and (min-width: 430px) {
         .panel-container{
             background: var(--home-panel-background-gradient);
         }
+    }
+
+    @media screen and (min-width: 610px) {
         .mobile-show{
             display: none;
         }
@@ -183,7 +183,6 @@
 	}
 
 </style>
-
 <div class="panel-container">
     {#if results.length > 0}
         <table>
@@ -201,7 +200,7 @@
                         />
                     </button>
                 </th>
-                <th class="flex-col">
+                <th>
                     <div class="flex-row">
                         <div class="dropdown">
                             <select bind:value={type} bind:this={selectElm} on:change={handleCurrencyTypeChange}>
@@ -219,12 +218,19 @@
                             />
                         </button>
                     </div>
-                    <div class="mobile-show text-primary-dim sub-heading">
-                        24hr Change
-                    </div>
+                    <button class="mobile-show flex-row text-primary-dim sub-heading" on:click={() => handleFilterClick('price_change')}>
+                        <div>24hr %</div>
+                        <DirectionalChevron 
+                            width="10px"
+                            styles={`position: relative; ${priceChangeFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
+                            margin={"0 0 0 8px"}
+                            direction={priceChangeFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "price_change" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                        />
+                    </button>
                 </th>
                 <th class="mobile-hide">                    
-                    <button class="flex-row" on:click={() => handleFilterClick('price_change')}>
+                    <button class="flex-row" on:click={() => handleFilterClick('price_change')} >
                             24hr % 
                         <DirectionalChevron 
                             width="10px"
@@ -236,20 +242,25 @@
                     </button>
                 </th>
                 <th>
-                    <button class="flex-col" on:click={() => handleFilterClick('volume')}>
-                        <div class="flex-row flex-align-center text-left">
-                            Volume (24hrs) 
-                            <DirectionalChevron 
-                                width="10px" 
-                                styles={`position: relative; ${volumeFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
-                                margin={"0 0 0 8px"}
-                                direction={volumeFilter === "asc" ? "down" : "up"} 
-                                color={currentFilter === "volume" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
-                            />
-                        </div>
-                        <div class="mobile-show text-primary-dim sub-heading">
-                            Liquidity
-                        </div>
+                    <button class="flex-row flex-align-center text-left" on:click={() => handleFilterClick('volume')}>
+                        Volume (24hrs) 
+                        <DirectionalChevron 
+                            width="10px" 
+                            styles={`position: relative; ${volumeFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
+                            margin={"0 0 0 8px"}
+                            direction={volumeFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "volume" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                        />
+                    </button>
+                    <button class="mobile-show flex-row text-primary-dim sub-heading" on:click={() => handleFilterClick('liquidity')}>
+                        Liquidity
+                        <DirectionalChevron 
+                            width="10px" 
+                            styles={`position: relative; ${liquidityFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
+                            margin={"0 0 0 8px"}
+                            direction={liquidityFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "liquidity" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                        />
                     </button>
                 </th>
                 <th class="mobile-hide">
@@ -280,7 +291,7 @@
                     </td>
                     
                     <td >
-                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(8).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 5)}
+                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(9).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 9)}
                         <div
                             class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
                             class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
