@@ -1,4 +1,4 @@
-<script lang="ts">
+<script >
     import { onMount } from 'svelte'
 
     // Components
@@ -7,6 +7,7 @@
     import HorizontalStakingPanel from '../components/panels/horizontal-staking-panel.svelte'
     import PageHeader from '../components/misc/page-header.svelte'
     import EarnFilters from '../components/misc/earn-filters.svelte'
+    import OnBoarding from '../components/onboarding/onboarding-messages.svelte'
 
     // Services
     import { WsService } from '../services/ws.service'
@@ -111,6 +112,7 @@
 <div class="page">
     <PageHeader title={pageTitle} />
     <EarnFilters />
+    <OnBoarding type="rocketfarm_info" />
     <div class="flex earn-content panels" 
         class:horizontal={$earnFilters?.rowView}>
         {#each filteredList as stakeInfo}

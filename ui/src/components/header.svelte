@@ -25,7 +25,7 @@
 	const { themeToggle, currentThemeName } = getContext('app')
 
 	let links
-	let menuItems = ["Home", "Swap", "Pools", "$RSWP", "Farm"]
+	let menuItems = ["Home", "Swap", "Pools", "$RSWP", "Farm", "Help"]
 	$: links = Object.values($routes)
 
 	const handleLinkClick = () => mainMenuOpen.set(false)
@@ -217,10 +217,6 @@
 					</a> 
 				{/if}
 			{/each}
-			<a href="{`${window.location.protocol}//${config.docs_subdomain}.${window.location.hostname}`}" on:click={handleLinkClick}
-				rel="noopener noreferrer" target="_blank"> 
-				{"Docs"} 
-			</a> 
 		</div>
 		<LightDark />
 	</div>
@@ -246,13 +242,6 @@
 					</div>
 				{/if}
 			{/each}
-				<div class="mobile-link flex-row flex-center-center">
-					<a  class="text-large weight-400"
-						href="{`${window.location.protocol}//${config.docs_subdomain}.${window.location.hostname}`}" on:click={handleLinkClick}
-						rel="noopener noreferrer" target="_blank"> 
-						{"Docs"} 
-					</a> 
-				</div>
 			{#if $walletAddress}
 				<button class="logout flex flex-center-center primary outline " on:click={logout} title="logout">
 						<AntennaIcon width="20px" margin="0 8px 0 0" /> Logout

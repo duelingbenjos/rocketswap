@@ -18,7 +18,8 @@ import {
 	rswpMetrics,
 	tauUSDPrice,
 	currencyType,
-	homePageTableFilter} from './store'
+	homePageTableFilter,
+	onboarding_settings} from './store'
 
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
@@ -106,6 +107,7 @@ export const initializeStateFromLocalStorage = () => {
 	getTauUsdPrice()
 	getCurrencyType()
 	getHomePageTableFilter()
+	getOnboardingSettings()
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -153,11 +155,36 @@ export const setCurrencyType = (value) => {
 }
 export const getHomePageTableFilter = () => {
 	let value = localStorage.getItem("home_page_talbe_filters")
-	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", price_change: "asc", name: "asc", current: "volume"})
+	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", price_change: "asc", name: "asc", liquidity: "asc", current: "volume"})
 	else homePageTableFilter.set(JSON.parse(value))
 }
-export const setHomePageTableFilter = (volume, price, price_change, name, current) => {
-	setLSValue("home_page_talbe_filters", {volume, price, price_change, name, current})
+export const getOnboardingSettings = () => {
+	const default_settings = {rocketfarm_info: true, home_info: true}
+	let value = localStorage.getItem("onboarding_settings")
+	if (value === null) {
+		onboarding_settings.set(default_settings)
+		setLSValue("onboarding_settings", default_settings)
+	}
+	else {
+		let current_settings = JSON.parse(value)
+		Object.keys(default_settings).forEach(setting => {
+			if (typeof current_settings[setting] === 'undefined'){
+				current_settings[setting] = default_settings[setting]
+				setOnboardingSetting(setting, default_settings[setting])
+			}
+		})
+		onboarding_settings.set(current_settings)
+	}
+}
+export const setOnboardingSetting = (key, value) => {
+	let current_setttings = get(onboarding_settings)
+	console.log({key, value, current_setttings})
+	current_setttings[key] = value
+	localStorage.setItem("onboarding_settings", JSON.stringify(current_setttings))
+	onboarding_settings.set(current_setttings)
+}
+export const setHomePageTableFilter = (volume, price, price_change, name, liquidity, current) => {
+	setLSValue("home_page_talbe_filters", {volume, price, price_change, name, liquidity, current})
 }
 export const setLSValue = (key, value) => {
 	localStorage.setItem(key, JSON.stringify(value))

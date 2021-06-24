@@ -27,6 +27,7 @@ export const toast_store: Writable<ToastMetaType[]> = writable([])
 export const tabHidden = writable(false);
 export const currencyType = writable(undefined);
 export const homePageTableFilter = writable(undefined);
+export const onboarding_settings = writable({});
 
 // EXCHANGE PRICES
 export const tauUSDPrice = writable(null);

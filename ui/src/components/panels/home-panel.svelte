@@ -4,7 +4,6 @@
     // Components
     import PulseSpinner from '../pulse-spinner.svelte'
     import TokenLogo from '../../icons/token-logo.svelte'
-    import TradeRocket from '../misc/trade-rocket.svelte'
 
     // Icons
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
@@ -20,10 +19,11 @@
     $: volumeFilter = $homePageTableFilter ? $homePageTableFilter.volume : null;
     $: priceFilter = $homePageTableFilter ? $homePageTableFilter.price : null;
     $: nameFilter = $homePageTableFilter ? $homePageTableFilter.name : null;
+    $: liquidityFilter = $homePageTableFilter ? $homePageTableFilter.liquidity : null;
     $: priceChangeFilter = $homePageTableFilter ? $homePageTableFilter.price_change : null;
     $: currentFilter = $homePageTableFilter ? $homePageTableFilter.current : null;
 
-    $: results = sortMarketData(marketData, $homePageTableFilter)
+    $: results = [...sortMarketData(marketData, $homePageTableFilter)]
 
     const handleCurrencyTypeChange = () => setCurrencyType(type)
 
@@ -33,7 +33,7 @@
             if (current[filer_name] === "asc") current[filer_name] = "dsc"
             else current[filer_name] = "asc"
 
-            setHomePageTableFilter(current.volume, current.price, current.price_change, current.name, current.current)
+            setHomePageTableFilter(current.volume, current.price, current.price_change, current.name, current.liquidity, current.current)
             return current
         })
     }
@@ -53,12 +53,15 @@
                 if (currentFilter === "volume" && volumeFilter === "asc") return a.BaseVolume.isLessThan(b.BaseVolume) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "dsc") return a.Last.isGreaterThan(b.Last) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "asc") return a.Last.isLessThan(b.Last) ? 1 : -1
+                if (currentFilter === "liquidity" && liquidityFilter === "dsc") return a.tauLiquidity.isGreaterThan(b.tauLiquidity) ? 1 : -1
+                if (currentFilter === "liquidity" && liquidityFilter === "asc") return a.tauLiquidity.isLessThan(b.tauLiquidity) ? 1 : -1
             }else{
                 if (currentFilter === "volume" && volumeFilter === "dsc") return a.usdVolume.isGreaterThan(b.usdVolume) ? 1 : -1
                 if (currentFilter === "volume" && volumeFilter === "asc") return a.usdVolume.isLessThan(b.usdVolume) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "dsc") return a.usdPrice.isGreaterThan(b.usdPrice) ? 1 : -1
                 if (currentFilter === "price" && priceFilter === "asc") return a.usdPrice.isLessThan(b.usdPrice) ? 1 : -1
-
+                if (currentFilter === "liquidity" && liquidityFilter === "dsc") return a.usdLiquidity.isGreaterThan(b.usdLiquidity) ? 1 : -1
+                if (currentFilter === "liquidity" && liquidityFilter === "asc") return a.usdLiquidity.isLessThan(b.usdLiquidity) ? 1 : -1
             }
         })
         return r
@@ -82,11 +85,14 @@
     .mobile-hide{
         display: none;
     }
-
+    .symbol-text{
+        margin-left: 34px;
+        margin-top: -6px;
+    }
     th{
         text-align: left;
-        font-weight: 100;
         padding: 0 8px;
+        font-weight: 100;
     }
     td{
         max-width: 100px;
@@ -102,42 +108,54 @@
     a{
         text-decoration: underline;
     }
-    a:hover{
-        color: var(--color-primary);
-    }
+
     select{
         width: unset;
         padding: 0px 5px 0px 7px;
-        margin: 12px 0 0px;
+        margin: 0;
+        align-self: flex-start;
     }
     .dropdown{
         margin: 0 0 7px;
     }
     button{
-        align-items: baseline;
+        align-items: center;
+        width: max-content;
     }
-
-
+    .sub-heading{
+        align-self: flex-start;
+        margin-top: -5px;
+    }
     @media screen and (min-width: 430px) {
         .panel-container{
             background: var(--home-panel-background-gradient);
         }
+    }
+
+    @media screen and (min-width: 610px) {
         .mobile-show{
             display: none;
         }
         .mobile-hide{
             display: table-cell;
         }
+        
+        select{
+            align-self: unset;
+        }
+        th{
+            padding: 0 8px;
+        }
 	}
 
-	@media screen and (min-width: 550px) {
+	@media screen and (min-width: 680px) {
         td{
             max-width: 175px;
             padding: 12px 8px 0;
         }
 	}
 
-    @media screen and (min-width: 650px) {
+    @media screen and (min-width: 850px) {
         td{
             max-width: 250px;
             padding: 12px 8px 0;
@@ -165,7 +183,6 @@
 	}
 
 </style>
-
 <div class="panel-container">
     {#if results.length > 0}
         <table>
@@ -176,7 +193,7 @@
                         Name
                         <DirectionalChevron 
                             width="10px"
-                            styles={`position: relative; ${nameFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
+                            styles={`position: relative; ${nameFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
                             margin={"0 0 0 8px"}
                             direction={nameFilter === "asc" ? "down" : "up"} 
                             color={currentFilter === "name" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
@@ -184,8 +201,8 @@
                     </button>
                 </th>
                 <th>
-                    <div class="flex-row flex-align-center">
-                            <div class="dropdown">
+                    <div class="flex-row">
+                        <div class="dropdown">
                             <select bind:value={type} bind:this={selectElm} on:change={handleCurrencyTypeChange}>
                                     <option value={"tau"}>Price TAU</option>
                                     <option value={"usd"}>Price USD</option>
@@ -194,20 +211,30 @@
                         <button class="flex-row" on:click={() => handleFilterClick('price')}>
                             <DirectionalChevron 
                                 width="10px"
-                                styles={`position: relative; ${priceFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
+                                styles={`position: relative; ${priceFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
                                 margin={"0 0 0 8px"}
                                 direction={priceFilter === "asc" ? "down" : "up"} 
                                 color={currentFilter === "price" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
                             />
                         </button>
                     </div>
+                    <button class="mobile-show flex-row text-primary-dim sub-heading" on:click={() => handleFilterClick('price_change')}>
+                        <div>24hr %</div>
+                        <DirectionalChevron 
+                            width="10px"
+                            styles={`position: relative; ${priceChangeFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
+                            margin={"0 0 0 8px"}
+                            direction={priceChangeFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "price_change" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                        />
+                    </button>
                 </th>
                 <th class="mobile-hide">                    
-                    <button class="flex-row" on:click={() => handleFilterClick('price_change')}>
+                    <button class="flex-row" on:click={() => handleFilterClick('price_change')} >
                             24hr % 
                         <DirectionalChevron 
                             width="10px"
-                            styles={`position: relative; ${priceChangeFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
+                            styles={`position: relative; ${priceChangeFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
                             margin={"0 0 0 8px"}
                             direction={priceChangeFilter === "asc" ? "down" : "up"} 
                             color={currentFilter === "price_change" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
@@ -215,14 +242,36 @@
                     </button>
                 </th>
                 <th>
-                    <button class="flex-row" on:click={() => handleFilterClick('volume')}>
+                    <button class="flex-row flex-align-center text-left" on:click={() => handleFilterClick('volume')}>
                         Volume (24hrs) 
                         <DirectionalChevron 
                             width="10px" 
-                            styles={`position: relative; ${volumeFilter === "asc" ? "top: 6px;" : "top: -3px;"}`}
+                            styles={`position: relative; ${volumeFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
                             margin={"0 0 0 8px"}
                             direction={volumeFilter === "asc" ? "down" : "up"} 
                             color={currentFilter === "volume" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                        />
+                    </button>
+                    <button class="mobile-show flex-row text-primary-dim sub-heading" on:click={() => handleFilterClick('liquidity')}>
+                        Liquidity
+                        <DirectionalChevron 
+                            width="10px" 
+                            styles={`position: relative; ${liquidityFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
+                            margin={"0 0 0 8px"}
+                            direction={liquidityFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "liquidity" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                        />
+                    </button>
+                </th>
+                <th class="mobile-hide">
+                    <button class="flex-row" on:click={() => handleFilterClick('liquidity')}>
+                        Liquidity
+                        <DirectionalChevron 
+                            width="10px" 
+                            styles={`position: relative; ${liquidityFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
+                            margin={"0 0 0 8px"}
+                            direction={liquidityFilter === "asc" ? "down" : "up"} 
+                            color={currentFilter === "liquidity" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
                         />
                     </button>
                 </th>
@@ -231,23 +280,24 @@
             {#each results as tokenInfo, index}
                 <tr>
                     <td>{index + 1}</td>
-                    <td class="flex-row flex-align-center">
-                        <TokenLogo tokenMeta={tokenInfo.token} margin={"0 10px 0 0"}/>
-                        
-                        <div class="ellipsis">
-                            <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
+                    <td class="flex-col">
+                        <div class="flex-row" >
+                            <TokenLogo tokenMeta={tokenInfo.token} margin={"0 10px 0 0"}/>
+                            <div class="ellipsis">
+                                <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
+                            </div>
                         </div>
+                        <div class="text-primary-dimmer symbol-text">{tokenInfo.token.token_symbol}</div>
                     </td>
                     
-                    <td>
-                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(8).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 5)}
+                    <td >
+                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(9).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 9)}
                         <div
                             class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
                             class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
                             class="mobile-show">
                             {stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%
                         </div>
-                    
                     </td>
                     <td
                         class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
@@ -255,8 +305,18 @@
                         class="mobile-hide">
                         {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
                     </td>
-                    <td>
+                    <td class="mobile-hide">
                         {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
+                    </td>
+                    <td class="mobile-show">
+                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
+                        <div class="text-primary-dim">
+                            {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
+                        </div>
+                        
+                    </td>
+                    <td class="mobile-hide">
+                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
                     </td>
                 </tr>
             {/each}
