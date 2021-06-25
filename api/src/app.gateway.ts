@@ -38,6 +38,7 @@ import {
 import { log } from "./utils/logger";
 
 import { getTokenMetrics } from "./entities/price.entity";
+import { datetimeToUnix } from "./utils/yield-utils";
 /**
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
@@ -198,7 +199,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	private async handleJoinStakingPanel(client: Socket) {
 		const staking_entities = await StakingMetaEntity.find({ where: { OpenForBusiness: true } });
-		let response = staking_entities.map(async (entity) => {
+		let response = staking_entities.reverse().map(async (entity) => {
 			return new Promise(async (resolver) => {
 				const staking_token = await TokenEntity.findOne({ contract_name: entity.meta.STAKING_TOKEN });
 				const yield_token = await TokenEntity.findOne({ contract_name: entity.meta.YIELD_TOKEN });
