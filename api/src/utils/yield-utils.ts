@@ -218,7 +218,7 @@ function getEmissionRatePerSecond(emission_rate_per_hour: number) {
 	return emission_rate_per_hour / 60 / 60;
 }
 
-function datetimeToUnix(time: IContractingTime) {
+export function datetimeToUnix(time: IContractingTime) {
 	let arr = time.__time__;
 	return new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], arr[5]).getTime();
 }
