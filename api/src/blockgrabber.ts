@@ -40,7 +40,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 	const route_getLastestBlock = "/latest_block";
 	let lastestBlockNum: any = 0;
 	let currBatchMax = 0;
-	let batchAmount = 10;
+	let batchAmount = 25;
 	let timerId;
 
 	const wipeDB = async (force = false) => {
