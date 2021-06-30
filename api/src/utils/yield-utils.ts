@@ -1,10 +1,12 @@
+import { ApiExtraModels } from "@nestjs/swagger";
+import { config } from "../config";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { IStakingDeposit, UserStakingEntity } from "../entities/user-staking.entity";
-import { IContractingTime, ITimeRampValue } from "../types/misc.types";
+import { EpochResponse, IContractingTime, ITimeRampValue } from "../types/misc.types";
 import { log } from "./logger";
 import { dateNowUtc } from "./utils";
-
+import axios from "axios";
 
 export function calculateSmartEpochYield(args: {
 	starting_epoch_index: number;
@@ -23,6 +25,12 @@ export function calculateSmartEpochYield(args: {
 		else if (time > end_time) time = end_time;
 		return time;
 	};
+
+	log.log({
+		calculateSmartCompoundingYield: {
+			meta: meta.contract_name
+		}
+	});
 
 	amount = parseFloat(amount.__fixed__);
 	let this_epoch_index = starting_epoch_index;
@@ -120,6 +128,13 @@ export function calculateSmartCompoundingYield(args: {
 		return time;
 	};
 
+	log.log({
+		calculateSmartCompoundingYield: {
+			meta: meta.contract_name
+		}
+	});
+	log.log(epochs.map((e) => e.epoch_index));
+
 	let step_offset_ms = (step_offset ? step_offset[1] + daysToSeconds(step_offset[0]) : 0) * 1000;
 	// log.warn({ step_offset_ms });
 	let deposit_start_step_adjusted = datetimeToUnix(deposit_start_time) + step_offset_ms;
@@ -145,6 +160,7 @@ export function calculateSmartCompoundingYield(args: {
 		} else if (this_epoch_index === starting_epoch_index) {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(deposit_start_step_adjusted);
 		} else if (this_epoch_index === current_epoch_index) {
+			log.log({ meta: meta.contract_name });
 			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(this_epoch.time));
 		} else {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
@@ -161,12 +177,11 @@ export function calculateSmartCompoundingYield(args: {
 }
 
 export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: number, user_entity: UserStakingEntity) {
-	
 	if (!meta) {
-		log.warn("No meta entity found, returning 0 Yield Per Second.")
-		return 0
+		log.warn("No meta entity found, returning 0 Yield Per Second.");
+		return 0;
 	}
-	
+
 	if (meta.meta.type === "staking_simple") {
 		const deposit_total = user_entity.deposits.reduce((accum, dep) => {
 			return (accum += parseFloat(dep.amount.__fixed__));
@@ -176,7 +191,7 @@ export function getUserYieldPerSecond(meta: StakingMetaEntity, total_staked: num
 		return stakingTimeWindowIsActive(meta) ? total - dev_fee : 0;
 	}
 
-	if (meta.meta.type === "staking_smart_epoch" || meta.meta.type === 'liquidity_mining_smart_epoch') {
+	if (meta.meta.type === "staking_smart_epoch" || meta.meta.type === "liquidity_mining_smart_epoch") {
 		const emission_rate_per_hour = meta.EmissionRatePerHour;
 		const total_emission_rate_per_second = getEmissionRatePerSecond(emission_rate_per_hour);
 		const share_of_pool = total_staked / meta.StakedBalance;
@@ -234,7 +249,7 @@ function daysToSeconds(days: number): number {
 export function getUserRewardRate(meta: StakingMetaEntity, deposit: IStakingDeposit) {
 	let time_ramp_values = meta.TimeRampValues;
 	let step_offset = deposit.step_offset?.__delta__;
-	log.log({step_offset})
+	log.log({ step_offset });
 	let step_offset_ms = (step_offset ? step_offset[1] + daysToSeconds(step_offset[0]) : 0) * 1000;
 	let time_ramp_delta = fitTime(dateNowUtc(), meta) - fitTime(datetimeToUnix(deposit.time), meta) + step_offset_ms;
 	let step_multiplier = findTimeRampStep(meta.TimeRampValues, time_ramp_delta) * 100;
@@ -261,3 +276,57 @@ const fitTime = (time: number, meta: StakingMetaEntity): number => {
 	else if (time > end_time) time = end_time;
 	return time;
 };
+
+export function filterEpochs(epoch_entities: StakingEpochEntity[]): StakingEpochEntity[] {
+	let epoch_entities_filtered = [];
+	epoch_entities.forEach((epoch) => {
+		if (epoch_entities_filtered.findIndex((ent) => ent.epoch_index === epoch.epoch_index) < 0) {
+			epoch_entities_filtered.push(epoch);
+		}
+	});
+	return epoch_entities_filtered;
+}
+
+export async function fillMissingEpochs(
+	contract_name: string,
+	epoch_entities: StakingEpochEntity[],
+	current_epoch_index: number
+): Promise<StakingEpochEntity[]> {
+	try {
+		const epoch_arr: StakingEpochEntity[] = new Array(current_epoch_index);
+		const new_epochs: StakingEpochEntity[] = [];
+
+		for (let i = 0; i < epoch_arr.length; i++) {
+			let exists = epoch_entities.find((epoch) => epoch.epoch_index == i);
+			if (!exists) {
+				const new_epoch_entity = await retrieveEpoch(contract_name, i);
+				new_epochs.push(new_epoch_entity);
+			} else {
+				epoch_arr[i] = exists;
+			}
+		}
+		new_epochs.forEach((epoch) => {
+			epoch_arr[epoch.epoch_index] = epoch;
+		});
+		return epoch_arr;
+	} catch (err) {
+		log.error(err);
+	}
+}
+
+export async function retrieveEpoch(contract_name: string, index: number): Promise<StakingEpochEntity> {
+	log.log({ retrieveEpoch: `${contract_name} : ${index}` });
+	const path = `/contracts/${contract_name}/Epochs?key=${index}`;
+	const res = await axios.get(`${config.masternode}${path}`);
+	const data: EpochResponse = res.data;
+
+	const entity = new StakingEpochEntity();
+	entity.epoch_index = index;
+	entity.fn = "created_by_api";
+	entity.staking_contract = contract_name;
+	// log.log({ amount_staked: data.value.staked });
+	entity.amount_staked = Number(data.value.staked.__fixed__);
+	entity.time = data.value.time;
+	entity.amt_per_hr = data.value.amt_per_hr.__fixed__ ? Number(data.value.amt_per_hr.__fixed__) : Number(data.value.amt_per_hr);
+	return await entity.save();
+}

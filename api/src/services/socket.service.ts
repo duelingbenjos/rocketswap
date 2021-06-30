@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { getUserRewardRate, getUserYieldPerSecond } from "../utils/yield-utils";
+import { fillMissingEpochs, filterEpochs, getUserRewardRate, getUserYieldPerSecond } from "../utils/yield-utils";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { getUserYield, UserStakingEntity } from "../entities/user-staking.entity";
@@ -68,6 +68,17 @@ export class SocketService {
 							where: { staking_contract: user_entity.staking_contract },
 							take: 10000
 						});
+						const staking_meta_entity = await StakingMetaEntity.findOneOrFail(user_entity.staking_contract);
+						/** Hack here to make this work, on testnet, after multiple resyncs. */
+						const epoch_entities_filtered = filterEpochs(epoch_entities);
+						/** Hack here because  */
+						const epoch_entities_complete = await fillMissingEpochs(
+							user_entity.staking_contract,
+							epoch_entities_filtered,
+							staking_meta_entity.Epoch.index
+						);
+						epoch_entities_complete.sort((a, b) => a.epoch_index - b.epoch_index);
+				
 						const metrics = await this.updateClientStakingMetrics(
 							vk,
 							user_entity.staking_contract,
@@ -119,21 +130,12 @@ export class SocketService {
 		epoch_entities: StakingEpochEntity[]
 	): Promise<IUserYieldPayload> {
 		try {
-			/** Hack here to make this work, on testnet, after multiple resyncs. */
-			let epoch_entities_filtered = [];
-			epoch_entities.forEach((epoch) => {
-				if (epoch_entities_filtered.findIndex((ent) => ent.epoch_index === epoch.epoch_index) < 0) {
-					epoch_entities_filtered.push(epoch);
-				}
-			});
-			epoch_entities_filtered.sort((a, b) => a.epoch_index - b.epoch_index);
 			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract, OpenForBusiness: true } });
 			if (!meta_entity) return;
 			const total_staked = user_entity.deposits.reduce((accum, deposit) => {
 				return (accum += parseFloat(deposit.amount.__fixed__));
 			}, 0);
-			log.log(epoch_entities_filtered.length)
-			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities_filtered });
+			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities });
 			const yield_per_sec = user_entity.deposits.length ? getUserYieldPerSecond(meta_entity, total_staked, user_entity) : 0;
 			const time_updated = Date.now();
 			const epoch_updated = meta_entity.Epoch.index;
