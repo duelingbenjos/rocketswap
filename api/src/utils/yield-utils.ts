@@ -330,3 +330,9 @@ export async function retrieveEpoch(contract_name: string, index: number): Promi
 	entity.amt_per_hr = data.value.amt_per_hr.__fixed__ ? Number(data.value.amt_per_hr.__fixed__) : Number(data.value.amt_per_hr);
 	return await entity.save();
 }
+
+export function changeVisibility(value: number): "hide" | "show" {
+	const parts = value.toString().split(".");
+	if (parts[1] && parts[1] === "1000001") return "hide";
+	if (parts[1] && parts[1] === "1111111") return "show";
+}

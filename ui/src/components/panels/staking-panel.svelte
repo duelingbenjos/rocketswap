@@ -60,7 +60,8 @@
     $: hasBothTokens = yieldToken && stakingToken;
     $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null;
     $: isLpToken = stakingContractType === "liquidity_mining_smart_epoch"
-    $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType === "staking_smart_epoch_compounding_timeramp" && stakingContractType !== "staking_simple" : false;
+    // $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType === "staking_smart_epoch_compounding_timeramp" && stakingContractType !== "staking_simple" : false;
+    $: showCompoundButton = false
     $: useTimeRamp = stakingInfo?.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
 

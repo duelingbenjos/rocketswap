@@ -25,7 +25,7 @@ export class SocketService {
 	public staking_panel_clients: string[] = [];
 
 	async afterInit() {
-		const staking_entities = await StakingMetaEntity.find({ where: { OpenForBusiness: true } });
+		const staking_entities = await StakingMetaEntity.find({ where: { visible: true } });
 		this.staking_epochs = staking_entities.reduce((accum, entity) => {
 			accum[entity.contract_name] = entity.Epoch.index;
 			return accum;

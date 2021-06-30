@@ -44,6 +44,9 @@ export class StakingMetaEntity extends BaseEntity {
 	OpenForBusiness: boolean;
 
 	@Column({ nullable: true })
+	visible: boolean = true;
+
+	@Column({ nullable: true })
 	__developer__: string;
 
 	@Column({ nullable: true })
@@ -72,11 +75,12 @@ export class StakingMetaEntity extends BaseEntity {
 
 export const getStakingMetaList = async () => {
 	const list = await StakingMetaEntity.find();
-	return {
+	const return_obj = {
 		all: list.map((staking_entity) => staking_entity.contract_name),
 		active: list.reduce((accum, value) => {
-			if (value.OpenForBusiness) accum.push(value.contract_name);
+			if (value.visible) accum.push(value.contract_name);
 			return accum;
 		}, [])
 	};
+	return return_obj;
 };
