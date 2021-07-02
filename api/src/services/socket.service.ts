@@ -56,39 +56,39 @@ export class SocketService {
 			const staking_entities = await UserStakingEntity.find({ where: { vk } });
 			const payload = await staking_entities
 				.filter((ent) => this.parserProvider.getActiveStakingContracts().includes(ent.staking_contract))
-				.reduce(async (accumP, user_entity) => {
+				.reduce(async (accumP, user_staking_entity) => {
 					const accum = await accumP;
+					const { staking_contract } = user_staking_entity;
 					if (
-						(!user_entity.yield_info ||
-							!Object.keys(user_entity.yield_info).length ||
-							user_entity.yield_info.epoch_updated !== this.staking_epochs[user_entity.staking_contract]) &&
-						user_entity.deposits.length
+						(!user_staking_entity.yield_info ||
+							!Object.keys(user_staking_entity.yield_info).length ||
+							user_staking_entity.yield_info.epoch_updated !== this.staking_epochs[staking_contract]) &&
+						user_staking_entity.deposits.length
 					) {
 						const epoch_entities = await StakingEpochEntity.find({
-							where: { staking_contract: user_entity.staking_contract },
+							where: { staking_contract: staking_contract },
 							take: 10000
 						});
-						const staking_meta_entity = await StakingMetaEntity.findOneOrFail(user_entity.staking_contract);
+						const staking_meta_entity = await StakingMetaEntity.findOneOrFail(staking_contract);
 						/** Hack here to make this work, on testnet, after multiple resyncs. */
 						const epoch_entities_filtered = filterEpochs(epoch_entities);
 						/** Hack here because  */
 						const epoch_entities_complete = await fillMissingEpochs(
-							user_entity.staking_contract,
+							staking_contract,
 							epoch_entities_filtered,
 							staking_meta_entity.Epoch.index
 						);
 						epoch_entities_complete.sort((a, b) => a.epoch_index - b.epoch_index);
-				
-						const metrics = await this.updateClientStakingMetrics(
-							vk,
-							user_entity.staking_contract,
-							user_entity,
-							epoch_entities
-						);
-						user_entity.yield_info = metrics[user_entity.staking_contract];
-						user_entity.save();
+
+						const metrics = await this.updateClientStakingMetrics(vk, staking_contract, user_staking_entity, epoch_entities);
+						if (metrics && metrics[staking_contract]) {
+							user_staking_entity.yield_info = metrics[staking_contract]
+							await user_staking_entity.save();
+							accum[staking_contract] = user_staking_entity.yield_info;
+						} else {
+							log.warn(`client staking metrics for staking contract : ${staking_contract}, vk : ${vk} is undefined.`)
+						}
 					}
-					accum[user_entity.staking_contract] = user_entity.yield_info;
 					return accum;
 				}, Promise.resolve({}));
 			return payload;
@@ -130,7 +130,7 @@ export class SocketService {
 		epoch_entities: StakingEpochEntity[]
 	): Promise<IUserYieldPayload> {
 		try {
-			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract, OpenForBusiness: true } });
+			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract } });
 			if (!meta_entity) return;
 			const total_staked = user_entity.deposits.reduce((accum, deposit) => {
 				return (accum += parseFloat(deposit.amount.__fixed__));
