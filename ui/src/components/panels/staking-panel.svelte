@@ -64,7 +64,7 @@
     $: showCompoundButton = false
     $: useTimeRamp = stakingInfo?.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
-    $: stakingDisabled = stakingInfo?.OpenForBusiness === true || false
+    $: stakingDisabled = !stakingInfo?.OpenForBusiness
 
     onDestroy(() => {
        clearInterval(startTimer)
