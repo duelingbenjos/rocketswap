@@ -119,6 +119,7 @@ export function calculateSmartCompoundingYield(args: {
 }): number {
 	let { starting_epoch_index, amount, deposit_start_time, current_epoch_index, epochs, meta, step_offset } = args;
 
+	// log.log({epochs: epochs.length})
 	let start_time = datetimeToUnix(meta.StartTime);
 	let end_time = datetimeToUnix(meta.EndTime);
 
@@ -128,12 +129,12 @@ export function calculateSmartCompoundingYield(args: {
 		return time;
 	};
 
-	log.log({
-		calculateSmartCompoundingYield: {
-			meta: meta.contract_name
-		}
-	});
-	log.log(epochs.map((e) => e.epoch_index));
+	// log.log({
+	// 	calculateSmartCompoundingYield: {
+	// 		meta: meta.contract_name
+	// 	}
+	// });
+	// log.log(epochs.map((e) => e.epoch_index));
 
 	let step_offset_ms = (step_offset ? step_offset[1] + daysToSeconds(step_offset[0]) : 0) * 1000;
 	// log.warn({ step_offset_ms });
@@ -293,13 +294,13 @@ export async function fillMissingEpochs(
 	current_epoch_index: number
 ): Promise<StakingEpochEntity[]> {
 	try {
-		const epoch_arr: StakingEpochEntity[] = new Array(current_epoch_index);
+		const epoch_arr: StakingEpochEntity[] = new Array(current_epoch_index+1);
 		const new_epochs: StakingEpochEntity[] = [];
 
 		for (let i = 0; i < epoch_arr.length; i++) {
 			let exists = epoch_entities.find((epoch) => epoch.epoch_index == i);
 			if (!exists) {
-				const new_epoch_entity = await retrieveEpoch(contract_name, i);
+				const new_epoch_entity = await retrieveEpochFromMN(contract_name, i);
 				new_epochs.push(new_epoch_entity);
 			} else {
 				epoch_arr[i] = exists;
@@ -314,7 +315,7 @@ export async function fillMissingEpochs(
 	}
 }
 
-export async function retrieveEpoch(contract_name: string, index: number): Promise<StakingEpochEntity> {
+export async function retrieveEpochFromMN(contract_name: string, index: number): Promise<StakingEpochEntity> {
 	log.log({ retrieveEpoch: `${contract_name} : ${index}` });
 	const path = `/contracts/${contract_name}/Epochs?key=${index}`;
 	const res = await axios.get(`${config.masternode}${path}`);

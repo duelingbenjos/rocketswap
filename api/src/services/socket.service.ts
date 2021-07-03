@@ -72,21 +72,21 @@ export class SocketService {
 						const staking_meta_entity = await StakingMetaEntity.findOneOrFail(staking_contract);
 						/** Hack here to make this work, on testnet, after multiple resyncs. */
 						const epoch_entities_filtered = filterEpochs(epoch_entities);
-						/** Hack here because  */
+						/** Quick fix here, since API is missing some epochs on resync */
 						const epoch_entities_complete = await fillMissingEpochs(
 							staking_contract,
 							epoch_entities_filtered,
 							staking_meta_entity.Epoch.index
 						);
 						epoch_entities_complete.sort((a, b) => a.epoch_index - b.epoch_index);
-
-						const metrics = await this.updateClientStakingMetrics(vk, staking_contract, user_staking_entity, epoch_entities);
+						// log.log(epoch_entities_complete.map((e) => e.epoch_index));
+						const metrics = await this.updateClientStakingMetrics(vk, staking_contract, user_staking_entity, epoch_entities_complete);
 						if (metrics && metrics[staking_contract]) {
-							user_staking_entity.yield_info = metrics[staking_contract]
+							user_staking_entity.yield_info = metrics[staking_contract];
 							await user_staking_entity.save();
 							accum[staking_contract] = user_staking_entity.yield_info;
 						} else {
-							log.warn(`client staking metrics for staking contract : ${staking_contract}, vk : ${vk} is undefined.`)
+							log.warn(`client staking metrics for staking contract : ${staking_contract}, vk : ${vk} is undefined.`);
 						}
 					}
 					return accum;
@@ -98,6 +98,7 @@ export class SocketService {
 	}
 
 	public async sendClientStakingUpdates(staking_contract: string) {
+		log.log("sendClientStakingUpdats called")
 		try {
 			const epoch_entities = await StakingEpochEntity.find({ where: { staking_contract }, take: 10000 });
 			for (let vk of this.staking_panel_clients) {
@@ -130,6 +131,7 @@ export class SocketService {
 		epoch_entities: StakingEpochEntity[]
 	): Promise<IUserYieldPayload> {
 		try {
+			log.log(epoch_entities)
 			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract } });
 			if (!meta_entity) return;
 			const total_staked = user_entity.deposits.reduce((accum, deposit) => {
