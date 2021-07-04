@@ -4,6 +4,7 @@ export class BlockDTO {
 	contract: string;
 	timestamp: number;
 	hash: string;
+	block_num: number
 }
 
 export interface IKvp {

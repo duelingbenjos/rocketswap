@@ -31,7 +31,7 @@ if (typeof process.env.RE_LOAD_API !== "undefined") {
 	if (process.env.RE_LOAD_API === "yes") reloadAPI = true;
 }
 
-const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string) => {
+const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string, block_num?: number) => {
 	let currBlockNum = 1;
 	let checkNextIn = 0;
 	let maxCheckCount = 10;
@@ -71,7 +71,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = parseInt(process.env.currBlockNum) || 7000;
+		currBlockNum = parseInt(process.env.currBlockNum) || block_num || 7000;
 
 		log.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
@@ -171,7 +171,8 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 								fn: tx.transaction.payload.function,
 								contract: tx.transaction.payload.contract,
 								timestamp: tx.transaction.metadata.timestamp,
-								hash: tx.hash
+								hash: tx.hash,
+								block_num: blockNum
 							});
 						}
 					})();
@@ -299,7 +300,7 @@ function updateLastChecked(time_delta:number = 0) {
 	ParserProvider.updateLastChecked(time_delta)
 }
 
-export default (handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string) => {
+export default (handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string, block_num?:number) => {
 	db.connect(
 		connectionString,
 		{ useNewUrlParser: true, useUnifiedTopology: true },
@@ -307,7 +308,7 @@ export default (handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_i
 			if (error) log.log(error);
 			else {
 				//log.log("connection successful");
-				databaseLoader(mongoose_models, handleNewBlock, bypass_wipe, instance_id);
+				databaseLoader(mongoose_models, handleNewBlock, bypass_wipe, instance_id, block_num);
 			}
 		}
 	);

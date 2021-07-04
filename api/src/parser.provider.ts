@@ -38,6 +38,7 @@ export class ParserProvider {
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
 	private action_que_processing: boolean;
+	private last_block: number
 
 	public static updateLastChecked = (time_delta: number = 0) => {
 		ParserProvider.blockgrabber_last_update = time_delta + Date.now();
@@ -80,6 +81,7 @@ export class ParserProvider {
 	};
 
 	public handleNewBlock = async (block: BlockDTO) => {
+		this.last_block = block.block_num
 		await this.parseBlock(block);
 	};
 
@@ -252,10 +254,10 @@ export class ParserProvider {
 		ParserProvider.amm_meta_entity = amm_meta_entity;
 	};
 
-	private startBlockgrabber = (skip_wipe: boolean = false) => {
+	private startBlockgrabber = (skip_wipe: boolean = false, block_num?:number) => {
 		let id = nanoid(7);
 		ParserProvider.blockgrabber_active_instance_id = id;
-		blockgrabber(this.handleNewBlock, skip_wipe, id);
+		blockgrabber(this.handleNewBlock, skip_wipe, id, block_num);
 	};
 }
 
