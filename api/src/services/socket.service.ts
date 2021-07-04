@@ -137,7 +137,7 @@ export class SocketService {
 			const total_staked = user_entity.deposits.reduce((accum, deposit) => {
 				return (accum += parseFloat(deposit.amount.__fixed__));
 			}, 0);
-			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities });
+			const current_yield = getUserYield({ meta: meta_entity, user: user_entity, epochs: epoch_entities }) || 0;
 			const yield_per_sec = user_entity.deposits.length ? getUserYieldPerSecond(meta_entity, total_staked, user_entity) : 0;
 			const time_updated = Date.now();
 			const epoch_updated = meta_entity.Epoch.index;

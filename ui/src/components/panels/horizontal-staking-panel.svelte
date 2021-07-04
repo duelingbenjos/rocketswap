@@ -36,7 +36,7 @@
     $: userYield = $userYieldInfo[stakingInfo?.contract_name];
     $: totalStaked = userYield ? userYield.total_staked : toBigNumber("0");
     $: additionalYield = userYield ? stakingCalcs.calcNewYeild(userYield) : toBigNumber("0");
-    $: currentYield = userYield ? userYield.current_yield.plus(additionalYield) : toBigNumber("0");
+    $: currentYield = userYield ? userYield.current_yield?.plus(additionalYield) : toBigNumber("0");
     $: hasStake = totalStaked?.isGreaterThan(0) || false;
     $: startTimer = !startTimer && currentYield.isGreaterThan(0) ? startUpdater() : null;
 
