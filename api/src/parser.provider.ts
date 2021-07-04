@@ -59,7 +59,7 @@ export class ParserProvider {
 			if (Date.now() - ParserProvider.blockgrabber_last_update > 30000) {
 				log.warn("no response from blockgrabber in 30 seconds => starting it up again");
 				ParserProvider.updateLastChecked();
-				this.startBlockgrabber(true);
+				this.startBlockgrabber(true, this.last_block);
 			}
 		}, 5000);
 		// setInterval(() => {
