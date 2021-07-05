@@ -32,7 +32,7 @@ if (typeof process.env.RE_LOAD_API !== "undefined") {
 }
 
 const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string, block_num?: number) => {
-	let currBlockNum = block_num || 1;
+	let currBlockNum = 1;
 	let checkNextIn = 0;
 	let maxCheckCount = 10;
 	let alreadyCheckedCount = 0;

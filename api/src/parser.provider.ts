@@ -56,7 +56,7 @@ export class ParserProvider {
 		 * Temporary workaround, since the blockgrabber likes to stop checking for blocks randomly.
 		 */
 		setInterval(() => {
-			if (Date.now() - ParserProvider.blockgrabber_last_update > 30000) {
+			if (Date.now() - ParserProvider.blockgrabber_last_update > 120000) {
 				log.warn("no response from blockgrabber in 30 seconds => starting it up again");
 				ParserProvider.updateLastChecked();
 				this.startBlockgrabber(false, this.last_block);
@@ -206,14 +206,14 @@ export class ParserProvider {
 					await action();
 				}
 				this.action_que.splice(0, 1);
-				await this.executeActionQue(action_que);
+				this.executeActionQue(action_que);
 			} else {
 				this.action_que_processing = false;
 			}
 		} catch (err) {
 			log.error(err);
 			this.action_que.splice(0, 1);
-			setTimeout(async () => this.executeActionQue(action_que), 1000);
+			setTimeout(() => this.executeActionQue(action_que), 1000);
 		}
 	};
 
