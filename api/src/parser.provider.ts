@@ -47,7 +47,7 @@ export class ParserProvider {
 	async onModuleInit() {
 		this.updateTokenList();
 		// await this.updateStakingContractList();
-		this.addToActionQue(this.updateStakingContractList);
+		await this.updateStakingContractList();
 		ParserProvider.amm_meta_entity = await AmmMetaEntity.findOne();
 
 		this.startBlockgrabber(false);
@@ -122,8 +122,6 @@ export class ParserProvider {
 						hash,
 						fn
 					});
-					// this.addToActionQue(this.updateStakingContractList);
-					// this.addToActionQue(this.stakingService.decideUpdateEpoch)
 				}
 			} else if (contract_name === config.contractName) {
 				// handle events for the AMM contract
@@ -154,14 +152,6 @@ export class ParserProvider {
 					hash,
 					fn
 				});
-				// this.addToActionQue(this.stakingService.decideUpdateEpoch, {
-				// 	state,
-				// 	handleClientUpdate: this.socketService.handleClientUpdate,
-				// 	staking_contract: contract_name,
-				// 	timestamp,
-				// 	hash,
-				// 	fn
-				// });
 				this.addToActionQue(saveUserLp, {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate
@@ -202,7 +192,7 @@ export class ParserProvider {
 		}
 	};
 
-	/** The action que is added to attempt to solve a bug where transactions coming in from the blockgrabber fail to be processed
+	/** The action que attempts to solve a bug where transactions coming in from the blockgrabber fail to be processed
 	 * by the parser. Assuming that it's a race condition causing it, this approach should be effective.
 	 */
 

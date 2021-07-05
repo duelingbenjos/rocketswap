@@ -38,7 +38,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 	let alreadyCheckedCount = 0;
 	const route_getBlockNum = "/blocks?num=";
 	const route_getLastestBlock = "/latest_block";
-	let lastestBlockNum: any = 0;
+	let latestBlockNum: any = 0;
 	let currBatchMax = 0;
 	let batchAmount = 25;
 	let timerId;
@@ -72,6 +72,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 			IF Testnet is reset or for production change this value
 		*/
 		currBlockNum = block_num || parseInt(process.env.currBlockNum) || 7000;
+		log.warn("restarting blockgrabber from block : " + block_num)
 
 		log.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
@@ -222,16 +223,16 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		let response: any = await getLatestBlock_MN();
 
 		if (!response.error) {
-			lastestBlockNum = response.number;
-			if (lastestBlockNum.__fixed__) lastestBlockNum = parseInt(lastestBlockNum.__fixed__)
-			if ((lastestBlockNum < currBlockNum || wipeOnStartup || reloadAPI) && !bypass_wipe) {
+			latestBlockNum = response.number;
+			if (latestBlockNum.__fixed__) latestBlockNum = parseInt(latestBlockNum.__fixed__)
+			if ((latestBlockNum < currBlockNum || wipeOnStartup || reloadAPI) && !bypass_wipe) {
 				await wipeDB();
 				wipeOnStartup = false;
 				reloadAPI = false;
 			} else {
 				// log.log("lastestBlockNum: " + lastestBlockNum);
 				// log.log("currBlockNum: " + currBlockNum);
-				if (lastestBlockNum === currBlockNum) {
+				if (latestBlockNum === currBlockNum) {
 					if (alreadyCheckedCount < maxCheckCount)
 						alreadyCheckedCount = alreadyCheckedCount + 1;
 					checkNextIn = 200 * alreadyCheckedCount;
@@ -239,10 +240,10 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 				}
 
 				let to_fetch = [];
-				if (lastestBlockNum > currBlockNum) {
+				if (latestBlockNum > currBlockNum) {
 					currBatchMax = currBlockNum + batchAmount;
-					if (currBatchMax > lastestBlockNum)
-						currBatchMax = lastestBlockNum;
+					if (currBatchMax > latestBlockNum)
+						currBatchMax = latestBlockNum;
 					if (currBatchMax > batchAmount) currBatchMax + batchAmount;
 					// let to_process = []
 					let blocksToGetCount = 1
@@ -272,7 +273,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 					for (let block of to_process) await processBlock(block);
 				}
 
-				if (lastestBlockNum < currBlockNum) {
+				if (latestBlockNum < currBlockNum) {
 					await wipeDB(true);
 					timerId = setTimeout(checkForBlocks, 10000);
 				}
