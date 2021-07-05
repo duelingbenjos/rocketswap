@@ -1,13 +1,13 @@
 # Imports
 
-import con_basic_token
+import con_random_lst001
 
 I = importlib
 
 # Setup Tokens
 
-STAKING_TOKEN = con_basic_token
-YIELD_TOKEN = con_basic_token
+STAKING_TOKEN = con_random_lst001
+YIELD_TOKEN = con_random_lst001
 
 # State
 
@@ -31,6 +31,8 @@ EpochMaxRatioIncrease = (
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
 decimal_converter_var = Variable()
+TimeRampValues = Variable()
+UseTimeRamp = Variable()
 
 # Vtoken
 balances = Hash(default_value=0)
@@ -46,20 +48,20 @@ def seed():
     EpochMaxRatioIncrease.set(1 / 2)
     EpochMinTime.set(0)
 
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 1000}
 
     meta["version"] = "0.0.1"
     meta[
         "type"
-    ] = "staking_smart_epoch_compounding"  # staking || lp_farming || etcetera ...
-    meta["STAKING_TOKEN"] = "con_basic_token"
-    meta["YIELD_TOKEN"] = "con_basic_token"
+    ] = "staking_smart_epoch_compounding_timeramp"  # staking || lp_farming || etcetera ...
+    meta["STAKING_TOKEN"] = "con_random_lst001"
+    meta["YIELD_TOKEN"] = "con_random_lst001"
 
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
+    EmissionRatePerHour.set(1000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(1 / 10)
 
     # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
+    StartTime.set(datetime.datetime(year=2021, month=7, day=3, hour=22))
     # The datetime at which you want staking to finish.
     EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
 
