@@ -32,7 +32,7 @@ if (typeof process.env.RE_LOAD_API !== "undefined") {
 }
 
 const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boolean, instance_id: string, block_num?: number) => {
-	let currBlockNum = 1;
+	let currBlockNum = block_num || 1;
 	let checkNextIn = 0;
 	let maxCheckCount = 10;
 	let alreadyCheckedCount = 0;
@@ -71,8 +71,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		TODO:
 			IF Testnet is reset or for production change this value
 		*/
-		currBlockNum = block_num || parseInt(process.env.currBlockNum) || 7000;
-		log.warn("restarting blockgrabber from block : " + block_num)
+		currBlockNum = parseInt(process.env.currBlockNum) || 7000;
 
 		log.log("Set currBlockNum = 0");
 		timerId = setTimeout(checkForBlocks, 500);
