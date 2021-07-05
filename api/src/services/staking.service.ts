@@ -228,14 +228,12 @@ export class StakingService implements OnModuleInit {
 					time,
 					amt_per_hr
 				};
-				log.warn("decideUpdateEpoch LEGACY called");
-				log.warn({ staking_contract, index });
 			}
 		}
 		await entity.save();
 		if (new_staking_contract === true) {
-			await this.parserProvider.updateStakingContractList();
 			this.parserProvider.addNewStakingToList(staking_contract);
+			await this.parserProvider.updateStakingContractList();
 		}
 
 		const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
@@ -276,47 +274,6 @@ export class StakingService implements OnModuleInit {
 				await Promise.all(proms);
 			}
 		}
-		await handleClientUpdate({ action: "staking_panel_update", data: entity });
-		// const prom = new Promise((resolve) =>
-		// 	setTimeout(() => {
-		// 		resolve(true);
-		// 	}, 50)
-		// );
-		// return await prom;
+		handleClientUpdate({ action: "staking_panel_update", data: entity });
 	};
-
-	public async decideUpdateEpoch(args: {
-		state: IKvp[];
-		handleClientUpdate: handleClientUpdateType;
-		staking_contract: string;
-		timestamp: number;
-		hash: string;
-		fn: string;
-	}) {
-		const { state, handleClientUpdate, fn, hash, timestamp, staking_contract } = args;
-		const epoch_kvp = state.find((kvp) => kvp.key.includes("Epochs"));
-		if (!epoch_kvp) return;
-		const { staked, time, emission_rate_per_tau, amt_per_hr } = epoch_kvp.value;
-		const index = parseInt(epoch_kvp.key.split(":")[1]);
-		log.warn("decideUpdateEpoch NEW called");
-		log.warn({ staking_contract, index });
-		await updateEpoch({
-			staking_contract,
-			epoch_index: index,
-			time,
-			amount_staked: staked,
-			emission_rate_per_tau,
-			amt_per_hr,
-			fn,
-			real_staked_balance: 0,
-			previous_staked_balance: 0,
-			timestamp,
-			hash,
-			handleClientUpdate
-		});
-	}
-}
-
-function getWithdrawalKey(kvp: IKvp) {
-	return kvp.value.split();
 }

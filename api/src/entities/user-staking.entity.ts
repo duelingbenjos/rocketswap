@@ -103,13 +103,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			calcFn = calculateSmartEpochYield;
 			if (deposits[0].user_yield) harvestable_yield += getNumber(deposits[0].user_yield);
 		}
-		// else if (staking_contract_type === "liquidity_mining_smart_epoch") {
-		// 	if (deposits[0].user_yield) calcFn = calculateSmartEpochLiqMiningYield;
-		// }
-		if (meta.contract_name === "con_rswp_compounding_01") {
-			// log.log({ meta });
-		}
-		// log.log(d);
+
 		log.log({contract: meta.contract_name})
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
