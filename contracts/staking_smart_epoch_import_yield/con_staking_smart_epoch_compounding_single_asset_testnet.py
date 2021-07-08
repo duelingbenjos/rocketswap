@@ -1,13 +1,13 @@
 # Imports
 
-import con_basic_token
+import con_rswp_lst001
 
 I = importlib
 
 # Setup Tokens
 
-STAKING_TOKEN = con_basic_token
-YIELD_TOKEN = con_basic_token
+STAKING_TOKEN = con_rswp_lst001
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
@@ -33,7 +33,7 @@ meta = Hash(default_value=False)
 decimal_converter_var = Variable()
 TimeRampValues = Variable()
 UseTimeRamp = Variable()
-
+TrustedExporters = Variable()
 
 # Vtoken
 balances = Hash(default_value=0)
@@ -48,27 +48,8 @@ def seed():
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(1 / 2)
     EpochMinTime.set(0)
-
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
-
-    meta["version"] = "0.0.1"
-    meta[
-        "type"
-    ] = "staking_smart_epoch_compounding"  # staking || lp_farming || etcetera ...
-    meta["STAKING_TOKEN"] = "con_basic_token"
-    meta["YIELD_TOKEN"] = "con_basic_token"
-
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
-    DevRewardPct.set(1 / 10)
-
-    # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
-    # The datetime at which you want staking to finish.
-    EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
-
-    OpenForBusiness.set(True)
-
-    UseTimeRamp.set(False)
+    UseTimeRamp.set(True)
+    TrustedExporters.set([])
     TimeRampValues.set(
         [
             {"lower": 0, "upper": 11, "multiplier": 0.1},
@@ -84,6 +65,25 @@ def seed():
         ]
     )
 
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 100}
+
+    meta["version"] = "0.0.2"
+    meta[
+        "type"
+    ] = "staking_smart_epoch_compounding_timeramp"  # staking || lp_farming || etcetera ...
+    meta["STAKING_TOKEN"] = "con_rswp_lst001"
+    meta["YIELD_TOKEN"] = "con_rswp_lst001"
+
+    EmissionRatePerHour.set(100)  # 1200000 RSWP per year = 10% of supply
+    DevRewardPct.set(1 / 10)
+
+    # The datetime from which you want to allow staking.
+    StartTime.set(datetime.datetime(year=2021, month=7, day=8, hour=14))
+    # The datetime at which you want staking to finish.
+    EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
+
+    OpenForBusiness.set(True)
+
 
 @export
 def addStakingTokens(amount: float):
@@ -95,6 +95,29 @@ def addStakingTokens(amount: float):
     else:
         return increaseDeposit(amount=amount, user_ctx="caller", from_contract=False)
 
+
+# This is called FROM the contract to which the yields will be staked.
+# This contract name will need to be added to the "TrustedImporters" list on the foreign contract.
+@export
+def stakeFromContractProfits(contract: str):
+    # verify that the contract is calling it is trusted.
+    assert (
+        contract in TrustedExporters.get()
+    ), "The contract is not in the trusted exporters list."
+    # import staking contract
+    yield_contract = I.import_module(contract)
+    # call withdraw function to this contract, take return value
+    amount = yield_contract.exportYieldToForeignContract()
+    # stake this value
+    user = ctx.signer
+
+    deposit = Deposits[user]
+
+    if deposit is False:
+        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=True)
+    else:
+        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=True)
+        
 
 def createNewDeposit(
     amount: float, user_ctx: str, from_contract: bool
@@ -129,7 +152,7 @@ def increaseDeposit(
     amount: float, user_ctx: str, from_contract: bool
 ):  # user_ctx will either be "caller" or "signer"
 
-    user = ctx.caller if user_ctx is "caller" else ctx.signer
+    user = ctx.caller if user_ctx is "caller" else "signer"
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount >= 0, "You cannot stake a negative balance."
 
@@ -145,10 +168,9 @@ def increaseDeposit(
     yield_to_harvest = 0
     existing_stake = 0
     user_yield_share = 0
-    start_time = False
 
     yield_to_harvest += calculateYield(deposit=deposit)
-    start_time = deposit["time"]
+    deposit_start_time = deposit["time"]
     existing_stake = deposit["amount"]
 
     yield_to_harvest -= withdrawn_yield
@@ -174,9 +196,9 @@ def increaseDeposit(
     Withdrawals[user] = 0
     Deposits[user] = {
         "starting_epoch": decideIncrementEpoch(new_staked_amount=new_global_staked),
-        "time": start_time,
+        "time": deposit_start_time,
         "amount": total_deposit_amount,
-        "step_offset": now - start_time,
+        "step_offset": fitTimeToRange(now) - fitTimeToRange(deposit_start_time),
     }
 
     return Deposits[user]
@@ -293,11 +315,17 @@ def calculateYield(deposit):
     this_epoch_index = starting_epoch_index
 
     y = 0
+    time_step_multiplier = 1
 
     while this_epoch_index <= current_epoch_index:
         this_epoch = Epochs[this_epoch_index]
         next_epoch = Epochs[this_epoch_index + 1]
 
+        if UseTimeRamp.get():
+            time_ramp_delta = (
+                fitTimeToRange(now) - fitTimeToRange(this_epoch["time"]) + step_offset
+            )
+            time_step_multiplier = findTimeRampStep(time_ramp_delta.days)
 
         delta = 0
 
@@ -326,7 +354,7 @@ def calculateYield(deposit):
         decimal_converter_var.set(pct_share_of_stake)
         pct_share_of_stake = decimal_converter_var.get()
         deposit_yield_this_epoch = (
-            global_yield_this_epoch * pct_share_of_stake
+            global_yield_this_epoch * pct_share_of_stake * time_step_multiplier
         )
         y += deposit_yield_this_epoch
 
@@ -377,7 +405,7 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
         else this_epoch_staked
     )
     dif = bigger - smaller
-    if this_epoch_staked < 0.001 :
+    if this_epoch_staked < 0.0001 :
         return true
     return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
@@ -452,18 +480,35 @@ def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
 
+
 @export
-def recoverYieldToken(amount: float):
+def addToTrustedExporters(contract: str):
     assertOwner()
-    assert amount > 0, "Yield token amount must be greater than 0"
+    trusted_exporters = TrustedExporters.get()
+    if contract in trusted_exporters:
+        return
+    trusted_exporters.append(contract)
+    TrustedExporters.set(trusted_exporters)
+
+
+@export
+def removeFromTrustedExporters(contract: str):
+    assertOwner()
+    trusted_exporters = TrustedExporters.get()
+    trusted_exporters.remove(contract)
+    TrustedExporters.set(trusted_exporters)
+
+
+@export
+def recoverYieldToken():
+    assertOwner()
     staked_balance = StakedBalance.get()
     yield_balances = ForeignHash(
         foreign_contract=meta["YIELD_TOKEN"], foreign_name="balances"
     )
     total_in_contract = yield_balances[ctx.this]
-    total_available = total_in_contract
-    amount_to_recover = amount if amount <= total_available else total_available
-    YIELD_TOKEN.transfer(amount=amount_to_recover, to=Owner.get())
+    total_available = total_in_contract - staked_balance
+    YIELD_TOKEN.transfer(amount=total_available, to=Owner.get())
 
 
 @export
@@ -514,6 +559,29 @@ def emergencyReturnStake():
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
     decideIncrementEpoch(new_staked_amount=new_staked_amount)
+
+
+@export
+def toggleTimeRamp(on: bool):
+    assertOwner()
+    UseTimeRamp.set(on)
+
+
+def findTimeRampStep(days: int):
+    time_ramps = TimeRampValues.get()
+    step = None
+    for s in time_ramps:
+        if s["lower"] <= days and s["upper"] > days:
+            step = s
+    if step is None:
+        return time_ramps[len(time_ramps) - 1]["multiplier"]
+    return step["multiplier"]
+
+
+@export
+def setTimeRampValues(data: list):
+    assertOwner()
+    TimeRampValues.set(data)
 
 
 # VTOKEN METHODS
