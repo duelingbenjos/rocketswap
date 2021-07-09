@@ -120,7 +120,7 @@ def increaseDeposit(
     amount: float, user_ctx: str
 ):  # user_ctx will either be "caller" or "signer"
 
-    user = ctx.caller if user_ctx is "caller" else "signer"
+    user = ctx.caller if user_ctx is "caller" else ctx.caller
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You cannot stake a negative balance."
 
