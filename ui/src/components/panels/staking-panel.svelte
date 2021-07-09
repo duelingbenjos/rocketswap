@@ -50,7 +50,7 @@
     $: userYield = $userYieldInfo[stakingInfo?.contract_name];
     $: totalStaked = userYield ? userYield.total_staked : toBigNumber("0");
     $: additionalYield = userYield ? stakingCalcs.calcNewYeild(userYield) : toBigNumber("0");
-    $: currentYield = userYield ? userYield.current_yield.plus(additionalYield) : toBigNumber("0");
+    $: currentYield = userYield ? userYield.current_yield?.plus(additionalYield) : toBigNumber("0");
     $: rewardRate = userYield ? userYield.user_reward_rate : toBigNumber("0")
     $: hasStake = totalStaked?.isGreaterThan(0) || false;
     $: startTimer = !startTimer && currentYield.isGreaterThan(0) ? startUpdater() : null;
@@ -60,9 +60,11 @@
     $: hasBothTokens = yieldToken && stakingToken;
     $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null;
     $: isLpToken = stakingContractType === "liquidity_mining_smart_epoch"
-    $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType !== "staking_simple" : false;
+    // $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType === "staking_smart_epoch_compounding_timeramp" && stakingContractType !== "staking_simple" : false;
+    $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType !== "staking_simple" && stakingInfo.OpenForBusiness : false;
     $: useTimeRamp = stakingInfo?.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
+    $: stakingDisabled = !stakingInfo?.OpenForBusiness
 
     onDestroy(() => {
        clearInterval(startTimer)
@@ -294,7 +296,9 @@
                     bind:clearInput/>
                     
                 <div class="flex-row flex-center-center buttons">
-                    <button class="primary" on:click={openStakingConfirm} disabled={loading || !validStakingAmount}>STAKE</button>
+                    {#if !stakingDisabled}
+                        <button class="primary" on:click={openStakingConfirm} disabled={loading || !validStakingAmount }>STAKE</button>
+                    {/if}
                     <button class="primary outline" on:click={openRemoveStakingConfirm} disabled={loading || !hasStake}>REMOVE STAKE</button>
                 </div>
             {/if}
@@ -380,12 +384,14 @@
                             COMPOUND
                         </button>
                     {/if}
+                    {#if !stakingDisabled}
                     <button 
                         class="primary outline" 
                         on:click={openStakingConfirm} 
                         disabled={loading || !validStakingAmount}>
                         STAKE
                     </button>
+                    {/if}
                     <button 
                         class="primary outline" 
                         style="margin: 0 10px;"
@@ -393,9 +399,11 @@
                         disabled={loading || !hasStake}>
                         REMOVE STAKE
                     </button>
+                    <!--
                     <div class="info-icon-horizontal">
                         <InfoIcon />
                     </div>
+                    -->
                 </div>
             </div>
             

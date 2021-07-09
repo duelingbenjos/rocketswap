@@ -403,6 +403,8 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
         else this_epoch_staked
     )
     dif = bigger - smaller
+    if this_epoch_staked is 0 :
+        return true
     return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
 

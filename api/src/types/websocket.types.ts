@@ -5,7 +5,7 @@ import { UserStakingEntity } from "../entities/user-staking.entity";
 import { BlockDTO } from "./misc.types";
 import { PairEntity } from "../entities/pair.entity";
 
-export type handleClientUpdateType = (update: ClientUpdateType) => {};
+export type handleClientUpdateType = (update: ClientUpdateType) => Promise<void>;
 
 export type handleAuthenticateResponseType = (auth_response: { socket_id: string; payload: AuthenticationPayload }) => void;
 

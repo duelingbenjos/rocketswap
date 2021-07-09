@@ -21,7 +21,8 @@
 
 <style>
 	.wrap {
-		word-wrap: break-word;
+		word-wrap: break-word;	
+		line-height: 1.8;
 	}
 	p{
 		margin: 0;
@@ -38,43 +39,54 @@
 	.staking-detail{
 		margin: 2rem 0 1rem;
 	}
+	.staking-input-output{
+		margin: 0 0 1rem;
+	}
+	.dev-wallet{
+		margin-top: 1rem;
+	}
 </style>
 
 {#if stakingInfo}
-	<div class="wrap" in:fade={{}}>
+	<div class="wrap text-small" in:fade={{}}>
 		<p class="staking-detail">
 			Stake
 			<a href="{`${tauhqURL}/contracts/${stakingToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
 				{`${stakingToken.token_symbol}${stakingInfo.meta.type === "liquidity_mining_smart_epoch" ? " LP" : ""}`}
-				<TokenLogo tokenMeta={stakingToken} {stakingContractType} width="22px" inline={true} margin="0 3px 0 2px" lpBottom={"0"}/> 
+				<TokenLogo tokenMeta={stakingToken} {stakingContractType} width="18px" inline={true} margin="0 2px 0 2px" lpBottom={"0"} lpFontSize="6px"/> 
 			</a>
-			in this contract and you will yield {stringToFixed(stakingInfo.EmissionRatePerHour, 8)}
+			in this contract to get a share of {stringToFixed(stakingInfo.EmissionRatePerHour, 8)}
 			<a href="{`${tauhqURL}/contracts/${yieldToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
 				{yieldToken.token_symbol}
-				<TokenLogo tokenMeta={yieldToken} inline={true} width="22px" margin="0 3px 0 0" lpBottom={"0"}/>  
+				<TokenLogo tokenMeta={yieldToken} inline={true} width="18px" margin="0 2px 0 0" lpBottom={"0"}/>  
 			</a>
-			distributed proportionally to the 
+			emitted per hour.
+		</p>
+
+		<p class="text-small staking-input-output">
+			{stringToFixed(stakingInfo.StakedBalance, 8)}
 			<a href="{`${tauhqURL}/contracts/${stakingToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
 				{`${stakingToken.token_symbol}${stakingInfo.meta.type === "liquidity_mining_smart_epoch" ? " LP" : ""}`}
-				<TokenLogo tokenMeta={stakingToken} {stakingContractType} inline={true} width="22px" margin="0 3px 0 0" lpBottom={"0"}/> 
 			</a>
-			in the staking pool.
+			is currently staked in this contract and
+			{stringToFixed(stakingInfo.WithdrawnBalance, 8)}
+			<a href="{`${tauhqURL}/contracts/${yieldToken.contract_name}`}" target="_blank" rel="noopener noreferrer">
+				{yieldToken.token_symbol} 
+			</a>
+			has been withdrawn so far.
 		</p>
-		<p>
+		<p class="text-small">
 			<span>Contract Name:</span>
 			<a href="{`${tauhqURL}/contracts/${stakingInfo.contract_name}`}" target="_blank" rel="noopener noreferrer">{stakingInfo.contract_name}</a>
 		</p>
-		<p>
+		<p class="text-small">
 			<span>Contract Type:</span> {stakingInfo.meta.type}
 		</p>
-		<p>
-			<span>Dev Reward Wallet: </span>
+		<p class="text-primary-dim text-small dev-wallet">
+			This 
 			<a href="{`${tauhqURL}/addresses/${stakingInfo.DevRewardWallet}`}" target="_blank" rel="noopener noreferrer">
-				{formatAccountAddress(stakingInfo.DevRewardWallet, 8, 5)}
-			</a>
-		</p>
-		<p class="text-primary-dim">
-			The developer will earn {stringToFixed(stakingInfo.DevRewardPct, 2)}% of the tokens you withdraw.
+				developer wallet
+			</a> will earn {stringToFixed(stakingInfo.DevRewardPct.multipliedBy(100), 1)}% of the tokens you withdraw.
 		</p>
 
 		<div class="flex-row flex-center-center">

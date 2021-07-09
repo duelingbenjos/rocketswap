@@ -1,0 +1,37 @@
+[{
+        "q": "What is Rocketswap (RSWP)?",
+        "a": "Rocketswap (RSWP) is a community developed AMM (Automated Market Maker) which resides on the Lamden Blockchain."
+    },
+    {
+        "q": "What is an AMM (Automated Market Maker)?",
+        "a": "An Automated Market Maker is a system for exchanging assets which was popularized first by Uniswap and differs from traditional exchange systems in a few fundamental ways."
+    },
+    {
+        "q": "What is Lamden?",
+        "a": "Lamden is the performant Python-Based blockchain platform that makes using and creating the next generation of dApps easy for everyone. With distributed governance and rewards for smart contract developers, Lamden democratises access to the blockchain. More info @ www.lamden.io"
+    },
+    {
+        "q": "How can I get RSWP?",
+        "a": "RSWP will be distributed by staking Mainnet TAU on Launch Date (23th March 2021). This staking pool will be live indefinitely. Shortly afterwards, the RSWP/TAU LP farming pool will be opened, providing a higher RSWP reward to compensate for the unfortunate realities of impermanent loss."
+    },
+    {
+        "q": "What’s the RSWP Token Information?",
+        "a": "Supply: 1,200,000,000, Price: To be set by market, Distribution: TAU Staking & market LP Staking, Emission Rate: % of total on a yearly basis. 30, 20, 15, 10, 7, 5, 4, 3, 2, 2, 1, 1, Dev Reward: 10% of emissions, Deflationary Mechanisms: Burn on payment of RSWP transaction fee."
+    },
+    {
+        "q": "What does RSWP do?",
+        "a": "RSWP is the governance token of the Rocketswap exchange. Paying fees with RSWP on Rocketswap will reduce fees by 25%. Additional discounts also apply depending on how much RSWP you are holding in your fuel tank (check the guide section on staking $RSWP)."
+    },
+    {
+        "q": "How do I report a bug or request a new feature?",
+        "a": "Submit an issue on Github - That way you can check to see if anyone else has reported it and this is also the best way to ensure one of the developers sees it."
+    },
+    {
+        "q": "How can I get Mainnet TAU?",
+        "a": "Mainnet TAU is available at Txbit (centralized) or here on Rocketswap DEX."
+    },
+    {
+        "q": "How do I get help not answered in these questions?",
+        "a": "First, check the documentation https://rocketswap.exchange/docs/. Second, this document is in it’s infancy and relies on good people just like you to help us if you spot an error or something missing — it will get better with time with your help. If your answer was not here, talk to the good people in Rocketswap Telegram (use the code word — cowsgomoo then we know you read this doc)."
+    }
+]

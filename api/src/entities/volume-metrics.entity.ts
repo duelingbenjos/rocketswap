@@ -1,4 +1,5 @@
 import { Entity, Column, BaseEntity, PrimaryColumn, JoinColumn, OneToOne } from "typeorm";
+import { PairEntity } from "./pair.entity";
 import { TokenEntity } from "./token.entity";
 
 /** Based on the TXBIT.io API, for compatibility with coingecko
@@ -34,6 +35,10 @@ export class VolumeMetricsEntity extends BaseEntity {
     @OneToOne(() => TokenEntity)
     @JoinColumn()
     token: TokenEntity;
+
+    @OneToOne(() => PairEntity, { nullable: true })
+    @JoinColumn()
+    pair: PairEntity;
 	
 	@Column({ nullable: true })
 	Last: number;

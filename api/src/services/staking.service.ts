@@ -1,5 +1,3 @@
-import axios from "axios";
-// import { SocketService } from "./socket.service";
 import { log } from "../utils/logger";
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
@@ -11,7 +9,7 @@ import { handleClientUpdateType } from "../types/websocket.types";
 import { getVal } from "../utils/utils";
 import { updateUserStakingInfo } from "../entities/user-staking.entity";
 import { SocketService } from "./socket.service";
-import { LpPointsEntity } from "../entities/lp-points.entity";
+import { changeVisibility } from "../utils/yield-utils";
 
 @Injectable()
 export class StakingService implements OnModuleInit {
@@ -33,7 +31,7 @@ export class StakingService implements OnModuleInit {
 		// log.debug("UPDATE ROI CALLED")
 		// log.log({staking_contracts: this.parserProvider.getAllStakingContracts()})
 		for (let contract_name of this.parserProvider.getActiveStakingContracts()) {
-			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name, OpenForBusiness: true } });
+			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name, visible: true } });
 			// log.debug({meta_entity})
 			if (meta_entity) {
 				const ROI = await this.decideROI(meta_entity);
@@ -128,120 +126,197 @@ export class StakingService implements OnModuleInit {
 		hash: string;
 		fn: string;
 	}) => {
-		// console.log({ updateStakingContractMeta: args });
-		try {
-			const { state, handleClientUpdate, staking_contract, fn, hash, timestamp } = args;
-			let previous_staked_balance: number;
-			let entity = await StakingMetaEntity.findOne(staking_contract);
-			if (!entity) {
-				entity = new StakingMetaEntity();
-				entity.contract_name = staking_contract;
-			}
-			for (let kvp of state) {
-				switch (kvp.key) {
-					case `${staking_contract}.Owner`:
-						entity["Owner"] = getVal(kvp);
-						break;
-					case `${staking_contract}.DevRewardWallet`:
-						entity["DevRewardWallet"] = getVal(kvp);
-						break;
-					case `${staking_contract}:CurrentEpochIndex`:
-						entity["CurrentEpochIndex"] = getVal(kvp);
-						break;
-					case `${staking_contract}.StakedBalance`:
-						if (entity.StakedBalance) previous_staked_balance = JSON.parse(JSON.stringify(entity.StakedBalance));
-						entity["StakedBalance"] = getVal(kvp);
-						break;
-					case `${staking_contract}.meta:version`:
-						entity["meta"] = this.updateMetaProperty(entity.meta, "version", getVal(kvp));
-						break;
-					case `${staking_contract}.meta:type`:
-						entity["meta"] = this.updateMetaProperty(entity.meta, "type", getVal(kvp));
-						break;
-					case `${staking_contract}.meta:STAKING_TOKEN`:
-						entity["meta"] = this.updateMetaProperty(entity.meta, "STAKING_TOKEN", getVal(kvp));
-						entity.STAKING_TOKEN = getVal(kvp);
-						break;
-					case `${staking_contract}.meta:YIELD_TOKEN`:
-						entity["meta"] = this.updateMetaProperty(entity.meta, "YIELD_TOKEN", getVal(kvp));
-						entity.YIELD_TOKEN = getVal(kvp);
-						break;
-					case `${staking_contract}.EmissionRatePerHour`:
-						entity["EmissionRatePerHour"] = getVal(kvp);
-						break;
-					case `${staking_contract}.DevRewardPct`:
-						entity["DevRewardPct"] = getVal(kvp);
-						break;
-					case `${staking_contract}.StartTime`:
-						entity["StartTime"] = getVal(kvp);
-						break;
-					case `${staking_contract}.EndTime`:
-						entity["EndTime"] = getVal(kvp);
-						break;
-					case `${staking_contract}.OpenForBusiness`:
-						entity["OpenForBusiness"] = getVal(kvp);
-						break;
-					case `${staking_contract}.__developer__`:
-						entity["__developer__"] = getVal(kvp);
-						break;
-					case `${staking_contract}.EpochMaxRatioIncrease`:
-						entity["EpochMaxRatioIncrease"] = getVal(kvp);
-						break;
-					case `${staking_contract}.EmissionRatePerTauYearly`:
-						entity["EmissionRatePerTauYearly"] = getVal(kvp);
-						entity["EmissionRatePerHour"] = parseFloat(getVal(kvp)) / 365 / 24;
-						break;
-					case `${staking_contract}.EmissionRatePerSecond`:
-						entity["EmissionRatePerSecond"] = getVal(kvp);
-						break;
-					case `${staking_contract}.WithdrawnBalance`:
-						entity["WithdrawnBalance"] = getVal(kvp);
-						break;
-					case `${staking_contract}.UseTimeRamp`:
-						entity["UseTimeRamp"] = getVal(kvp);
-						break;
-					case `${staking_contract}.TimeRampValues`:
-						entity["TimeRampValues"] = getVal(kvp);
-						break;
-				}
-
-				if (kvp.key.includes("Epochs")) {
-					const index = parseInt(kvp.key.split(":")[1]);
-					const { staked, time, emission_rate_per_tau, amt_per_hr } = kvp.value;
-					Promise.resolve(
-						updateEpoch({
-							staking_contract,
-							epoch_index: index,
-							time,
-							amount_staked: staked,
-							emission_rate_per_tau,
-							amt_per_hr,
-							fn,
-							real_staked_balance: entity.StakedBalance,
-							previous_staked_balance,
-							timestamp,
-							hash,
-							handleClientUpdate
-						})
-					);
-					entity.Epoch = {
-						index,
-						staked,
-						time,
-						amt_per_hr
-					};
-				}
-			}
-			await entity.save();
-
-			const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
-			const withdrawals = state.find((kvp) => kvp.key.includes("Withdrawals"));
-			if (deposits || withdrawals) {
-				await updateUserStakingInfo({ deposits, withdrawals, staking_contract, fn, handleClientUpdate });
-			}
-			handleClientUpdate({ action: "staking_panel_update", data: entity });
-		} catch (err) {
-			console.error(err);
+		const { state, handleClientUpdate, fn, hash, timestamp, staking_contract } = args;
+		let previous_staked_balance: number;
+		let entity = await StakingMetaEntity.findOne(staking_contract);
+		let new_staking_contract = false;
+		if (!entity) {
+			entity = new StakingMetaEntity();
+			entity.contract_name = staking_contract;
+			new_staking_contract = true;
 		}
+		for (let kvp of state) {
+			switch (kvp.key) {
+				case `${staking_contract}.Owner`:
+					entity["Owner"] = getVal(kvp);
+					break;
+				case `${staking_contract}.DevRewardWallet`:
+					entity["DevRewardWallet"] = getVal(kvp);
+					break;
+				case `${staking_contract}:CurrentEpochIndex`:
+					entity["CurrentEpochIndex"] = getVal(kvp);
+					break;
+				case `${staking_contract}.StakedBalance`:
+					if (entity.StakedBalance) previous_staked_balance = JSON.parse(JSON.stringify(entity.StakedBalance));
+					entity["StakedBalance"] = getVal(kvp);
+					break;
+				case `${staking_contract}.meta:version`:
+					entity["meta"] = this.updateMetaProperty(entity.meta, "version", getVal(kvp));
+					break;
+				case `${staking_contract}.meta:type`:
+					entity["meta"] = this.updateMetaProperty(entity.meta, "type", getVal(kvp));
+					break;
+				case `${staking_contract}.meta:STAKING_TOKEN`:
+					entity["meta"] = this.updateMetaProperty(entity.meta, "STAKING_TOKEN", getVal(kvp));
+					entity.STAKING_TOKEN = getVal(kvp);
+					break;
+				case `${staking_contract}.meta:YIELD_TOKEN`:
+					entity["meta"] = this.updateMetaProperty(entity.meta, "YIELD_TOKEN", getVal(kvp));
+					entity.YIELD_TOKEN = getVal(kvp);
+					break;
+				case `${staking_contract}.EmissionRatePerHour`:
+					let value = getVal(kvp);
+					entity["EmissionRatePerHour"] = getVal(kvp);
+					if (changeVisibility(value) === "hide") entity.visible = false;
+					else if (changeVisibility(value) === "show") entity.visible = true;
+					break;
+				case `${staking_contract}.DevRewardPct`:
+					entity["DevRewardPct"] = getVal(kvp);
+					break;
+				case `${staking_contract}.StartTime`:
+					entity["StartTime"] = getVal(kvp);
+					break;
+				case `${staking_contract}.EndTime`:
+					entity["EndTime"] = getVal(kvp);
+					break;
+				case `${staking_contract}.OpenForBusiness`:
+					entity["OpenForBusiness"] = getVal(kvp);
+					break;
+				case `${staking_contract}.__developer__`:
+					entity["__developer__"] = getVal(kvp);
+					break;
+				case `${staking_contract}.EpochMaxRatioIncrease`:
+					entity["EpochMaxRatioIncrease"] = getVal(kvp);
+					break;
+				case `${staking_contract}.EmissionRatePerTauYearly`:
+					entity["EmissionRatePerTauYearly"] = getVal(kvp);
+					entity["EmissionRatePerHour"] = parseFloat(getVal(kvp)) / 365 / 24;
+					break;
+				case `${staking_contract}.EmissionRatePerSecond`:
+					entity["EmissionRatePerSecond"] = getVal(kvp);
+					break;
+				case `${staking_contract}.WithdrawnBalance`:
+					entity["WithdrawnBalance"] = getVal(kvp);
+					break;
+				case `${staking_contract}.UseTimeRamp`:
+					entity["UseTimeRamp"] = getVal(kvp);
+					break;
+				case `${staking_contract}.TimeRampValues`:
+					entity["TimeRampValues"] = getVal(kvp);
+					break;
+			}
+			if (kvp.key.includes("Epochs")) {
+				const index = parseInt(kvp.key.split(":")[1]);
+				const { staked, time, emission_rate_per_tau, amt_per_hr } = kvp.value;
+				await updateEpoch({
+					staking_contract,
+					epoch_index: index,
+					time,
+					amount_staked: staked,
+					emission_rate_per_tau,
+					amt_per_hr,
+					fn,
+					real_staked_balance: entity.StakedBalance || 0,
+					previous_staked_balance,
+					timestamp,
+					hash,
+					handleClientUpdate
+				});
+				entity.Epoch = {
+					index,
+					staked,
+					time,
+					amt_per_hr
+				};
+				log.warn("decideUpdateEpoch LEGACY called");
+				log.warn({ staking_contract, index });
+			}
+		}
+		await entity.save();
+		if (new_staking_contract === true) {
+			await this.parserProvider.updateStakingContractList();
+			this.parserProvider.addNewStakingToList(staking_contract);
+		}
+
+		const deposits = state.find((kvp) => kvp.key.includes("Deposits"));
+		const withdrawals = state.find((kvp) => kvp.key.includes("Withdrawals"));
+		if (deposits || withdrawals) {
+			if (fn !== "stakeFromContractProfits") {
+				await updateUserStakingInfo({ deposits, withdrawals, staking_contract, fn, handleClientUpdate });
+			} else {
+				const deposits_arr = state.filter((kvp) => kvp.key.includes("Deposits"));
+				const withdrawals_arr = state.filter((kvp) => kvp.key.includes("Withdrawals"));
+				// log.log({ deposits_arr });
+				// log.log(withdrawals_arr);
+				const exporter_contract = withdrawals_arr.find((kvp) => !kvp.key.includes(staking_contract)).key.split(".")[0];
+
+				const importer_deposit = deposits_arr.find((kvp) => kvp.key.includes(staking_contract));
+				const importer_withdrawal = withdrawals_arr.find((kvp) => kvp.key.includes(staking_contract));
+
+				const exporter_deposit = deposits_arr.find((kvp) => kvp.key.includes(exporter_contract));
+				const exporter_withdrawal = withdrawals_arr.find((kvp) => kvp.key.includes(exporter_contract));
+
+				const proms = [
+					updateUserStakingInfo({
+						deposits: importer_deposit,
+						withdrawals: importer_withdrawal,
+						staking_contract,
+						fn,
+						handleClientUpdate
+					}),
+					updateUserStakingInfo({
+						deposits: exporter_deposit,
+						withdrawals: exporter_withdrawal,
+						staking_contract: exporter_contract,
+						fn,
+						handleClientUpdate
+					})
+				];
+
+				await Promise.all(proms);
+			}
+		}
+		await handleClientUpdate({ action: "staking_panel_update", data: entity });
+		// const prom = new Promise((resolve) =>
+		// 	setTimeout(() => {
+		// 		resolve(true);
+		// 	}, 50)
+		// );
+		// return await prom;
 	};
+
+	public async decideUpdateEpoch(args: {
+		state: IKvp[];
+		handleClientUpdate: handleClientUpdateType;
+		staking_contract: string;
+		timestamp: number;
+		hash: string;
+		fn: string;
+	}) {
+		const { state, handleClientUpdate, fn, hash, timestamp, staking_contract } = args;
+		const epoch_kvp = state.find((kvp) => kvp.key.includes("Epochs"));
+		if (!epoch_kvp) return;
+		const { staked, time, emission_rate_per_tau, amt_per_hr } = epoch_kvp.value;
+		const index = parseInt(epoch_kvp.key.split(":")[1]);
+		log.warn("decideUpdateEpoch NEW called");
+		log.warn({ staking_contract, index });
+		await updateEpoch({
+			staking_contract,
+			epoch_index: index,
+			time,
+			amount_staked: staked,
+			emission_rate_per_tau,
+			amt_per_hr,
+			fn,
+			real_staked_balance: 0,
+			previous_staked_balance: 0,
+			timestamp,
+			hash,
+			handleClientUpdate
+		});
+	}
+}
+
+function getWithdrawalKey(kvp: IKvp) {
+	return kvp.value.split();
 }

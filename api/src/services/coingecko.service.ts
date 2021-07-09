@@ -3,6 +3,7 @@ import { saveUSDPrice, TauMarketEntity } from "../entities/tau-market.entity";
 import { SocketService } from "./socket.service";
 import { log } from "../utils/logger";
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { PairEntity } from "../entities/pair.entity";
 
 @Injectable()
 export class CoinGeckoAPIService implements OnModuleInit {
@@ -13,10 +14,12 @@ export class CoinGeckoAPIService implements OnModuleInit {
 	constructor(private readonly socketService: SocketService) {}
 
 	async onModuleInit() {
-		await this.getTauUSDPrice();
+		// await this.getTauUSDPrice();
+		await this.getTauUSDPrice_rocketswap();
 		setInterval(async () => {
-			await this.getTauUSDPrice();
-		}, 5000);
+			// await this.getTauUSDPrice();
+			await this.getTauUSDPrice_rocketswap();
+		}, this.timeInterval);
 	}
 
 	private getTauUSDPrice = async () => {
@@ -35,5 +38,20 @@ export class CoinGeckoAPIService implements OnModuleInit {
 		} catch (err) {
 			log.error(err);
 		}
+	};
+
+	private getTauUSDPrice_rocketswap = async () => {
+		let tickerData: any = await axios.get(`${this.baseUrl}/exchanges/${"binance"}/tickers?coin_ids=${"ethereum"}`);
+		const eth_usd_ticker = tickerData.data?.tickers?.find((ticker) => ticker.target === "USDT");
+		const last_price = eth_usd_ticker.last;
+		const weth_pair = await PairEntity.findOne({ where: { token_symbol: "WETH" } });
+		if (!weth_pair) return;
+		const [tau_reserve, weth_reserve] = weth_pair.reserves;
+		const tau_weth_price = Number(tau_reserve) / Number(weth_reserve);
+		const tau_price_usd = (last_price / tau_weth_price).toString();
+		return await saveUSDPrice({
+			price: tau_price_usd,
+			handleClientUpdate: this.socketService.handleClientUpdate
+		});
 	};
 }

@@ -34,7 +34,7 @@ export class ParserProvider {
 	) {}
 
 	private staking_contract_list_all: string[] = [];
-	private staking_contract_list_active: string[] = []
+	private staking_contract_list_active: string[] = [];
 	private token_contract_list: string[];
 	private action_que: { action: any; args: any }[] = [];
 	private action_que_processing: boolean;
@@ -45,6 +45,7 @@ export class ParserProvider {
 
 	async onModuleInit() {
 		this.updateTokenList();
+		// await this.updateStakingContractList();
 		this.addToActionQue(this.updateStakingContractList);
 		ParserProvider.amm_meta_entity = await AmmMetaEntity.findOne();
 
@@ -60,15 +61,22 @@ export class ParserProvider {
 				this.startBlockgrabber(true);
 			}
 		}, 5000);
-		setInterval(() => {
-			this.addToActionQue(this.updateStakingContractList);
-		}, 10000);
+		// setInterval(() => {
+		// 	this.addToActionQue(this.updateStakingContractList);
+		// }, 10000);
 	}
 
-	private updateStakingContractList = async (): Promise<void> => {
+	public updateStakingContractList = async (): Promise<void> => {
 		const staking_list_update = await getStakingMetaList();
+		log.warn({ staking_list_update });
 		this.staking_contract_list_all = staking_list_update.all;
-		this.staking_contract_list_active = staking_list_update.active
+		this.staking_contract_list_active = staking_list_update.active;
+	};
+
+	public addNewStakingToList = (contract_name: string) => {
+		this.staking_contract_list_all.push(contract_name);
+		log.warn({staking_contract_list_all: this.staking_contract_list_all})
+		this.staking_contract_list_all = this.staking_contract_list_all
 	};
 
 	public handleNewBlock = async (block: BlockDTO) => {
@@ -107,11 +115,14 @@ export class ParserProvider {
 					this.addToActionQue(this.stakingService.updateStakingContractMeta, {
 						state,
 						handleClientUpdate: this.socketService.handleClientUpdate,
-						staking_contract: submitted_contract_name
+						staking_contract: submitted_contract_name,
+						timestamp,
+						hash,
+						fn
 					});
-					this.addToActionQue(this.updateStakingContractList);
+					// this.addToActionQue(this.updateStakingContractList);
+					// this.addToActionQue(this.stakingService.decideUpdateEpoch)
 				}
-				return;
 			} else if (contract_name === config.contractName) {
 				// handle events for the AMM contract
 				this.addToActionQue(this.processAmmBlock, {
@@ -132,7 +143,7 @@ export class ParserProvider {
 						this.authService.authenticate(state);
 						break;
 				}
-			} else if (this.staking_contract_list_all.includes(contract_name)) {
+			} else if (this.getAllStakingContracts().includes(contract_name)) {
 				this.addToActionQue(this.stakingService.updateStakingContractMeta, {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate,
@@ -141,6 +152,14 @@ export class ParserProvider {
 					hash,
 					fn
 				});
+				// this.addToActionQue(this.stakingService.decideUpdateEpoch, {
+				// 	state,
+				// 	handleClientUpdate: this.socketService.handleClientUpdate,
+				// 	staking_contract: contract_name,
+				// 	timestamp,
+				// 	hash,
+				// 	fn
+				// });
 				this.addToActionQue(saveUserLp, {
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate
