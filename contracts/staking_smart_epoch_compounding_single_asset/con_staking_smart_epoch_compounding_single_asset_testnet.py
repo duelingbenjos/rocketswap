@@ -1,14 +1,13 @@
 # Imports
 
-# import currency
-import con_basic_token
-import dex
+import con_random_lst001
+
+I = importlib
 
 # Setup Tokens
 
-DEX = dex
-LIQUIDITY_TOKEN = "con_rswp"
-YIELD_TOKEN = con_basic_token
+STAKING_TOKEN = con_random_lst001
+YIELD_TOKEN = con_random_lst001
 
 # State
 
@@ -32,7 +31,8 @@ EpochMaxRatioIncrease = (
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
 decimal_converter_var = Variable()
-TrustedImporters = Variable()
+TimeRampValues = Variable()
+UseTimeRamp = Variable()
 
 # Vtoken
 balances = Hash(default_value=0)
@@ -47,24 +47,41 @@ def seed():
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(1 / 2)
     EpochMinTime.set(0)
-    TrustedImporters.set([])
 
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 1000}
 
-    meta["version"] = "0.3"
-    meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
-    meta["STAKING_TOKEN"] = "con_rswp_lp"
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
-    meta["YIELD_TOKEN"] = "con_basic_token"
+    meta["version"] = "0.0.1"
+    meta[
+        "type"
+    ] = "staking_smart_epoch_compounding_timeramp"  # staking || lp_farming || etcetera ...
+    meta["STAKING_TOKEN"] = "con_random_lst001"
+    meta["YIELD_TOKEN"] = "con_random_lst001"
 
+    EmissionRatePerHour.set(1000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(1 / 10)
 
     # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
+    StartTime.set(datetime.datetime(year=2021, month=7, day=3, hour=22))
     # The datetime at which you want staking to finish.
     EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
 
     OpenForBusiness.set(True)
+
+    UseTimeRamp.set(False)
+    TimeRampValues.set(
+        [
+            {"lower": 0, "upper": 11, "multiplier": 0.1},
+            {"lower": 11, "upper": 21, "multiplier": 0.2},
+            {"lower": 21, "upper": 31, "multiplier": 0.3},
+            {"lower": 31, "upper": 41, "multiplier": 0.4},
+            {"lower": 41, "upper": 51, "multiplier": 0.5},
+            {"lower": 51, "upper": 61, "multiplier": 0.6},
+            {"lower": 61, "upper": 71, "multiplier": 0.7},
+            {"lower": 71, "upper": 81, "multiplier": 0.8},
+            {"lower": 81, "upper": 91, "multiplier": 0.9},
+            {"lower": 91, "upper": 101, "multiplier": 1},
+        ]
+    )
 
 
 @export
@@ -73,23 +90,22 @@ def addStakingTokens(amount: float):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller")
+        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=False)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller")
+        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=False)
 
 
 def createNewDeposit(
-    amount: float, user_ctx: str
+    amount: float, user_ctx: str, from_contract: bool
 ):  # user_ctx will either be "caller" or "signer"
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You must stake something."
 
     user = ctx.caller
 
-    # Take the staking tokens from the user's wallet
-    DEX.transfer_liquidity_from(
-        contract=LIQUIDITY_TOKEN, to=ctx.this, main_account=user, amount=amount
-    )
+    # Take the staking tokens from the user's wallet if the user has called this function via addStakingTokens
+    if from_contract is False: 
+        STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     # Update the Staked amount
     staked = StakedBalance.get()
@@ -101,74 +117,78 @@ def createNewDeposit(
 
     # Create a record of the user's deposit
 
-    Deposits[user] = {
-        "starting_epoch": epoch_index,
-        "time": now,
-        "amount": amount,
-        "user_yield": 0,
-    }
+    Deposits[user] = {"starting_epoch": epoch_index, "time": now, "amount": amount}
 
     # mint vtoken equal to the deposit.
     mintVToken(amount=amount)
     return Deposits[user]
 
 
-@export
 def increaseDeposit(
-    amount: float, user_ctx: str
+    amount: float, user_ctx: str, from_contract: bool
 ):  # user_ctx will either be "caller" or "signer"
 
     user = ctx.caller if user_ctx is "caller" else ctx.signer
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
-    assert amount > 0, "You cannot stake a negative balance."
+    assert amount >= 0, "You cannot stake a negative balance."
 
     deposit = Deposits[user]
 
     assert deposit is not False, "This user has no deposit to add to."
 
     # Take the staking tokens from the user's wallet
-    DEX.transfer_liquidity_from(
-        contract=LIQUIDITY_TOKEN, to=ctx.this, main_account=user, amount=amount
-    )
+    if amount > 0 and from_contract is False:
+        STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     withdrawn_yield = Withdrawals[user]
-    user_yield = deposit["user_yield"]
-    existing_stake = deposit["amount"]
+    yield_to_harvest = 0
+    existing_stake = 0
+    user_yield_share = 0
     start_time = False
 
-    user_yield += calculateYield(deposit=deposit)
+    yield_to_harvest += calculateYield(deposit=deposit)
     start_time = deposit["time"]
     existing_stake = deposit["amount"]
 
-    total_deposit_amount = existing_stake + amount
+    yield_to_harvest -= withdrawn_yield
+
+    if yield_to_harvest > 0:
+
+        # Take % of Yield Tokens, send it to dev fund
+        dev_share = yield_to_harvest * DevRewardPct.get()
+        if dev_share > 0:
+            YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
+
+        # Send remanding Yield Tokens to user
+        user_yield_share = yield_to_harvest - dev_share
+
+    total_deposit_amount = user_yield_share + existing_stake + amount
     global_amount_staked = StakedBalance.get()
-    new_global_staked = global_amount_staked + amount
+    new_global_staked = global_amount_staked + user_yield_share + amount
     StakedBalance.set(new_global_staked)
+    WithdrawnBalance.set(WithdrawnBalance.get() + yield_to_harvest)
 
-    mintVToken(amount=amount)
+    mintVToken(amount=user_yield_share + amount)
 
+    Withdrawals[user] = 0
     Deposits[user] = {
         "starting_epoch": decideIncrementEpoch(new_staked_amount=new_global_staked),
-        "time": now,
+        "time": start_time,
         "amount": total_deposit_amount,
-        "user_yield": user_yield,
+        "step_offset": now - start_time,
     }
 
     return Deposits[user]
 
 
-@export
-def withdrawYield(amount: float):
-    assert amount > 0, "You cannot harvest a negative balance"
+def sendYieldToTarget(amount: float, target: str, user: str):
 
-    user = ctx.caller
     deposit = Deposits[user]
-
     assert deposit is not False, "You have no deposit to withdraw yield from."
 
     # Calculate how much yield is due per deposit account
     withdrawn_yield = Withdrawals[user]
-    harvestable_yield = deposit["user_yield"]
+    harvestable_yield = 0
 
     harvestable_yield += calculateYield(deposit=deposit)
 
@@ -184,16 +204,25 @@ def withdrawYield(amount: float):
 
     if dev_share > 0:
         YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
-        # DEX.transfer_liquidity(contract=LIQUIDITY_TOKEN, to=user, amount=amount)
 
     # Send remanding Yield Tokens to user
     user_share = yield_to_harvest - dev_share
-    YIELD_TOKEN.transfer(to=user, amount=user_share)
+    YIELD_TOKEN.transfer(to=target, amount=user_share)
 
     Withdrawals[user] = withdrawn_yield + yield_to_harvest
 
     new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
     WithdrawnBalance.set(new_withdrawn_amount)
+
+    return user_share
+
+
+@export
+def withdrawYield(amount: float):
+    assert amount > 0, "You cannot harvest a negative balance"
+
+    user = ctx.caller
+    return sendYieldToTarget(amount=amount, target=user, user=user)
 
 
 @export
@@ -205,13 +234,16 @@ def withdrawTokensAndYield():
 
     # Calculate how much yield is due per deposit account
     withdrawn_yield = Withdrawals[user]
-    stake_to_return = deposit["amount"]
-    yield_to_harvest = deposit["user_yield"]
+    stake_to_return = 0
+    yield_to_harvest = 0
+    user_share = 0
 
     yield_to_harvest += calculateYield(deposit=deposit)
+    stake_to_return += deposit["amount"]
 
     # Send Staking Tokens to user
-    DEX.transfer_liquidity(contract=LIQUIDITY_TOKEN, to=user, amount=stake_to_return)
+    STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
+    returnAndBurnVToken(amount=stake_to_return)
 
     # check that the user has yield left to harvest (this should never be negative, but let's check here just in case)
     yield_to_harvest -= withdrawn_yield
@@ -234,7 +266,6 @@ def withdrawTokensAndYield():
 
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
-    returnAndBurnVToken(amount=stake_to_return)
     StakedBalance.set(new_staked_amount)
     new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
     WithdrawnBalance.set(new_withdrawn_amount)
@@ -242,26 +273,39 @@ def withdrawTokensAndYield():
     # Increment Epoch
     decideIncrementEpoch(new_staked_amount=new_staked_amount)
 
+    return user_share
+
 
 # This runs over each of the items in the user's Deposit
 def calculateYield(deposit):
     starting_epoch_index = deposit.get("starting_epoch")
-    start_time = deposit.get("time")
+    deposit_start_time = deposit.get("time")
     amount = deposit.get("amount")
+    step_offset = deposit.get("step_offset")
+
+    if step_offset is not None:
+        deposit_start_time = deposit_start_time + step_offset
+    else:
+        step_offset = now - now  # now - now // 0 delta
 
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
+
     y = 0
+
     while this_epoch_index <= current_epoch_index:
         this_epoch = Epochs[this_epoch_index]
         next_epoch = Epochs[this_epoch_index + 1]
 
+
         delta = 0
 
         if starting_epoch_index == current_epoch_index:
-            delta = fitTimeToRange(now) - fitTimeToRange(start_time)
+            delta = fitTimeToRange(now) - fitTimeToRange(deposit_start_time)
         elif this_epoch_index == starting_epoch_index:
-            delta = fitTimeToRange(next_epoch["time"]) - fitTimeToRange(start_time)
+            delta = fitTimeToRange(next_epoch["time"]) - fitTimeToRange(
+                deposit_start_time
+            )
         elif this_epoch_index == current_epoch_index:
             delta = fitTimeToRange(now) - fitTimeToRange(this_epoch["time"])
         else:
@@ -280,7 +324,9 @@ def calculateYield(deposit):
         )
         decimal_converter_var.set(pct_share_of_stake)
         pct_share_of_stake = decimal_converter_var.get()
-        deposit_yield_this_epoch = global_yield_this_epoch * pct_share_of_stake
+        deposit_yield_this_epoch = (
+            global_yield_this_epoch * pct_share_of_stake
+        )
         y += deposit_yield_this_epoch
 
         this_epoch_index += 1
@@ -329,15 +375,14 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
         if new_staked_amount >= this_epoch_staked
         else this_epoch_staked
     )
-    dif = bigger - smaller    
-    if this_epoch_staked is 0 :
+    dif = bigger - smaller
+    if this_epoch_staked < 0.001 :
         return true
     return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
-    
 
 
 def incrementEpoch(new_staked_amount: float):
-    current_epoch = getCurrentEpochIndex()
+    current_epoch = CurrentEpochIndex.get()
     new_epoch_idx = current_epoch + 1
     CurrentEpochIndex.set(new_epoch_idx)
     Epochs[new_epoch_idx] = {
@@ -402,16 +447,22 @@ def setDevRewardPct(amount: float):
     DevRewardPct.set(amount)
 
 
-@export
 def setEmissionRatePerHour(amount: float):
     assertOwner()
     EmissionRatePerHour.set(amount)
 
-
 @export
 def recoverYieldToken(amount: float):
     assertOwner()
-    YIELD_TOKEN.transfer(amount=amount, to=Owner.get())
+    assert amount > 0, "Yield token amount must be greater than 0"
+    staked_balance = StakedBalance.get()
+    yield_balances = ForeignHash(
+        foreign_contract=meta["YIELD_TOKEN"], foreign_name="balances"
+    )
+    total_in_contract = yield_balances[ctx.this]
+    total_available = total_in_contract
+    amount_to_recover = amount if amount <= total_available else total_available
+    YIELD_TOKEN.transfer(amount=amount_to_recover, to=Owner.get())
 
 
 @export
@@ -449,9 +500,11 @@ def emergencyReturnStake():
 
     assert Deposits[user] is not False, "This account has no deposits to return."
 
-    stake_to_return = deposit["amount"]
+    stake_to_return = 0
 
-    DEX.transfer_liquidity(contract=LIQUIDITY_TOKEN, to=user, amount=stake_to_return)
+    stake_to_return += deposit["amount"]
+
+    STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
     returnAndBurnVToken(amount=stake_to_return)
     Deposits[user] = False
     Withdrawals[user] = 0
@@ -460,77 +513,6 @@ def emergencyReturnStake():
     new_staked_amount = StakedBalance.get() - stake_to_return
     StakedBalance.set(new_staked_amount)
     decideIncrementEpoch(new_staked_amount=new_staked_amount)
-
-
-@export
-def exportYieldToForeignContract():
-    calling_contract = ctx.caller
-    user = ctx.signer
-    withdrawn_yield = Withdrawals[user]
-
-    # verify that the contract is calling it is trusted.
-    assert (
-        calling_contract in TrustedImporters.get()
-    ), "The calling contract is not in the trusted list ! :("
-
-    transferred = sendYieldToTarget(
-        amount=999999999999,
-        target=calling_contract,
-        user=user,  # big number - transfers all yield.
-    )
-    return transferred
-
-
-def sendYieldToTarget(amount: float, target: str, user: str):
-
-    deposit = Deposits[user]
-    assert deposit is not False, "You have no deposit to withdraw yield from."
-
-    # Calculate how much yield is due per deposit account
-    withdrawn_yield = Withdrawals[user]
-    harvestable_yield = 0
-
-    harvestable_yield += calculateYield(deposit=deposit)
-
-    # Determine maximum amount of yield user can withdraw
-    harvestable_yield -= withdrawn_yield
-
-    yield_to_harvest = amount if amount < harvestable_yield else harvestable_yield
-
-    assert yield_to_harvest > 0, "There is no yield to harvest right now :("
-
-    # Take % of Yield Tokens, send it to dev fund
-    dev_share = yield_to_harvest * DevRewardPct.get()
-
-    if dev_share > 0:
-        YIELD_TOKEN.transfer(to=DevRewardWallet.get(), amount=dev_share)
-
-    # Send remanding Yield Tokens to user
-    user_share = yield_to_harvest - dev_share
-    YIELD_TOKEN.transfer(to=target, amount=user_share)
-
-    Withdrawals[user] = withdrawn_yield + yield_to_harvest
-
-    new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
-    WithdrawnBalance.set(new_withdrawn_amount)
-
-    return user_share
-
-
-@export
-def addToTrustedImporters(contract: str):
-    assertOwner()
-    trusted_importers = TrustedImporters.get()
-    trusted_importers.append(contract)
-    TrustedImporters.set(trusted_importers)
-
-
-@export
-def removeFromTrustedImporters(contract: str):
-    assertOwner()
-    trusted_importers = TrustedImporters.get()
-    trusted_importers.remove(contract)
-    TrustedImporters.set(trusted_importers)
 
 
 # VTOKEN METHODS
@@ -565,7 +547,6 @@ def transfer_from(amount: float, to: str, main_account: str):
 
 def returnAndBurnVToken(amount: float):
     user = ctx.caller
-    this = ctx.this
     assert (
         balances[user] >= amount
     ), "Your VTOKEN balance is too low to unstake, recover your VTOKENS and try again."

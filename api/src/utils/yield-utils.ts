@@ -138,7 +138,7 @@ export function calculateSmartCompoundingYield(args: {
 
 	let step_offset_ms = (step_offset ? step_offset[1] + daysToSeconds(step_offset[0]) : 0) * 1000;
 	// log.warn({ step_offset_ms });
-	let deposit_start_step_adjusted = datetimeToUnix(deposit_start_time) + step_offset_ms;
+	let deposit_start_step_adjusted = fitTime(datetimeToUnix(deposit_start_time)) + step_offset_ms;
 	amount = parseFloat(amount.__fixed__);
 
 	let this_epoch_index = starting_epoch_index;
