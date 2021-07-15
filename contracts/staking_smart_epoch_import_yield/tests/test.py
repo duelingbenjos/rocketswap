@@ -23,13 +23,13 @@ class MyTestCase(unittest.TestCase):
 
         self.basic_token = self.c.get_contract("con_basic_token")
 
-        with open("con_staking_smart_epoch_compounding.py") as f:
+        with open("con_staking_smart_epoch_import_yield.py") as f:
             code = f.read()
             self.c.submit(code, name="con_staking_smart_epoch")
 
         self.contract = self.c.get_contract("con_staking_smart_epoch")
 
-        with open("con_staking_smart_epoch_compounding_single_asset.py") as f:
+        with open("con_staking_smart_epoch_compounding_import_yield_sa.py") as f:
             code = f.read()
             self.c.submit(code, name="con_staking_smart_epoch_single_asset")
 
