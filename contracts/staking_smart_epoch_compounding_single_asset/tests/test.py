@@ -190,6 +190,7 @@ class MyTestCase(unittest.TestCase):
         dev_share = self.basic_token.balances["dev_wallet"]
         self.assertAlmostEqual(dev_share, 300)
 
+        # withdrawable balance is now 0, this will fail.
         with self.assertRaises(AssertionError):
             self.contract.withdrawYield(environment=env_2, signer="bob", amount=1500)
 
@@ -915,6 +916,163 @@ class MyTestCase(unittest.TestCase):
         contract_token_balance = self.contract.balances["con_staking_smart_epoch"]
 
         self.assertAlmostEqual(contract_token_balance, 10)
+
+    def setUpDex(self):
+        self.currency.approve(amount=10000000000, to="dex")
+        self.rswp.approve(amount=10000000000, to="dex")
+        self.dex.create_market(
+            contract="con_rswp", currency_amount=100, token_amount=100
+        )
+        env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        self.dex.add_liquidity(contract="con_rswp", currency_amount=100000)
+        # self.dex.approve_liquidity(contract="con_rswp", to="sys", amount=5000)
+        self.currency.approve(signer="bob", amount=999999999999, to="dex")
+        self.currency.approve(signer="bob", amount=999999999999, to="dex")
+        self.currency.approve(signer="sys", amount=999999999999, to="bob")
+        self.rswp.approve(signer="bob", amount=999999999999, to="dex")
+        self.rswp.transfer(to="bob", amount=1000)
+        self.dex.approve_liquidity(
+            signer="bob",
+            contract="con_rswp",
+            to="con_liquidity_mining_smart_epoch",
+            amount=10000,
+        )
+        self.contract_single_asset.addToTrustedExporters(contract="con_liquidity_mining_smart_epoch")
+        self.yield_farm.addToTrustedImporters(
+            contract="con_staking_smart_epoch_single_asset"
+        )
+        self.yield_farm.setDevRewardPct(amount=0)
+        self.basic_token.transfer(
+            to="con_staking_smart_epoch_single_asset", amount=100000
+        )
+        self.basic_token.transfer(to="con_liquidity_mining_smart_epoch", amount=100000)
+
+    def test_30_stakeFromContractProfits_liquidity_mining_one_deposit_passes(self):
+        self.setUpDex()
+
+        env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+
+        # bob stakes LP
+        self.dex.add_liquidity(signer="bob", contract="con_rswp", currency_amount=1000)
+
+        self.yield_farm.addStakingTokens(environment=env_0, signer="bob", amount=1000)
+
+        # after 1 hour, withdraws rewards to staking contract
+        self.contract_single_asset.stakeFromContractProfits(
+            environment=env_1, signer="bob", contract="con_liquidity_mining_smart_epoch"
+        )
+        # check that staking contract has received his deposit.
+        bob_deposit = self.contract_single_asset.Deposits["bob"]
+        self.assertAlmostEquals(bob_deposit["amount"], 3000)
+
+    def test_31_stakeFromContractProfits_liquidity_mining_two_deposits_passes(self):
+        self.setUpDex()
+        self.contract_single_asset.changeAmountPerHour(amount_per_hour=0)
+
+        env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
+
+        # bob stakes LP
+        self.dex.add_liquidity(signer="bob", contract="con_rswp", currency_amount=1000)
+
+        # Puts LP in Yield Farming Contract
+        bob_lp_balance = self.dex.lp_points["con_rswp", "bob"]
+
+        self.yield_farm.addStakingTokens(environment=env_0, signer="bob", amount=1000)
+
+        # after 1 hour, withdraws rewards to staking contract
+        self.contract_single_asset.stakeFromContractProfits(
+            environment=env_1, signer="bob", contract="con_liquidity_mining_smart_epoch"
+        )
+
+        self.contract_single_asset.stakeFromContractProfits(
+            environment=env_2, signer="bob", contract="con_liquidity_mining_smart_epoch"
+        )
+        # check that staking contract has received his deposit.
+        bob_deposit = self.contract_single_asset.Deposits["bob"]
+        self.assertAlmostEquals(bob_deposit["amount"], 6000)
+
+        bob_vtokens = self.contract_single_asset.balances["bob"]
+        self.assertAlmostEquals(bob_vtokens, 6000)
+
+    def test_32_stakeFromContractProfits_no_lp_fails(self):
+        self.setUpDex()
+        self.contract_single_asset.changeAmountPerHour(amount_per_hour=0)
+
+        env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
+
+        with self.assertRaises(AssertionError):
+            self.contract_single_asset.stakeFromContractProfits(
+                environment=env_1,
+                signer="bob",
+                contract="con_liquidity_mining_smart_epoch",
+            )
+
+
+    def test_33_stakeFromContractProfits_not_trusted_importer_fails(self):
+        self.setUpDex()
+        self.contract_single_asset.changeAmountPerHour(amount_per_hour=0)
+        self.yield_farm.removeFromTrustedImporters(
+            contract="con_staking_smart_epoch_single_asset"
+        )
+
+        env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
+
+        with self.assertRaises(AssertionError):
+            self.contract_single_asset.stakeFromContractProfits(
+                environment=env_1,
+                signer="bob",
+                contract="con_liquidity_mining_smart_epoch",
+            )
+
+
+    def test_34_stakeFromContractProfits_not_trusted_exporter_fails(self):
+        self.setUpDex()
+        self.contract_single_asset.changeAmountPerHour(amount_per_hour=0)
+        self.contract_single_asset.removeFromTrustedExporters(contract="con_liquidity_mining_smart_epoch")
+
+        env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
+
+        with self.assertRaises(AssertionError):
+            self.contract_single_asset.stakeFromContractProfits(
+                environment=env_1,
+                signer="bob",
+                contract="con_liquidity_mining_smart_epoch",
+            )
+
+    def test_35_stakeFromContractProfits_lp_contract_no_yield_token_balance_fails(self):
+        env_0 = {"now": Datetime(year=2021, month=1, day=1, hour=0)}
+        env_1 = {"now": Datetime(year=2021, month=1, day=1, hour=1)}
+        env_2 = {"now": Datetime(year=2021, month=1, day=1, hour=2)}
+        
+        self.setUpDex()
+
+        # self.basic_token.approve(amount=999999999999, to="burn")
+        self.basic_token.transfer(signer="con_liquidity_mining_smart_epoch", to="burn", amount=100000)
+
+        self.dex.approve_liquidity(
+            contract="con_rswp",
+            to="con_liquidity_mining_smart_epoch",
+            amount=1000,
+        )
+        self.yield_farm.addStakingTokens(
+            environment=env_0,
+            amount=1000)
+
+        with self.assertRaises(AssertionError):
+            self.contract_single_asset.stakeFromContractProfits(
+                environment=env_1,
+                contract="con_liquidity_mining_smart_epoch",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

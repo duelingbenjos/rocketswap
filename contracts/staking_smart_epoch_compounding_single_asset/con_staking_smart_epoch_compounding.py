@@ -33,7 +33,7 @@ EpochMaxRatioIncrease = (
 meta = Hash(default_value=False)
 decimal_converter_var = Variable()
 UseTimeRamp = Variable()
-TrustedImporters = Variable()
+TrustedExporters = Variable()
 
 # Vtoken
 balances = Hash(default_value=0)
@@ -362,7 +362,7 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
         else this_epoch_staked
     )
     dif = bigger - smaller
-    if this_epoch_staked is 0 :
+    if this_epoch_staked < 0.001 :
         return true
     return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
 
@@ -543,3 +543,45 @@ def returnAndBurnVToken(amount: float):
 def mintVToken(amount: float):
     user = ctx.signer
     balances[user] += amount
+
+
+# This is called FROM the contract to which the yields will be staked.
+# This contract name will need to be added to the "TrustedImporters" list on the foreign contract.
+@export
+def stakeFromContractProfits(contract: str):
+    # verify that the contract is calling it is trusted.
+    assert (
+        contract in TrustedExporters.get()
+    ), "The contract is not in the trusted exporters list."
+    # import staking contract
+    yield_contract = I.import_module(contract)
+    # call withdraw function to this contract, take return value
+    amount = yield_contract.exportYieldToForeignContract()
+    # stake this value
+    user = ctx.signer
+
+    deposit = Deposits[user]
+
+    if deposit is False:
+        return createNewDeposit(amount=amount, from_contract=True)
+    else:
+        return increaseDeposit(amount=amount, from_contract=True)
+
+
+@export
+def addToTrustedExporters(contract: str):
+    assertOwner()
+    trusted_exporters = TrustedExporters.get()
+    if contract in trusted_exporters:
+        return
+    trusted_exporters.append(contract)
+    TrustedExporters.set(trusted_exporters)
+
+
+@export
+def removeFromTrustedExporters(contract: str):
+    assertOwner()
+    trusted_exporters = TrustedExporters.get()
+    trusted_exporters.remove(contract)
+    TrustedExporters.set(trusted_exporters)
+

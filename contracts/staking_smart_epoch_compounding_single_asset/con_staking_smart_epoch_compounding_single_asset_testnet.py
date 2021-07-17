@@ -1,13 +1,13 @@
 # Imports
 
-import con_random_lst001
+import con_rswp_lst001
 
 I = importlib
 
 # Setup Tokens
 
-STAKING_TOKEN = con_random_lst001
-YIELD_TOKEN = con_random_lst001
+STAKING_TOKEN = con_rswp_lst001
+YIELD_TOKEN = con_rswp_lst001
 
 # State
 
@@ -33,6 +33,7 @@ meta = Hash(default_value=False)
 decimal_converter_var = Variable()
 TimeRampValues = Variable()
 UseTimeRamp = Variable()
+TrustedExporters = Variable()
 
 # Vtoken
 balances = Hash(default_value=0)
@@ -54,19 +55,19 @@ def seed():
     meta[
         "type"
     ] = "staking_smart_epoch_compounding_timeramp"  # staking || lp_farming || etcetera ...
-    meta["STAKING_TOKEN"] = "con_random_lst001"
-    meta["YIELD_TOKEN"] = "con_random_lst001"
+    meta["STAKING_TOKEN"] = "con_rswp_lst001"
+    meta["YIELD_TOKEN"] = "con_rswp_lst001"
 
     EmissionRatePerHour.set(1000)  # 1200000 RSWP per year = 10% of supply
     DevRewardPct.set(1 / 10)
 
     # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2021, month=7, day=3, hour=22))
+    StartTime.set(datetime.datetime(year=2021, month=7, day=17, hour=22))
     # The datetime at which you want staking to finish.
     EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
 
     OpenForBusiness.set(True)
-
+    TrustedExporters.set([])
     UseTimeRamp.set(False)
     TimeRampValues.set(
         [
@@ -90,14 +91,14 @@ def addStakingTokens(amount: float):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=False)
+        return createNewDeposit(amount=amount, from_contract=False)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=False)
+        return increaseDeposit(amount=amount, from_contract=False)
 
 
 def createNewDeposit(
-    amount: float, user_ctx: str, from_contract: bool
-):  # user_ctx will either be "caller" or "signer"
+    amount: float, from_contract: bool
+):
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You must stake something."
 
@@ -125,10 +126,10 @@ def createNewDeposit(
 
 
 def increaseDeposit(
-    amount: float, user_ctx: str, from_contract: bool
-):  # user_ctx will either be "caller" or "signer"
+    amount: float, from_contract: bool
+):
 
-    user = ctx.caller if user_ctx is "caller" else ctx.signer
+    user = ctx.caller
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount >= 0, "You cannot stake a negative balance."
 
@@ -556,3 +557,45 @@ def returnAndBurnVToken(amount: float):
 def mintVToken(amount: float):
     user = ctx.signer
     balances[user] += amount
+
+
+# This is called FROM the contract to which the yields will be staked.
+# This contract name will need to be added to the "TrustedImporters" list on the foreign contract.
+@export
+def stakeFromContractProfits(contract: str):
+    # verify that the contract is calling it is trusted.
+    assert (
+        contract in TrustedExporters.get()
+    ), "The contract is not in the trusted exporters list."
+    # import staking contract
+    yield_contract = I.import_module(contract)
+    # call withdraw function to this contract, take return value
+    amount = yield_contract.exportYieldToForeignContract()
+    # stake this value
+    user = ctx.signer
+
+    deposit = Deposits[user]
+
+    if deposit is False:
+        return createNewDeposit(amount=amount, from_contract=True)
+    else:
+        return increaseDeposit(amount=amount, from_contract=True)
+
+
+@export
+def addToTrustedExporters(contract: str):
+    assertOwner()
+    trusted_exporters = TrustedExporters.get()
+    if contract in trusted_exporters:
+        return
+    trusted_exporters.append(contract)
+    TrustedExporters.set(trusted_exporters)
+
+
+@export
+def removeFromTrustedExporters(contract: str):
+    assertOwner()
+    trusted_exporters = TrustedExporters.get()
+    trusted_exporters.remove(contract)
+    TrustedExporters.set(trusted_exporters)
+
