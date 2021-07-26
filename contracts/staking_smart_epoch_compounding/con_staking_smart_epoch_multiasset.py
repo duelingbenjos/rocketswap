@@ -85,6 +85,10 @@ def addStakingTokens(amount: float):
 # This contract name will need to be added to the "TrustedImporters" list on the foreign contract.
 @export
 def stakeFromContractProfits(contract: str):
+    # verify that the contract is calling it is trusted.
+    assert (
+        contract in TrustedExporters.get()
+    ), "The contract is not in the trusted exporters list."
     # import staking contract
     yield_contract = I.import_module(contract)
     # call withdraw function to this contract, take return value
