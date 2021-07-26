@@ -31,8 +31,6 @@ EpochMaxRatioIncrease = (
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
 decimal_converter_var = Variable()
-TimeRampValues = Variable()
-UseTimeRamp = Variable()
 TrustedExporters = Variable()
 
 # Vtoken
@@ -48,29 +46,14 @@ def seed():
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(1 / 2)
     EpochMinTime.set(0)
-    UseTimeRamp.set(False)
     TrustedExporters.set([])
-    TimeRampValues.set(
-        [
-            {"lower": 0, "upper": 11, "multiplier": 0.1},
-            {"lower": 11, "upper": 21, "multiplier": 0.2},
-            {"lower": 21, "upper": 31, "multiplier": 0.3},
-            {"lower": 31, "upper": 41, "multiplier": 0.4},
-            {"lower": 41, "upper": 51, "multiplier": 0.5},
-            {"lower": 51, "upper": 61, "multiplier": 0.6},
-            {"lower": 61, "upper": 71, "multiplier": 0.7},
-            {"lower": 71, "upper": 81, "multiplier": 0.8},
-            {"lower": 81, "upper": 91, "multiplier": 0.9},
-            {"lower": 91, "upper": 101, "multiplier": 1},
-        ]
-    )
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
-    meta["version"] = "0.0.1"
+    meta["version"] = "0.0.2"
     meta[
         "type"
-    ] = "staking_smart_epoch_compounding_timeramp"  # staking || lp_farming || etcetera ...
+    ] = "staking_smart_epoch"  # sta # staking || lp_farming || etcetera ...
     meta["STAKING_TOKEN"] = "con_basic_token"
     meta["YIELD_TOKEN"] = "con_basic_token"
 
@@ -91,9 +74,9 @@ def addStakingTokens(amount: float):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=False)
+        return createNewDeposit(amount=amount, from_contract=False)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=False)
+        return increaseDeposit(amount=amount, from_contract=False)
 
 
 # This is called FROM the contract to which the yields will be staked.
@@ -114,14 +97,14 @@ def stakeFromContractProfits(contract: str):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=True)
+        return createNewDeposit(amount=amount, from_contract=True)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=True)
+        return increaseDeposit(amount=amount, from_contract=True)
         
 
 def createNewDeposit(
-    amount: float, user_ctx: str, from_contract: bool
-):  # user_ctx will either be "caller" or "signer"
+    amount: float, from_contract: bool
+):
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You must stake something."
 
@@ -141,16 +124,19 @@ def createNewDeposit(
 
     # Create a record of the user's deposit
 
-    Deposits[user] = {"starting_epoch": epoch_index, "time": fitTimeToRange(now), "amount": amount}
-
+    Deposits[user] = {
+        "starting_epoch": epoch_index,
+        "time": now,
+        "amount": amount
+    }
     # mint vtoken equal to the deposit.
     mintVToken(amount=amount)
     return Deposits[user]
 
 
 def increaseDeposit(
-    amount: float, user_ctx: str, from_contract: bool
-):  # user_ctx will either be "caller" or "signer"
+    amount: float, from_contract: bool
+):
 
     user = ctx.caller
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
@@ -165,14 +151,14 @@ def increaseDeposit(
         STAKING_TOKEN.transfer_from(amount=amount, to=ctx.this, main_account=user)
 
     withdrawn_yield = Withdrawals[user]
+    existing_stake = deposit["amount"]    
+    start_time = False
+
     yield_to_harvest = 0
-    existing_stake = 0
-    user_yield_share = 0
-
     yield_to_harvest += calculateYield(deposit=deposit)
-    deposit_start_time = deposit["time"]
+    start_time = deposit["time"]
     existing_stake = deposit["amount"]
-
+    user_yield_share = 0
     yield_to_harvest -= withdrawn_yield
 
     if yield_to_harvest > 0:
@@ -196,9 +182,8 @@ def increaseDeposit(
     Withdrawals[user] = 0
     Deposits[user] = {
         "starting_epoch": decideIncrementEpoch(new_staked_amount=new_global_staked),
-        "time": fitTimeToRange(now),
+        "time": now,
         "amount": total_deposit_amount,
-        "step_offset": fitTimeToRange(now) - fitTimeToRange(deposit_start_time),
     }
 
     return Deposits[user]
@@ -303,29 +288,16 @@ def withdrawTokensAndYield():
 def calculateYield(deposit):
     starting_epoch_index = deposit.get("starting_epoch")
     deposit_start_time = deposit.get("time")
-    amount = deposit.get("amount")
-    step_offset = deposit.get("step_offset")
-
-    if step_offset is not None:
-        deposit_start_time = deposit_start_time + step_offset
-    else:
-        step_offset = now - now  # now - now // 0 delta
+    amount = deposit.get("amount")# now - now // 0 delta
 
     current_epoch_index = getCurrentEpochIndex()
     this_epoch_index = starting_epoch_index
 
     y = 0
-    time_step_multiplier = 1
 
     while this_epoch_index <= current_epoch_index:
         this_epoch = Epochs[this_epoch_index]
         next_epoch = Epochs[this_epoch_index + 1]
-
-        if UseTimeRamp.get():
-            time_ramp_delta = (
-                fitTimeToRange(now) - fitTimeToRange(this_epoch["time"]) + step_offset
-            )
-            time_step_multiplier = findTimeRampStep(time_ramp_delta.days)
 
         delta = 0
 
@@ -354,7 +326,7 @@ def calculateYield(deposit):
         decimal_converter_var.set(pct_share_of_stake)
         pct_share_of_stake = decimal_converter_var.get()
         deposit_yield_this_epoch = (
-            global_yield_this_epoch * pct_share_of_stake * time_step_multiplier
+            global_yield_this_epoch * pct_share_of_stake
         )
         y += deposit_yield_this_epoch
 
