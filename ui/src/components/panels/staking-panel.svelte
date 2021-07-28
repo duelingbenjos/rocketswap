@@ -44,7 +44,7 @@
 
     let showInfo = false;
 
-    $: log = console.log({stakingInfo})
+    //$: log = console.log({stakingInfo})
     $: stakingCalcs = stakingCalculator(stakingInfo);
 
     $: userYield = $userYieldInfo[stakingInfo?.contract_name];
@@ -286,7 +286,6 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
-                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 
@@ -361,7 +360,6 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
-                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 

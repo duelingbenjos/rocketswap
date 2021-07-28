@@ -3,9 +3,11 @@
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
 
     // Misc
-    import { earnFilters, farmFilter, farmFilterUpDown } from '../../store.js'
-    import { setEarnFilters, setFarmFilter, setFarmFilterUpDown } from '../../utils.js'
+    import { earnFilters, farmFilter, farmFilterUpDown, farmStakedByMe, farmOpenForBusiness } from '../../store.js'
+    import { setEarnFilters, setFarmFilter, setFarmFilterUpDown, setFarmStakedByMe, setFarmOpenForBusiness } from '../../utils.js'
 
+    $: stakedByMeChecked = $farmStakedByMe
+    $: openForBusinessChecked = $farmOpenForBusiness
     $: sortFilter = $farmFilter
 
     let sortOptions = [
@@ -28,10 +30,6 @@
         {
             name: "End Date",
             value: "end_date"
-        },
-        {
-            name: "Value of total staked token",
-            value: "total_value_of_staked"
         }
     ]
 
@@ -47,6 +45,16 @@
         $farmFilterUpDown === "up" ? setFarmFilterUpDown("down") : setFarmFilterUpDown("up")
     }
 
+        
+    const handleStakedByMeChange = () => {
+        setFarmStakedByMe(stakedByMeChecked)
+    }
+
+            
+    const handleOpenForBusinessChange = () => {
+        setFarmOpenForBusiness(openForBusinessChecked)
+    }
+
 </script>
 
 <style>
@@ -56,12 +64,16 @@
         padding: 6px 10px;
         font-weight: 200;
         margin: 0;
+        height: 40px;
+        border: 1px solid var(--text-color-highlight);
     }
     input{
         font-size: 16px;
         padding: 6px 10px;
         font-weight: 200;
         margin: 0;
+        height: 40px;
+        border: 1px solid var(--text-color-highlight);
     }
     .search-container{
         width: 100%;
@@ -77,7 +89,18 @@
     input.primaryInput{
         height: 32px;
     }
-
+    .chk-container{
+        position: relative;
+        top: 9px;
+        margin-left: 10px;
+        color: var(--text-color-highlight);
+    }
+    .chk-container > span{
+        margin-right: 10px;
+    }
+    label.show-staked-by-me{
+        color: var(--text-color-highlight);
+    }
     @media screen and (min-width: 800px) {
         .layout-buttons{
             display: block;
@@ -99,12 +122,25 @@
                 <button class="flex" on:click={handleFarmFilterUpDownClick}>
                     <DirectionalChevron 
                         width="14px"
-                        styles={`position: relative; ${$farmFilterUpDown === "up" ? "top: -5px;" : "top: 4px;"}`}
+                        styles={`position: relative; ${$farmFilterUpDown === "up" ? "top: -4px;" : "top: 5px;"}`}
                         margin={"0 0 0 8px"}
                         direction={$farmFilterUpDown}
                         color={$farmFilterUpDown === "price_change" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
                     />
                 </button>
+
+                <label class="flex-row chk-container" class:show-staked-by-me={$farmStakedByMe} id="chk-stakedByMe">
+                    <input  type="checkbox" bind:checked={stakedByMeChecked} on:change={handleStakedByMeChange}>
+                    <span  class="chk-checkmark chk-small"></span>
+                    Staked by me
+                </label>
+
+                <label class="flex-row chk-container" class:show-staked-by-me={$farmOpenForBusiness} id="chk-openForBusiness">
+                    <input  type="checkbox" bind:checked={openForBusinessChecked} on:change={handleOpenForBusinessChange}>
+                    <span  class="chk-checkmark chk-small"></span>
+                    Open For Business
+                </label>
+
             </div>
         </div>
     </div>

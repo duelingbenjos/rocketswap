@@ -4,7 +4,6 @@
     // Components
     import HeadMeta from '../components/head-meta.svelte'
     import StakingPanel from '../components/panels/staking-panel.svelte'
-    import HorizontalStakingPanel from '../components/panels/horizontal-staking-panel.svelte'
     import PageHeader from '../components/misc/page-header.svelte'
     import EarnFilters from '../components/misc/earn-filters.svelte'
     import OnBoarding from '../components/onboarding/onboarding-messages.svelte'
@@ -13,18 +12,17 @@
     import { WsService } from '../services/ws.service'
     const ws = WsService.getInstance()
     import { ApiService } from '../services/api.service'
-	const api = ApiService.getInstance()
+    const api = ApiService.getInstance()
 
     //Misc
-    import { stakingInfoProcessed, earnFilters, farmFilter, farmFilterUpDown } from '../store'
-    import { config } from '../config'
-import { toBigNumber } from '../utils';
+    import { stakingInfoProcessed, earnFilters, farmFilter, farmFilterUpDown, farmStakedByMe, userYieldInfo, farmOpenForBusiness } from '../store'
+    import { toBigNumber } from '../utils';
 
     let innerWidth;
 
     $: pageTitle = 'Rocket Farm'
     $: pageDescription = "The FASTEST way to earn Crypto!"
-    $: filteredList = filterBySelection($stakingInfoProcessed, $farmFilter, $farmFilterUpDown);
+    $: filteredList = filterBySelection($stakingInfoProcessed, $farmFilter, $farmFilterUpDown, $farmStakedByMe, $userYieldInfo, $farmOpenForBusiness);
     $: finalFilteredList = filterBySearch(filteredList, $earnFilters?.search);
 
     onMount(() => {
@@ -60,21 +58,23 @@ import { toBigNumber } from '../utils';
         })
         if (filterType === "end_time") list.sort((a, b) => {
             return new Date(a.EndTime.__Time__) > new Date(b.EndTime.__Time__) ? up : down
-        })/*
-        if (filterType === "total_value_of_staked") list.sort((a, b) => {
-            if (!a.StakedBalance) a.StakedBalance = toBigNumber(0)
-            if (!b.StakedBalance) b.StakedBalance = toBigNumber(0)
-            else return a.StakedBalance.isGreaterThan(b.StakedBalance) ? up : down
-        })*/
-        return list
+        })
+
+        if ($farmStakedByMe && $userYieldInfo) {
+            list = list.filter(farm => {
+                let yeildInfo = $userYieldInfo[farm.contract_name]
+                if (!yeildInfo) return false
+                if (!yeildInfo.total_staked) return false
+                return yeildInfo.total_staked.isGreaterThan(0)
+            })
+        }
+        return list.filter(farm => farm.OpenForBusiness === $farmOpenForBusiness)
     }
 
     const filterBySearch = (list, search) => {
-        console.log({list})
         if (!search) return list
         let filteredList = []
         list.forEach(item => {
-            let pass = false
             let contractName_lower = item.contract_name.toLowerCase()
             let stakingTokenSymbol_lower = item.staking_token ? item.staking_token.token_symbol.toLowerCase() : ""
             let stakingTokenName_lower = item.staking_token ? item.staking_token.token_name.toLowerCase() : ""
@@ -161,6 +161,9 @@ import { toBigNumber } from '../utils';
             <StakingPanel stakingInfo={stakeInfo} horizontal={$earnFilters?.rowView && innerWidth > 800}/>
         {/each}
     </div>
+    {#if finalFilteredList.length === 0 && $farmStakedByMe}
+        <p class="text-xlarge text-color-highlight text-center">You have no tokens staked</p>
+    {/if}
 </div>
 
 <svelte:window bind:innerWidth />
