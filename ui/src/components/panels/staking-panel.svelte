@@ -44,7 +44,7 @@
 
     let showInfo = false;
 
-    $: log = console.log({stakingInfo})
+    //$: log = console.log({stakingInfo})
     $: stakingCalcs = stakingCalculator(stakingInfo);
 
     $: userYield = $userYieldInfo[stakingInfo?.contract_name];
@@ -88,9 +88,7 @@
     }
 
     const handleInput = (e) => {
-        
         stakingAmount = toBigNumberPrecision(e.detail, 8)
-        console.log({e, stakingAmount: stakingAmount.toString(), validStakingAmount})
     }
 
     const openStakingConfirm = () => toggleStakingConfirm(true)
@@ -131,7 +129,6 @@
         }else{
             showCompoundStakeConfirm = force;
         }
-        console.log({showCompoundStakeConfirm})
     }
 
     const toggleInfo = () => showInfo = !showInfo;
@@ -289,7 +286,6 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
-                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 
@@ -364,7 +360,6 @@
                 <InputSpecific 
                     on:input={handleInput} 
                     tokenInfo={stakingToken} 
-                    {stakingContractType}
                     {isLpToken}
                     {getStampCost} 
                     small={true} 

@@ -115,6 +115,11 @@ export const rswpPriceUSD = derived(([rswpPrice, tauUSDPrice]), ([$rswpPrice, $t
 // AMM
 export const accountName = writable(null);  // ROCKET-ID
 export const earnFilters = writable({});
+export const farmFilter = writable(null);
+export const farmStakedByMe = writable(false);
+export const farmOpenForBusiness = writable(true);
+
+export const farmFilterUpDown = writable("down");
 export const slippageTolerance = writable(toBigNumber("1.0"));
 
 export const ammFuelTank = writable({})

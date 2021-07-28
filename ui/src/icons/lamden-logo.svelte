@@ -1,5 +1,6 @@
 <script>
     export let width = "24px";
+    export let height = "24px";
     export let margin = "0 5px";
     export let reverseColors = false;
 

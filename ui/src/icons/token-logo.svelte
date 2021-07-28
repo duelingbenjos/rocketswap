@@ -6,7 +6,7 @@
     export let margin = '0 10px';
     export let inline = false;
     export let lpBottom = "-6px";
-    export let lpFontSize;
+    export let lpFontSize = "var(--text-size-small)";
     export let stakingContractType = ""
 
     let height = width;

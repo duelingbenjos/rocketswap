@@ -12,6 +12,10 @@ import {
 	slippageTolerance,
 	rswpPrice, 
 	earnFilters,
+	farmFilter,
+	farmFilterUpDown,
+	farmStakedByMe,
+	farmOpenForBusiness,
 	payInRswp, 
 	ammFuelTank,
 	ammFuelTank_discount,
@@ -108,6 +112,10 @@ export const initializeStateFromLocalStorage = () => {
 	getCurrencyType()
 	getHomePageTableFilter()
 	getOnboardingSettings()
+	getFarmFilter()
+	getFarmFilterUpDown()
+	getFarmStakedByMe()
+	getFarmOpenForBusiness()
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -135,6 +143,42 @@ export const getEarnFilters = () => {
 export const setEarnFilters = (value) => {
 	setLSValue("earn_filters", value)
 	earnFilters.set(value)
+}
+export const getFarmFilter = () => {
+	let value = localStorage.getItem("farm_filter")
+	if (value === null) return
+	else farmFilter.set(JSON.parse(value))
+}
+export const setFarmFilter = (value) => {
+	setLSValue("farm_filter", value)
+	farmFilter.set(value)
+}
+export const getFarmFilterUpDown = () => {
+	let value = localStorage.getItem("farm_filter_up_down")
+	if (value === null) return
+	else farmFilterUpDown.set(JSON.parse(value))
+}
+export const setFarmFilterUpDown = (value) => {
+	setLSValue("farm_filter_up_down", value)
+	farmFilterUpDown.set(value)
+}
+export const getFarmStakedByMe = () => {
+	let value = localStorage.getItem("farm_filter_staked_by_me")
+	if (value === null) return
+	else farmStakedByMe.set(JSON.parse(value))
+}
+export const setFarmStakedByMe = (value) => {
+	setLSValue("farm_filter_staked_by_me", value)
+	farmStakedByMe.set(value)
+}
+export const getFarmOpenForBusiness = () => {
+	let value = localStorage.getItem("farm_filter_open_for_bus")
+	if (value === null) return
+	else farmOpenForBusiness.set(JSON.parse(value))
+}
+export const setFarmOpenForBusiness = (value) => {
+	setLSValue("farm_filter_open_for_bus", value)
+	farmOpenForBusiness.set(value)
 }
 export const getTauUsdPrice = () => {
 	let value = localStorage.getItem("tau_usd_price")
