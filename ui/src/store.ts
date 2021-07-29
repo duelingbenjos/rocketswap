@@ -117,7 +117,7 @@ export const accountName = writable(null);  // ROCKET-ID
 export const earnFilters = writable({});
 export const farmFilter = writable(null);
 export const farmStakedByMe = writable(false);
-export const farmOpenForBusiness = writable(true);
+export const farmShowClosed = writable(false);
 
 export const farmFilterUpDown = writable("down");
 export const slippageTolerance = writable(toBigNumber("1.0"));

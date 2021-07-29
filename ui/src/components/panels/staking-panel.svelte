@@ -207,7 +207,7 @@
     {#if !horizontal}
         <div class="panel-container text-small">
             <div class="info-icon" on:click={toggleInfo}>
-                <InfoIcon />
+            <InfoIcon color={"var(--text-color-highlight)"}/>
             </div>
             <StakingPanelHeader {yieldToken} {stakingToken} {stakingContractType}/>
 

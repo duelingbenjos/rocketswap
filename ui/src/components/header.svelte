@@ -146,7 +146,9 @@
 		.header{
 			padding: 40px 20px;
 		}
-
+		.mobile-link{
+			font-size: 1.3em;
+		}
     }
 	/* When page width is greater than 475px (tablets) */
 	 @media screen and (min-width: 940px) {
