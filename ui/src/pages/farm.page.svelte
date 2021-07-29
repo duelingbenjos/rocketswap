@@ -15,14 +15,14 @@
     const api = ApiService.getInstance()
 
     //Misc
-    import { stakingInfoProcessed, earnFilters, farmFilter, farmFilterUpDown, farmStakedByMe, userYieldInfo, farmOpenForBusiness } from '../store'
+    import { stakingInfoProcessed, earnFilters, farmFilter, farmFilterUpDown, farmStakedByMe, userYieldInfo, farmShowClosed } from '../store'
     import { toBigNumber } from '../utils';
 
     let innerWidth;
 
     $: pageTitle = 'Rocket Farm'
     $: pageDescription = "The FASTEST way to earn Crypto!"
-    $: filteredList = filterBySelection($stakingInfoProcessed, $farmFilter, $farmFilterUpDown, $farmStakedByMe, $userYieldInfo, $farmOpenForBusiness);
+    $: filteredList = filterBySelection($stakingInfoProcessed, $farmFilter, $farmFilterUpDown, $farmStakedByMe, $userYieldInfo, $farmShowClosed);
     $: finalFilteredList = filterBySearch(filteredList, $earnFilters?.search);
 
     onMount(() => {
@@ -68,7 +68,11 @@
                 return yeildInfo.total_staked.isGreaterThan(0)
             })
         }
-        return list.filter(farm => farm.OpenForBusiness === $farmOpenForBusiness)
+
+        if (!$farmShowClosed){
+            list = list.filter(farm => farm.OpenForBusiness === true)
+        }
+        return list
     }
 
     const filterBySearch = (list, search) => {
@@ -102,9 +106,9 @@
 <style>
     .page{
         width: 100%;
-        max-width: 1020px;
+        max-width: 2500px;
         margin-bottom: 10rem;
-        padding: 0 20px 20px;
+        padding: 0 20px 20px 20px;
         margin: 0 auto;
         box-sizing: border-box;
     }
@@ -122,13 +126,17 @@
         margin-top: 1rem;
         margin-bottom: 4rem;
         box-sizing: border-box;
+        align-items: center;
+    }
+
+    p{
+        margin: 0 auto;
     }
 
     @media screen and (min-width: 430px) {
         .page{
             padding: 0 20px 20px;
         }
-
     }
 
     @media screen and (min-width: 650px) {
@@ -146,6 +154,26 @@
         }
     }
 
+    @media screen and (min-width: 1020px) {
+		.page {
+			max-width: 1020px;
+		}
+	}
+	@media screen and (min-width: 1330px) {
+		.page {
+			max-width: 1330px;
+		}
+	}
+	@media screen and (min-width: 1960px) {
+		.page {
+			max-width: 1960px;
+		}
+	}
+
+
+
+
+
 </style>
 
 
@@ -153,17 +181,17 @@
 
 <div class="page">
     <PageHeader title={pageTitle} />
-    <EarnFilters />
     <OnBoarding type="rocketfarm_info" />
+    <EarnFilters />
     <div class="flex earn-content panels" 
         class:horizontal={$earnFilters?.rowView}>
         {#each finalFilteredList as stakeInfo (stakeInfo.contract_name)}
             <StakingPanel stakingInfo={stakeInfo} horizontal={$earnFilters?.rowView && innerWidth > 800}/>
         {/each}
+        {#if finalFilteredList.length === 0 && $farmStakedByMe}
+            <p class="text-xlarge text-color-highlight">You have no tokens staked</p>
+        {/if}
     </div>
-    {#if finalFilteredList.length === 0 && $farmStakedByMe}
-        <p class="text-xlarge text-color-highlight text-center">You have no tokens staked</p>
-    {/if}
 </div>
 
 <svelte:window bind:innerWidth />

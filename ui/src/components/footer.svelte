@@ -211,12 +211,16 @@
 		}
     }
 
-	/* When page width is greater than 430px (tablets) */
     @media screen and (min-width: 2040px) {
         .footer{
 			left: 50%;
     		transform: translate(-50%, 0px);
 			max-width: 2040px;
+		}
+	}
+	@media screen and (min-width: 3040px) {
+        .footer{
+			max-width: 3040px;
 		}
     }
 </style>

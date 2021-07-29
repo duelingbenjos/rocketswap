@@ -91,12 +91,12 @@
     }
     th{
         text-align: left;
-        padding: 0 8px;
+        padding: 0;
         font-weight: 100;
     }
     td{
         max-width: 100px;
-        padding: 12px 8px 0;
+        padding: 8px 0px;
         vertical-align: top;
     }
     div.ellipsis{
@@ -129,6 +129,13 @@
     @media screen and (min-width: 430px) {
         .panel-container{
             background: var(--home-panel-background-gradient);
+        }
+        td{
+            padding: 12px 8px 0;
+        }
+
+        th{
+            padding: 0 8px;
         }
     }
 
@@ -187,7 +194,7 @@
     {#if results.length > 0}
         <table>
             <tr class="headings">
-                <th>#</th>
+                <th class="mobile-hide">#</th>
                 <th>                    
                     <button class="flex-row" on:click={() => handleFilterClick('name')}>
                         Name
@@ -279,7 +286,7 @@
 
             {#each results as tokenInfo, index}
                 <tr>
-                    <td>{index + 1}</td>
+                    <td class="mobile-hide">{index + 1}</td>
                     <td class="flex-col">
                         <div class="flex-row" >
                             <TokenLogo tokenMeta={tokenInfo.token} margin={"0 10px 0 0"}/>

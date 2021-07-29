@@ -3,11 +3,11 @@
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
 
     // Misc
-    import { earnFilters, farmFilter, farmFilterUpDown, farmStakedByMe, farmOpenForBusiness } from '../../store.js'
-    import { setEarnFilters, setFarmFilter, setFarmFilterUpDown, setFarmStakedByMe, setFarmOpenForBusiness } from '../../utils.js'
+    import { earnFilters, farmFilter, farmFilterUpDown, farmStakedByMe, farmShowClosed } from '../../store.js'
+    import { setEarnFilters, setFarmFilter, setFarmFilterUpDown, setFarmStakedByMe, setFarmShowClosed } from '../../utils.js'
 
     $: stakedByMeChecked = $farmStakedByMe
-    $: openForBusinessChecked = $farmOpenForBusiness
+    $: showClosedChecked = $farmShowClosed
     $: sortFilter = $farmFilter
 
     let sortOptions = [
@@ -20,7 +20,7 @@
             value: "alpha_staking_token"
         },
         {
-            name: "Apy",
+            name: "APY %",
             value: "apy"
         },
         {
@@ -51,106 +51,140 @@
     }
 
             
-    const handleOpenForBusinessChange = () => {
-        setFarmOpenForBusiness(openForBusinessChecked)
+    const handleShowClosed = () => {
+        setFarmShowClosed(showClosedChecked)
     }
 
 </script>
 
 <style>
+    .container{
+        display: flex;
+        flex-direction: column-reverse;
+        margin: 10px;
+        margin-bottom: 2rem;
+    }
     select{
-        max-width: fit-content;
+        width: 100%;
+        max-width: 280px;
         font-size: 16px;
-        padding: 6px 10px;
+        padding: 0 10px;
         font-weight: 200;
         margin: 0;
-        height: 40px;
+        height: 36px;
         border: 1px solid var(--text-color-highlight);
     }
     input{
-        font-size: 16px;
-        padding: 6px 10px;
-        font-weight: 200;
         margin: 0;
-        height: 40px;
-        border: 1px solid var(--text-color-highlight);
     }
+
     .search-container{
-        width: 100%;
-        max-width: 300px;
-        margin-left: 10px;
+        flex-grow: 1;
     }
     button{
         margin: 0 4px;
     }
-    .layout-buttons{
-        display: none;
-    }
+
     input.primaryInput{
-        height: 32px;
+        font-size: 16px;
+        width: 100%;
+        height: 34px;
+        padding: 6px 10px;
+        font-weight: 200;
+        margin: 0;
+        border: 1px solid var(--text-color-highlight);
+        
+    }
+
+    .checkboxes{
+        margin: 1rem 0 0.5rem;
+        min-width: fit-content;
     }
     .chk-container{
-        position: relative;
-        top: 9px;
-        margin-left: 10px;
+        margin-right: 10px;
         color: var(--text-color-highlight);
+        width: -webkit-fill-available;
+        width: fit-content;
     }
     .chk-container > span{
         margin-right: 10px;
     }
+    .chk-checkmark{
+        margin-left: 0;
+    }
     label.show-staked-by-me{
         color: var(--text-color-highlight);
     }
-    @media screen and (min-width: 800px) {
-        .layout-buttons{
-            display: block;
+    label.search{
+        width: 100%;
+        max-width: 400px;
+    }
+    @media screen and (min-width: 600px) {
+        .container{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            margin: 10px;
+        }
+        .checkboxes{
+            margin: 0 10px;
+        }
+        .chk-container{
+            position: relative;
+            top: 14px;
+            margin-left: 10px;
+        }
+    }
+    @media screen and (min-width: 850px) {
+        .search-container{
+            justify-content: flex-end;
         }
     }
 </style>
 
-<div class="flex-row flex-align-end">
-    <div class="layout-buttons flex-row flex-grow">
-        <div class="dropdown flex-col">
-            <lable>Sort</lable>
-            <div class="flex-row flex-align-center">
-                <select bind:value={sortFilter} on:change={handleChangedSort}>
-                    {#each sortOptions as option}
-                        <option value={option.value} selected={option.value === $farmFilter ? "selected" : null}>{option.name}</option>
-                    {/each}
-                </select>
 
-                <button class="flex" on:click={handleFarmFilterUpDownClick}>
-                    <DirectionalChevron 
-                        width="14px"
-                        styles={`position: relative; ${$farmFilterUpDown === "up" ? "top: -4px;" : "top: 5px;"}`}
-                        margin={"0 0 0 8px"}
-                        direction={$farmFilterUpDown}
-                        color={$farmFilterUpDown === "price_change" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
-                    />
-                </button>
+<div class="container">
+    <div class="dropdown flex-col">
+        <label>Sort</label>
+        <div class="flex-row flex-align-center">
+            <select bind:value={sortFilter} on:change={handleChangedSort}>
+                {#each sortOptions as option}
+                    <option value={option.value} selected={option.value === $farmFilter ? "selected" : null}>{option.name}</option>
+                {/each}
+            </select>
 
-                <label class="flex-row chk-container" class:show-staked-by-me={$farmStakedByMe} id="chk-stakedByMe">
-                    <input  type="checkbox" bind:checked={stakedByMeChecked} on:change={handleStakedByMeChange}>
-                    <span  class="chk-checkmark chk-small"></span>
-                    Staked by me
-                </label>
-
-                <label class="flex-row chk-container" class:show-staked-by-me={$farmOpenForBusiness} id="chk-openForBusiness">
-                    <input  type="checkbox" bind:checked={openForBusinessChecked} on:change={handleOpenForBusinessChange}>
-                    <span  class="chk-checkmark chk-small"></span>
-                    Open For Business
-                </label>
-
-            </div>
+            <button class="flex" on:click={handleFarmFilterUpDownClick}>
+                <DirectionalChevron 
+                    width="14px"
+                    styles={`position: relative; ${$farmFilterUpDown === "up" ? "top: -4px;" : "top: 5px;"}`}
+                    margin={"0 0 0 8px"}
+                    direction={$farmFilterUpDown}
+                    color={$farmFilterUpDown === "price_change" ? "var(--text-color-highlight)" : "var(--text-primary-color-dim)"}
+                />
+            </button>
         </div>
     </div>
+    <div class="checkboxes flex">
+        <label class="flex-row chk-container flex-align-center" class:show-staked-by-me={$farmStakedByMe} id="chk-stakedByMe">
+            <input  type="checkbox" bind:checked={stakedByMeChecked} on:change={handleStakedByMeChange}>
+            <span  class="chk-checkmark chk-small"></span>
+            Staked by me
+        </label>
 
-    <div class="search-container flex-col">
-        <lable>Search</lable>
-        <input 
-            class="primaryInput" 
-            on:input={handleSearch} 
-            value={$earnFilters?.search || ""}/>
+        <label class="flex-row chk-container flex-align-center" class:show-staked-by-me={$farmShowClosed} id="chk-showClosed">
+            <input  type="checkbox" bind:checked={showClosedChecked} on:change={handleShowClosed}>
+            <span  class="chk-checkmark chk-small"></span>
+            Show closed
+        </label>
     </div>
 
+    <div class="search-container flex">
+        <label class="search">
+            Search
+            <input 
+                class="primaryInput" 
+                on:input={handleSearch} 
+                value={$earnFilters?.search || ""}/>
+        </label>
+    </div>
 </div>

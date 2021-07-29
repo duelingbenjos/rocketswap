@@ -69,7 +69,7 @@
 </style>
 
 <div class="container flex-row">
-    <span class="text-massive weight-800">{title}</span>
+    <span class="text-massive weight-500">{title}</span>
     <div class="rocket" bind:this={rocketElm}>
         <Rocket width="65px" direction={"down"} color={"var(--color-primary)"} shakeRight={true} blastOff={true}/>
     </div>

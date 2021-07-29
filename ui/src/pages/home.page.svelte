@@ -4,7 +4,7 @@
     // Components
     import HomePanel from '../components/panels/home-panel.svelte'
     import TradeRockets from '../components/misc/trade-rockets.svelte'
-    import TradeRocket from '../components/misc/trade-rocket.svelte'
+    import OnBoarding from '../components/onboarding/onboarding-messages.svelte'
 
     // Services
 	import { ApiService } from '../services/api.service'
@@ -57,29 +57,10 @@
     .page-container{
         padding-bottom: 10rem;
     }
-    .header{
-        margin: 0 auto 2rem;
-        max-width: 850px;
-        font-weight: 200;
-    }
-    span > a {
-        text-decoration: none;
-    }
-    span > a:hover {
-        text-decoration: underline;
-    }
-    span > a:visited{
-        color: var(--text-color-highlight);
-    }
 </style>
 
 <div class="page-container"  >
-    <div class="header text-xxlarge">
-        <span>
-            Rocketswap is a community developed Automated Market Maker for exchanging digital assets. 
-            <a href="https://rocketswap.exchange/docs/#/" class="text-color-highlight"  rel="noopener noreferrer" target="_blank"> Learn More</a>
-        </span>
-    </div>
+    <OnBoarding type={"home_info"} />
     {#if $currencyType && homePageTableFilter}
 	    <HomePanel {marketData}/>
     {/if}

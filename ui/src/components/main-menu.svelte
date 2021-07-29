@@ -57,7 +57,6 @@
     @media screen and (min-width: 430px) {
         .menu{
             border-radius: 0 0 0 var(--button-border-radius);
-            max-width: 320px;
             max-height: 600px;
         }
     }

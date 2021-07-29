@@ -15,7 +15,7 @@ import {
 	farmFilter,
 	farmFilterUpDown,
 	farmStakedByMe,
-	farmOpenForBusiness,
+	farmShowClosed,
 	payInRswp, 
 	ammFuelTank,
 	ammFuelTank_discount,
@@ -115,7 +115,7 @@ export const initializeStateFromLocalStorage = () => {
 	getFarmFilter()
 	getFarmFilterUpDown()
 	getFarmStakedByMe()
-	getFarmOpenForBusiness()
+	getFarmShowClosed()
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -171,14 +171,14 @@ export const setFarmStakedByMe = (value) => {
 	setLSValue("farm_filter_staked_by_me", value)
 	farmStakedByMe.set(value)
 }
-export const getFarmOpenForBusiness = () => {
-	let value = localStorage.getItem("farm_filter_open_for_bus")
+export const getFarmShowClosed = () => {
+	let value = localStorage.getItem("farm_filter_show_closed")
 	if (value === null) return
-	else farmOpenForBusiness.set(JSON.parse(value))
+	else farmShowClosed.set(JSON.parse(value))
 }
-export const setFarmOpenForBusiness = (value) => {
-	setLSValue("farm_filter_open_for_bus", value)
-	farmOpenForBusiness.set(value)
+export const setFarmShowClosed = (value) => {
+	setLSValue("farm_filter_show_closed", value)
+	farmShowClosed.set(value)
 }
 export const getTauUsdPrice = () => {
 	let value = localStorage.getItem("tau_usd_price")

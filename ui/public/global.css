@@ -130,13 +130,13 @@ body.light {
     --pool-main-box-border-color: var(--text-primary-color);
     --main-background-solid: #fff;
     --main-background-gradient: linear-gradient(#b2adff, rgb(255 0 252 / 8%));
-    --panel-background-gradient: linear-gradient(5deg, rgb(248, 245, 255) 10%, #f7f4ff 50%);
+    --panel-background-gradient: linear-gradient(10deg, #edf4f2 80%, #f2fffb 70%);
     --home-panel-background-gradient: linear-gradient(5deg, #f8f5ff4d 10%, #f7f4ff99 50%);
     --box-border-color: #0000000f;
     --modal-background-primary: #ffffff;
     --modal-background-secondary: #673ab712;
     --modal-wallet-setup-background: linear-gradient(333deg, rgb(242 237 255) 10%, #fefeff 50%);
-    --msg-box-background: #f0f0f0;
+    --msg-box-background: var(--color-primary);
     --toast-background-success: var(--success-color-light);
     --toast-background-warning: var(--warning-color-light);
     --toast-background-error: var(--error-color-light);
@@ -154,7 +154,7 @@ body.light {
     --fuel-tank-text-shadow: var(--color-gray-3);
     --small-box-background: #2b284b00;
     --price-color-buy: var(--color-primary-dark);
-    --faq-item-background: #a39cea;
+    --faq-item-background: var(--color-secondary-light);
     background-image: var(--main-background-gradient);
     background-blend-mode: none;
 }
@@ -347,6 +347,14 @@ body.light {
 
 .flex-grow {
     flex-grow: 1;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-wrap-reverse {
+    flex-wrap: wrap-reverse;
 }
 
 .flex-row {
@@ -555,7 +563,7 @@ input.primaryInput {
     width: 20px;
     border-radius: 6px;
     background-color: transparent;
-    border: 2px solid var(--checkbox-border);
+    border: 1px solid var(--checkbox-border);
     color: var(--text-color-highlight);
 }
 
