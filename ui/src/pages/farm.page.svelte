@@ -22,44 +22,24 @@
 
     $: pageTitle = 'Rocket Farm'
     $: pageDescription = "The FASTEST way to earn Crypto!"
-    $: filteredList = filterBySelection($stakingInfoProcessed, $farmFilter, $farmFilterUpDown, $farmStakedByMe, $userYieldInfo, $farmShowClosed);
-    $: finalFilteredList = filterBySearch(filteredList, $earnFilters?.search);
+    $: results = processList($stakingInfoProcessed, $earnFilters?.search, $farmFilter, $farmFilterUpDown, $farmStakedByMe, $userYieldInfo, $farmShowClosed);
 
     onMount(() => {
         ws.joinStakingPanel()
         return () => ws.leaveStakingPanel()
     })
 
-    const filterBySelection = (list, filterType) => {
-        let up = -1
-        let down = 1
+    const processList = (list, search, sortType) => {
+        list = runFilters(list, search)
+        list = runSorts(list, sortType)
+        console.log("start")
+        console.log(list.map(l => l.StartTime.__time__))
+        console.log("end")
+        console.log(list.map(l => l.EndTime.__time__))
+        return list
+    }
 
-        if ($farmFilterUpDown === "down") {
-            up = 1
-            down = -1
-        }
-        if (filterType === "alpha_reward_token") list.sort((a, b) => {
-            let token_a_name = a.yield_token ? a.yield_token.token_name : ""
-            let token_b_name = b.yield_token ? b.yield_token.token_name : ""
-            return token_a_name > token_b_name ? up : down
-        })
-        if (filterType === "alpha_staking_token") list.sort((a, b) => {
-            let token_a_name = a.staking_token ? a.staking_token.token_name : ""
-            let token_b_name = b.staking_token ? b.staking_token.token_name : ""
-            return token_a_name > token_b_name ? up : down
-        })
-        if (filterType === "apy") list.sort((a, b) => {
-            if (!a.ROI_yearly) a.ROI_yearly = toBigNumber(0)
-            if (!b.ROI_yearly) b.ROI_yearly = toBigNumber(0)
-            return a.ROI_yearly.isGreaterThan(b.ROI_yearly) ? up : down
-        })
-        if (filterType === "start_time") list.sort((a, b) => {
-            return new Date(a.StartTime.__Time__) > new Date(b.StartTime.__Time__) ? up : down
-        })
-        if (filterType === "end_time") list.sort((a, b) => {
-            return new Date(a.EndTime.__Time__) > new Date(b.EndTime.__Time__) ? up : down
-        })
-
+    const runFilters = (list, search) => {
         if ($farmStakedByMe && $userYieldInfo) {
             list = list.filter(farm => {
                 let yeildInfo = $userYieldInfo[farm.contract_name]
@@ -72,10 +52,7 @@
         if (!$farmShowClosed){
             list = list.filter(farm => farm.OpenForBusiness === true)
         }
-        return list
-    }
 
-    const filterBySearch = (list, search) => {
         if (!search) return list
         let filteredList = []
         list.forEach(item => {
@@ -101,6 +78,44 @@
         })
         return filteredList
     }
+
+    const runSorts = (list, filterType) => {
+        console.log({filterType})
+        let up = -1
+        let down = 1
+
+
+
+        if ($farmFilterUpDown === "down") {
+            up = 1
+            down = -1
+        }
+        if (filterType === "alpha_reward_token") list.sort((a, b) => {
+            let token_a_name = a.yield_token ? a.yield_token.token_name : ""
+            let token_b_name = b.yield_token ? b.yield_token.token_name : ""
+            return token_a_name > token_b_name ? up : down
+        })
+        if (filterType === "alpha_staking_token") list.sort((a, b) => {
+            let token_a_name = a.staking_token ? a.staking_token.token_name : ""
+            let token_b_name = b.staking_token ? b.staking_token.token_name : ""
+            return token_a_name > token_b_name ? up : down
+        })
+        if (filterType === "apy") list.sort((a, b) => {
+            if (!a.ROI_yearly) a.ROI_yearly = toBigNumber(0)
+            if (!b.ROI_yearly) b.ROI_yearly = toBigNumber(0)
+            return a.ROI_yearly.isGreaterThan(b.ROI_yearly) ? up : down
+        })
+        if (filterType === "start_date") list.sort((a, b) => {
+            return new Date(a.StartTime.__time__) > new Date(b.StartTime.__time__) ? up : down
+        })
+        if (filterType === "end_date") list.sort((a, b) => {
+            return new Date(a.EndTime.__time__) > new Date(b.EndTime.__time__) ? up : down
+        })
+
+        return list
+    }
+
+
 </script>
 
 <style>
@@ -185,10 +200,10 @@
     <EarnFilters />
     <div class="flex earn-content panels" 
         class:horizontal={$earnFilters?.rowView}>
-        {#each finalFilteredList as stakeInfo (stakeInfo.contract_name)}
+        {#each results as stakeInfo (stakeInfo.contract_name)}
             <StakingPanel stakingInfo={stakeInfo} horizontal={$earnFilters?.rowView && innerWidth > 800}/>
         {/each}
-        {#if finalFilteredList.length === 0 && $farmStakedByMe}
+        {#if results.length === 0 && $farmStakedByMe}
             <p class="text-xlarge text-color-highlight">You have no tokens staked</p>
         {/if}
     </div>
