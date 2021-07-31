@@ -61,7 +61,7 @@
     $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null;
     $: isLpToken = stakingContractType === "liquidity_mining_smart_epoch"
     // $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType === "staking_smart_epoch_compounding_timeramp" && stakingContractType !== "staking_simple" : false;
-    $: showCompoundButton = yieldToken && stakingContractType ? yieldToken.contract_name === config.ammTokenContract && stakingContractType !== "staking_simple" && stakingInfo.OpenForBusiness : false;
+    $: showCompoundButton = shouldShowCompoundButton(yieldToken, currentYield, stakingContractType, totalStaked)
     $: useTimeRamp = stakingInfo?.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
     $: stakingDisabled = !stakingInfo?.OpenForBusiness
@@ -85,6 +85,17 @@
 			{contract, method}
 		]
 		return await walletService.estimateTxCosts(txList)
+    }
+
+    const shouldShowCompoundButton = (yieldToken, currentYield, stakingContractType) => {
+        if (!yieldToken || !stakingContractType) return false
+        if (!stakingInfo.OpenForBusiness) return false
+        if (currentYield.isLessThanOrEqualTo(0)) return false
+
+        if (yieldToken.contract_name === config.ammTokenContract){
+                return true
+        }
+        return false
     }
 
     const handleInput = (e) => {
