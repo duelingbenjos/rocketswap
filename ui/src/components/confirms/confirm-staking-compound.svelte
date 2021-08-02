@@ -62,7 +62,7 @@
         let args = {
             amount: {"__fixed__": "0"}
         }
-        walletService.compoundSelf(config.ammTokenYieldContract, args, yieldToken, {success, error})
+        walletService.compoundSelf(stakingInfo.contract_name, args, yieldToken, {success, error})
         .catch(err => {
             console.log(err)
             finish()
