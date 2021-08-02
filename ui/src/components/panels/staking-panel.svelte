@@ -60,7 +60,8 @@
     $: hasBothTokens = yieldToken && stakingToken;
     $: stakingContractType = stakingInfo ? stakingInfo.meta.type : null;
     $: isLpToken = stakingContractType === "liquidity_mining_smart_epoch"
-    $: showCompoundButton = shouldShowCompoundButton(yieldToken, currentYield, stakingContractType, totalStaked)
+    // $: showCompoundButton = shouldShowCompoundButton(yieldToken, currentYield, stakingContractType, totalStaked)
+    $: showCompoundButton = false
     $: useTimeRamp = stakingInfo?.UseTimeRamp ? stakingInfo.UseTimeRamp : false;
     $: validStakingAmount = stakingAmount.isGreaterThan(0);
     $: stakingDisabled = !stakingInfo?.OpenForBusiness
