@@ -32,10 +32,10 @@
     const processList = (list, search, sortType) => {
         list = runFilters(list, search)
         list = runSorts(list, sortType)
-        console.log("start")
-        console.log(list.map(l => l.StartTime.__time__))
-        console.log("end")
-        console.log(list.map(l => l.EndTime.__time__))
+        // console.log("start")
+        // console.log(list.map(l => l.StartTime.__time__))
+        // console.log("end")
+        // console.log(list.map(l => l.EndTime.__time__))
         return list
     }
 
@@ -80,7 +80,7 @@
     }
 
     const runSorts = (list, filterType) => {
-        console.log({filterType})
+        // console.log({filterType})
         let up = -1
         let down = 1
 
