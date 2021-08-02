@@ -99,7 +99,7 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			calcFn = calculateSimpleYield;
 		} else if (staking_contract_type === "staking_smart_epoch_compounding_timeramp") {
 			calcFn = calculateSmartCompoundingYield;
-		} else if (staking_contract_type === "staking_smart_epoch" || staking_contract_type === "liquidity_mining_smart_epoch") {
+		} else if (staking_contract_type === "staking_smart_epoch" || staking_contract_type === "liquidity_mining_smart_epoch" || "staking_smart_epoch_compounding") {
 			calcFn = calculateSmartEpochYield;
 			if (deposits[0].user_yield) harvestable_yield += getNumber(deposits[0].user_yield);
 		}

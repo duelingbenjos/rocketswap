@@ -27,7 +27,10 @@
     let loading = false;
     const yieldAmount = currentYield
 
-    $: singleAssetContract = stakingInfo.contract_name === config.ammTokenYieldContract
+    $: yieldTokenSymbol = stakingInfo?.yield_token?.token_symbol
+    $: stakingTokenSymbol = stakingInfo?.staking_token?.token_symbol
+    $: isLpStakingContract = stakingInfo?.meta?.type === "liquidity_mining_smart_epoch"
+    $: singleAssetContract = stakingTokenSymbol === yieldTokenSymbol && !isLpStakingContract
 
 
     const success = () => {
@@ -64,6 +67,11 @@
             console.log(err)
             finish()
         })
+    }
+
+    const decideCompoundingFn = () => {
+        console.log({stakingInfo})
+        return singleAssetContract ? handleCompoundSelf() : handleCompoundYield()
     }
 </script>
 
@@ -108,7 +116,7 @@
         </div>
     </div>
     <p class="text-xsmall sub-text text-primary-dim">
-        ** {stringToFixed(stakingInfo.DevRewardPct.multipliedBy(100), 1)}% of the yield from all RSWP withdrawals goes to the developers of Rocketswap! This amount will be added automatically to the transaction total.
+        ** {stringToFixed(stakingInfo.DevRewardPct.multipliedBy(100), 1)}% of the yield from all {yieldTokenSymbol} withdrawals goes to the developers of Rocketswap! This amount will be added automatically to the transaction total.
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row">
@@ -122,20 +130,20 @@
         <div class="flex-row">
             <span class="flex-grow text-primary-dim">Send To:</span>
             <div class="flex-row">
-                RSWP
+                {yieldTokenSymbol}
                 <DicrectionalArrowIcon direction="right" width="10px" margin="0 4px 0" />
-                RSWP
+                {yieldTokenSymbol}
             </div>
         </div>
         <div class="modal-confirm-buttons flex-col">
             <Button 
                 style="secondary" 
                 loading={loading} 
-                callback={singleAssetContract ? handleCompoundSelf : handleCompoundYield} 
-                text="COMPOUND RSWP" />
+                callback={decideCompoundingFn} 
+                text="COMPOUND {yieldTokenSymbol}" />
         </div>
         <p class="text-xsmall text-justify text-primary-dim">
-            * Staking will compound interest already in your RSWP POOL. This action will also reinvest any yield due on the RSWP pool.
+            * Staking will compound interest already in your {yieldTokenSymbol} POOL. This action will also reinvest any yield due on the {yieldTokenSymbol} pool.
         </p>
     </div>
 </div>

@@ -24,7 +24,8 @@ export type StakingType =
 	| "staking_simple"
 	| "staking_smart_epoch"
 	| "staking_smart_epoch_compounding_timeramp"
-	| "liquidity_mining_smart_epoch";
+	| "liquidity_mining_smart_epoch"
+	| "staking_smart_epoch_compounding"
 
 export interface ITimeRampValue {
 	lower: number;

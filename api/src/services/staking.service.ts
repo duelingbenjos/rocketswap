@@ -67,7 +67,7 @@ export class StakingService implements OnModuleInit {
 			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			return await this.getRSWPStakingROI(meta_entity);
-		} else if (meta.type === "staking_smart_epoch_compounding_timeramp" || meta.type === "staking_smart_epoch") {
+		} else if (meta.type === "staking_smart_epoch_compounding_timeramp" || meta.type === "staking_smart_epoch" || meta.type === "staking_smart_epoch_compounding") {
 			return await this.getSmartEpochCompoundingROI(meta_entity);
 		} else if (meta.type === "liquidity_mining_smart_epoch") {
 			return await this.getLiqMiningROI(meta_entity);
