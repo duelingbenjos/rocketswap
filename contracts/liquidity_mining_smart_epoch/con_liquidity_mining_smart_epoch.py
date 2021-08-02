@@ -50,18 +50,16 @@ def seed():
     TrustedImporters.set([])
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
+    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
 
-    meta["version"] = "0.4"
+    meta["version"] = "0.5"
     meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
     meta["STAKING_TOKEN"] = "con_rswp_lp"
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
     meta["YIELD_TOKEN"] = "con_basic_token"
 
     DevRewardPct.set(1 / 10)
 
-    # The datetime from which you want to allow staking.
     StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
-    # The datetime at which you want staking to finish.
     EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
 
     OpenForBusiness.set(True)
@@ -73,14 +71,14 @@ def addStakingTokens(amount: float):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller")
+        return createNewDeposit(amount=amount)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller")
+        return increaseDeposit(amount=amount)
 
 
 def createNewDeposit(
-    amount: float, user_ctx: str
-):  # user_ctx will either be "caller" or "signer"
+    amount: float
+):
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You must stake something."
 
@@ -115,10 +113,10 @@ def createNewDeposit(
 
 @export
 def increaseDeposit(
-    amount: float, user_ctx: str
-):  # user_ctx will either be "caller" or "signer"
+    amount: float
+):
 
-    user = ctx.caller if user_ctx is "caller" else ctx.signer
+    user = ctx.caller
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You cannot stake a negative balance."
 
@@ -320,7 +318,7 @@ def decideIncrementEpoch(new_staked_amount: float):
 
 def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: float):
     if this_epoch_staked < 0.0001 :
-        return true    
+        return true
     smaller = (
         new_staked_amount
         if new_staked_amount <= this_epoch_staked
@@ -331,9 +329,8 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
         if new_staked_amount >= this_epoch_staked
         else this_epoch_staked
     )
-    dif = bigger - smaller    
+    dif = bigger - smaller
     return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
-    
 
 
 def incrementEpoch(new_staked_amount: float):
@@ -471,7 +468,7 @@ def exportYieldToForeignContract():
     # verify that the contract is calling it is trusted.
     assert (
         calling_contract in TrustedImporters.get()
-    ), "The calling contract is not in the trusted list ! :("
+    ), "The calling contract is not in the trusted importers list."
 
     transferred = sendYieldToTarget(
         amount=999999999999,
@@ -565,7 +562,6 @@ def transfer_from(amount: float, to: str, main_account: str):
 
 def returnAndBurnVToken(amount: float):
     user = ctx.caller
-    this = ctx.this
     assert (
         balances[user] >= amount
     ), "Your VTOKEN balance is too low to unstake, recover your VTOKENS and try again."
@@ -573,5 +569,5 @@ def returnAndBurnVToken(amount: float):
 
 
 def mintVToken(amount: float):
-    user = ctx.signer
+    user = ctx.caller
     balances[user] += amount

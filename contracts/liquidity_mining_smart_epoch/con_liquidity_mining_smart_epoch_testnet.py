@@ -53,7 +53,7 @@ def seed():
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
 
-    meta["version"] = "0.3"
+    meta["version"] = "0.4"
     meta["type"] = "liquidity_mining_smart_epoch"  # staking || lp_farming
     meta["STAKING_TOKEN"] = "con_rswp_lst001"
     meta["YIELD_TOKEN"] = "con_rswp_lst001"
@@ -321,6 +321,8 @@ def decideIncrementEpoch(new_staked_amount: float):
 
 
 def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: float):
+    if this_epoch_staked < 0.0001 :
+        return true
     smaller = (
         new_staked_amount
         if new_staked_amount <= this_epoch_staked
