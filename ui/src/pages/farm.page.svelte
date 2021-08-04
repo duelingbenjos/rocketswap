@@ -133,10 +133,6 @@
         flex-wrap: wrap;
     }
 
-    .horizontal{
-        flex-wrap: nowrap;
-    }
-
     .earn-content{
         margin-top: 1rem;
         margin-bottom: 4rem;
@@ -158,14 +154,6 @@
         .panels{
             flex-direction: row;
             justify-content: space-evenly;
-        }
-    }
-
-    @media screen and (min-width: 800px) {
-        .horizontal{
-            flex-direction: column;
-            align-items: unset;
-            justify-content: unset;
         }
     }
 
@@ -198,10 +186,9 @@
     <PageHeader title={pageTitle} />
     <OnBoarding type="rocketfarm_info" />
     <EarnFilters />
-    <div class="flex earn-content panels" 
-        class:horizontal={$earnFilters?.rowView}>
+    <div class="flex earn-content panels" >
         {#each results as stakeInfo (stakeInfo.contract_name)}
-            <StakingPanel stakingInfo={stakeInfo} horizontal={$earnFilters?.rowView && innerWidth > 800}/>
+            <StakingPanel stakingInfo={stakeInfo}/>
         {/each}
         {#if results.length === 0 && $farmStakedByMe}
             <p class="text-xlarge text-color-highlight">You have no tokens staked</p>
