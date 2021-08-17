@@ -5,6 +5,7 @@
     import HomePanel from '../components/panels/home-panel.svelte'
     import TradeRockets from '../components/misc/trade-rockets.svelte'
     import OnBoarding from '../components/onboarding/onboarding-messages.svelte'
+    import HomeFilters from '../components/home-page/homeFilters.svelte'
 
     // Services
 	import { ApiService } from '../services/api.service'
@@ -13,8 +14,8 @@
 	const wsService = WsService.getInstance()
     
     // Misc
-    import { tauUSDPrice, currencyType, homePageTableFilter } from '../store'
-    import { stringToFixed, toBigNumber } from '../utils'
+    import { tauUSDPrice, currencyType, homePageTableFilter, homeFilters } from '../store'
+    import { toBigNumber } from '../utils'
 
     let marketData = [];
     let timer;
@@ -37,6 +38,7 @@
         })
 
         marketData = data.filter(f => !f.remove)
+        console.log({homeFilters: $homeFilters})
     }
 
     onMount(() => {
@@ -61,6 +63,7 @@
 
 <div class="page-container"  >
     <OnBoarding type={"home_info"} />
+    <HomeFilters />
     {#if $currencyType && homePageTableFilter}
 	    <HomePanel {marketData}/>
     {/if}

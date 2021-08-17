@@ -435,6 +435,10 @@ body.light {
     justify-content: space-between;
 }
 
+.m-r-20 {
+    margin-right: 20px;
+}
+
 .number {
     font-family: 'Roboto Mono', monospace;
     font-size: 0.9em;
@@ -554,6 +558,10 @@ input.primaryInput {
     height: 0;
     width: 0;
     transition: 0.5s border ease-in-out;
+}
+
+.chk-container>span {
+    margin-right: 10px;
 }
 
 .chk-checkmark {

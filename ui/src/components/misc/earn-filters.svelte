@@ -36,7 +36,6 @@
     const handleChangedSort = (e) => setFarmFilter(e.target.value)
 
     const handleSearch = (e) => {
-        console.log(e)
         if (e.target.value === "") setEarnFilters({...$earnFilters, search: null}) 
         else setEarnFilters({...$earnFilters, search: e.target.value.toLowerCase()})
     }
@@ -105,9 +104,6 @@
         color: var(--text-color-highlight);
         width: -webkit-fill-available;
         width: fit-content;
-    }
-    .chk-container > span{
-        margin-right: 10px;
     }
     .chk-checkmark{
         margin-left: 0;
