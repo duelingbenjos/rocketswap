@@ -32,6 +32,15 @@
     const dispatchEvent = (value) => dispatch('input', value)
 </script>
 
+<style>
+    input{
+        width: inherit;
+    }
+    label{
+        width: -webkit-fill-available;
+    }
+</style>
+
 <label style={`margin: ${margin}; ${styles}`}>{title}
     <input class="primaryInput"
         bind:this={inputElm}

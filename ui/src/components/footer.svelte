@@ -91,6 +91,7 @@
 		padding: 5px 10px;
 		background-color: var(--color-secondary);
 		width: 100%;
+		z-index: 101;
 
 	}
 	.wallet-info {
@@ -171,7 +172,6 @@
 			display: flex;
 			align-items: center;
 			background-color: transparent;
-			z-index: 101;
 			width: 100%;
 			padding: 0 10px;
 			color: var(--wallet-info-text);
