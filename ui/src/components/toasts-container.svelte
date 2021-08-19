@@ -59,7 +59,7 @@
 
 <style>
 	.toasts-container{
-		position: absolute; 
+		position: fixed; 
 		box-sizing: border-box;
 		top: 0px; 
 		right: 0px; 

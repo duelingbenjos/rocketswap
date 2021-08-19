@@ -91,6 +91,7 @@
 		padding: 5px 10px;
 		background-color: var(--color-secondary);
 		width: 100%;
+		z-index: 101;
 
 	}
 	.wallet-info {
@@ -104,7 +105,9 @@
 		margin-left: 8px;
 		color: var(--color-white);
 	}
-
+	a.address{
+		color: var(--text-grey-5);
+	}
 	.wallet-message {
 		margin: 0 auto;
 		text-decoration: underline;
@@ -169,7 +172,6 @@
 			display: flex;
 			align-items: center;
 			background-color: transparent;
-			z-index: 101;
 			width: 100%;
 			padding: 0 10px;
 			color: var(--wallet-info-text);
@@ -257,7 +259,7 @@
 					<button class="flex flex-center-center" on:click={logout} title="logout">
 						<AntennaIcon width="20px" margin="0 8px 0 0" />
 					</button>
-					<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" rel="noopener noreferrer" target="_blank" >
+					<a href="{`${config.blockExplorer}/addresses/${$walletAddress}`}" class="address" rel="noopener noreferrer" target="_blank" >
 						{formatAccountAddress($walletAddress,4,2)}
 					</a>
 				</div>

@@ -15,14 +15,14 @@ export class CoinGeckoAPIService implements OnModuleInit {
 
 	async onModuleInit() {
 		// await this.getTauUSDPrice();
-		await this.getTauUSDPrice_rocketswap();
+		await this.getTauUSDGlobalPrice();
 		setInterval(async () => {
 			// await this.getTauUSDPrice();
-			await this.getTauUSDPrice_rocketswap();
+			await this.getTauUSDGlobalPrice();
 		}, this.timeInterval);
 	}
 
-	private getTauUSDPrice = async () => {
+	private getTauUSDTxbitPrice = async () => {
 		try {
 			let tickerData: any = await axios.get(`${this.baseUrl}/exchanges/${"txbit"}/tickers?coin_ids=${"lamden"}`);
 			const eth_tau_ticker = tickerData.data?.tickers?.find((ticker) => ticker.target === "ETH");
@@ -32,6 +32,24 @@ export class CoinGeckoAPIService implements OnModuleInit {
 				CoinGeckoAPIService.last_price = eth_tau_ticker.converted_last.usd;
 				return await saveUSDPrice({
 					price: UsdPrice,
+					handleClientUpdate: this.socketService.handleClientUpdate
+				});
+			}
+		} catch (err) {
+			log.error(err);
+		}
+	};
+
+	private getTauUSDGlobalPrice = async () => {
+		try {
+			let tickerData: any = await axios.get(
+				`${this.baseUrl}/coins/markets?vs_currency=usd&ids=lamden&order=market_cap_desc&per_page=100&page=1&sparkline=false`
+			);
+			log.log(tickerData.data[0].current_price);
+			const price = tickerData?.data[0].current_price;
+			if (price) {
+				return await saveUSDPrice({
+					price: price.toString(),
 					handleClientUpdate: this.socketService.handleClientUpdate
 				});
 			}
