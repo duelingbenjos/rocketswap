@@ -6,9 +6,12 @@
 	import InputToken from '../inputs/input-token.svelte'
 	import Buttons from '../buttons.svelte'
 	import DirectionalArrow from '../../icons/directional-arrow.svelte'
+	import VerifiedToken from '../../icons/verified_token.svelte'
 
 	//Misc
 	import { quoteCalculator, toBigNumber, stringToFixed } from '../../utils'
+	import { verifiedTokens } from '../../store';
+
 
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
 	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP, payInRswp, currentPrice, lastTradeType } = pageStores
@@ -104,6 +107,13 @@
 		color: var(--error-color);
 	}
 
+	.verified-token-legend{
+		position: absolute;
+		top: 0;
+		left: 0;
+		transform: translate(-40%, -40%);
+    }
+
 	@media screen and (min-width: 430px) {
 		.price{
 			position: absolute;
@@ -120,6 +130,13 @@
 </style>
 
 <div class="panel-container">
+	{#if $selectedToken}
+		{#if $verifiedTokens.includes($selectedToken.contract_name)}
+			<div class="verified-token-legend flex row">
+				<VerifiedToken width="75px" />
+			</div>
+		{/if}
+	{/if}
 	{#if $selectedToken && !$currentPrice.isNaN()}
 		<div 
 			class="flex-row flex-center-center price weight-600"
