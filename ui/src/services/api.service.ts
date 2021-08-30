@@ -14,6 +14,15 @@ export class ApiService {
 	private base_url = getBaseUrl()
 	private token_info_cache = {}
 
+	async getVerifiedTokensList() {
+		try {
+			return await axios.get(`${this.base_url}/api/verified_tokens`).then((res) => res.data)
+		} catch (err) {
+			console.error(err)
+			throw err
+		}
+	}
+
 	async getTokenList(filter = []) {
 		try {
 			let token_list = await axios.get(`${this.base_url}/api/token_list`).then((res) => valuesToBigNumber(res.data))

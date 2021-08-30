@@ -14,12 +14,22 @@
 	const wsService = WsService.getInstance()
     
     // Misc
-    import { tauUSDPrice, currencyType, homePageTableFilter, homeFilters } from '../store'
+    import { tauUSDPrice, currencyType, homePageTableFilter, homeFilters, verifiedTokens } from '../store'
     import { toBigNumber } from '../utils'
 
     let marketData = [];
+    $: filteredData = applyFilters(marketData, $homeFilters, $verifiedTokens)
     let timer;
-    let joinedFeeds = []
+
+    onMount(() => {
+        getData()
+        setInterval(getData, 60000)
+        wsService.joinTradeFeed('global')
+        return () => {
+            clearInterval(timer)
+            wsService.leaveTradeFeed('global')
+        }
+    })
 
     async function getData(){
         let data = await apiService.get_market_summaries()
@@ -38,20 +48,27 @@
         })
 
         marketData = data.filter(f => !f.remove)
-        console.log({homeFilters: $homeFilters})
     }
 
-    onMount(() => {
-        getData()
-        setInterval(getData, 60000)
-        wsService.joinTradeFeed('global')
-        return () => {
-            console.log("leaving feeds")
-            clearInterval(timer)
-            joinedFeeds.map(contract_name => wsService.leaveTradeFeed('global'))
-            joinedFeeds = []
+
+
+    function applyFilters(data, filters, verifiedTokens){
+        if (!filters) return data
+        if (!filters.showLowLiquidity){
+            data = data.filter(f => f.usdLiquidity.isGreaterThan(1000))
         }
-    })
+        if (!filters.showLowVolume){
+            data = data.filter(f => f.usdVolume.isGreaterThan (500))
+        }
+        if (!filters.showNotVerified){
+            data = data.filter(f => verifiedTokens.includes(f.contract_name))
+        }
+        if (filters.search){
+            let search = filters.search.toLowerCase()
+            data = data.filter(f => f.token.token_name.toLowerCase().includes(search) || f.token.token_symbol.toLowerCase().includes(search))
+        }
+        return data
+    }
 
 </script>
 
@@ -64,8 +81,9 @@
 <div class="page-container"  >
     <OnBoarding type={"home_info"} />
     <HomeFilters />
+    
     {#if $currencyType && homePageTableFilter}
-	    <HomePanel {marketData}/>
+	    <HomePanel marketData={filteredData}/>
     {/if}
     <TradeRockets {marketData}/>
 </div>

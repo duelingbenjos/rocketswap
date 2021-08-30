@@ -19,6 +19,7 @@ import {
 	farmShowClosed,
 	payInRswp, 
 	ammFuelTank,
+	verifiedTokens,
 	ammFuelTank_discount,
 	rswpMetrics,
 	tauUSDPrice,
@@ -118,6 +119,17 @@ export const initializeStateFromLocalStorage = () => {
 	getFarmStakedByMe()
 	getFarmShowClosed()
 	getHomeFilters()
+	getVerifiedTokens()
+}
+export const getVerifiedTokens = () => {
+	let value = localStorage.getItem("verified_tokens")
+	if (value !== null) verifiedTokens.set(JSON.parse(value))
+
+	const apiService = ApiService.getInstance();
+	apiService.getVerifiedTokensList().then(res => {
+		verifiedTokens.set(res)
+		setLSValue("verified_tokens", res)
+	})
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")

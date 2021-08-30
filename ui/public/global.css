@@ -98,6 +98,7 @@ body {
     --fuel-tank-text-shadow: var(--color-gray-8);
     --small-box-background: #2b284b69;
     --price-color-buy: var(--color-primary);
+    --dropdown-background: #cd8cff4f;
     background-repeat: no-repeat;
     background-image: var(--main-background-solid);
     background-image: url('/assets/images/stars-bg-mobile.png'), var(--main-background-gradient);
@@ -155,6 +156,7 @@ body.light {
     --small-box-background: #2b284b00;
     --price-color-buy: var(--color-primary-dark);
     --faq-item-background: var(--color-secondary-light);
+    --dropdown-background: #9cffe078;
     background-image: var(--main-background-gradient);
     background-blend-mode: none;
 }
@@ -435,6 +437,10 @@ body.light {
     justify-content: space-between;
 }
 
+.overflow.hidden{
+    overflow: hidden;
+}
+
 .m-r-20 {
     margin-right: 20px;
 }
@@ -653,7 +659,6 @@ button.full:disabled {
 }
 
 button:not(:disabled):active,
-,
 input[type="submit"]:not(:disabled):active {
     filter: brightness(120%);
 }
@@ -721,7 +726,7 @@ button.outline.small:hover {
 button.text {
     color: var(--color-gray-5);
     background-color: transparent;
-    border: border: 2px solid transparent;
+    border: 2px solid transparent;
     border-radius: var(--button-border-radius);
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -734,7 +739,7 @@ button.text.small {
 }
 
 button.text:hover {
-    border: border: 2px solid transparent;
+    border: 2px solid transparent;
     text-decoration: underline;
 }
 
@@ -1038,8 +1043,6 @@ div[slot="main-centered"] {
     align-items: center;
     color: var(--color-gray-3);
 }
-
-.deathstar {}
 
 
 /* When page width is greater than 430px and less than 650px (phones) */
