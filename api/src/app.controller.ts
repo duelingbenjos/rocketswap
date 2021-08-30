@@ -25,10 +25,25 @@ import {
 import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
+const fs = require('fs')
+
 @Controller("api")
 @ApiTags("Main API")
 export class AppController {
 	constructor() {}
+
+	@Get("verified_tokens")
+	public async getVerifiedTokens() {
+		return await new Promise((resolve, reject) => {
+			fs.readFile(`${__dirname}/verified_tokens.json`, (err, data: any) => {
+				if (err) reject(err)
+				else resolve(JSON.parse(data))
+			});
+		})
+		.catch((err) => {
+			throw new HttpException(err, 500);
+		})
+	}
 
 	@Get("amm_meta")
 	public async getAmmMeta() {

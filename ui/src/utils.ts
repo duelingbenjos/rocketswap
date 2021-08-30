@@ -12,12 +12,14 @@ import {
 	slippageTolerance,
 	rswpPrice, 
 	earnFilters,
+	homeFilters,
 	farmFilter,
 	farmFilterUpDown,
 	farmStakedByMe,
 	farmShowClosed,
 	payInRswp, 
 	ammFuelTank,
+	verifiedTokens,
 	ammFuelTank_discount,
 	rswpMetrics,
 	tauUSDPrice,
@@ -116,6 +118,18 @@ export const initializeStateFromLocalStorage = () => {
 	getFarmFilterUpDown()
 	getFarmStakedByMe()
 	getFarmShowClosed()
+	getHomeFilters()
+	getVerifiedTokens()
+}
+export const getVerifiedTokens = () => {
+	let value = localStorage.getItem("verified_tokens")
+	if (value !== null) verifiedTokens.set(JSON.parse(value))
+
+	const apiService = ApiService.getInstance();
+	apiService.getVerifiedTokensList().then(res => {
+		verifiedTokens.set(res)
+		setLSValue("verified_tokens", res)
+	})
 }
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
@@ -202,6 +216,29 @@ export const getHomePageTableFilter = () => {
 	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", price_change: "asc", name: "asc", liquidity: "asc", current: "volume"})
 	else homePageTableFilter.set(JSON.parse(value))
 }
+export const getHomeFilters = () => {
+    let value = localStorage.getItem("home_filters")
+    if (value === null) {
+        setLSValue("filters", {})
+        homeFilters.set({})
+    } else {
+        homeFilters.set(JSON.parse(value))
+    }
+}
+
+export const updateHomeFilters = (filter, new_value) => {
+	console.log({filter, new_value})
+    if (!filter) return
+    let filters_store = get(homeFilters)
+    filters_store[filter] = new_value
+    setHomeFilters(filters_store)
+}
+
+export const setHomeFilters = (value) => {
+    setLSValue("home_filters", value)
+    homeFilters.set(value)
+}
+
 export const getOnboardingSettings = () => {
 	const default_settings = {rocketfarm_info: true, home_info: true}
 	let value = localStorage.getItem("onboarding_settings")

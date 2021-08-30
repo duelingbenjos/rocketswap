@@ -115,9 +115,21 @@ export const rswpPriceUSD = derived(([rswpPrice, tauUSDPrice]), ([$rswpPrice, $t
 // AMM
 export const accountName = writable(null);  // ROCKET-ID
 export const earnFilters = writable({});
+export const homeFilters = writable({});
+export const homeFiltersApplied = derived(homeFilters, ($homeFilters) => {
+	let numOfApplied = 0
+	Object.keys($homeFilters).map(key => {
+		if (key !== "search"){
+			if ($homeFilters[key] === true) numOfApplied = numOfApplied + 1
+		}
+	})
+	return numOfApplied
+})
+
 export const farmFilter = writable(null);
 export const farmStakedByMe = writable(false);
 export const farmShowClosed = writable(false);
+export const verifiedTokens = writable([]);
 
 export const farmFilterUpDown = writable("down");
 export const slippageTolerance = writable(toBigNumber("1.0"));
