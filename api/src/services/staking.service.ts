@@ -67,7 +67,11 @@ export class StakingService implements OnModuleInit {
 			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			return await this.getRSWPStakingROI(meta_entity);
-		} else if (meta.type === "staking_smart_epoch_compounding_timeramp" || meta.type === "staking_smart_epoch" || meta.type === "staking_smart_epoch_compounding") {
+		} else if (
+			meta.type === "staking_smart_epoch_compounding_timeramp" ||
+			meta.type === "staking_smart_epoch" ||
+			meta.type === "staking_smart_epoch_compounding"
+		) {
 			return await this.getSmartEpochCompoundingROI(meta_entity);
 		} else if (meta.type === "liquidity_mining_smart_epoch") {
 			return await this.getLiqMiningROI(meta_entity);
@@ -95,8 +99,28 @@ export class StakingService implements OnModuleInit {
 		return Math.round((reward_value_per_year / total_staked_value) * 100);
 	};
 
-	getSmartEpochCompoundingROI = async (meta_entity: StakingMetaEntity) =>
-		Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
+	getSmartEpochCompoundingROI = async (meta_entity: StakingMetaEntity) => {
+		if (meta_entity.STAKING_TOKEN === meta_entity.YIELD_TOKEN) {
+			return Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
+		} else {
+			const staking_token = meta_entity.STAKING_TOKEN;
+			const reward_token = meta_entity.YIELD_TOKEN;
+			const [staking_token_pair_entity, reward_token_pair_entity] = await Promise.all([
+				PairEntity.findOne(staking_token),
+				PairEntity.findOne(reward_token)
+			]);
+			if (!staking_token_pair_entity || !reward_token_pair_entity) return 0
+			log.log(staking_token, reward_token)
+
+			log.log(staking_token_pair_entity, reward_token_pair_entity)
+			const staking_p = Number(staking_token_pair_entity.price)
+			const reward_p = Number(reward_token_pair_entity.price)
+
+			const total_staked_value = staking_p * meta_entity.StakedBalance
+			const reward_value_per_year = reward_p * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour);
+			return Math.round((reward_value_per_year / total_staked_value) * 100);
+		}
+	};
 
 	getRSWPStakingROI = async (meta_entity: StakingMetaEntity) =>
 		Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
