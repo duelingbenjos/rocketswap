@@ -18,7 +18,7 @@ export class CoinGeckoAPIService implements OnModuleInit {
 		await this.getTauUSDGlobalPrice();
 		setInterval(async () => {
 			// await this.getTauUSDPrice();
-			await this.getTauUSDGlobalPrice();
+			await this.getTauUSDPrice_rocketswap();
 		}, this.timeInterval);
 	}
 
