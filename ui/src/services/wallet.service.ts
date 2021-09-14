@@ -744,7 +744,6 @@ export class WalletService {
 	}
 
 	public async compoundYield(singleAssetContractName, args, amount, stakingToken, yieldToken, callbacks = undefined) {
-		console.log({singleAssetContractName, args, stakingToken, yieldToken})
 		let txList = [{contract: singleAssetContractName, method: "stakeFromContractProfits"}]
 		if (await this.needsApproval(stakingToken.contract_name, amount, singleAssetContractName)){
 			txList.push({contract: yieldToken.contract_name, method: "approve"})
@@ -847,7 +846,6 @@ export class WalletService {
 	}
 
 	private txResult(txResults, callbacks = undefined) {
-		console.log(txResults)
 		if (txResults.errors) {
 			this.handleTxErrors(txResults.errors, callbacks)
 			return txResults.errors
@@ -907,9 +905,9 @@ export class WalletService {
 			}
 		]
 		let res = await this.blockExplorerService.getKeys(keyList)
-		console.log({getApprovedAmount_LP: res})
+
 		let approval = res[`${keyList[0].contractName}.${keyList[0].variableName}:${keyList[0].key}`]
-		console.log({approval})
+
 		if (!approval) return toBigNumber('0')
 		if (typeof approval?.__fixed__ !== 'undefined') approval = toBigNumber(approval.__fixed__)
 		else approval = toBigNumber(approval)

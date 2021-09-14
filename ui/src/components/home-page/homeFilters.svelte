@@ -12,7 +12,6 @@
     let multiselectElm
 
     const handleUpdateFilter = (filterName, new_value) => {
-        console.log({filterName, new_value})
         updateHomeFilters(filterName, new_value)
     }
 
@@ -161,17 +160,17 @@
                 <label class="flex-row chk-container flex-align-center m-r-20" class:checked={showLowLiquidity} id="chk-showLowLiquidity">
                     <input type="checkbox" bind:checked={$homeFilters.showLowLiquidity} on:change={(e) => handleUpdateFilter("showLowLiquidity", e.target.checked)}>
                     <span class="chk-checkmark chk-small"></span>
-                    Show Low Liquidity
+                    Low Liquidity
                 </label>
                 <label class="flex-row chk-container flex-align-center" class:checked={showLowVolume} id="chk-showLowVolume">
                     <input type="checkbox" bind:checked={$homeFilters.showLowVolume} on:change={(e) => handleUpdateFilter("showLowVolume", e.target.checked)}>
                     <span class="chk-checkmark chk-small"></span>
-                    Show Low Volume
+                    Low Volume
                 </label>
                 <label class="flex-row chk-container flex-align-center" class:checked={showNotVerified} id="chk-showNotVerified">
                     <input type="checkbox" bind:checked={$homeFilters.showNotVerified} on:change={(e) => handleUpdateFilter("showNotVerified", e.target.checked)}>
                     <span class="chk-checkmark chk-small"></span>
-                    Show Not Verified
+                    Unverified Tokens
                 </label>
                 <button class="primary outline small" on:click={showCheckboxes}>close</button>
             </div>
