@@ -197,6 +197,10 @@ body.light {
     color: var(--warning-color);
 }
 
+.text-warning-dark {
+    color: var(--warning-color-dark);
+}
+
 .text-error {
     color: var(--error-color);
 }

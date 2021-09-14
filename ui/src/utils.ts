@@ -227,7 +227,6 @@ export const getHomeFilters = () => {
 }
 
 export const updateHomeFilters = (filter, new_value) => {
-	console.log({filter, new_value})
     if (!filter) return
     let filters_store = get(homeFilters)
     filters_store[filter] = new_value
@@ -259,7 +258,6 @@ export const getOnboardingSettings = () => {
 }
 export const setOnboardingSetting = (key, value) => {
 	let current_setttings = get(onboarding_settings)
-	console.log({key, value, current_setttings})
 	current_setttings[key] = value
 	localStorage.setItem("onboarding_settings", JSON.stringify(current_setttings))
 	onboarding_settings.set(current_setttings)

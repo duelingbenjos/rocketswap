@@ -3,8 +3,6 @@
     export let margin = "0";
 </script>
 
-
-
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" {width} height={width} style={`isolation:isolate; margin: ${margin};`} title="Verified Token">
     <defs>
         <clipPath id="_clipPath_6anizaKgQtLGcW1J45P1prIc8KZfuBaj">

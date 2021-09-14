@@ -68,7 +68,6 @@ export class ApiService {
 	async getToken(contract_name: string) {
 		try {
 			const res = await axios.get(`${this.base_url}/api/token/${contract_name}`).then((res) => valuesToBigNumber(res.data))
-			console.log({res})
 			return res
 		} catch (err) {
 			console.error(err)

@@ -38,7 +38,6 @@
 	connection: SocketIOClient.Socket
 
 	constructor() {
-		//console.log('WS Service STARTED')
 		this.base_url = getBaseUrl()
 		this.connection = socket.connect(this.base_url)
 		this.setupEvents()
@@ -68,7 +67,6 @@
 */ 
 	// CONNECT
 	private handleConnect(){
-		//console.log(`socket connected to : ${this.base_url}:${this.port}`)
 		if (!this.previously_connected) {
 			this.connection.emit('join_room', `trollbox`)
 			this.previously_connected = true
@@ -98,9 +96,7 @@
 		This payload is an array containing all the registered staking pools in the API
 		*/
 		this.connection.on(`staking_panel`, (payload) => {
-			console.log(JSON.parse(JSON.stringify(payload)))
 			stakingInfo.set(valuesToBigNumber(payload))
-			console.log({staking_panel: payload})
 		})
 
 		/*
@@ -108,7 +104,6 @@
 		Type : StakingMetaEntity
 		*/
 		this.connection.on('staking_panel_update', (payload) => {
-			console.log({staking_update: payload})
 			stakingInfo.update(currentValue => {
 				currentValue.forEach((info, index) => {
 				if (info.contract_name === payload.data.contract_name) currentValue[index] = payload.data
@@ -119,11 +114,10 @@
 
 		this.connection.on(`epoch_data`, (payload) => {
 			epochs.set(valuesToBigNumber(payload))
-			console.log({epoch_data: payload})
 		})
 
 		this.connection.on(`epoch_update`, (payload) => {
-			console.log({epoch_update: payload})
+			//console.log({epoch_update: payload})
 		})
 
 		this.joinedFeeds['staking_panel'] = true
@@ -166,7 +160,6 @@
 
 	// AUTH 
 	private handleAuthResponse(msg){
-		console.log({handleAuthResponse:msg})
 		localStorage.setItem('auth_token', JSON.stringify(msg))
 		setBearerToken()
 	}
@@ -182,7 +175,6 @@
 	}
 
 	private handleTauUsdFeed(msg){
-		console.log({handleTauUsdFeed: msg})
 		if (msg.current_price){
 			setTauUsdPrice(msg.current_price)
 			tauUSDPrice.set(toBigNumber(msg.current_price))
@@ -200,7 +192,6 @@
 	public joinTokenMetricsFeed(contract_name: string) {
 		if(this.joinedFeeds[`price_feed:${contract_name}`]) return
 		
-		console.log({joinTokenMetricsFeed: contract_name})
 		this.connection.emit('join_room', `price_feed:${contract_name}`)
 		this.connection.on(`price_feed:${contract_name}`, this.handleTokenMetricsFeed)
 
@@ -208,7 +199,6 @@
 	}
 
 	private handleTokenMetricsFeed = (metrics_update: MetricsUpdateType) => {
-		console.log({handleTokenMetricsFeed: JSON.parse(JSON.stringify(metrics_update))})
 		let { contract_name } = metrics_update
 		const metrics = this.token_metrics
 		metrics[contract_name] = { ...metrics[contract_name], ...metrics_update }
@@ -223,11 +213,8 @@
 	}
 
 	public joinTradeFeed(contract_name: string) {
-		console.log({joinedFeeds: this.joinedFeeds, contract_name, currentEquals: this.current_trade_feed === contract_name, joinedAlready: this.joinedFeeds[`trade_feed:${contract_name}`]})
 		if (this.current_trade_feed === contract_name) return
 		if (this.joinedFeeds[`trade_feed:${contract_name}`]) return
-
-		console.log("joining " + contract_name)
 
 		this.connection.on(`trade_update:${contract_name}`, (event) => this.handleTradeUpdate(event, contract_name))
 		this.connection.emit('join_room', `trade_feed:${contract_name}`)
@@ -237,7 +224,6 @@
 	}
 
 	private handleTradeUpdate(event, contract_name) {
-		console.log({event, contract_name, joinedFeeds: this.joinedFeeds})
 		if (event.history) {
 			tradeHistory.update( current => {
 				if (!current[contract_name]) current[contract_name] = []
@@ -284,13 +270,11 @@
 	}
 
 	private handleUserYieldFeed(payload) {
-		console.log(JSON.parse(JSON.stringify({user_yield_list: payload})))
 		if (payload) userYieldInfo.set(valuesToBigNumber(payload))
 		
 	}
 
 	private handleUserYieldFeedUpdate(update){
-		console.log(JSON.parse(JSON.stringify({user_yield_update: update})))
 		userYieldInfo.update(currentValue => {
 			Object.keys(update).map(val => {
 				currentValue[val] = valuesToBigNumber(update[val])
@@ -316,12 +300,10 @@
 	}
 
 	private handleBalanceList(payload) {
-		console.log({handleBalanceList: JSON.parse(JSON.stringify(payload))})
 		tokenBalances.set(valuesToBigNumber(payload).balances)
 	}
 
 	private handleBalanceUpdate(data) {
-		console.log({handleBalanceUpdate: data})
 		const { payload } = data
 		tokenBalances.set(valuesToBigNumber(payload).balances)
 	}
@@ -336,7 +318,7 @@
 
 	public joinUserLpBalancesFeed(vk: string){
 		if (this.joinedFeeds[`user_lp_feed:${vk}`]) return
-		console.log({joinUserLpBalancesFeed: vk})
+
 		this.connection.emit('join_room', `user_lp_feed:${vk}`)
 		this.connection.on(`user_lp_feed:${vk}`, this.handleUserLpBalanceList)
 		this.connection.on(`user_lp_update:${vk}`, this.handleUserLpBalanceUpdate)
@@ -345,13 +327,11 @@
 	}
 
 	private handleUserLpBalanceList(payload){
-		console.log({handleUserLpBalanceList: JSON.parse(JSON.stringify(payload))})
 		lpBalances.set(valuesToBigNumber(payload).points)
 		get(lpPairs)
 	}
 
 	private handleUserLpBalanceUpdate(data){
-		console.log({handleUserLpBalanceUpdate: JSON.parse(JSON.stringify(data))})
 		lpBalances.set(valuesToBigNumber(data).points)
 	}
 
