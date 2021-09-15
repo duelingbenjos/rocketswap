@@ -2,8 +2,8 @@
     import { fade } from 'svelte/transition';
 
     // Misc
-    import { onboarding_settings } from '../../store.ts'
-    import { setOnboardingSetting } from '../../utils.ts'
+    import { onboarding_settings } from '../../store.js'
+    import { setOnboardingSetting } from '../../utils.js'
 
     // Icons
     import CloseCircle from '../../icons/close-circle.svelte'

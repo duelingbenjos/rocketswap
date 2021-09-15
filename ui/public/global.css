@@ -561,6 +561,9 @@ input.primaryInput {
     border-radius: var(--button-border-radius);
     font-weight: 600;
 }
+.chk-container{
+    position: relative;
+}
 
 .chk-container input {
     opacity: 0;
@@ -568,6 +571,7 @@ input.primaryInput {
     height: 0;
     width: 0;
     transition: 0.5s border ease-in-out;
+    position: absolute;
 }
 
 .chk-container>span {

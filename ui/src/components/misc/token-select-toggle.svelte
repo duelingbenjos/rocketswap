@@ -1,10 +1,10 @@
-<script lang="ts">
+<script>
     import { createEventDispatcher, getContext } from 'svelte'
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 
     // Stores
-    import { token_list_store, tokenBalances, walletIsReady } from '../../store'
+    import { token_list_store, tokenBalances, walletIsReady, verifiedTokens } from '../../store'
 
     //Services
     import { WalletService } from '../../services/wallet.service'
@@ -19,9 +19,11 @@
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
     import CloseIcon from '../../icons/close.svelte'
     import SelectedArrow from '../../icons/selected-arrow.svelte'
+    import IconVerified from '../../icons/verified_token.svelte'
     
     //Misc
-    import { stringToFixed  } from '../../utils'
+    import { stringToFixed, toBigNumber, setTokenSelectFilter  } from '../../utils'
+    import {tokenSelect_showUnverifed } from '../../store'
 
     const dispatch = createEventDispatcher();
     const { getTokenList, pageStores } = getContext('pageContext');
@@ -33,7 +35,7 @@
     let api_tokens;
 
     $: filter = ""; 
-    $: token_list = createTokenList(api_tokens, filter, $walletIsReady, $tokenBalances);
+    $: token_list = createTokenList(api_tokens, filter, $walletIsReady, $tokenBalances, $verifiedTokens, $tokenSelect_showUnverifed);
     $: selected_contract = $selectedToken?.contract_name;
 
     const openTokenSelect = async () => {
@@ -57,29 +59,53 @@
                 }
                 
             }
-            if ($walletIsReady){
-                tokenList = [...tokenList
-                    .map((token) => {
-                        token.balance = $tokenBalances[token.contract_name] || 0
-                        return token
-                    })
 
-                    .sort((a, b) => b.balance - a.balance)
-                ]
-            }else{
-                tokenList = [...tokenList
-                    .sort((a, b) => {
-                        return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
-                    })
-                ]
+            tokenList = tokenList.map(token => {
+                    token.balance = addBalance(token)
+                    token.isVerified = isVerified(token)
+                    console.log(token)
+                    return token
+                })
+                .sort((a, b) => b.balance.isGreaterThan(a.balance) ? 1 : -1)
+            
+            let hasBalance = tokenList.filter(f => f.balance.isGreaterThan("0"))
+            let noBalance = tokenList
+                .filter(f => f.balance.isEqualTo("0"))
+                .sort((a, b) => {
+                    return a.token_symbol.toLowerCase() < b.token_symbol.toLowerCase() ? -1 : a.token_symbol.toLowerCase() > b.token_symbol.toLowerCase() ? 1 : 0
+                })
+                .sort((a,b) => a.isVerified > b.isVerified ? -1 : 1)
+
+            tokenList = [...hasBalance,  ...noBalance]
+
+            if ($selectedToken){
+                tokenList = tokenList.filter(f => f.contract_name !== $selectedToken.contract_name)
+                tokenList.unshift({...$selectedToken, balance: addBalance($selectedToken), isVerified: isVerified($selectedToken)})
             }
+
+            if (!$tokenSelect_showUnverifed) tokenList = tokenList.filter(f => f.isVerified)
+
             return tokenList
         }
+    }
+
+    function addBalance(token){
+        if ($walletIsReady){
+            return $tokenBalances[token.contract_name] || toBigNumber("0")
+        }
+        return toBigNumber("0")
+    }
+
+    function isVerified(token){
+        return $verifiedTokens.includes(token.contract_name)
     }
 
     const handleSearch = (e) => {
         const { inputValue } = e.detail
         filter = inputValue
+    }
+    const handleShowUnverivied = (e) => {
+        setTokenSelectFilter('show_unverified', e.target.checked)
     }
 </script>
 
@@ -156,6 +182,24 @@
         top: 2px;
         margin: 0 3px;
     }
+    .chk-container{
+        color: var(--text-primary-color-dimmer);
+        font-size: 0.9em;
+        margin: 0 0 1rem;
+    }
+    .chk-container:hover{
+        filter: brightness(130%)
+    }
+    .show-unverified-checked{
+        color: var(--text-color-highlight);
+    }
+    span.show-unverified-checked{
+        border: 1px solid var(--text-color-highlight);
+    }
+    .chk-checkmark{
+        margin-left: 0;
+        border: 1px solid var(--text-primary-color-dimmer);
+    }    
 
     /* When page width is greater than 430px and less than 650px (phones) */
     @media screen and (min-width: 430px) {
@@ -197,9 +241,14 @@
                     <CloseIcon width="18px" />
                 </button>
             </div>
-
+            <label id="chk-showUnverified" class="flex-row chk-container flex-align-center" class:show-unverified-checked={$tokenSelect_showUnverifed} >
+                <input type="checkbox" bind:checked={$tokenSelect_showUnverifed} on:change={handleShowUnverivied}>
+                <span  class="chk-checkmark" class:show-unverified-checked={$tokenSelect_showUnverifed}></span>
+                Show Unverified Tokens
+            </label>
             <TokenSearch on:search={handleSearch}/>
             <hr />
+
             <div class="token-scroll">
                 <div class="token-list">
                     {#if token_list}
@@ -210,6 +259,9 @@
                                         <div class="token-name-logo flex-row">
                                             <TokenLogo tokenMeta={token} width={'27px'} lpBottom={"-2px"}/>
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
+                                            {#if token.isVerified}
+                                                <IconVerified width="20px" margin="0 0 0 8px" />
+                                            {/if}
                                             {#if token.contract_name === selected_contract}
                                                 <SelectedArrow width="10px" margin="0 8px" direction="left"/>
                                             {/if}
