@@ -115,7 +115,7 @@
 		left: -5px;
 		width: 50px;
 		transform: translateY(-50%);
-		z-index: 500;
+		z-index: 2;
     }
 
 	@media screen and (min-width: 430px) {

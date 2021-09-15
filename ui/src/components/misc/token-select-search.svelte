@@ -35,7 +35,7 @@
 </style>
 
 <input 
-    placeholder="Token Name or Contract"
+    placeholder="Search for Token"
     bind:value={inputValue}
     on:input={handleInput}
 />

@@ -43,6 +43,7 @@
     label{
         margin-top: 1rem;
         margin-bottom: 1rem;
+        margin-left: 1rem;
     }
     label.checked{
         color: var(--text-color-highlight);

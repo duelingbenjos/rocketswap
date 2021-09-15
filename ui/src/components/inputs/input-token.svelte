@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
 	import { createEventDispatcher, getContext, onMount } from 'svelte'
 	import { scale } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
