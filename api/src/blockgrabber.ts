@@ -109,11 +109,10 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 			typeof blockInfo.error === "undefined" &&
 			typeof blockInfo.number !== "undefined"
 		) {
-			let hasBlockInDB = false
-			let blockNum = blockInfo.number.__fixed__ ? parseInt(blockInfo.number.__fixed__) : blockInfo.number;
+
+			let blockNum = blockInfo.number;
 			let block = await models.Blocks.findOne({blockNum})
 			if (!block){
-				log.log("Block doesn't exists, adding new BLOCK model")
 				block = new models.Blocks({
 					rawBlock: JSON.stringify(blockInfo),
 					blockNum,
@@ -123,9 +122,6 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 					numOfTransactions: 0,
 					transactions: JSON.stringify([])
 				});
-			}else{
-				hasBlockInDB = true
-				log.log("Block already exists, not adding BLOCK model")
 			}
 
 			log.log(
@@ -186,8 +182,9 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 				log.log("saved " + blockNum);
 				updateLastChecked()
 			});
+			currBlockNum = blockNum
 			if (blockNum === currBatchMax) {
-				currBlockNum = currBatchMax;
+				// currBlockNum = currBatchMax;
 				timerId = setTimeout(checkForBlocks, 100);
 			}
 		}
@@ -215,8 +212,42 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		});
 	};
 
+	const malformedBlock = (blockInfo) => {
+        const validateValue = (value, name) => {
+            if (isNaN(parseInt(value))) throw new Error(`'${name}' has malformed value ${JSON.stringify(value)}`)
+        }
+
+        const { number, subblocks } = blockInfo
+        try{
+            validateValue(number, 'number')
+            if (Array.isArray(subblocks)) {
+                for (let sb of subblocks){
+                    const { transactions, subblock } = sb
+                    
+                    validateValue(subblock, 'subblock')
+                    if (Array.isArray(transactions)) {
+                        for (let tx of transactions){
+                            const { stamps_used,  status, transaction } = tx
+                            const { metadata,  payload } = transaction
+                            const { timestamp } = metadata
+                            const { nonce, stamps_supplied } = payload
+                            validateValue(stamps_used, 'stamps_used')
+                            validateValue(status, 'status')
+                            validateValue(timestamp, 'timestamp')
+                            validateValue(nonce, 'nonce')
+                            validateValue(stamps_supplied, 'stamps_supplied')
+                        }
+                    }
+                }
+            }
+        }catch(e){
+            console.log({"Malformed Block":e})
+            return true
+        }
+        return false
+    }
+
 	const checkForBlocks = async () => {
-		log.log("checking")
 		if (instance_id !== ParserProvider.blockgrabber_active_instance_id) return
 		updateLastChecked()
 		let response: any = await getLatestBlock_MN();
@@ -239,37 +270,77 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 				}
 
 				let to_fetch = [];
+				
 				if (latestBlockNum > currBlockNum) {
 					currBatchMax = currBlockNum + batchAmount;
 					if (currBatchMax > latestBlockNum)
 						currBatchMax = latestBlockNum;
 					if (currBatchMax > batchAmount) currBatchMax + batchAmount;
-					// let to_process = []
+
 					let blocksToGetCount = 1
 					for (let i = currBlockNum + 1; i <= currBatchMax; i++) {
-						let blockInfo = await models.Blocks.findOne({blockNum: i})
-						let blockData = null;
-						if(blockInfo) {
-							blockData = JSON.parse(blockInfo.rawBlock)
-						}else{
-							const timedelay = blocksToGetCount * 500;
-							log.log(
-								"getting block: " +
-									i +
-									" with delay of " +
-									timedelay +
-									"ms"
-							);	
+						// Get the raw block data from the internal database
+						let block = await db.models.Blocks.findOne({ blockNum: i })
+                        let blockData = null;
+						
+						// If there was somethin then check to make sure it is a proper block and not malformed
+                        if (block){
+							const { rawBlock } = block
+							let blockInfo = JSON.parse(rawBlock)
+                            if (blockInfo){
+								// If it's good then use this block data instead of getting it from the maternode
+								if (!malformedBlock(blockInfo)) {
+									blockData = blockInfo
+								// If it was malformed then delete the bad block from the database. 
+								// not setting "blockData" here will make the logic get it from the Masternode below
+								}else{
+                                    log.log(`Block ${i}: Malformed block in database, deleting it!`)
+                                    await db.models.Blocks.deleteOne({ blockNum: i })
+                                }
+                            }
+                        }
+						
+						// If we didn't get block data from the database (above)
+                        if (blockData === null){
+							
+							// Create time delay to get the block info (to prevernt getting rate limted)
+                            const timedelay = blocksToGetCount * 100;
+							// Get blockData from the masternode
+							// This is a promise that will get awaited below in Promise.all
 							blockData = getBlock_MN(i, timedelay)
-							blocksToGetCount = blocksToGetCount + 1
-							if (i === currBatchMax) updateLastChecked(timedelay)
+                            blocksToGetCount = blocksToGetCount + 1
 						}
-						to_fetch.push(blockData);
+						
+						// Add this Blockdata and blockNum (id) to a list
+                        to_fetch.push({id: i, blockData});
 					}
 
-					let to_process = await Promise.all(to_fetch);
-					to_process.sort((a, b) => a.number - b.number);
-					for (let block of to_process) await processBlock(block);
+					if (to_fetch.length > 0) {
+						// Sort the list by id (blockNum) so all our blocks can be processed in order
+						to_fetch.sort((a, b) => a.id - b.id);
+						// await the masternode results of all the blocks we needed (if any)
+                        let processed = await Promise.all(to_fetch.map(b => b.blockData));
+						
+						// Loop through the blockData in order and process it
+                        for (let blockData of processed) {
+							// If any blocks are malformed then
+							// 1) Don't process it
+							// 2) Stop processig any more block data
+							// 3) Check again in 30000 seconds
+                            if (malformedBlock(blockData)) {
+								console.log({blockData})
+								console.log({latestBlockNum, currBlockNum})
+                                log.log(`Malformed Block, trying again in 30 Seconds`)
+                                timerId = setTimeout(checkForBlocks, 30000);
+                                break
+                            }else{
+								// If the block is fine process it
+                                await processBlock(blockData);
+                            }
+                        }
+                    }else{
+                        timerId = setTimeout(checkForBlocks, 10000);
+                    }
 				}
 
 				if (latestBlockNum < currBlockNum) {
