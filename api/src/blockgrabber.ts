@@ -305,7 +305,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
                         if (blockData === null){
 							
 							// Create time delay to get the block info (to prevernt getting rate limted)
-                            const timedelay = blocksToGetCount * 100;
+                            const timedelay = blocksToGetCount * 150;
 							// Get blockData from the masternode
 							// This is a promise that will get awaited below in Promise.all
 							blockData = getBlock_MN(i, timedelay)
