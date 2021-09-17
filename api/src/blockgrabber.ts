@@ -185,7 +185,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 			currBlockNum = blockNum
 			if (blockNum === currBatchMax) {
 				// currBlockNum = currBatchMax;
-				timerId = setTimeout(checkForBlocks, 100);
+				checkForBlocks()
 			}
 		}
 	};
