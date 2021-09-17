@@ -194,6 +194,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		return new Promise(resolver => {
 			setTimeout(async () => {
 				const block_res = await sendBlockRequest(`${MASTERNODE_URL}${route_getBlockNum}${blockNum}`);
+				console.log({url: `${MASTERNODE_URL}${route_getBlockNum}${blockNum}`, block_res})
 				resolver(block_res);
 			}, timedelay)
 		})
