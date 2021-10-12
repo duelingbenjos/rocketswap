@@ -212,6 +212,14 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		});
 	};
 
+	const blockExists = (blockInfo) => {
+		const { error } = blockInfo
+		if (error){
+			if (error === "Block not found.") return false
+		}
+		return true
+	}
+
 	const malformedBlock = (blockInfo) => {
         const validateValue = (value, name) => {
             if (isNaN(parseInt(value))) throw new Error(`'${name}' has malformed value ${JSON.stringify(value)}`)
@@ -241,8 +249,10 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
                 }
             }
         }catch(e){
-            console.log({"Malformed Block":e})
-            return true
+			console.log({"Malformed Block":e})
+			
+			if (!blockExists(blockInfo)) return false
+			return true
         }
         return false
     }
@@ -334,8 +344,9 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
                                 timerId = setTimeout(checkForBlocks, 30000);
                                 break
                             }else{
-								// If the block is fine process it
-                                await processBlock(blockData);
+								// If the block is not malformed and actaully exists then process it
+								if (blockExists(blockData)) await processBlock(blockData);
+								
                             }
                         }
                     }else{
