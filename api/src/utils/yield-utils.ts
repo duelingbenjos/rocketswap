@@ -26,12 +26,6 @@ export function calculateSmartEpochYield(args: {
 		return time;
 	};
 
-	log.log({
-		calculateSmartCompoundingYield: {
-			meta: meta.contract_name
-		}
-	});
-
 	amount = parseFloat(amount.__fixed__);
 	let this_epoch_index = starting_epoch_index;
 	let y = 0;
@@ -161,7 +155,6 @@ export function calculateSmartCompoundingYield(args: {
 		} else if (this_epoch_index === starting_epoch_index) {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(deposit_start_step_adjusted);
 		} else if (this_epoch_index === current_epoch_index) {
-			log.log({ meta: meta.contract_name });
 			delta = fitTime(dateNowUtc()) - fitTime(datetimeToUnix(this_epoch.time));
 		} else {
 			delta = fitTime(datetimeToUnix(next_epoch.time)) - fitTime(datetimeToUnix(this_epoch.time));
@@ -250,7 +243,6 @@ function daysToSeconds(days: number): number {
 export function getUserRewardRate(meta: StakingMetaEntity, deposit: IStakingDeposit) {
 	let time_ramp_values = meta.TimeRampValues;
 	let step_offset = deposit.step_offset?.__delta__;
-	log.log({ step_offset });
 	let step_offset_ms = (step_offset ? step_offset[1] + daysToSeconds(step_offset[0]) : 0) * 1000;
 	let time_ramp_delta = fitTime(dateNowUtc(), meta) - fitTime(datetimeToUnix(deposit.time), meta) + step_offset_ms;
 	let step_multiplier = findTimeRampStep(meta.TimeRampValues, time_ramp_delta) * 100;
@@ -316,7 +308,6 @@ export async function fillMissingEpochs(
 }
 
 export async function retrieveEpochFromMN(contract_name: string, index: number): Promise<StakingEpochEntity> {
-	log.log({ retrieveEpoch: `${contract_name} : ${index}` });
 	const path = `/contracts/${contract_name}/Epochs?key=${index}`;
 	const res = await axios.get(`${config.masternode}${path}`);
 	const data: EpochResponse = res.data;

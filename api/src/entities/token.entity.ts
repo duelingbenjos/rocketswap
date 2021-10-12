@@ -69,7 +69,6 @@ export const saveToken = async (add_token_dto: AddTokenDto) => {
 		operator
 	} = add_token_dto;
 	if (!contract_name) {
-		log.log({ add_token_dto });
 		throw new Error("Field missing.");
 	}
 

@@ -70,7 +70,6 @@ export async function updateEpoch(args: {
 		timestamp,
 		hash
 	} = args;
-	log.log("increment epoch")
 	const entity = new StakingEpochEntity();
 	entity.amount_staked = amount_staked?.__fixed__;
 	entity.emission_rate_per_tau = emission_rate_per_tau?.__fixed__;

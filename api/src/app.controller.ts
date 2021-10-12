@@ -1,7 +1,5 @@
 import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { pairs, VirtualTimeScheduler } from "rxjs";
-import { CircularRelationsError } from "typeorm";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -118,7 +116,7 @@ export class AppController {
 							return a;
 					  }, {})
 					: {};
-				accum.push(obj)
+				accum.push(obj);
 				return accum;
 			}, []);
 

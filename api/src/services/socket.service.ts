@@ -131,7 +131,6 @@ export class SocketService {
 		epoch_entities: StakingEpochEntity[]
 	): Promise<IUserYieldPayload> {
 		try {
-			log.log(epoch_entities)
 			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name: staking_contract } });
 			if (!meta_entity) return;
 			const total_staked = user_entity.deposits.reduce((accum, deposit) => {

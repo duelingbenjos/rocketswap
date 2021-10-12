@@ -45,7 +45,6 @@ export class CoinGeckoAPIService implements OnModuleInit {
 			let tickerData: any = await axios.get(
 				`${this.baseUrl}/coins/markets?vs_currency=usd&ids=lamden&order=market_cap_desc&per_page=100&page=1&sparkline=false`
 			);
-			log.log(tickerData.data[0].current_price);
 			const price = tickerData?.data[0].current_price;
 			if (price) {
 				return await saveUSDPrice({

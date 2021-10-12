@@ -110,9 +110,6 @@ export class StakingService implements OnModuleInit {
 				PairEntity.findOne(reward_token)
 			]);
 			if (!staking_token_pair_entity || !reward_token_pair_entity) return 0
-			log.log(staking_token, reward_token)
-
-			log.log(staking_token_pair_entity, reward_token_pair_entity)
 			const staking_p = Number(staking_token_pair_entity.price)
 			const reward_p = Number(reward_token_pair_entity.price)
 
