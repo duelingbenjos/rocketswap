@@ -105,10 +105,10 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 	};
 
 	const processBlock = async (blockInfo) => {
-		if (
-			typeof blockInfo.error === "undefined" &&
-			typeof blockInfo.number !== "undefined"
-		) {
+		const { error } = blockInfo
+		if (error) return
+
+		if ( !malformedBlock(blockInfo) ) {
 
 			let blockNum = blockInfo.number;
 			let block = await models.Blocks.findOne({blockNum})
@@ -185,7 +185,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 			currBlockNum = blockNum
 			if (blockNum === currBatchMax) {
 				// currBlockNum = currBatchMax;
-				timerId = setTimeout(checkForBlocks, 100);
+				checkForBlocks()
 			}
 		}
 	};
@@ -194,6 +194,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		return new Promise(resolver => {
 			setTimeout(async () => {
 				const block_res = await sendBlockRequest(`${MASTERNODE_URL}${route_getBlockNum}${blockNum}`);
+				console.log({url: `${MASTERNODE_URL}${route_getBlockNum}${blockNum}`, block_res})
 				resolver(block_res);
 			}, timedelay)
 		})
@@ -227,6 +228,9 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 
         const { number, subblocks } = blockInfo
         try{
+			// If the block isn't there then that's okay
+			if (blockInfo.error === "Block not found.") return false
+
             validateValue(number, 'number')
             if (Array.isArray(subblocks)) {
                 for (let sb of subblocks){
@@ -249,10 +253,8 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
                 }
             }
         }catch(e){
-			console.log({"Malformed Block":e})
-			
-			if (!blockExists(blockInfo)) return false
-			return true
+            console.log({"Malformed Block": e})
+            return true
         }
         return false
     }
@@ -314,7 +316,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
                         if (blockData === null){
 							
 							// Create time delay to get the block info (to prevernt getting rate limted)
-                            const timedelay = blocksToGetCount * 100;
+                            const timedelay = blocksToGetCount * 150;
 							// Get blockData from the masternode
 							// This is a promise that will get awaited below in Promise.all
 							blockData = getBlock_MN(i, timedelay)
