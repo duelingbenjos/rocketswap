@@ -194,7 +194,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 		return new Promise(resolver => {
 			setTimeout(async () => {
 				const block_res = await sendBlockRequest(`${MASTERNODE_URL}${route_getBlockNum}${blockNum}`);
-				console.log({url: `${MASTERNODE_URL}${route_getBlockNum}${blockNum}`, block_res})
+				// console.log({url: `${MASTERNODE_URL}${route_getBlockNum}${blockNum}`, block_res})
 				resolver(block_res);
 			}, timedelay)
 		})
@@ -340,8 +340,8 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 							// 2) Stop processig any more block data
 							// 3) Check again in 30000 seconds
                             if (malformedBlock(blockData)) {
-								console.log({blockData})
-								console.log({latestBlockNum, currBlockNum})
+								// console.log({blockData})
+								// console.log({latestBlockNum, currBlockNum})
                                 log.log(`Malformed Block, trying again in 30 Seconds`)
                                 timerId = setTimeout(checkForBlocks, 30000);
                                 break
