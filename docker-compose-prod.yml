@@ -35,8 +35,8 @@ services:
       - SECRET=SECRET_GOES_HERE
       - NETWORK_TYPE=mainnet
       - CONTEXT=remote
-    volumes:
-      - rocketswap-volume:/api
+    # volumes:
+    #   - rocketswap-volume:/api
 
   docs:
     build: ./docs
