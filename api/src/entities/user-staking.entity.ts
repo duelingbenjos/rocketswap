@@ -104,7 +104,6 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			if (deposits[0].user_yield) harvestable_yield += getNumber(deposits[0].user_yield);
 		}
 
-		log.log({contract: meta.contract_name})
 		harvestable_yield += calcFn({
 			starting_epoch_index: d.starting_epoch,
 			amount: d.amount,

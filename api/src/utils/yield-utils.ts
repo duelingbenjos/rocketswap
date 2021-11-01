@@ -1,4 +1,3 @@
-import { ApiExtraModels } from "@nestjs/swagger";
 import { config } from "../config";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";

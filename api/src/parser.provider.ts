@@ -16,6 +16,7 @@ import { savePrice } from "./entities/price.entity";
 import { StakingService } from "./services/staking.service";
 import { nanoid } from "nanoid";
 import { getStakingMetaList, StakingMetaEntity } from "./entities/staking-meta.entity";
+import { LastBlockEntity, updateLastBlock } from "./entities/last-block.entity";
 
 @Injectable()
 export class ParserProvider {
@@ -49,8 +50,8 @@ export class ParserProvider {
 		// await this.updateStakingContractList();
 		await this.updateStakingContractList();
 		ParserProvider.amm_meta_entity = await AmmMetaEntity.findOne();
-
-		this.startBlockgrabber(false);
+		const last_block = await LastBlockEntity.findOne()
+		this.startBlockgrabber(false, last_block?.last_block);
 
 		/**
 		 * Temporary workaround, since the blockgrabber likes to stop checking for blocks randomly.
@@ -90,7 +91,8 @@ export class ParserProvider {
 	 */
 
 	public parseBlock = async (block: BlockDTO) => {
-		const { state, fn, contract: contract_name, timestamp, hash } = block;
+		const { state, fn, contract: contract_name, timestamp, hash, block_num } = block;
+		this.addToActionQue(updateLastBlock, {block_num})
 		this.addToActionQue(saveTransfer, {
 			state,
 			handleClientUpdate: this.socketService.handleClientUpdate
@@ -244,7 +246,7 @@ export class ParserProvider {
 		ParserProvider.amm_meta_entity = amm_meta_entity;
 	};
 
-	private startBlockgrabber = (skip_wipe: boolean = false, block_num?:number) => {
+	private startBlockgrabber = async (skip_wipe: boolean = false, block_num?:number) => {
 		let id = nanoid(7);
 		ParserProvider.blockgrabber_active_instance_id = id;
 		blockgrabber(this.handleNewBlock, skip_wipe, id, block_num);

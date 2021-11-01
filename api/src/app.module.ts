@@ -33,6 +33,7 @@ import { MarketcapEntity } from "./entities/marketcap.entity";
 import { MarketcapService } from "./services/marketcap.service";
 import { CoinGeckoAPIService } from "./services/coingecko.service";
 import { StakingService } from "./services/staking.service";
+import { LastBlockEntity } from "./entities/last-block.entity";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -54,7 +55,8 @@ const db_options: TypeOrmModuleOptions = {
 		StakingEpochEntity,
 		TauMarketEntity,
 		VolumeMetricsEntity,
-		MarketcapEntity
+		MarketcapEntity,
+		LastBlockEntity
 	],
 	subscribers: [TradeSubscriber],
 	synchronize: true,
