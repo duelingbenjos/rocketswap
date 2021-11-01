@@ -10,7 +10,7 @@ then\n\
     echo "Building Database..." \n\
 fi \n\
 echo "Starting API..."\n\
-npm run start:dev \n'\
+npm run start \n'\
 > entypoint.sh
 
 COPY package.json .
