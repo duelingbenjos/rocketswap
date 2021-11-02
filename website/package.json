@@ -5,6 +5,7 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public -p 82 --host",
+    "start-web": "sirv public -p 80 --host",
     "validate": "svelte-check"
   },
   "devDependencies": {
