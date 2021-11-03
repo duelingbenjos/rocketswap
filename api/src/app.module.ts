@@ -32,8 +32,7 @@ import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
 import { MarketcapEntity } from "./entities/marketcap.entity";
 import { MarketcapService } from "./services/marketcap.service";
 import { CoinGeckoAPIService } from "./services/coingecko.service";
-import { StakingService } from "./services/staking.service";
-import { LastBlockEntity } from "./entities/last-block.entity";
+
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
@@ -55,8 +54,7 @@ const db_options: TypeOrmModuleOptions = {
 		StakingEpochEntity,
 		TauMarketEntity,
 		VolumeMetricsEntity,
-		MarketcapEntity,
-		LastBlockEntity
+		MarketcapEntity
 	],
 	subscribers: [TradeSubscriber],
 	synchronize: true,
@@ -73,15 +71,14 @@ const db_options: TypeOrmModuleOptions = {
 			}
 		})
 	],
-	exports: [
-		ParserProvider
-	],
+	exports: [ParserProvider],
 	controllers: [AppController, TrollboxController],
 	providers: [
 		ParserProvider,
 		AppGateway,
 		SocketService,
-		StakingService,
+		// BsSyncService,
+		// StakingService,
 		TokensService,
 		RefreshTokensRepository,
 		JWTGuard,
@@ -92,7 +89,7 @@ const db_options: TypeOrmModuleOptions = {
 		StakingEpochEntity,
 		VolumeService,
 		MarketcapService,
-		CoinGeckoAPIService,
+		CoinGeckoAPIService
 	]
 })
 export class AppModule {}

@@ -53,7 +53,6 @@ export function validateStakingContract(contract: string): boolean {
 	return missing_idx > -1 ? false : true;
 }
 
-
 export function getKey(state: IKvp[], idx_1: number, idx_2: number) {
 	return state[idx_1].key.split(":")[idx_2];
 }
@@ -73,6 +72,12 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 	} else {
 		return val;
 	}
+}
+
+export function getValue(value: any) {
+	if (value.__fixed__) return value.__fixed__;
+	else if (value.__hash_self__) return getValue(value.__hash_self__);
+	return value;
 }
 
 export function getNumber(value: any) {

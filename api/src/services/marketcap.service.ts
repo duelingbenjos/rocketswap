@@ -3,7 +3,6 @@ import { log } from "../utils/logger";
 import { TokenEntity } from "../entities/token.entity";
 import { MarketcapEntity } from "../entities/marketcap.entity";
 import { BalanceEntity } from "../entities/balance.entity";
-import { ParserProvider } from "../parser.provider";
 import { PairEntity } from "../entities/pair.entity";
 import { CoinGeckoAPIService } from "./coingecko.service";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";

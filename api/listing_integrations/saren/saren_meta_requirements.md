@@ -3,20 +3,22 @@
 ``` typescript
 
 // meta fields :
- twitter : string
+// * : required for listing as a verified coin on rocketswap.
+ twitter* : string
  reddit : string
- telegram : string
+ telegram* : string
  git : string[]
  announcements : string // medium link
- chat: string[]
- website : string
- categories : string[] // need to figure out what the category types are
- name : string // "Rocketswap"
- description : string // "We aim to build decentralised tools for the cryptocurrency community that are more engaging than the current apps."
+ chat: string[] // any misc chat links can go in here, discord, IRC, etc etc.
+ website* : string
+ categories* : string[] // defi, Lending, Farming, Vaults etc // perhaps this could be a list of dropdowns ? need to talk to saren about this, so we conform to their standard.
+ name* : string // long form name eg : "Rocketswap"
+ description* : string // This is the overview for your token. What it does, the vision, etc, etc 1 - 5 paragraphs should do it. \n 
+ // eg. "We aim to build decentralised tools for the cryptocurrency community that are more engaging than the current apps, leveraging XYZ technologies."
+ // use \n for line breaks
+```
 
- genesisDate: string // "2021-03-30"
- blockchain: string[] // link to TauHQ contract info
-
+``` typescript
 
 // market metrics :
 price : number // Eth or USD ?
@@ -34,7 +36,9 @@ change :{
     '1y' : number
 }  // (pct I'm assuming.)
 timestamp: string // eg - "2021-04-20T03:15:01.395Z"
+```
 
+``` typescript
 // computed :
 
  platform : string // Lamden
@@ -46,6 +50,12 @@ timestamp: string // eg - "2021-04-20T03:15:01.395Z"
     small : string,
     large : string
 }
+
+
+// other fields (to be filled by api)
+ genesisDate: string // "2021-03-30"
+ blockchain: string[] // link to TauHQ contract info
+
   
 ```
 
