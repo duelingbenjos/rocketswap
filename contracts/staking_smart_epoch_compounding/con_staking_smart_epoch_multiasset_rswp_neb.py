@@ -1,14 +1,14 @@
 # Imports
 
-import currency
-import con_basic_token
+import con_rswp_lst001
+import con_nebula
 
 I = importlib
 
 # Setup Tokens
 
-STAKING_TOKEN = currency
-YIELD_TOKEN = con_basic_token
+STAKING_TOKEN = con_rswp_lst001
+YIELD_TOKEN = con_nebula
 
 # State
 
@@ -45,26 +45,26 @@ def seed():
     CurrentEpochIndex.set(0)
     StakedBalance.set(0)
     WithdrawnBalance.set(0)
-    EpochMaxRatioIncrease.set(1 / 2)
-    EpochMinTime.set(0)
+    EpochMaxRatioIncrease.set(1)
+    EpochMinTime.set(86000)
     TrustedExporters.set([])
 
-    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 3000}
+    Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 1878}
 
     meta["version"] = "0.0.3"
     meta[
         "type"
     ] = "staking_smart_epoch"  # staking || lp_farming || etcetera ...
-    meta["STAKING_TOKEN"] = "currency"
-    meta["YIELD_TOKEN"] = "con_basic_token"
+    meta["STAKING_TOKEN"] = "con_rswp_lst001"
+    meta["YIELD_TOKEN"] = "con_nebula"
 
-    EmissionRatePerHour.set(3000)  # 1200000 RSWP per year = 10% of supply
-    DevRewardPct.set(1 / 10)
+    EmissionRatePerHour.set(1878)  # 1200000 RSWP per year = 10% of supply
+    DevRewardPct.set(1 / 4)
 
     # The datetime from which you want to allow staking.
-    StartTime.set(datetime.datetime(year=2018, month=1, day=1, hour=0))
+    StartTime.set(datetime.datetime(year=2021, month=9, day=1, hour=10))
     # The datetime at which you want staking to finish.
-    EndTime.set(datetime.datetime(year=2022, month=3, day=4, hour=0))
+    EndTime.set(datetime.datetime(year=2021, month=12, day=14, hour=10))
 
     OpenForBusiness.set(True)
 

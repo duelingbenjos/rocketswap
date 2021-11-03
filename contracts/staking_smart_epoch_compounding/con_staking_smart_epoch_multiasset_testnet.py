@@ -32,7 +32,7 @@ EpochMaxRatioIncrease = (
 )  # The maximum ratio which the Epoch can increase by since last Epoch before incrementing.
 meta = Hash(default_value=False)
 decimal_converter_var = Variable()
-TrustedImporters = Variable()
+TrustedExporters = Variable()
 
 # Vtoken
 balances = Hash(default_value=0)
@@ -47,10 +47,11 @@ def seed():
     WithdrawnBalance.set(0)
     EpochMaxRatioIncrease.set(1 / 2)
     EpochMinTime.set(0)
+    TrustedExporters.set([])
 
     Epochs[0] = {"time": now, "staked": 0, "amt_per_hr": 100}
 
-    meta["version"] = "0.0.2"
+    meta["version"] = "0.0.3"
     meta[
         "type"
     ] = "staking_smart_epoch"  # staking || lp_farming || etcetera ...
@@ -76,15 +77,19 @@ def addStakingTokens(amount: float):
     assert amount > 0, "You must stake some tokens."
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=False)
+        return createNewDeposit(amount=amount, from_contract=False)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=False)
+        return increaseDeposit(amount=amount, from_contract=False)
 
 
 # This is called FROM the contract to which the yields will be staked.
 # This contract name will need to be added to the "TrustedImporters" list on the foreign contract.
 @export
 def stakeFromContractProfits(contract: str):
+    # verify that the contract is calling it is trusted.
+    assert (
+        contract in TrustedExporters.get()
+    ), "The contract is not in the trusted exporters list."
     # import staking contract
     yield_contract = I.import_module(contract)
     # call withdraw function to this contract, take return value
@@ -95,14 +100,14 @@ def stakeFromContractProfits(contract: str):
     deposit = Deposits[user]
 
     if deposit is False:
-        return createNewDeposit(amount=amount, user_ctx="caller", from_contract=True)
+        return createNewDeposit(amount=amount, from_contract=True)
     else:
-        return increaseDeposit(amount=amount, user_ctx="caller", from_contract=True)
+        return increaseDeposit(amount=amount, from_contract=True)
         
 
 def createNewDeposit(
-    amount: float, user_ctx: str, from_contract: bool
-):  # user_ctx will either be "caller" or "signer"
+    amount: float, from_contract: bool
+): # user_ctx will either be "caller" or "signer"
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount > 0, "You must stake something."
 
@@ -136,10 +141,10 @@ def createNewDeposit(
 
 @export
 def increaseDeposit(
-    amount: float, user_ctx: str, from_contract: bool
+    amount: float, from_contract: bool
 ):  # user_ctx will either be "caller" or "signer"
 
-    user = ctx.caller if user_ctx is "caller" else "signer"
+    user = ctx.caller
     assert OpenForBusiness.get() == True, "This staking pool is not open right now."
     assert amount >= 0, "You cannot stake a negative balance."
 
@@ -238,6 +243,7 @@ def withdrawTokensAndYield():
 
     # Send Staking Tokens to user
     STAKING_TOKEN.transfer(to=user, amount=stake_to_return)
+    returnAndBurnVToken(amount=stake_to_return)
 
     # check that the user has yield left to harvest (this should never be negative, but let's check here just in case)
     yield_to_harvest -= withdrawn_yield
@@ -260,7 +266,6 @@ def withdrawTokensAndYield():
 
     # Remove token amount from Staked
     new_staked_amount = StakedBalance.get() - stake_to_return
-    returnAndBurnVToken(amount=stake_to_return)
     StakedBalance.set(new_staked_amount)
     new_withdrawn_amount = WithdrawnBalance.get() + yield_to_harvest
     WithdrawnBalance.set(new_withdrawn_amount)
@@ -358,7 +363,7 @@ def maxStakedChangeRatioExceeded(new_staked_amount: float, this_epoch_staked: fl
         else this_epoch_staked
     )
     dif = bigger - smaller
-    if this_epoch_staked is 0 :
+    if this_epoch_staked < 0.0001 :
         return true
     return (dif) / this_epoch_staked >= EpochMaxRatioIncrease.get()
     
@@ -435,6 +440,24 @@ def setEmissionRatePerHour(amount: float):
 
 
 @export
+def addToTrustedExporters(contract: str):
+    assertOwner()
+    trusted_exporters = TrustedExporters.get()
+    if contract in trusted_exporters:
+        return
+    trusted_exporters.append(contract)
+    TrustedExporters.set(trusted_exporters)
+
+
+@export
+def removeFromTrustedExporters(contract: str):
+    assertOwner()
+    trusted_exporters = TrustedExporters.get()
+    trusted_exporters.remove(contract)
+    TrustedExporters.set(trusted_exporters)
+
+
+@export
 def recoverYieldToken():
     assertOwner()
     staked_balance = StakedBalance.get()
@@ -471,9 +494,10 @@ def assertOwner():
 
 
 # This is only to be called in emergencies - the user will forgo their yield when calling this FN.
+
+
 @export
 def emergencyReturnStake():
-
     user = ctx.caller
     deposit = Deposits[user]
 
