@@ -16,7 +16,7 @@ const DBUSER = process.env.ROCKETSWAP_DB_USERNAME;
 const DBPWD = process.env.ROCKETSWAP_DB_PASSWORD;
 const NETWORK_TYPE = process.env.NETWORK_TYPE;
 //log.log(DBUSER, DBPWD);
-let connectionString = `mongodb://127.0.0.1:27017/${config.networkType}`;
+let connectionString = `mongodb://127.0.0.1:27017/block-explorer`;
 
 if (DBUSER) {
 	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}`;
