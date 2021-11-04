@@ -57,10 +57,10 @@ export class ParserProvider {
 		 * Temporary workaround, since the blockgrabber likes to stop checking for blocks randomly.
 		 */
 		setInterval(() => {
-			if (Date.now() - ParserProvider.blockgrabber_last_update > 120000) {
+			if (Date.now() - ParserProvider.blockgrabber_last_update > 30000) {
 				log.warn("no response from blockgrabber in 30 seconds => starting it up again");
 				ParserProvider.updateLastChecked();
-				this.startBlockgrabber(false, this.last_block);
+				this.startBlockgrabber(true, this.last_block);
 			}
 		}, 5000);
 		// setInterval(() => {

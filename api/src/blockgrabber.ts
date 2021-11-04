@@ -2,19 +2,21 @@ import mongoose_models from "./mongoose.models";
 import { ParserProvider } from "./parser.provider";
 import { handleNewBlock } from "./types/misc.types";
 import {log} from './utils/logger'
+import {config} from './config'
+
 const https = require("https");
 const http = require("http");
 const mongoose = require("mongoose");
 
 let db = mongoose;
-const MASTERNODE_URL = process.env.MASTERNODE_URL || "https://testnet-master-1.lamden.io";
+const MASTERNODE_URL = process.env.MASTERNODE_URL || config.masternode;
 
 /******* MONGO DB CONNECTION INFO **/
 const DBUSER = process.env.ROCKETSWAP_DB_USERNAME;
 const DBPWD = process.env.ROCKETSWAP_DB_PASSWORD;
 const NETWORK_TYPE = process.env.NETWORK_TYPE;
 //log.log(DBUSER, DBPWD);
-let connectionString = `mongodb://127.0.0.1:27017/block-explorer`;
+let connectionString = `mongodb://127.0.0.1:27017/${config.networkType}`;
 
 if (DBUSER) {
 	connectionString = `mongodb://${DBUSER}:${DBPWD}@${process.env.ROCKETSWAP_DB_HOST}`;
