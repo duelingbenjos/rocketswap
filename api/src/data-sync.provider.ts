@@ -40,21 +40,21 @@ export class ParserProvider {
 	token_contract_list: any[] = [];
 
 	async onModuleInit() {
-		// const start_sync_block = await getLatestSyncedBlock();
+		const start_sync_block = await getLatestSyncedBlock();
 
-		// await syncAmmCurrentState();
+		await syncAmmCurrentState();
 		this.refreshAmmMeta();
 
-		// log.log("AMM_META state synced");
+		log.log("AMM_META state synced");
 
-		// await syncContracts();
-		// await updatePairs();
+		await syncContracts();
+		await updatePairs();
 
-		// // await syncAllStakingData(staking_contracts);
+		// await syncAllStakingData(staking_contracts);
 
-		// await syncIdentityData();
-		// await fillBlocksSinceSync(start_sync_block, this.parseBlock);
-		// await syncTradeHistory();
+		await syncIdentityData();
+		await fillBlocksSinceSync(start_sync_block, this.parseBlock);
+		await syncTradeHistory();
 		
 		this.updateStakingContractList();
 
