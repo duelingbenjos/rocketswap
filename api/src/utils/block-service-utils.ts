@@ -12,7 +12,6 @@ import { syncUserStakingData } from "../entities/user-staking.entity";
 import { BlockService } from "../services/block.service";
 import { handleNewBlock, T_ParseBlockFn } from "../socket-client.provider";
 import { log } from "./logger";
-import { IMetaContractStateOuter, IStakingContractMetaData } from "./staking-contract-type";
 import { arrFromStr, getValue, isValidStakingContract, validateStakingContract, validateTokenContract, writeToFile } from "./utils";
 import { changeVisibility } from "./yield-utils";
 
