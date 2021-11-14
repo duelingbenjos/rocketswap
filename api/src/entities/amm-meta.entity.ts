@@ -91,6 +91,7 @@ export const syncAmmCurrentState = async () => {
 		await syncPairEntities(reserves);
 		await syncAmmMeta(amm_meta);
 	}
+	log.log("AMM_META state synced");
 };
 
 export const syncAmmMeta = async (amm_meta: IAmmMetaState) => {

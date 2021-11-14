@@ -14,13 +14,7 @@ import { log } from "./utils/logger";
 import { savePrice } from "./entities/price.entity";
 import { StakingService } from "./services/staking.service";
 import { getStakingMetaList, removeAllStakingMeta as removeAllStakingData, StakingMetaEntity } from "./entities/staking-meta.entity";
-import {
-	fillBlocksSinceSync,
-	getLatestSyncedBlock,
-	syncContracts,
-	syncIdentityData,
-	syncTradeHistory
-} from "./utils/block-service-utils";
+import { fillBlocksSinceSync, getLatestSyncedBlock, syncContracts, syncIdentityData, syncTradeHistory } from "./utils/block-service-utils";
 import { BlockDTO, initSocket } from "./socket-client.provider";
 
 @Injectable()
@@ -43,20 +37,19 @@ export class ParserProvider {
 		const start_sync_block = await getLatestSyncedBlock();
 
 		await syncAmmCurrentState();
-		this.refreshAmmMeta();
+		await this.refreshAmmMeta();
 
-		log.log("AMM_META state synced");
 
-		await syncContracts();
-		await updatePairs();
+		// await syncContracts();
+		// await updatePairs();
 
-		// await syncAllStakingData(staking_contracts);
+		// // await syncAllStakingData(staking_contracts);
 
-		await syncIdentityData();
-		await syncTradeHistory();
-		await fillBlocksSinceSync(start_sync_block, this.parseBlock);
-		
-		this.updateStakingContractList();
+		// await syncIdentityData();
+		// await syncTradeHistory();
+		// await fillBlocksSinceSync(start_sync_block, this.parseBlock);
+
+		await this.updateStakingContractList();
 
 		initSocket(this.parseBlock);
 	}
@@ -65,6 +58,7 @@ export class ParserProvider {
 		const staking_list_update = await getStakingMetaList();
 		this.staking_contract_list_all = staking_list_update.all;
 		this.staking_contract_list_active = staking_list_update.active;
+		log.log(staking_list_update);
 	};
 
 	public addNewStakingToList = (contract_name: string) => {
