@@ -100,7 +100,6 @@ export class AppController {
 	public async getMarketSummariesWToken() {
 		try {
 			let res = await VolumeMetricsEntity.find({ relations: ["token", "pair"] });
-
 			const fields = ["contract_name", "token_symbol", "Volume", "PrevDay", "BaseVolume", "PercentPriceIncrease_24h", "Last"];
 			const token_fields = ["token_symbol", "token_name", "token_base64_svg", "token_base64_png", "token_logo_url"];
 
@@ -203,7 +202,8 @@ export class AppController {
 	@Get("market_list")
 	public async getMarketList() {
 		try {
-			return await TokenEntity.find({ where: { has_market: true } });
+			const res = (await TokenEntity.find({ where: { has_market: true } })).filter((t) => t.token_name && t.token_symbol);
+			return res;
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}

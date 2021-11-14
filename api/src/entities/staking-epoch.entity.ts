@@ -88,3 +88,13 @@ export async function updateEpoch(args: {
 	await entity.save();
 	handleClientUpdate({ action: "epoch_update", data: entity });
 }
+
+export async function createNewEpoch(epoch: any, staking_contract: string) {
+	const ent = new StakingEpochEntity();
+	ent.epoch_index = epoch.index;
+	ent.staking_contract = staking_contract;
+	ent.time = epoch.time;
+	ent.amt_per_hr = epoch.amt_per_hr;
+	ent.amount_staked = epoch.staked;
+	await ent.save();
+}

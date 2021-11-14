@@ -1,8 +1,5 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { ConnectionNotFoundError } from "typeorm";
 import { config } from "../config";
-// import { findMostRecentTradeFromDb, syncHistoryToDb } from '../db/trade-entity';
-// import { syncRecentHistory } from '../utils/block-service-utils';
 import { log } from "../utils/logger";
 
 @Injectable()

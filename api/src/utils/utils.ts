@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import { TokenEntity } from "../entities/token.entity";
 import { log } from "./logger";
 import { config } from "../config";
+const Fs = require("fs");
 
 const validators = require("types-validate-assert");
 const { validateTypes } = validators;
@@ -75,6 +76,7 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 }
 
 export function getValue(value: any) {
+	if (!value) return 0;
 	if (value.__fixed__) return value.__fixed__;
 	else if (value.__hash_self__) return getValue(value.__hash_self__);
 	return value;
@@ -140,3 +142,25 @@ export function dateNowUtc() {
 }
 
 export const arrFromStr = (str: string, delimiter: string = ","): string[] => str.split(delimiter);
+
+export function writeToFile(data, path) {
+	const json = JSON.stringify(data, null, 2);
+
+	Fs.writeFile(path, json, (err) => {
+		if (err) {
+			console.error(err);
+			throw err;
+		}
+
+		console.log("Saved data to file.");
+	});
+}
+
+export const getNumberFromFixed = (value: any) => (value.__fixed__ ? Number(value.__fixed__) : Number(value));
+
+export const getVkFromKeys = (keys: string[]): string => {
+	return keys.find((k) => {
+		let vk = k.split(":")[1];
+		return vk.length === 64;
+	});
+};

@@ -165,3 +165,42 @@ export async function getTokenList(): Promise<string[]> {
 	const tokens = await TokenEntity.find();
 	return tokens.map((token) => token.contract_name);
 }
+
+/** STUB */
+
+export const getBaseSupply = () => {
+	return "0";
+};
+
+export const getTokenData = (state, contract_name: string): { token: AddTokenDto; balances: any } => {
+	let { __developer__: developer, __owner__: owner, balances, metadata } = state;
+
+	if (!metadata) metadata = {};
+
+	/** Process Metadata if it exists */
+	const {
+		operator,
+		token_logo_base64_svg,
+		token_logo_base64_png,
+		token_logo_url,
+		token_symbol,
+		token_name,
+		custodian_addresses,
+		burn_addresses
+	} = metadata;
+	const token: AddTokenDto = {
+		developer,
+		operator,
+		token_base64_png: token_logo_base64_png,
+		token_base64_svg: token_logo_base64_svg,
+		token_logo_url,
+		base_supply: getBaseSupply(),
+		token_symbol: token_symbol || '',
+		token_name: token_name || '',
+		contract_name,
+		token_seed_holder: developer,
+		custodian_addresses: arrFromStr(custodian_addresses || "", ","),
+		burn_addresses: arrFromStr(burn_addresses || "", ",")
+	};
+	return { token, balances };
+};

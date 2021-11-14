@@ -94,7 +94,6 @@ export const syncAmmCurrentState = async () => {
 };
 
 export const syncAmmMeta = async (amm_meta: IAmmMetaState) => {
-	log.log(amm_meta);
 	const ent = new AmmMetaEntity();
 	ent.TOKEN_DISCOUNT = getValue(amm_meta.TOKEN_DISCOUNT);
 	ent.MULTIPLIER = getValue(amm_meta.MULTIPLIER);

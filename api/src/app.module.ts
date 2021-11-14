@@ -32,6 +32,7 @@ import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
 import { MarketcapEntity } from "./entities/marketcap.entity";
 import { MarketcapService } from "./services/marketcap.service";
 import { CoinGeckoAPIService } from "./services/coingecko.service";
+import { StakingService } from "./services/staking.service";
 
 
 const db_options: TypeOrmModuleOptions = {
@@ -77,8 +78,7 @@ const db_options: TypeOrmModuleOptions = {
 		ParserProvider,
 		AppGateway,
 		SocketService,
-		// BsSyncService,
-		// StakingService,
+		StakingService,
 		TokensService,
 		RefreshTokensRepository,
 		JWTGuard,

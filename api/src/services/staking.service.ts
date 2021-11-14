@@ -21,6 +21,7 @@ export class StakingService implements OnModuleInit {
 	) {}
 
 	async onModuleInit() {
+		await this.parserProvider.updateStakingContractList();
 		Promise.resolve(this.updateROI());
 		setInterval(async () => {
 			Promise.resolve(this.updateROI());
@@ -30,6 +31,7 @@ export class StakingService implements OnModuleInit {
 	updateROI = async () => {
 		// log.debug("UPDATE ROI CALLED")
 		// log.log({staking_contracts: this.parserProvider.getAllStakingContracts()})
+		// log.log(this.parserProvider.getActiveStakingContracts().length)
 		for (let contract_name of this.parserProvider.getActiveStakingContracts()) {
 			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name, visible: true } });
 			// log.debug({meta_entity})

@@ -5,7 +5,7 @@ import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { StakingEpochEntity } from "./staking-epoch.entity";
 import { StakingMetaEntity } from "./staking-meta.entity";
 import { calculateSimpleYield, calculateSmartCompoundingYield, calculateSmartEpochYield } from "../utils/yield-utils";
-import { getNumber } from "../utils/utils";
+import { getNumber, getValue } from "../utils/utils";
 
 @Entity()
 export class UserStakingEntity extends BaseEntity {
@@ -99,7 +99,11 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 			calcFn = calculateSimpleYield;
 		} else if (staking_contract_type === "staking_smart_epoch_compounding_timeramp") {
 			calcFn = calculateSmartCompoundingYield;
-		} else if (staking_contract_type === "staking_smart_epoch" || staking_contract_type === "liquidity_mining_smart_epoch" || "staking_smart_epoch_compounding") {
+		} else if (
+			staking_contract_type === "staking_smart_epoch" ||
+			staking_contract_type === "liquidity_mining_smart_epoch" ||
+			"staking_smart_epoch_compounding"
+		) {
 			calcFn = calculateSmartEpochYield;
 			if (deposits[0].user_yield) harvestable_yield += getNumber(deposits[0].user_yield);
 		}
@@ -118,4 +122,20 @@ export function getUserYield(args: { meta: StakingMetaEntity; user: UserStakingE
 	harvestable_yield -= withdrawals;
 	const dev_share = harvestable_yield * DevRewardPct;
 	return harvestable_yield - dev_share;
+}
+
+export async function syncUserStakingData(state) {
+	const { contract_name, contract_state } = state;
+	const { Deposits: deposits, Withdrawals: withdrawals } = contract_state;
+	const deposit_keys = Object.keys(deposits || []);
+	for (let k of deposit_keys) {
+		if (deposits[k]) {
+			const ent = new UserStakingEntity();
+			ent.staking_contract = contract_name;
+			ent.vk = k;
+			ent.deposits = deposits[k];
+			ent.withdrawals = getValue(withdrawals[k]);
+			await ent.save();
+		}
+	}
 }
