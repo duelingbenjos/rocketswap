@@ -11,7 +11,7 @@ import {
 	IUserYieldPayload
 } from "../types/websocket.types";
 import { log } from "../utils/logger";
-import { ParserProvider } from "../parser.provider";
+import { ParserProvider } from "../data-sync.provider";
 @Injectable()
 export class SocketService {
 	constructor(private readonly parserProvider: ParserProvider) {}

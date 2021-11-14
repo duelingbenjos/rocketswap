@@ -10,21 +10,17 @@ import { SocketService } from "./services/socket.service";
 import { setName } from "./entities/name.entity";
 import { AuthService } from "./authentication/trollbox.service";
 import { AmmMetaEntity, syncAmmCurrentState, updateAmmMeta } from "./entities/amm-meta.entity";
-import blockgrabber from "./blockgrabber";
 import { log } from "./utils/logger";
 import { savePrice } from "./entities/price.entity";
 import { StakingService } from "./services/staking.service";
-import { nanoid } from "nanoid";
 import { getStakingMetaList, removeAllStakingMeta as removeAllStakingData, StakingMetaEntity } from "./entities/staking-meta.entity";
 import {
 	fillBlocksSinceSync,
 	getLatestSyncedBlock,
-	syncAllStakingData,
 	syncContracts,
 	syncIdentityData,
 	syncTradeHistory
 } from "./utils/block-service-utils";
-import * as staking_contracts from "./staking_contracts1.json";
 import { BlockDTO, initSocket } from "./socket-client.provider";
 
 @Injectable()

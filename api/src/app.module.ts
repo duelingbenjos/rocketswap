@@ -3,7 +3,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { AppGateway } from "./app.gateway";
 import { TokenEntity } from "./entities/token.entity";
 import { AppController } from "./app.controller";
-import { ParserProvider } from "./parser.provider";
+import { ParserProvider } from "./data-sync.provider";
 import { BalanceEntity } from "./entities/balance.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";

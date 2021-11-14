@@ -1,7 +1,7 @@
 import { log } from "../utils/logger";
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
-import { ParserProvider } from "../parser.provider";
+import { ParserProvider } from "../data-sync.provider";
 import { PairEntity } from "../entities/pair.entity";
 import { updateEpoch } from "../entities/staking-epoch.entity";
 import { IKvp } from "../types/misc.types";
