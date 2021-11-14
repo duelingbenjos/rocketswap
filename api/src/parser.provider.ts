@@ -59,6 +59,7 @@ export class ParserProvider {
 		await syncIdentityData();
 		await fillBlocksSinceSync(start_sync_block, this.parseBlock);
 		await syncTradeHistory();
+		await this.updateStakingContractList();
 
 		initSocket(this.parseBlock);
 	}

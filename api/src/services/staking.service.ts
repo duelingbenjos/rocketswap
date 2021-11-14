@@ -21,7 +21,6 @@ export class StakingService implements OnModuleInit {
 	) {}
 
 	async onModuleInit() {
-		await this.parserProvider.updateStakingContractList();
 		Promise.resolve(this.updateROI());
 		setInterval(async () => {
 			Promise.resolve(this.updateROI());
