@@ -40,18 +40,19 @@ export class ParserProvider {
 		await this.refreshAmmMeta();
 
 
-		// await syncContracts();
-		// await updatePairs();
+		await syncContracts();
+		await updatePairs();
 
 		// // await syncAllStakingData(staking_contracts);
 
-		// await syncIdentityData();
-		// await syncTradeHistory();
-		// await fillBlocksSinceSync(start_sync_block, this.parseBlock);
+		await syncIdentityData();
+		await syncTradeHistory();
+		await fillBlocksSinceSync(start_sync_block, this.parseBlock);
+
+		
+		initSocket(this.parseBlock);
 
 		await this.updateStakingContractList();
-
-		initSocket(this.parseBlock);
 	}
 
 	public updateStakingContractList = async (): Promise<void> => {
