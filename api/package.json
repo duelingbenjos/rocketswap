@@ -33,7 +33,7 @@
     "@nestjs/swagger": "^4.8.0",
     "@nestjs/typeorm": "^7.1.4",
     "@nestjs/websockets": "^7.5.5",
-    "socket.io-client": "^4.3.2",
+    "socket.io-client": "^3",
     "axios": "^0.24.0",
     "bcrypt": "^5.0.0",
     "bignumber.js": "^9.0.1",
