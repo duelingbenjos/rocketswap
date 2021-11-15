@@ -39,7 +39,7 @@ export class TradeHistoryEntity extends BaseEntity {
 	tx_uid?: string;
 
 	@Column({ nullable: true })
-	base_reserves?: number;
+	reserves?: number;
 }
 
 export interface ITrade {
@@ -96,24 +96,24 @@ export const parseTrades = async (history: any[], contract_name: string, token_s
 		trade_transactions.forEach((curr_value, index) => {
 			const prev_value = trade_transactions[index - 1];
 
-			let prev_reserves_base;
+			let prev_reserves_token;
 
 			if (most_recent_trade_uid === "0" && index === 0) {
-				prev_reserves_base = 0;
+				prev_reserves_token = 0;
 			} else if (most_recent_trade_uid !== "0" && index === 0) {
-				prev_reserves_base = last_most_recent_trade.base_reserves;
+				prev_reserves_token = most_recent_trade.reserves;
 			} else {
-				prev_reserves_base = getNumberFromFixed(
-					prev_value.state_changes_obj[`${config.amm_contract}`].reserves[`${contract_name}`][0]
+				prev_reserves_token = getNumberFromFixed(
+					prev_value.state_changes_obj[`${config.amm_contract}`].reserves[`${contract_name}`][1]
 				);
 			}
-			const curr_reserves_base = getNumberFromFixed(
-				curr_value.state_changes_obj[`${config.amm_contract}`].reserves[`${contract_name}`][0]
+			const curr_reserves_token = getNumberFromFixed(
+				curr_value.state_changes_obj[`${config.amm_contract}`].reserves[`${contract_name}`][1]
 			);
-			const action = prev_reserves_base > curr_reserves_base ? "sell" : "buy";
-			const base_volume = action === "buy" ? curr_reserves_base - prev_reserves_base : prev_reserves_base - curr_reserves_base;
+			const action = prev_reserves_token > curr_reserves_token ? "sell" : "buy";
+			const base_volume = action === "buy" ? curr_reserves_token - prev_reserves_token : prev_reserves_token - curr_reserves_token;
 			const tx_uid = curr_value.tx_uid;
-			const timestamp = curr_value.timestamp;
+			const timestamp = curr_value.timestamp / 1000;
 			const base_price = getNumberFromFixed(curr_value.state_changes_obj[`${config.amm_contract}`].prices[`${contract_name}`]);
 			const vk = getVkFromKeys(curr_value.affectedRootKeysList);
 			const hash = curr_value.txInfo.hash;
@@ -123,8 +123,8 @@ export const parseTrades = async (history: any[], contract_name: string, token_s
 				type: action,
 				price: base_price,
 				amount: base_volume,
-				time: timestamp / 1000,
-				reserves: curr_reserves_base,
+				time: timestamp,
+				reserves: curr_reserves_token,
 				token_symbol,
 				contract_name,
 				vk,

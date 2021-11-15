@@ -76,11 +76,11 @@ export const saveBalances = async (contract_name: string, balances) => {
 		if (!entity) {
 			entity = new BalanceEntity();
 			entity.balances = {};
+			entity.vk = key;
 		}
 
-		const balance_entry = getValue(balances[key]);
-		entity.vk = key;
-		entity.balances[contract_name] = String(balance_entry);
+		const balance_entry = String(getValue(balances[key]));
+		entity.balances[contract_name] = balance_entry;
 		await entity.save();
 	}
 };

@@ -76,10 +76,15 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 }
 
 export function getValue(value: any) {
-	if (!value) return 0;
-	if (value.__fixed__) return value.__fixed__;
-	else if (value.__hash_self__) return getValue(value.__hash_self__);
-	return value;
+	if (!value) {
+		return 0;
+	} else if (value.__fixed__) {
+		return value.__fixed__;
+	} else if (value.__hash_self__ || String(value.__hash_self__) === "0") {
+		return value.__hash_self__.__fixed__ ? value.__hash_self__.__fixed__ : value.__hash_self__;
+	} else {
+		return value;
+	}
 }
 
 export function getNumber(value: any) {
@@ -159,8 +164,9 @@ export function writeToFile(data, path) {
 export const getNumberFromFixed = (value: any) => (value.__fixed__ ? Number(value.__fixed__) : Number(value));
 
 export const getVkFromKeys = (keys: string[]): string => {
-	return keys.find((k) => {
+	const k = keys.find((k) => {
 		let vk = k.split(":")[1];
 		return vk.length === 64;
 	});
+	return k.split(":")[1];
 };

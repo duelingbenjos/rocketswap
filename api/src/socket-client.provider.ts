@@ -13,6 +13,7 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 		
 		if (!connected) {
 			socket.emit("join", "new-block");
+			connected = true;
 		}
 
 		socket.on("new-block", async (payload) => {
@@ -20,7 +21,6 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 			const bs_block = parsed.message;
 			await handleNewBlock(bs_block, parseBlockFn);
 		});
-		connected = true;
 	});
 
 	socket.io.on("reconnect", (attempt) => {
