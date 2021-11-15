@@ -4,19 +4,23 @@ import { IKvp } from "./types/misc.types";
 import { log } from "./utils/logger";
 
 export function initSocket(parseBlockFn: T_ParseBlockFn) {
+	let connected = false;
 	const socket = io(`http://${BlockService.get_block_service_url()}`, {
 		reconnectionDelayMax: 10000
 	});
 	socket.on("connect", () => {
 		log.log("Connected to Blockservice via socket.io");
-
-		socket.emit("join", "new-block");
+		
+		if (!connected) {
+			socket.emit("join", "new-block");
+		}
 
 		socket.on("new-block", async (payload) => {
 			const parsed: IBsSocketBlockUpdate = JSON.parse(payload);
 			const bs_block = parsed.message;
 			await handleNewBlock(bs_block, parseBlockFn);
 		});
+		connected = true;
 	});
 
 	socket.io.on("reconnect", (attempt) => {
@@ -44,7 +48,7 @@ export async function handleNewBlock(block: IBsBlock, parseBlockFn: T_ParseBlock
 			const { contract } = transaction.payload;
 			const { timestamp } = transaction.metadata;
 			const block_obj: BlockDTO = { state, hash, fn, contract, timestamp };
-			log.log(`Processed ${hash} for ${contract}`)
+			log.log(`Processed ${hash} for ${contract}`);
 			await parseBlockFn(block_obj);
 		}
 	}

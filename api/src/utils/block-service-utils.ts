@@ -112,7 +112,9 @@ export const prepareAndAddToken = async (contract_name: string) => {
 	const token_data = getTokenData(state[contract_name], contract_name);
 	const { token, balances } = token_data;
 	/** Save the TokenEntity */
-	await saveToken(token);
+	if (contract_name !== "currency") {
+		await saveToken(token);
+	}
 	/** Update Balances */
 	if (balances) {
 		await saveBalances(contract_name, balances);
@@ -141,6 +143,7 @@ export const syncContracts = async (starting_tx_id = "0", batch_size = 1000, con
 	const staking_contracts_to_process = [];
 
 	//
+	
 	for (let contract_name of contract_titles_parsed) {
 		const contract_source = await getContractSource(contract_name);
 
@@ -163,6 +166,7 @@ export const syncContracts = async (starting_tx_id = "0", batch_size = 1000, con
 		}
 	}
 	log.log(`${valid_tokens.length} tokens added to DB`);
+	await prepareAndAddToken("currency")
 	await syncAllStakingData(staking_contracts_to_process);
 
 	if (length === batch_size) {

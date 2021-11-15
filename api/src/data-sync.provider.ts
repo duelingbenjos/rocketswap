@@ -39,7 +39,6 @@ export class ParserProvider {
 		await syncAmmCurrentState();
 		await this.refreshAmmMeta();
 
-
 		await syncContracts();
 		await updatePairs();
 
@@ -49,7 +48,6 @@ export class ParserProvider {
 		await syncTradeHistory();
 		await fillBlocksSinceSync(start_sync_block, this.parseBlock);
 
-		
 		initSocket(this.parseBlock);
 
 		await this.updateStakingContractList();

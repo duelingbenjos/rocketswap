@@ -133,7 +133,7 @@ export async function syncUserStakingData(state) {
 			const ent = new UserStakingEntity();
 			ent.staking_contract = contract_name;
 			ent.vk = k;
-			ent.deposits = deposits[k];
+			ent.deposits = deposits[k].length ? deposits[k] : [deposits[k]];
 			ent.withdrawals = getValue(withdrawals[k]);
 			await ent.save();
 		}
