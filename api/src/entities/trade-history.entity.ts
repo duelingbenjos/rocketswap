@@ -171,5 +171,7 @@ export const saveTradesToDb = async (trades: ITrade[]) => {
 		}
 		return trade_entity;
 	});
-	await Promise.all(proms.map((p) => p.save()));
+	for (let p of proms) {
+		await p.save()
+	}
 };
