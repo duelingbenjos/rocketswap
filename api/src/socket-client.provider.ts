@@ -5,17 +5,18 @@ import { log } from "./utils/logger";
 
 export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	let connected = false;
-	const socket = io(`http://${BlockService.get_block_service_url()}`, {
+	const block_service_url = `http://${BlockService.get_block_service_url()}`;
+	const socket = io(block_service_url, {
 		reconnectionDelayMax: 10000
 	});
 	socket.on("connect", () => {
 		log.log("Connected to Blockservice via socket.io");
-		
+
 		if (!connected) {
 			socket.emit("join", "new-block");
 			connected = true;
 		}
-
+		log.log("IP : " + block_service_url);
 		socket.on("new-block", async (payload) => {
 			const parsed: IBsSocketBlockUpdate = JSON.parse(payload);
 			const bs_block = parsed.message;
