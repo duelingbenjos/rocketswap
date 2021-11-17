@@ -12,7 +12,6 @@
     function handleClick(){
         if (!clickable) return
         if ($modal) return
-        console.log("SETTING!")
         modal.set("ModalVerifiedTokenInfo")
     }
 </script>
