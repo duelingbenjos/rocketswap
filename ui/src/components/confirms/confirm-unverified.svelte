@@ -68,7 +68,7 @@
         <p class="text-primary-dim">Rocketswap is a decentralized exchange and can be used to swap any token that has a contract on Lamden. This means that you could have followed links to potentially unsafe token contracts.</p>
         <div class="verified-icon-row flex flex-align-center">
             <div class="verified-icon">
-                <IconVerifiedToken width="100%"/>
+                <IconVerifiedToken width="100%" clickable={false}/>
             </div>
             
             <p class="flex flex-align-center">Tokens with the Verifed by Rocketswap badge can be considered safer than other contracts. </p>

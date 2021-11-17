@@ -1,9 +1,30 @@
 <script>
+    // Components
+    import ModalVerifiedTokenInfo from '../components/modals/verified-token-info.svelte'
+
+    // Misc
+    import { modal } from '../store'
+
     export let width = "26px";
     export let margin = "0";
+    export let clickable = true;
+
+    function handleClick(){
+        if (!clickable) return
+        if ($modal) return
+        console.log("SETTING!")
+        modal.set("ModalVerifiedTokenInfo")
+    }
 </script>
 
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" {width} height={width} style={`isolation:isolate; margin: ${margin};`} title="Verified Token">
+<style>
+    svg{
+        cursor: pointer;
+    }
+</style>
+
+
+<svg on:click={handleClick} xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" {width} height={width} style={`isolation:isolate; margin: ${margin};`} title="Verified Token">
     <defs>
         <clipPath id="_clipPath_6anizaKgQtLGcW1J45P1prIc8KZfuBaj">
             <rect width="100" height="100"/>

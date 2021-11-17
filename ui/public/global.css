@@ -1062,7 +1062,7 @@ div[slot="main-centered"] {
     .panel-container {
         margin: 0 auto;
         padding: 30px;
-        border-radius: 32px;
+        border-radius: 10px;
         max-width: 430px;
         background: var(--panel-background-gradient);
         box-shadow: -1px 10px 15px 0px rgba(0, 0, 0, 0.3);

@@ -260,7 +260,7 @@
                                             <TokenLogo tokenMeta={token} width={'27px'} lpBottom={"-2px"}/>
                                             <span class="token-symbol"> {token.token_symbol.toUpperCase()} </span>
                                             {#if token.isVerified}
-                                                <IconVerified width="20px" margin="0 0 0 8px" />
+                                                <IconVerified width="20px" margin="0 0 0 8px" clickable={false} />
                                             {/if}
                                             {#if token.contract_name === selected_contract}
                                                 <SelectedArrow width="10px" margin="0 8px" direction="left"/>

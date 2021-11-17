@@ -39,11 +39,11 @@
         margin: 0 auto;
         max-width: 850px;
         padding: 18px 20px;
+        width: 100%;
     }
     label{
         margin-top: 1rem;
         margin-bottom: 1rem;
-        margin-left: 1rem;
     }
     label.checked{
         color: var(--text-color-highlight);
@@ -63,11 +63,15 @@
     }
     label.search{
         width: 100%;
+        max-width: 384px;
+    }
+    .multiselect-row{
+        width: 100%;
         max-width: 400px;
     }
     .multiselect {
         position: relative;
-        width: 200px;
+        width: 100%;  
     }
     select{
         font-size: 16px;
@@ -116,6 +120,7 @@
         border-top: 1px;
         width: 100%;
         box-sizing: border-box;
+        padding: 1rem;
     }
 
     #checkboxes label:hover {
@@ -138,6 +143,9 @@
         cursor: pointer;
         margin: 0 10px 0 auto;
     }
+    .close-button{
+        width: 100%;
+    }
     @media screen and (min-width: 2560px) {
         .container{
             max-width: 1020px;
@@ -147,7 +155,7 @@
 </style>
 
 <div class="container flex flex-row flex-wrap flex-align-center flex-justify-spacebetween" >
-    <div class="flex-row flex-align-center ">
+    <div class="flex-row flex-align-center multiselect-row">
         <div class="multiselect" bind:this={multiselectElm}>
             <div class="selectBox" on:click={showCheckboxes}>
                 <select class:open={expanded}>
@@ -173,7 +181,7 @@
                     <span class="chk-checkmark chk-small"></span>
                     Unverified Tokens
                 </label>
-                <button class="primary outline small" on:click={showCheckboxes}>close</button>
+                <button class="primary close-button" on:click={showCheckboxes}>close</button>
             </div>
         </div>
     </div>

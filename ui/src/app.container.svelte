@@ -10,6 +10,7 @@
 	import TrollBoxButton from './components/misc/troll-box-button.svelte'
 	import ToastsContainer from './components/toasts-container.svelte'
 	import TestnetBanner from './components/misc/testnet-banner.svelte'
+	import Modal from './components/modals/modal.svelte'
 
 	// Icons
 	import DeathStarImage from './icons/deathstar.svelte'
@@ -164,3 +165,4 @@
 {#if isMay4th() && $currentThemeName === "dark"}
 	<DeathStarImage />
 {/if}
+<Modal />

@@ -100,7 +100,7 @@
         font-weight: 400;
     }
     td{
-        max-width: 100px;
+        max-width: 150px;
         padding: 1.5em 0px;
         vertical-align: top;
         line-height: 1.4;

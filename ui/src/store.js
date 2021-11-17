@@ -26,6 +26,8 @@ export const tabHidden = writable(false);
 export const currencyType = writable(undefined);
 export const homePageTableFilter = writable(undefined);
 export const onboarding_settings = writable({});
+export const modalOpen = writable(false);
+export const modal = writable(null);
 
 // EXCHANGE PRICES
 export const tauUSDPrice = writable(null);

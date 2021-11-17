@@ -10,7 +10,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "ts-node src/main.ts",
-    "dev": "npx nodemon src/main.ts",
+    "dev": "NETWORK_TYPE=testnet npx nodemon src/main.ts",
     "start:dev": "nest start --watch",
     "start:dev:wipe": "rm -f database.sqlite && RE_LOAD_API=yes npm run dev",
     "start:dev:reset": "RE_LOAD_API=yes npm run dev",

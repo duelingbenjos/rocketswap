@@ -1,6 +1,4 @@
 <script>
-    import { fade } from 'svelte/transition';
-
     // Misc
     import { onboarding_settings } from '../../store.js'
     import { setOnboardingSetting } from '../../utils.js'
@@ -94,8 +92,7 @@
     <div 
         class="container flex-row" 
         class:has-background={onboarding_paragraphs[type].hasBackground}
-        style={`max-width: ${onboarding_paragraphs[type].maxWidth}; font-size: ${onboarding_paragraphs[type].fontSize}`} 
-        out:fade="{{delay: 0, duration: 300}}">
+        style={`max-width: ${onboarding_paragraphs[type].maxWidth}; font-size: ${onboarding_paragraphs[type].fontSize}`} >
         <div class="flex-grow">
             {#each onboarding_paragraphs[type].paragragh_list as paragragh }
             {#if paragragh.style === "regular"}

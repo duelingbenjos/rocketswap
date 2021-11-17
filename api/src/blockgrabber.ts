@@ -40,7 +40,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 	const route_getLastestBlock = "/latest_block";
 	let latestBlockNum: any = 0;
 	let currBatchMax = 0;
-	let batchAmount = 25;
+	let batchAmount = 250;
 	let timerId;
 
 	const wipeDB = async (force = false) => {
@@ -185,7 +185,7 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 			currBlockNum = blockNum
 			if (blockNum === currBatchMax) {
 				// currBlockNum = currBatchMax;
-				timerId = setTimeout(checkForBlocks, 100);
+				timerId = setTimeout(checkForBlocks, 0);
 			}
 		}
 	};
@@ -250,7 +250,8 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
             }
         }catch(e){
 			console.log({"Malformed Block":e})
-			
+			console.log(blockInfo)
+
 			if (!blockExists(blockInfo)) return false
 			return true
         }
@@ -329,7 +330,9 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 						// Sort the list by id (blockNum) so all our blocks can be processed in order
 						to_fetch.sort((a, b) => a.id - b.id);
 						// await the masternode results of all the blocks we needed (if any)
-                        let processed = await Promise.all(to_fetch.map(b => b.blockData));
+                        let processed = await Promise.all(to_fetch.map(b => {
+							return {...b.blockData, id: b.id}
+						}));
 						
 						// Loop through the blockData in order and process it
                         for (let blockData of processed) {
@@ -338,15 +341,23 @@ const databaseLoader = (models, handleNewBlock: handleNewBlock, bypass_wipe: boo
 							// 2) Stop processig any more block data
 							// 3) Check again in 30000 seconds
                             if (malformedBlock(blockData)) {
-								console.log({blockData})
-								console.log({latestBlockNum, currBlockNum})
-                                log.log(`Malformed Block, trying again in 30 Seconds`)
-                                timerId = setTimeout(checkForBlocks, 30000);
-                                break
+								if (NETWORK_TYPE === 'testnet') {
+									await processBlock({
+										number: blockData.id,
+										previous: blockData.id - 1,
+										hash: `badblock_ ${blockData.id}`,
+										subblocks: []
+									});
+								}else{
+									console.log({blockData})
+									console.log({latestBlockNum, currBlockNum})
+									log.log(`Malformed Block, trying again in 30 Seconds`)
+									timerId = setTimeout(checkForBlocks, 30000);
+									break
+								}
                             }else{
 								// If the block is not malformed and actaully exists then process it
 								if (blockExists(blockData)) await processBlock(blockData);
-								
                             }
                         }
                     }else{
