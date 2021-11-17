@@ -169,17 +169,17 @@
                 <label class="flex-row chk-container flex-align-center m-r-20" class:checked={showLowLiquidity} id="chk-showLowLiquidity">
                     <input type="checkbox" bind:checked={$homeFilters.showLowLiquidity} on:change={(e) => handleUpdateFilter("showLowLiquidity", e.target.checked)}>
                     <span class="chk-checkmark chk-small"></span>
-                    Low Liquidity
+                    Show Low Liquidity
                 </label>
                 <label class="flex-row chk-container flex-align-center" class:checked={showLowVolume} id="chk-showLowVolume">
                     <input type="checkbox" bind:checked={$homeFilters.showLowVolume} on:change={(e) => handleUpdateFilter("showLowVolume", e.target.checked)}>
                     <span class="chk-checkmark chk-small"></span>
-                    Low Volume
+                    Show Low Volume
                 </label>
                 <label class="flex-row chk-container flex-align-center" class:checked={showNotVerified} id="chk-showNotVerified">
                     <input type="checkbox" bind:checked={$homeFilters.showNotVerified} on:change={(e) => handleUpdateFilter("showNotVerified", e.target.checked)}>
                     <span class="chk-checkmark chk-small"></span>
-                    Unverified Tokens
+                    Show Unverified Tokens
                 </label>
                 <button class="primary close-button" on:click={showCheckboxes}>close</button>
             </div>
