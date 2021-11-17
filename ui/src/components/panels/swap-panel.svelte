@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { getContext } from 'svelte'
 
-	//Components
+	// Components
 	import InputCurrency from '../inputs/input-currency.svelte'
 	import InputToken from '../inputs/input-token.svelte'
 	import Tooltip from '../misc/tooltip.svelte'
 	import DirectionalArrow from '../../icons/directional-arrow.svelte'
+
+	// Icons
 	import VerifiedToken from '../../icons/verified_token.svelte'
 
-	//Misc
+	// Misc
 	import { quoteCalculator, toBigNumber, stringToFixed } from '../../utils'
-	import { verifiedTokens } from '../../store';
 
 
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')

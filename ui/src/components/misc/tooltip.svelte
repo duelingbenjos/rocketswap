@@ -47,7 +47,7 @@
     .icon-container:hover > .tooltip {
         display: block;
         position: absolute;
-        top: 50%;
+        top: 42%;
         transform: translate(105%,-50%);
         right: 0;
     }

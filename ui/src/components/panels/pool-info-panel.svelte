@@ -102,7 +102,7 @@
                 <span class="percent text-color-primary">{stringToFixed(poolPercent.multipliedBy(100), 2)}%</span>
             </div>
             {#if isVerified}
-                <IconVerifiedToken width="24px" margin="0 0 0 auto"/>
+                <IconVerifiedToken width="26px" margin="-5px 0 0 auto"/>
             {/if}
         </div>
 
