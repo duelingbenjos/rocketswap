@@ -4,7 +4,6 @@ import { IKvp } from "./types/misc.types";
 import { log } from "./utils/logger";
 
 export function initSocket(parseBlockFn: T_ParseBlockFn) {
-	let connected = false;
 	const block_service_url = `http://${BlockService.get_block_service_url()}`;
 	const socket = io(block_service_url, {
 		reconnectionDelayMax: 10000
@@ -12,10 +11,8 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	socket.on("connect", () => {
 		log.log("Connected to Blockservice via socket.io");
 
-		if (!connected) {
 			socket.emit("join", "new-block");
-			connected = true;
-		}
+
 		log.log("IP : " + block_service_url);
 		socket.on("new-block", async (payload) => {
 			const parsed: IBsSocketBlockUpdate = JSON.parse(payload);
@@ -33,7 +30,8 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	});
 
 	socket.io.on("error", (error) => {
-		log.log(error);
+		socket.disconnect();
+		initSocket(parseBlockFn);
 	});
 }
 
