@@ -238,8 +238,8 @@ export const getHomePageTableFilter = () => {
 export const getHomeFilters = () => {
     let value = localStorage.getItem("home_filters")
     if (value === null) {
-        setLSValue("filters", {})
-        homeFilters.set({})
+        setLSValue("filters", {showLowVolume:true})
+        homeFilters.set({showLowVolume:true})
     } else {
         homeFilters.set(JSON.parse(value))
     }

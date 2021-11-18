@@ -17,7 +17,7 @@
     import { tauUSDPrice, currencyType, homePageTableFilter, homeFilters, verifiedTokens } from '../store'
     import { toBigNumber } from '../utils'
 
-    let marketData = [];
+    let marketData = null;
     $: filteredData = applyFilters(marketData, $homeFilters, $verifiedTokens)
     let timer;
 
@@ -50,9 +50,8 @@
         marketData = data.filter(f => !f.remove)
     }
 
-
-
     function applyFilters(data, filters, verifiedTokens){
+        if (data === null) return null
         if (!filters) return data
         if (!filters.showLowLiquidity){
             data = data.filter(f => f.usdLiquidity.isGreaterThan(1000))

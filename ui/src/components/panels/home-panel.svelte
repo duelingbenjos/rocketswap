@@ -24,7 +24,7 @@
     $: priceChangeFilter = $homePageTableFilter ? $homePageTableFilter.price_change : null;
     $: currentFilter = $homePageTableFilter ? $homePageTableFilter.current : null;
 
-    $: results = [...sortMarketData(marketData, $homePageTableFilter)]
+    $: results = !marketData ? null : [...sortMarketData(marketData, $homePageTableFilter)]
 
     const handleCurrencyTypeChange = () => setCurrencyType(type)
 
@@ -40,7 +40,7 @@
     }
 
     const sortMarketData = () => {
-        if (!marketData) return []
+        if (!marketData) return null
         if (!$homePageTableFilter) return marketData
 
         let r =  marketData.sort((a, b) => {
@@ -135,6 +135,9 @@
     .verified-token-legend > span{
         margin-left: 0.5em;
     }
+    .no-results{
+        width: max-content;
+    }
     @media screen and (min-width: 430px) {
         .panel-container{
             background: var(--home-panel-background-gradient);
@@ -205,8 +208,9 @@
         <VerifiedToken />
         <span class="text-primary-dim">Rocketswap Verified Token</span>
     </div>
-    {#if results.length > 0}
-
+    {#if results === null}
+        <PulseSpinner margin="0 auto" color="var(--color-primary)" />
+    {:else}
         <table>
             <tr class="headings">
                 <th class="mobile-hide">#</th>
@@ -298,67 +302,70 @@
                     </button>
                 </th>
             </tr>
+            {#if results.length === 0}
 
-            {#each results as tokenInfo, index}
-                <tr>
-                    <td class="mobile-hide">
-                        <div class="flex flex-align-center">
-                            {index + 1}
-                        </div>
-                    </td>
-                    <td class="flex-col">
-                        <div class="flex-row flex-align-center" >
-                            <TokenLogo tokenMeta={tokenInfo.token} margin={"0 10px 0 0"} width="45px"/>
-                            <div class="flex-col overflow hidden">
-                                <div class="ellipsis">
-                                    <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
-                                </div>
-    
-                                <div class="flex-row flex-align-center">
-                                    <div class="text-primary-dimmer symbol-text">{tokenInfo.token.token_symbol}</div>
-                                    {#if $verifiedTokens.includes(tokenInfo.contract_name)}
-                                        <VerifiedToken margin="0 0 0 0.5em"/>
-                                    {/if}
+                <p class="text-primary-dim no-results">
+                    0 results (check filters) 
+                </p>
+            {:else}
+                {#each results as tokenInfo, index}
+                    <tr>
+                        <td class="mobile-hide">
+                            <div class="flex flex-align-center">
+                                {index + 1}
+                            </div>
+                        </td>
+                        <td class="flex-col">
+                            <div class="flex-row flex-align-center" >
+                                <TokenLogo tokenMeta={tokenInfo.token} margin={"0 10px 0 0"} width="45px"/>
+                                <div class="flex-col overflow hidden">
+                                    <div class="ellipsis">
+                                        <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
+                                    </div>
+        
+                                    <div class="flex-row flex-align-center">
+                                        <div class="text-primary-dimmer symbol-text">{tokenInfo.token.token_symbol}</div>
+                                        {#if $verifiedTokens.includes(tokenInfo.contract_name)}
+                                            <VerifiedToken margin="0 0 0 0.5em"/>
+                                        {/if}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
+                            
+                        </td>
                         
-                    </td>
-                    
-                    <td >
-                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(9).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 9)}
-                        <div
+                        <td >
+                            {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(9).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 9)}
+                            <div
+                                class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
+                                class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
+                                class="mobile-show">
+                                {stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%
+                            </div>
+                        </td>
+                        <td
                             class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
                             class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
-                            class="mobile-show">
-                            {stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%
-                        </div>
-                    </td>
-                    <td
-                        class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
-                        class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
-                        class="mobile-hide">
-                        {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
-                    </td>
-                    <td class="mobile-hide">
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
-                    </td>
-                    <td class="mobile-show">
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
-                        <div class="text-primary-dim">
+                            class="mobile-hide">
+                            {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
+                        </td>
+                        <td class="mobile-hide">
+                            {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
+                        </td>
+                        <td class="mobile-show">
+                            {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
+                            <div class="text-primary-dim">
+                                {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
+                            </div>
+                            
+                        </td>
+                        <td class="mobile-hide">
                             {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
-                        </div>
-                        
-                    </td>
-                    <td class="mobile-hide">
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
-                    </td>
-                </tr>
-            {/each}
+                        </td>
+                    </tr>
+                {/each}
+            {/if}
         </table>
-
-    {:else}
-        <PulseSpinner margin="0 auto" color="var(--color-primary)" />
     {/if}
 </div>
