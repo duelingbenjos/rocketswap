@@ -1,9 +1,9 @@
-import { forwardRef, Inject, Injectable, Logger } from "@nestjs/common";
+import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { IKvp } from "./types/misc.types";
 import { config } from "./config";
 import { getTokenList, prepareAddToken, saveToken, saveTokenUpdate } from "./entities/token.entity";
 import { getContractCode, getContractName, isValidStakingContract, validateTokenContract } from "./utils/utils";
-import { saveTransfer, updateBalance } from "./entities/balance.entity";
+import { saveTransfer } from "./entities/balance.entity";
 import { savePair, savePairLp, saveReserves, updatePairs } from "./entities/pair.entity";
 import { saveUserLp } from "./entities/lp-points.entity";
 import { SocketService } from "./services/socket.service";
@@ -13,9 +13,10 @@ import { AmmMetaEntity, syncAmmCurrentState, updateAmmMeta } from "./entities/am
 import { log } from "./utils/logger";
 import { savePrice } from "./entities/price.entity";
 import { StakingService } from "./services/staking.service";
-import { getStakingMetaList, removeAllStakingMeta as removeAllStakingData, StakingMetaEntity } from "./entities/staking-meta.entity";
+import { getStakingMetaList } from "./entities/staking-meta.entity";
 import { fillBlocksSinceSync, getLatestSyncedBlock, syncContracts, syncIdentityData, syncTradeHistory } from "./utils/block-service-utils";
 import { BlockDTO, initSocket } from "./socket-client.provider";
+import { getLastProcessedBlock, startTrimLastBlocksTask } from "./entities/last-block.entity";
 
 @Injectable()
 export class ParserProvider {
@@ -34,30 +35,36 @@ export class ParserProvider {
 	token_contract_list: any[] = [];
 
 	async onModuleInit() {
-		const start_sync_block = await getLatestSyncedBlock();
+		const last_block_saved_db = await getLastProcessedBlock();
+		const latest_synced_block_bs = await getLatestSyncedBlock();
+		const start_sync_block = last_block_saved_db || latest_synced_block_bs;
 
-		await syncAmmCurrentState();
+		if (!last_block_saved_db) {
+			await syncAmmCurrentState();
+			await this.refreshAmmMeta();
+			await syncContracts();
+			await updatePairs();
+			await syncIdentityData();
+			await syncTradeHistory();
+		} else {
+			log.log(`last block detected in local db.`);
+			log.log(`starting block sync from block ${start_sync_block}`);
+		}
+
 		await this.refreshAmmMeta();
 
-		await syncContracts();
-		await updatePairs();
-
-		// // await syncAllStakingData(staking_contracts);
-
-		await syncIdentityData();
-		await syncTradeHistory();
 		await fillBlocksSinceSync(start_sync_block, this.parseBlock);
 
 		initSocket(this.parseBlock);
 
 		await this.updateStakingContractList();
+		startTrimLastBlocksTask();
 	}
 
 	public updateStakingContractList = async (): Promise<void> => {
 		const staking_list_update = await getStakingMetaList();
 		this.staking_contract_list_all = staking_list_update.all;
 		this.staking_contract_list_active = staking_list_update.active;
-		log.log(staking_list_update);
 	};
 
 	public addNewStakingToList = (contract_name: string) => {

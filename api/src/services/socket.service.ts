@@ -29,7 +29,6 @@ export class SocketService implements OnApplicationBootstrap {
 			accum[entity.contract_name] = entity.Epoch.index;
 			return accum;
 		}, {});
-		log.log({ staking_epochs: this.staking_epochs });
 	}
 
 	public addStakingPanelClient(vk: string) {

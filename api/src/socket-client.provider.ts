@@ -1,4 +1,5 @@
 import * as io from "socket.io-client";
+import { updateLastBlock } from "./entities/last-block.entity";
 import { BlockService } from "./services/block.service";
 import { IKvp } from "./types/misc.types";
 import { log } from "./utils/logger";
@@ -6,14 +7,13 @@ import { log } from "./utils/logger";
 export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	const block_service_url = `http://${BlockService.get_block_service_url()}`;
 	const socket = io(block_service_url, {
-		reconnectionDelayMax: 10000
+		reconnection: false
 	});
 	socket.on("connect", () => {
-		log.log("Connected to Blockservice via socket.io");
+		log.log(`Connected to Blockservice via socket.io @ ${block_service_url}`);
 
-			socket.emit("join", "new-block");
+		socket.emit("join", "new-block");
 
-		log.log("IP : " + block_service_url);
 		socket.on("new-block", async (payload) => {
 			const parsed: IBsSocketBlockUpdate = JSON.parse(payload);
 			const bs_block = parsed.message;
@@ -38,7 +38,7 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 export async function handleNewBlock(block: IBsBlock, parseBlockFn: T_ParseBlockFn) {
 	const has_transaction = block.subblocks.length && block.subblocks[0].transactions.length;
 	if (!has_transaction) return;
-	const { subblocks } = block;
+	const { subblocks, number: block_num } = block;
 	for (let sb of subblocks) {
 		const { transactions } = sb;
 		for (let t of transactions) {
@@ -51,6 +51,7 @@ export async function handleNewBlock(block: IBsBlock, parseBlockFn: T_ParseBlock
 			await parseBlockFn(block_obj);
 		}
 	}
+	updateLastBlock({ block_num });
 }
 
 export class BlockDTO {
