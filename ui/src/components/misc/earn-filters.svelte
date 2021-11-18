@@ -20,7 +20,7 @@
             value: "alpha_staking_token"
         },
         {
-            name: "APY %",
+            name: "APR %",
             value: "apy"
         },
         {

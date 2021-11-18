@@ -42,7 +42,10 @@
 <style>
     .container{
         border-bottom: 4px dotted #a128fd42;
+        margin-top: 2rem;
+        margin-bottom: 2rem;
     }
+    
     .rocket{
         display: none;
         position: relative;
@@ -50,7 +53,7 @@
         margin: 0 0 0 10px;
     }
 
-    @media screen and (min-width: 430px) {
+    @media screen and (min-width: 500px) {
         .rocket{
             display: block;
             margin: 0 0 0 10px;

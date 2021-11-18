@@ -58,7 +58,7 @@ body {
     --text-size-large: 1.2em;
     --text-size-xlarge: 1.5em;
     --text-size-xxlarge: 1.8em;
-    --text-size-massive: 3.4em;
+    --text-size-massive: 2.8em;
     --button-primary-border-color: var(--color-primary-dark);
     --button-primary: var(--color-primary);
     --button-primary-disabled-background: #9ae0cd;
@@ -1054,7 +1054,6 @@ div[slot="main-centered"] {
 
 
 /* When page width is greater than 430px and less than 650px (phones) */
-
 @media screen and (min-width: 430px) {
     select {
         width: 50%;
@@ -1089,4 +1088,8 @@ div[slot="main-centered"] {
 
 /* When page width is greater than 650px (tablets) */
 
-@media screen and (min-width: 650px) {}
+@media screen and (min-width: 500px) {
+    body{
+        --text-size-massive: 3.4em;
+    }
+}

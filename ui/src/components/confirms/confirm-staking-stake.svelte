@@ -118,7 +118,7 @@
     </p>
     <div class="flex-col modal-confirm-details-box text-small weight-400">
         <div class="flex-row">
-            <span class="flex-grow text-primary-dim">APY:</span>
+            <span class="flex-grow text-primary-dim">APR:</span>
             <div class="flex-col flex-align-end ">
                 <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
                 <!-- <span class="text-primary-dimmer">{stakingInfo.EmissionRatePerHour}/hour</span> -->
