@@ -33,7 +33,7 @@ export class AppController {
 	@Get("verified_tokens")
 	public async getVerifiedTokens() {
 		return await new Promise((resolve, reject) => {
-			fs.readFile(`${__dirname}/verified_tokens.json`, (err, data: any) => {
+			fs.readFile(`./src/verified_tokens.json`, (err, data: any) => {
 				if (err) reject(err)
 				else resolve(JSON.parse(data))
 			});
