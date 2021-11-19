@@ -12,18 +12,21 @@ import {
 	slippageTolerance,
 	rswpPrice, 
 	earnFilters,
+	homeFilters,
 	farmFilter,
 	farmFilterUpDown,
 	farmStakedByMe,
 	farmShowClosed,
 	payInRswp, 
 	ammFuelTank,
+	verifiedTokens,
 	ammFuelTank_discount,
 	rswpMetrics,
 	tauUSDPrice,
 	currencyType,
 	homePageTableFilter,
-	onboarding_settings} from './store'
+	onboarding_settings,
+	tokenSelectFilters} from './store'
 
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
@@ -116,7 +119,35 @@ export const initializeStateFromLocalStorage = () => {
 	getFarmFilterUpDown()
 	getFarmStakedByMe()
 	getFarmShowClosed()
+	getHomeFilters()
+	getVerifiedTokens()
+	getTokenSelectFilteres()
 }
+export const getVerifiedTokens = () => {
+	let value = localStorage.getItem("verified_tokens")
+	if (value !== null) verifiedTokens.set(JSON.parse(value))
+
+	const apiService = ApiService.getInstance();
+	apiService.getVerifiedTokensList().then(res => {
+		verifiedTokens.set(res)
+		setLSValue("verified_tokens", res)
+	})
+}
+
+export const getTokenSelectFilteres = () => {
+	let value = localStorage.getItem("token_select_filters")
+	if (value === null) return {}
+	else tokenSelectFilters.set(JSON.parse(value))
+}
+
+export const setTokenSelectFilter = (filter, newValue) => {
+	tokenSelectFilters.update(curr => {
+		curr[filter] = newValue
+		return curr
+	})
+	setLSValue("token_select_filters", get(tokenSelectFilters))
+}
+
 export const getSlippageTolerance = () => {
 	let st = localStorage.getItem("slippage_tolerance")
 	if (st === null) slippageTolerance.set(toBigNumber("1.0"))
@@ -126,6 +157,7 @@ export const setSlippageTolerance = (value) => {
 	setLSValue("slippage_tolerance", value.toString())
 	slippageTolerance.set(value)
 }
+
 export const getPayInRswp = () => {
 	let value = localStorage.getItem("pay_in_rswp")
 	if (value=== null) payInRswp.set(false)
@@ -135,6 +167,7 @@ export const setPayInRswp = (value) => {
 	setLSValue("pay_in_rswp", value)
 	payInRswp.set(value)
 }
+
 export const getEarnFilters = () => {
 	let value = localStorage.getItem("earn_filters")
 	if (value === null) return
@@ -202,6 +235,28 @@ export const getHomePageTableFilter = () => {
 	if (value === null) homePageTableFilter.set({volume: "asc", price: "asc", price_change: "asc", name: "asc", liquidity: "asc", current: "volume"})
 	else homePageTableFilter.set(JSON.parse(value))
 }
+export const getHomeFilters = () => {
+    let value = localStorage.getItem("home_filters")
+    if (value === null) {
+        setLSValue("filters", {showLowVolume:true})
+        homeFilters.set({showLowVolume:true})
+    } else {
+        homeFilters.set(JSON.parse(value))
+    }
+}
+
+export const updateHomeFilters = (filter, new_value) => {
+    if (!filter) return
+    let filters_store = get(homeFilters)
+    filters_store[filter] = new_value
+    setHomeFilters(filters_store)
+}
+
+export const setHomeFilters = (value) => {
+    setLSValue("home_filters", value)
+    homeFilters.set(value)
+}
+
 export const getOnboardingSettings = () => {
 	const default_settings = {rocketfarm_info: true, home_info: true}
 	let value = localStorage.getItem("onboarding_settings")
@@ -222,7 +277,6 @@ export const getOnboardingSettings = () => {
 }
 export const setOnboardingSetting = (key, value) => {
 	let current_setttings = get(onboarding_settings)
-	console.log({key, value, current_setttings})
 	current_setttings[key] = value
 	localStorage.setItem("onboarding_settings", JSON.stringify(current_setttings))
 	onboarding_settings.set(current_setttings)
@@ -248,7 +302,7 @@ export const getSavedKeystoreData = () => {
 }
 
 
-export const formatAccountAddress = (account: string, lsize = 4, rsize = 4) => {
+export const formatAccountAddress = (account, lsize = 4, rsize = 4) => {
   return account.substring(0, lsize) + '...' + account.substring(account.length - rsize)
 }
 
@@ -265,7 +319,7 @@ export const numberWithCommas = (nStr) => {
 	return x1 + x2;
 }
 
-export const returnFloat = (value: any) => {
+export const returnFloat = (value) => {
   return { __fixed__: parseFloat(value).toFixed(9) }
 }
 
@@ -337,7 +391,7 @@ export const characterRange = (startChar, endChar) => String.fromCharCode(...ran
 
 export const zip = (arr, ...arrs) => arr.map((val, i) => arrs.reduce((list, curr) => [...list, curr[i]], [val]))
 
-export const stripTrailingZero = (value: string): string => {
+export const stripTrailingZero = (value) => {
   const removeZeros = (v) => {
     const numParts = v.split('.')
     let formatted = numParts[1]
@@ -392,7 +446,7 @@ export const displayBalanceToPrecision = (value, precision) => {
  * Probably some edge cases I've ignored here, like what happens if it finds a BigNumber in the object ?
  */
 
-export function valuesToBigNumber(obj: any) {
+export function valuesToBigNumber(obj) {
   if (typeof obj === 'object') {
     for (let property in obj) {
 		if (!isBigNumber(obj[property])){
@@ -753,7 +807,7 @@ export const pageUtils = (pageStores) => {
 	}
 }
 
-export const unixToLocalTimestamp = (timestamp: string) => {
+export const unixToLocalTimestamp = (timestamp) => {
 	// console.log(timestamp)
 	let date = new Date(parseInt(timestamp))
 

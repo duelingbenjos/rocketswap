@@ -7,7 +7,6 @@ export class LamdenBlockexplorer_API{
     private static _instance: LamdenBlockexplorer_API
     private url;
 
-
     public static getInstance() {
 		if (!LamdenBlockexplorer_API._instance) {
 			LamdenBlockexplorer_API._instance = new LamdenBlockexplorer_API(config.blockExplorer)

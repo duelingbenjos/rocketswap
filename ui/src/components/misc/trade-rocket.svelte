@@ -1,5 +1,5 @@
 <script>
-    import { onMount, afterUpdate } from 'svelte'
+    import { onMount } from 'svelte'
 	import { fly } from 'svelte/transition';
     import { linear } from 'svelte/easing';    
 
@@ -22,15 +22,12 @@
         }, 6000)
     })
 
-    afterUpdate(() => console.log({rocket, innerRocket}))
-
     const getLeftValue = () => {
         let area = innerWidth - 200
         return  Math.floor(Math.random() * area) + 100
     }
 
     const getFlyDirection = () => {
-        console.log({innerHeight})
         if (tradeType === "buy") return innerHeight  + 250
         return (innerHeight + 500) * -1
     }

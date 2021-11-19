@@ -1,11 +1,9 @@
 import { Writable, writable, derived, get } from 'svelte/store'
-import type { TokenListType, TokenMetricsType, TokenSelectType } from './types/api.types'
 
 //Services
 import { ApiService } from './services/api.service'
 import { WsService } from './services/ws.service'
 
-import type { ToastMetaType } from './types/toast.types'
 import { toBigNumber, toBigNumberPrecision } from './utils'
 import { config, currencyToken, contract_blacklist } from './config'
 import CurrencyLogo from './icons/lamden-logo.svelte'
@@ -23,19 +21,21 @@ export const saveStoreValue = (store, value) => {
 export const mainMenuOpen = writable(false);
 export const epochs = writable({});
 export const rocketState = writable(0);
-export const toast_store: Writable<ToastMetaType[]> = writable([])
+export const toast_store = writable([])
 export const tabHidden = writable(false);
 export const currencyType = writable(undefined);
 export const homePageTableFilter = writable(undefined);
 export const onboarding_settings = writable({});
+export const modalOpen = writable(false);
+export const modal = writable(null);
 
 // EXCHANGE PRICES
 export const tauUSDPrice = writable(null);
 
 // WALLET
-export const ws_id: Writable<string> = writable('')
-export const token_metrics_store: Writable<TokenMetricsType> = writable({})
-export const token_list_store: Writable<TokenListType[]> = writable([])
+export const ws_id = writable('')
+export const token_metrics_store = writable({})
+export const token_list_store = writable([])
 export const tokenBalances = writable({})
 export const keystore = writable(null);
 export const lamdenWalletAutoConnect = writable(false);
@@ -103,7 +103,6 @@ export const rswpPrice = derived(token_metrics_store, ($token_metrics_store) => 
 })
 
 export const rswpMetrics = derived(token_metrics_store, ($token_metrics_store) => {
-	console.log($token_metrics_store[config.ammTokenContract])
 	return  $token_metrics_store[config.ammTokenContract] || null
 })
 
@@ -112,14 +111,31 @@ export const rswpPriceUSD = derived(([rswpPrice, tauUSDPrice]), ([$rswpPrice, $t
 	else toBigNumber("0")
 })
 
-// AMM
-export const accountName = writable(null);  // ROCKET-ID
+// Filters
 export const earnFilters = writable({});
+export const homeFilters = writable({});
+export const homeFiltersApplied = derived(homeFilters, ($homeFilters) => {
+	let numOfApplied = 0
+	Object.keys($homeFilters).map(key => {
+		if (key !== "search"){
+			if ($homeFilters[key] === true) numOfApplied = numOfApplied + 1
+		}
+	})
+	return numOfApplied
+})
+
 export const farmFilter = writable(null);
 export const farmStakedByMe = writable(false);
 export const farmShowClosed = writable(false);
+export const verifiedTokens = writable([]);
 
 export const farmFilterUpDown = writable("down");
+
+export const tokenSelectFilters = writable({});
+export const tokenSelect_showUnverifed = derived(tokenSelectFilters, ($tokenSelectFilters) => $tokenSelectFilters.show_unverified || false)
+
+// AMM
+export const accountName = writable(null);  // ROCKET-ID
 export const slippageTolerance = writable(toBigNumber("1.0"));
 
 export const ammFuelTank = writable({})

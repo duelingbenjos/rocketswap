@@ -80,6 +80,12 @@
     const swapBuy = () => {
         if (!$currencyAmount) return
         loading = true;
+        console.log({
+            'contract': $selectedToken.contract_name,
+            'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 8)},
+            'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
+            'token_fees': $payInRswp
+        })
         walletService.swapBuy({
             'contract': $selectedToken.contract_name,
             'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 8)},
