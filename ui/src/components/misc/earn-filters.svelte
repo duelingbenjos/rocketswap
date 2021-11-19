@@ -73,6 +73,9 @@
         height: 36px;
         border: 1px solid var(--text-color-highlight);
     }
+    select > option{
+        color: black;
+    }
     input{
         margin: 0;
     }

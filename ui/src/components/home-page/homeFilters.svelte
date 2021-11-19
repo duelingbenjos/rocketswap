@@ -40,6 +40,7 @@
         max-width: 850px;
         padding: 18px 20px;
         width: 100%;
+        box-sizing: border-box;
     }
     label{
         margin-top: 1rem;
@@ -63,11 +64,10 @@
     }
     label.search{
         width: 100%;
-        max-width: 384px;
     }
     .multiselect-row{
         width: 100%;
-        max-width: 400px;
+        max-width: 486px;
     }
     .multiselect {
         position: relative;
@@ -146,6 +146,23 @@
     .close-button{
         width: 100%;
     }
+    @media screen and (min-width: 450px) {
+        .multiselect-row{
+            width: 45%;
+        }
+        label.search{
+            padding-left: 1em;
+            width: 45%;
+        }
+	}
+    @media screen and (min-width: 450px) {
+        .multiselect-row{
+            max-width: 300px;
+        }
+        label.search{
+            max-width: 300px;
+        }
+	}
     @media screen and (min-width: 2560px) {
         .container{
             max-width: 1020px;
