@@ -1,5 +1,6 @@
 import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { isTestnet } from "./config";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -23,7 +24,7 @@ import {
 import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
-const fs = require('fs')
+const fs = require("fs");
 
 @Controller("api")
 @ApiTags("Main API")
@@ -32,15 +33,15 @@ export class AppController {
 
 	@Get("verified_tokens")
 	public async getVerifiedTokens() {
+		const path = isTestnet() ? `./src/verified_tokens_testnet.json` : `./src/verified_tokens.json`;
 		return await new Promise((resolve, reject) => {
-			fs.readFile(`./src/verified_tokens.json`, (err, data: any) => {
-				if (err) reject(err)
-				else resolve(JSON.parse(data))
+			fs.readFile(path, (err, data: any) => {
+				if (err) reject(err);
+				else resolve(JSON.parse(data));
 			});
-		})
-		.catch((err) => {
+		}).catch((err) => {
 			throw new HttpException(err, 500);
-		})
+		});
 	}
 
 	@Get("amm_meta")
