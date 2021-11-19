@@ -134,7 +134,7 @@ export async function syncUserStakingData(state) {
 			ent.staking_contract = contract_name;
 			ent.vk = k;
 			ent.deposits = deposits[k].length ? deposits[k] : [deposits[k]];
-			ent.withdrawals = getValue(withdrawals[k]);
+			ent.withdrawals = withdrawals ? getValue(withdrawals[k]) : 0;
 			await ent.save();
 		}
 	}

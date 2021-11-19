@@ -29,7 +29,7 @@ export class VolumeService implements OnModuleInit {
 				if (!volume_metrics_entity) {
 					volume_metrics_entity = new VolumeMetricsEntity();
 					volume_metrics_entity.contract_name = contract_name;
-					volume_metrics_entity.MarketName = `${config.currencySymbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
+					volume_metrics_entity.MarketName = `${config.currency_symbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
 					volume_metrics_entity.token_symbol = token.token_symbol;
 				}
 				if (!volume_metrics_entity.token_attached) {

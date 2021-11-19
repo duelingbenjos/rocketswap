@@ -34,12 +34,13 @@ import { MarketcapService } from "./services/marketcap.service";
 import { CoinGeckoAPIService } from "./services/coingecko.service";
 import { StakingService } from "./services/staking.service";
 import { LastBlockEntity } from "./entities/last-block.entity";
-
+import { log } from "./utils/logger";
+import { config, isTestnet } from "./config";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
 	type: "sqlite",
-	database: "database.sqlite",
+	database: isTestnet() ? "database.testnet.sqlite" : "database.sqlite",
 	entities: [
 		TokenEntity,
 		BalanceEntity,
@@ -94,4 +95,8 @@ const db_options: TypeOrmModuleOptions = {
 		CoinGeckoAPIService
 	]
 })
-export class AppModule {}
+export class AppModule {
+	constructor() {
+		log.log({ NETWORK_TYPE: process.env.NETWORK_TYPE });
+	}
+}

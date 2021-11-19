@@ -9,7 +9,7 @@ export class TransactionService {
 	constructor(private readonly socketService: SocketService) {}
 
 	private networkInfo = {
-		type: config.networkType,
+		type: config.network_type,
 		hosts: [config.masternode]
 	};
 

@@ -121,7 +121,7 @@ export class ParserProvider {
 				return;
 			} else if (isUpdateFn(fn)) {
 				saveTokenUpdate(state);
-			} else if (contract_name === config.identityContract) {
+			} else if (contract_name === config.identity_contract) {
 				switch (fn) {
 					case "setName":
 						setName(state);

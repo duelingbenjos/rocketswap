@@ -122,6 +122,9 @@ export const prepareAndAddToken = async (contract_name: string) => {
 	}
 };
 
+const isRbxTestContract = (contract_name: string) =>
+	(contract_name.includes("_dai") || contract_name.includes("_stake")) && contract_name.includes("_demo");
+
 /** This method syncs all Tokens and Staking data */
 
 export const syncContracts = async (starting_tx_id = "0", batch_size = 1000, contractName: string = "submission") => {
@@ -143,7 +146,7 @@ export const syncContracts = async (starting_tx_id = "0", batch_size = 1000, con
 	const staking_contracts_to_process = [];
 
 	//
-	
+
 	for (let contract_name of contract_titles_parsed) {
 		const contract_source = await getContractSource(contract_name);
 
@@ -166,7 +169,7 @@ export const syncContracts = async (starting_tx_id = "0", batch_size = 1000, con
 		}
 	}
 	log.log(`${valid_tokens.length} tokens added to DB`);
-	await prepareAndAddToken("currency")
+	await prepareAndAddToken("currency");
 	await syncAllStakingData(staking_contracts_to_process);
 
 	if (length === batch_size) {
@@ -274,15 +277,15 @@ export const getCurrentEpoch = (state: any) => {
 export const parseEpoch = (epoch, index) => {
 	return {
 		index: index,
-		time: epoch.time,
-		amt_per_hr: getValue(epoch.amt_per_hr),
-		staked: getValue(epoch.staked)
+		time: epoch?.time,
+		amt_per_hr: getValue(epoch?.amt_per_hr),
+		staked: getValue(epoch?.staked)
 	};
 };
 
 export async function syncIdentityData() {
-	const state = await getContractState(config.identityContract);
-	const names_state = state[config.identityContract].key_to_name;
+	const state = await getContractState(config.identity_contract);
+	const names_state = state[config.identity_contract].key_to_name;
 
 	const keys = Object.keys(names_state);
 

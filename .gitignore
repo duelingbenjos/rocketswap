@@ -7,4 +7,5 @@ node_modules
 */node_modules
 ui/public/build
 database.sqlite
+database.testnet.sqlite
 dist

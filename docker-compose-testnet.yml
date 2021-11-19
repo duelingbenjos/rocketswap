@@ -25,10 +25,7 @@ services:
     restart: always
     container_name: rocketswap-api
     environment:
-      - ROCKETSWAP_DB_HOST=127.0.0.1
-      - ROCKETSWAP_DB_PORT=8081
-      - ROCKETSWAP_DB_USERNAME=root
-      - ROCKETSWAP_DB_PASSWORD=example
+      - NETWORK_TYPE=testnet
       - CONTEXT=remote
     network_mode: host
 
