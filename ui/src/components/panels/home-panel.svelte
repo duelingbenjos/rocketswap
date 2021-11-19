@@ -74,6 +74,7 @@
     .panel-container{
         max-width: 850px;
         padding: 18px 20px;
+        font-size: 0.8em;
     }
     table {
         width: 100%;
@@ -138,9 +139,15 @@
     .no-results{
         width: max-content;
     }
+    @media screen and (min-width: 400px) {
+        .panel-container{
+            font-size: 0.9em;
+        }
+    }
     @media screen and (min-width: 430px) {
         .panel-container{
             background: var(--home-panel-background-gradient);
+            font-size: 1em;
         }
         td{
             padding: 1.5em 8px 0;
