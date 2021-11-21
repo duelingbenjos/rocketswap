@@ -4,21 +4,26 @@ import { BlockService } from "./services/block.service";
 import { IKvp } from "./types/misc.types";
 import { log } from "./utils/logger";
 
+let init = false;
+
 export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	const block_service_url = `http://${BlockService.get_block_service_url()}`;
 	const socket = io(block_service_url, {
-		reconnection: false
+		reconnectionDelayMax: 10000
 	});
 	socket.on("connect", () => {
 		log.log(`Connected to Blockservice via socket.io @ ${block_service_url}`);
+		log.log({ init });
+		if (!init) {
+			socket.emit("join", "new-block");
 
-		socket.emit("join", "new-block");
-
-		socket.on("new-block", async (payload) => {
-			const parsed: IBsSocketBlockUpdate = JSON.parse(payload);
-			const bs_block = parsed.message;
-			await handleNewBlock(bs_block, parseBlockFn);
-		});
+			socket.on("new-block", async (payload) => {
+				const parsed: IBsSocketBlockUpdate = JSON.parse(payload);
+				const bs_block = parsed.message;
+				await handleNewBlock(bs_block, parseBlockFn);
+			});
+			init = true;
+		}
 	});
 
 	socket.io.on("reconnect", (attempt) => {
@@ -30,8 +35,8 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	});
 
 	socket.io.on("error", (error) => {
-		socket.disconnect();
-		initSocket(parseBlockFn);
+		// socket.disconnect();
+		// initSocket(parseBlockFn);
 	});
 }
 
