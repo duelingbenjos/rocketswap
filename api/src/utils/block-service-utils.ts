@@ -309,15 +309,19 @@ export async function getBlock(num: number): Promise<any> {
 }
 
 export async function fillBlocksSinceSync(block_to_sync_from: number, parseBlock: T_ParseBlockFn): Promise<void> {
-	let current_block = await getLatestSyncedBlock();
-	if (block_to_sync_from === current_block) {
-		log.log("Finished syncing historical blocks");
-		return;
+	try {
+		let current_block = await getLatestSyncedBlock();
+		if (block_to_sync_from === current_block) {
+			log.log("Finished syncing historical blocks");
+			return;
+		}
+		let next_block_to_sync = block_to_sync_from + 1;
+		const block = await getBlock(next_block_to_sync);
+		await handleNewBlock(block, parseBlock);
+		if (next_block_to_sync <= current_block) return await fillBlocksSinceSync(next_block_to_sync, parseBlock);
+	} catch (err) {
+		log.warn({ err });
 	}
-	let next_block_to_sync = block_to_sync_from + 1;
-	const block = await getBlock(next_block_to_sync);
-	await handleNewBlock(block, parseBlock);
-	if (next_block_to_sync <= current_block) return await fillBlocksSinceSync(next_block_to_sync, parseBlock);
 }
 
 export async function syncTradeHistory() {
