@@ -5,12 +5,7 @@ RUN apk add --update nodejs npm
 RUN apk add --no-cache bash
 
 RUN echo $'\
-if [ "$ROCKETSWAP_DB_FIRST_RUN" = "true" ] \n\
-then\n\
-    echo "Building Database..." \n\
-fi \n\
-echo "Starting API..."\n\
-npm run start:dev:reset \n'\
+npm run dev \n'\
 > entypoint.sh
 
 COPY package.json .
