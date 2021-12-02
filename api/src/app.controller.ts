@@ -85,10 +85,10 @@ export class AppController {
 	}
 
 	@Get("get_market_summary/:contract_name")
-	public async getMarketSummary(@Query() params: GetMarketSummaryDTO) {
+	public async getMarketSummary(@Param() params: GetMarketSummaryDTO) {
 		const { contract_name } = params;
 		try {
-			return await VolumeMetricsEntity.findOne(contract_name);
+			return await VolumeMetricsEntity.findOne({ where: { contract_name } });
 		} catch (err) {
 			log.error(err);
 		}
