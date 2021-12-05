@@ -83,6 +83,10 @@ export class ParserProvider {
 			state,
 			handleClientUpdate: this.socketService.handleClientUpdate
 		});
+		await saveUserLp({
+			state,
+			handleClientUpdate: this.socketService.handleClientUpdate
+		});
 		try {
 			if (contract_name === "submission" && fn === "submit_contract") {
 				// Check if the submitted contract is a token, if it's a token, add it to the DB
@@ -157,10 +161,6 @@ export class ParserProvider {
 				handleClientUpdate: this.socketService.handleClientUpdate
 			});
 			await savePairLp(state);
-			await saveUserLp({
-				state,
-				handleClientUpdate: this.socketService.handleClientUpdate
-			});
 			await saveReserves(
 				fn,
 				state,
