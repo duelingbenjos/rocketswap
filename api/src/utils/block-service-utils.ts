@@ -352,3 +352,45 @@ export const syncTokenTradeHistory = async (starting_tx_id = "0", batch_size = 1
 		return await syncTokenTradeHistory(tx_uid, batch_size, contract_name, token_symbol);
 	}
 };
+
+// getApprovedAmount - The current approval given to a contract
+// getApprovedAmount_LP - The current LP approved to a contract
+// getAmmStakeDetails - Looks like some look up "staked_amount" and "discount" on the main rocketswap contract
+// getAccountName - Checks "key_to_name" variable in the namesContract to get their Trollbox name
+// nameIsTaken - checks the  "name_to_key" variable in the namesContract to see if a name is already taken.
+// {
+// 	"contractName": connectionRequest.contractName,
+// 	"variableName": "staked_amount",
+// 	"key": `${account}:${config.ammTokenContract}`
+// },
+// {
+// 	"contractName": connectionRequest.contractName,
+// 	"variableName": "discount",
+// 	"key": account
+// }
+
+interface IBlockServiceProxyReq {
+	action_name: string; // the name of your action
+	args: (string | number)[];
+}
+
+const getProxyActionPath = (req_params: IBlockServiceProxyReq): string | false => {
+	const { action_name, args } = req_params;
+
+	const requests = {
+		get_balance_value: `/current/one/${args[0]}/balances/${args[1]}`,
+		get_lp_approval_value: `/current/one/${config.amm_contract}/lp_points/${args[0]}`,
+		get_discount: `/current/one/${config.amm_contract}/discount/${args[0]}`,
+		get_staked_rocketfuel: `/current/one/${config.amm_contract}/staked_amount/${args[0]}`
+	};
+
+	const request_path = requests[action_name];
+	if (!request_path) throw `Request_name ${action_name} is not found.`;
+	return request_path;
+};
+
+export const proxyBlockserviceRequest = async (req_params: IBlockServiceProxyReq) => {
+	const request_path = getProxyActionPath(req_params);
+	const req = await axios.get(`http://${BlockService.get_block_service_url()}/${request_path}`);
+	return req.res;
+};
