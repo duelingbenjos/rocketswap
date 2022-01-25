@@ -79,7 +79,7 @@ export class ParserProvider {
 
 	public parseBlock = async (block: BlockDTO) => {
 		const { state, fn, contract: contract_name, timestamp, hash } = block;
-		saveTransfer({
+		await saveTransfer({
 			state,
 			handleClientUpdate: this.socketService.handleClientUpdate
 		});
@@ -94,7 +94,7 @@ export class ParserProvider {
 				const token_is_valid = validateTokenContract(contract_str);
 				const submitted_contract_name = getContractName(state);
 				if (submitted_contract_name === config.amm_contract) {
-					updateAmmMeta({
+					await updateAmmMeta({
 						state,
 						handleClientUpdate: this.socketService.handleClientUpdate
 					});
@@ -102,8 +102,8 @@ export class ParserProvider {
 				}
 				if (token_is_valid) {
 					const add_token_dto = prepareAddToken(state);
-					saveToken(add_token_dto);
-					this.updateTokenList();
+					await saveToken(add_token_dto);
+					await this.updateTokenList();
 				}
 				if (isValidStakingContract(state, submitted_contract_name)) {
 					this.stakingService.updateStakingContractMeta({
@@ -116,7 +116,7 @@ export class ParserProvider {
 					});
 				}
 			} else if (contract_name === config.amm_contract) {
-				this.processAmmBlock({
+				await this.processAmmBlock({
 					state,
 					fn,
 					timestamp,
@@ -124,7 +124,7 @@ export class ParserProvider {
 				});
 				return;
 			} else if (isUpdateFn(fn)) {
-				saveTokenUpdate(state);
+				await saveTokenUpdate(state);
 			} else if (contract_name === config.identity_contract) {
 				switch (fn) {
 					case "setName":
@@ -135,7 +135,7 @@ export class ParserProvider {
 						break;
 				}
 			} else if (this.getAllStakingContracts().includes(contract_name)) {
-				this.stakingService.updateStakingContractMeta({
+				await this.stakingService.updateStakingContractMeta({
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate,
 					staking_contract: contract_name,
@@ -143,7 +143,7 @@ export class ParserProvider {
 					hash,
 					fn
 				});
-				saveUserLp({
+				await saveUserLp({
 					state,
 					handleClientUpdate: this.socketService.handleClientUpdate
 				});

@@ -230,9 +230,10 @@ export const updatePairs = async () => {
 		for (let p of pairs) {
 			const { contract_name } = p;
 			const token_entity = await TokenEntity.findOne({ contract_name });
-			p.token_symbol = token_entity.token_symbol;
+			p.token_symbol = token_entity.token_symbol || "";
 			token_entity.has_market = true;
-			await Promise.all([token_entity.save(), p.save()]);
+			await token_entity.save()
+			await p.save()
 		}
 		log.log(`${pairs.length} pairs updated with token symbol.`);
 	} catch (err) {

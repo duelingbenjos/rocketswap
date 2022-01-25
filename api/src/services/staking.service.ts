@@ -110,11 +110,11 @@ export class StakingService implements OnModuleInit {
 				PairEntity.findOne(staking_token),
 				PairEntity.findOne(reward_token)
 			]);
-			if (!staking_token_pair_entity || !reward_token_pair_entity) return 0
-			const staking_p = Number(staking_token_pair_entity.price)
-			const reward_p = Number(reward_token_pair_entity.price)
+			if (!staking_token_pair_entity || !reward_token_pair_entity) return 0;
+			const staking_p = Number(staking_token_pair_entity.price);
+			const reward_p = Number(reward_token_pair_entity.price);
 
-			const total_staked_value = staking_p * meta_entity.StakedBalance
+			const total_staked_value = staking_p * meta_entity.StakedBalance;
 			const reward_value_per_year = reward_p * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour);
 			return Math.round((reward_value_per_year / total_staked_value) * 100);
 		}
@@ -226,6 +226,7 @@ export class StakingService implements OnModuleInit {
 				case `${staking_contract}.TimeRampValues`:
 					entity["TimeRampValues"] = getVal(kvp);
 					break;
+				default:
 			}
 			if (kvp.key.includes("Epochs")) {
 				const index = parseInt(kvp.key.split(":")[1]);
@@ -276,24 +277,20 @@ export class StakingService implements OnModuleInit {
 				const exporter_deposit = deposits_arr.find((kvp) => kvp.key.includes(exporter_contract));
 				const exporter_withdrawal = withdrawals_arr.find((kvp) => kvp.key.includes(exporter_contract));
 
-				const proms = [
-					updateUserStakingInfo({
-						deposits: importer_deposit,
-						withdrawals: importer_withdrawal,
-						staking_contract,
-						fn,
-						handleClientUpdate
-					}),
-					updateUserStakingInfo({
-						deposits: exporter_deposit,
-						withdrawals: exporter_withdrawal,
-						staking_contract: exporter_contract,
-						fn,
-						handleClientUpdate
-					})
-				];
-
-				await Promise.all(proms);
+				await updateUserStakingInfo({
+					deposits: importer_deposit,
+					withdrawals: importer_withdrawal,
+					staking_contract,
+					fn,
+					handleClientUpdate
+				});
+				await updateUserStakingInfo({
+					deposits: exporter_deposit,
+					withdrawals: exporter_withdrawal,
+					staking_contract: exporter_contract,
+					fn,
+					handleClientUpdate
+				});
 			}
 		}
 		handleClientUpdate({ action: "staking_panel_update", data: entity });

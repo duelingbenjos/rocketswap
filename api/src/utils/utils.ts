@@ -3,6 +3,8 @@ import BigNumber from "bignumber.js";
 import { TokenEntity } from "../entities/token.entity";
 import { log } from "./logger";
 import { config } from "../config";
+import { BalanceEntity } from "../entities/balance.entity";
+import { StakingMetaEntity } from "../entities/staking-meta.entity";
 const Fs = require("fs");
 
 const validators = require("types-validate-assert");
@@ -78,7 +80,8 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 export function getValue(value: any) {
 	if (!value) {
 		return 0;
-	} else if (Number(value)! === NaN) { // is
+	} else if (Number(value)! === NaN) {
+		// is
 		return value;
 	} else if (value.__fixed__) {
 		return value.__fixed__;
@@ -174,3 +177,52 @@ export const getVkFromKeys = (keys: string[]): string => {
 	});
 	return k.split(":")[1];
 };
+
+export async function calcRswpCirculating() {
+	// Get all RSWP balances
+	const rswp_balances = (await BalanceEntity.find())?.map((b) => {
+		return { vk: b.vk, rswp_balance: Number(b.balances?.con_rswp_lst001) || 0 };
+	});
+
+	const total_balance = rswp_balances.reduce((accum, b) => {
+		return accum + b.rswp_balance;
+	}, 0);
+
+	const out_of_circulation = [
+		"fcefe7743fa70c97ae2d5290fd673070da4b0293da095f0ae8aceccf5e62b6a1",
+		"con_liq_mining_rswp_rswp",
+		"burn",
+		"con_simple_staking_tau_rswp_01",
+		"con_simple_staking_tau_rswp_001"
+	];
+	const rswp_rswp_staking_contracts = ["con_staking_rswp_interop", "con_staking_rswp_rswp", "con_staking_rswp_rswp_interop_v2"];
+
+	const undistributed_from_rswp_rswp = await getUndistributed(rswp_rswp_staking_contracts, rswp_balances);
+
+	const custodians_balance = rswp_balances
+		.filter((b) => out_of_circulation.includes(b.vk))
+		.reduce((accum, b) => {
+			return (accum += b.rswp_balance);
+		}, 0);
+
+	const total = total_balance - custodians_balance - undistributed_from_rswp_rswp;
+	
+	log.log(total);
+}
+
+async function getUndistributed(contract_names: string[], rswp_balances: IRswpBalances[]) {
+	let undistributed = 0;
+	for (let c of contract_names) {
+		const this_balance = rswp_balances.find((b) => b.vk === c)?.rswp_balance;
+		const ent = await StakingMetaEntity.findOne({ where: { contract_name: c } });
+		const { StakedBalance } = ent;
+		const excess = this_balance - StakedBalance;
+		undistributed += excess > 0 ? excess : 0;
+	}
+	return undistributed;
+}
+
+interface IRswpBalances {
+	vk: string;
+	rswp_balance: number;
+}
