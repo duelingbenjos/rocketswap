@@ -507,7 +507,7 @@ export class WalletService {
 		if (await this.needsApproval('currency', currencyAmount)){
 			txList.push({contract: 'currency', method: "approve"})
 		}
-		let totalStampsNeeded = selectedToken.contract_name === "con_reflecttau" ? 300 : await this.estimateTxCosts(txList)
+		let totalStampsNeeded = selectedToken.contract_name === "con_reflecttau" || "con_reflecttau_v2" ? 350 : await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
 			let results = await this.callApprove('currency', currencyAmount)
 			if (results){
