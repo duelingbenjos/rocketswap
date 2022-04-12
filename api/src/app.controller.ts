@@ -19,8 +19,10 @@ import {
 	GetTokenDTO,
 	GetTradeHistoryDTO,
 	GetUserLpBalanceDTO,
-	GetUserStakingInfoDTO
+	GetUserStakingInfoDTO,
+	IBlockServiceProxyReq
 } from "./types/dto";
+import { proxyBlockserviceRequest } from "./utils/block-service-utils";
 import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
 
@@ -286,6 +288,16 @@ export class AppController {
 	async getMarketcaps() {
 		try {
 			return await MarketcapEntity.find();
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
+	@Get("proxy_req")
+	async proxyRequest(@Query() params: IBlockServiceProxyReq) {
+		log.log({params})
+		try {
+			return await proxyBlockserviceRequest(params);
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}

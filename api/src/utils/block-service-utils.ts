@@ -11,6 +11,7 @@ import { ITrade, parseTrades, saveTradesToDb, TradeHistoryEntity } from "../enti
 import { syncUserStakingData } from "../entities/user-staking.entity";
 import { BlockService } from "../services/block.service";
 import { handleNewBlock, T_ParseBlockFn } from "../socket-client.provider";
+import { IBlockServiceProxyReq } from "../types/dto";
 import { log } from "./logger";
 import { arrFromStr, getValue, isValidStakingContract, validateStakingContract, validateTokenContract, writeToFile } from "./utils";
 import { changeVisibility } from "./yield-utils";
@@ -369,19 +370,14 @@ export const syncTokenTradeHistory = async (starting_tx_id = "0", batch_size = 1
 // 	"key": account
 // }
 
-interface IBlockServiceProxyReq {
-	action_name: string; // the name of your action
-	args: (string | number)[];
-}
-
 const getProxyActionPath = (req_params: IBlockServiceProxyReq): string | false => {
-	const { action_name, args } = req_params;
-
+	let { action_name, args } = req_params;
+	if (typeof args === "string") args = [args]
 	const requests = {
-		get_balance_value: `/current/one/${args[0]}/balances/${args[1]}`,
-		get_lp_approval_value: `/current/one/${config.amm_contract}/lp_points/${args[0]}`,
-		get_discount: `/current/one/${config.amm_contract}/discount/${args[0]}`,
-		get_staked_rocketfuel: `/current/one/${config.amm_contract}/staked_amount/${args[0]}`
+		get_balance_value: `current/one/${args[0]}/balances/${args[1]}`,
+		get_lp_approval_value: `current/one/${config.amm_contract}/lp_points/${args[0]}`,
+		get_discount: `current/one/${config.amm_contract}/discount/${args[0]}`,
+		get_staked_rocketfuel: `current/one/${config.amm_contract}/staked_amount/${args[0]}:con_rswp_lst001`
 	};
 
 	const request_path = requests[action_name];
@@ -391,6 +387,9 @@ const getProxyActionPath = (req_params: IBlockServiceProxyReq): string | false =
 
 export const proxyBlockserviceRequest = async (req_params: IBlockServiceProxyReq) => {
 	const request_path = getProxyActionPath(req_params);
-	const req = await axios.get(`http://${BlockService.get_block_service_url()}/${request_path}`);
-	return req.res;
+	const url = `http://${BlockService.get_block_service_url()}/${request_path}`
+	log.log(url)
+	const req = await axios.get(url);
+	log.log(req.data)
+	return req.data?.value;
 };
