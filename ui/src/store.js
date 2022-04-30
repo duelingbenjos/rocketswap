@@ -1,4 +1,4 @@
-import { Writable, writable, derived, get } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 
 //Services
 import { ApiService } from './services/api.service'

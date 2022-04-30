@@ -178,8 +178,8 @@ export class WalletService {
 
 	private getIntialBalances = async (vk) => {
 		await Promise.all([
-			this.getAccountName(vk),
-			setBearerToken(vk),
+			// this.getAccountName(vk),
+			// setBearerToken(vk),
 			getAmmStakeDetails(vk)
 		])
 	}
@@ -693,7 +693,6 @@ export class WalletService {
 	}
 
 	public async stakeTokensInAMM(contractName, args, newDiscount, addingMore, callbacks = undefined) {
-		console.log(config)
 		let txList = [{contract: contractName, method: "stake"}]
 		if (await this.needsApproval(config.ammTokenContract, args.amount.__fixed__, config.ammContractName)){
 			txList.push({contract: config.ammTokenContract, method: "approve"})
@@ -701,17 +700,13 @@ export class WalletService {
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
 			let results = await this.callApprove(config.ammTokenContract, args.amount.__fixed__, config.ammContractName)
-			console.log({results})
 			if (results){
 				this.sendTransaction(
 					contractName, 
 					"stake", 
 					args, 
 					callbacks, 
-					(res) => {
-						console.log({res})
-						this.handleStakeTokensInAMM(res, newDiscount, addingMore, callbacks)
-					}
+					(res) => this.handleStakeTokensInAMM(res, newDiscount, addingMore, callbacks)
 				)
 			}else{
 				if (callbacks) callbacks.error()
@@ -871,7 +866,6 @@ export class WalletService {
 
 	public getApprovedAmount = async (vk, contract, approvalTo) => {
 		let res =  await this.apiService.getBalanceValue(contract, vk, approvalTo || connectionRequest.contractName)
-		console.log({getApprovedAmount: res})
 		return res
 	}
 

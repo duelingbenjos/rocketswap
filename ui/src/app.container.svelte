@@ -159,9 +159,12 @@
 	<ToastsContainer />
 </main>
 <Footer />
+<!--
 <TrollBoxButton />
 <TrollBox />
 <TestnetBanner/>
+-->
+
 {#if isMay4th() && $currentThemeName === "dark"}
 	<DeathStarImage />
 {/if}
