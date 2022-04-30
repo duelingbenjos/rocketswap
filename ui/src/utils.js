@@ -38,25 +38,12 @@ export const replaceAll = (string, char, replace) => {
 export const getAmmStakeDetails = async (account = undefined) => {
 	if (!account) account = get(lwc_info)?.walletAddress
 	if (!account) return
-	const blockExplorerService = LamdenBlockexplorer_API.getInstance()
+	
+	const apiService = ApiService.getInstance()
 
-	let keyList = [
-		{
-			"contractName": connectionRequest.contractName,
-			"variableName": "staked_amount",
-			"key": `${account}:${config.ammTokenContract}`
-		},
-		{
-			"contractName": connectionRequest.contractName,
-			"variableName": "discount",
-			"key": account
-		}
-	]
-	let res = await blockExplorerService.getKeys(keyList)
-	ammFuelTank.set( {
-		'stakedAmount': res[`${keyList[0].contractName}.${keyList[0].variableName}:${keyList[0].key}`] || null,
-		'discount': res[`${keyList[1].contractName}.${keyList[1].variableName}:${keyList[1].key}`] || null
-	})
+	const [stakedAmount, discount] = await Promise.all([apiService.getStakedRocketfuel(account), apiService.getDiscount(account)])
+
+	ammFuelTank.set( {stakedAmount, discount })
 }
 
 export const removeLpBalances = async () => lpBalances.set({})

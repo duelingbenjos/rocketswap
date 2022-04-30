@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
-    "dev": "PORT=3003 npm run start:dev",
+    "dev": "cp ./src/config-testnet.ts ./src/config.ts && PORT=3003 npm run start:dev",
+    "prod": "cp ./src/config-prod.ts ./src/config.ts && npm start",
     "start:dev": "rollup -c -w",
     "start": "sirv public --host -p 5000",
     "validate": "svelte-check"

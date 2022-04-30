@@ -28,7 +28,7 @@ import {
 	getAmmStakeDetails } from '../utils'
 import { ToastService } from './toast.service'
 import { WsService } from './ws.service'
-import { LamdenBlockexplorer_API } from './blockexplorer.service'
+import { ApiService } from './api.service'
 
 /** Singleton Wallet Service */
 
@@ -37,7 +37,7 @@ export class WalletService {
 	private lwc: WalletController
 	private toastService = ToastService.getInstance()
 	private wsService = WsService.getInstance()
-	private blockExplorerService = LamdenBlockexplorer_API.getInstance()
+	private apiService = ApiService.getInstance()
 	private _ws_joined: boolean = false
 	private connectionRequest = connectionRequest;
 	private installChecker = null;
@@ -185,21 +185,9 @@ export class WalletService {
 	}
 
 	private getStampCost = async (contractName, method) => {
-		return await axios.get(`${config.blockExplorer}/api/stamps/${contractName}/${method}`)
-		.then((stampsInfo) => {
-			let maxStamps = stampsInfo?.data?.max
-			if (!maxStamps) {
-				maxStamps = stamps[method]
-				if (!maxStamps) maxStamps = stamps.defaultValue
-			}
-			return maxStamps + stamps.buffer
-		})
-		.catch(() => {
-			let maxStamps = stamps[method]
-			if (!maxStamps) maxStamps = stamps.defaultValue
-			return maxStamps + stamps.buffer
-		})
-
+		let maxStamps = stamps[method]
+		if (!maxStamps) maxStamps = stamps.defaultValue
+		return maxStamps + stamps.buffer
 	}
 
 	public estimateTxCosts = async (txInfo) => {
@@ -705,6 +693,7 @@ export class WalletService {
 	}
 
 	public async stakeTokensInAMM(contractName, args, newDiscount, addingMore, callbacks = undefined) {
+		console.log(config)
 		let txList = [{contract: contractName, method: "stake"}]
 		if (await this.needsApproval(config.ammTokenContract, args.amount.__fixed__, config.ammContractName)){
 			txList.push({contract: config.ammTokenContract, method: "approve"})
@@ -712,13 +701,17 @@ export class WalletService {
 		let totalStampsNeeded = await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
 			let results = await this.callApprove(config.ammTokenContract, args.amount.__fixed__, config.ammContractName)
+			console.log({results})
 			if (results){
 				this.sendTransaction(
 					contractName, 
 					"stake", 
 					args, 
 					callbacks, 
-					(res) => this.handleStakeTokensInAMM(res, newDiscount, addingMore, callbacks)
+					(res) => {
+						console.log({res})
+						this.handleStakeTokensInAMM(res, newDiscount, addingMore, callbacks)
+					}
 				)
 			}else{
 				if (callbacks) callbacks.error()
@@ -877,20 +870,9 @@ export class WalletService {
 	}
 
 	public getApprovedAmount = async (vk, contract, approvalTo) => {
-		let keyList = [
-			{
-				"contractName": contract,
-				"variableName": "balances",
-				"key": `${vk}:${approvalTo || connectionRequest.contractName}`
-			}
-		]
-		let res = await this.blockExplorerService.getKeys(keyList)
-		let approval = res[`${keyList[0].contractName}.${keyList[0].variableName}:${keyList[0].key}`]
-		if (!approval) return toBigNumber('0')
-		if (typeof approval?.__fixed__ !== 'undefined') approval = toBigNumber(approval.__fixed__)
-		else approval = toBigNumber(approval)
-		if (approval.isNaN()) approval = toBigNumber('0')
-		return approval
+		let res =  await this.apiService.getBalanceValue(contract, vk, approvalTo || connectionRequest.contractName)
+		console.log({getApprovedAmount: res})
+		return res
 	}
 
 	public needsApproval_LP = async (tokenContract, amount, approvalTo = undefined) => {
@@ -899,22 +881,7 @@ export class WalletService {
 	}
 
 	public getApprovedAmount_LP = async (vk, tokenContract, approvalTo) => {
-		let keyList = [
-			{
-				"contractName": config.ammContractName,
-				"variableName": "lp_points",
-				"key": `${tokenContract}:${vk}:${approvalTo}`
-			}
-		]
-		let res = await this.blockExplorerService.getKeys(keyList)
-
-		let approval = res[`${keyList[0].contractName}.${keyList[0].variableName}:${keyList[0].key}`]
-
-		if (!approval) return toBigNumber('0')
-		if (typeof approval?.__fixed__ !== 'undefined') approval = toBigNumber(approval.__fixed__)
-		else approval = toBigNumber(approval)
-		if (approval.isNaN()) approval = toBigNumber('0')
-		return approval
+		return await this.apiService.getLpApprovalValue(`${tokenContract}:${vk}:${approvalTo}`)
 	}
 
 	public async approveBN(contractName, approveAmount, approveTo, callback = undefined) {
