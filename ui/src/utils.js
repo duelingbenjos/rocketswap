@@ -28,6 +28,8 @@ import {
 	onboarding_settings,
 	tokenSelectFilters} from './store'
 
+console.log({CONTRACT_NAME : config.ammContractName})
+
 import { ApiService } from './services/api.service'
 import { LamdenBlockexplorer_API } from './services/blockexplorer.service'
 
