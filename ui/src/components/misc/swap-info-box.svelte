@@ -8,7 +8,7 @@
     // Misc
     import { stringToFixed, quoteCalculator, toBigNumber, setPayInRswp} from '../../utils' 
     import { config } from '../../config'
-    import { slippageTolerance, rswpPrice, payInRswp, rswpPriceUSD } from '../../store'
+    import { slippageTolerance, rswpPrice, payInRswp, rswpPriceUSD, rswpBalance } from '../../store'
 
     const { pageStats, pageStores } = getContext('pageContext');
     const { selectedToken, buy, currencyAmount, tokenAmount, tokenLP } = pageStores
@@ -30,7 +30,8 @@
     $: rswpFeeUsdDisplay = isNaN($pageStats?.rswpFee) ? "0.0" : $pageStats?.rswpFee.multipliedBy($rswpPriceUSD);
     $: percentOfTolerance = slippage.dividedBy($slippageTolerance)
     $: minimumReceived = $buy ? $payInRswp ? $pageStats.minimumTokens : $pageStats.minimumTokensLessFee : $payInRswp ? $pageStats.minimumCurrency : $pageStats.minimumCurrencyLessFee;
-    $: checked = $payInRswp
+    $: canPayInRSWP = $rswpBalance.isGreaterThan(0)
+    $: checked = canPayInRSWP && $payInRswp
 
 
     const toggleChangeSlippageModal = () => {
@@ -132,8 +133,8 @@
                 {/if}
             </div>
             <label class="flex-row chk-container text-primary-dim" class:pay-in-rswp={$payInRswp} id="chk-all">
-                Pay fee with RSWP
-                <input  type="checkbox" bind:checked on:change={handleCheckChange}>
+                {canPayInRSWP ? "Pay fee with RSWP" : "Pay fee with RSWP (no RSWP balance)"}
+                <input  type="checkbox" bind:checked on:change={handleCheckChange} disabled={!canPayInRSWP}>
                 <span  class="chk-checkmark chk-small"></span>
             </label>
         </div>

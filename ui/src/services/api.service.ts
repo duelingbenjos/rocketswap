@@ -116,7 +116,11 @@ export class ApiService {
 				['args', contract],
 				['args', `${vk}:${approval_contract}`]
 			]);
-			const res = await axios.get(`${this.base_url}/api/proxy_req`, {params}).then((res) => res.data)
+			const res = await axios.get(`${this.base_url}/api/proxy_req`, {params})
+			.then((res) => {
+				return res.data
+			})
+
 			if (!res) return toBigNumber("0")
 			const { __fixed__ } = res
 			if (__fixed__) return toBigNumber(__fixed__)
@@ -132,7 +136,13 @@ export class ApiService {
 				['action_name', 'get_lp_approval_value'],
 				['args', vk]
 			]);
-			const res = await axios.get(`${this.base_url}/api/proxy_req`, {params}).then((res) => res.data)
+			const res = await axios.get(`${this.base_url}/api/proxy_req`, {params})
+			.then((res) => {
+				return res.data
+			})
+
+			if (!res) return toBigNumber("0")
+
 			const { __fixed__ } = res
 			if (__fixed__) return toBigNumber(__fixed__)
 			return toBigNumber(res)
