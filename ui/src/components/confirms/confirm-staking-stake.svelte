@@ -120,7 +120,7 @@
         <div class="flex-row">
             <span class="flex-grow text-primary-dim">APR:</span>
             <div class="flex-col flex-align-end ">
-                <span class="weight-600">{stakingCalcs.emissionRatePerYear} %</span>
+                <span class="weight-600">{stakingCalcs.emissionRatePerYear ? `${stakingCalcs.emissionRatePerYear} %` : "TBD" }</span>
                 <!-- <span class="text-primary-dimmer">{stakingInfo.EmissionRatePerHour}/hour</span> -->
             </div>
         </div>

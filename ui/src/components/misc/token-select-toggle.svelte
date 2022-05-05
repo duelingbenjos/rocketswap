@@ -63,7 +63,6 @@
             tokenList = tokenList.map(token => {
                     token.balance = addBalance(token)
                     token.isVerified = isVerified(token)
-                    console.log(token)
                     return token
                 })
                 .sort((a, b) => b.balance.isGreaterThan(a.balance) ? 1 : -1)

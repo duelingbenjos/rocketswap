@@ -70,7 +70,6 @@
     }
 
     const decideCompoundingFn = () => {
-        console.log({stakingInfo})
         return singleAssetContract ? handleCompoundSelf() : handleCompoundYield()
     }
 </script>

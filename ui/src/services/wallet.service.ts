@@ -490,13 +490,28 @@ export class WalletService {
 		}
 	}
 
-	public async swapBuy(args, selectedToken, currencyAmount, callbacks = undefined) {
+	public async swapBuy(args, selectedToken, currencyAmount, rswp_fee_amount, callbacks = undefined) {
 		let txList = [{contract: connectionRequest.contractName, method: "buy"}]
+
+		const { token_fees } = args
+
+		if (token_fees){
+			if (await this.needsApproval(config.ammTokenContract, rswp_fee_amount, config.ammContractName)){
+				txList.push({contract: config.ammTokenContract, method: "approve"})
+			}
+		}
 		if (await this.needsApproval('currency', currencyAmount)){
 			txList.push({contract: 'currency', method: "approve"})
 		}
 		let totalStampsNeeded = selectedToken.contract_name === "con_reflecttau" || "con_reflecttau_v2" ? 350 : await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			if (token_fees){
+				let rswp_approve_results = await this.callApprove(config.ammTokenContract, rswp_fee_amount, config.ammContractName)
+				if(!rswp_approve_results){
+					if (callbacks) callbacks.error();
+					return
+				}
+			}
 			let results = await this.callApprove('currency', currencyAmount)
 			if (results){
 				this.sendTransaction(
@@ -532,13 +547,29 @@ export class WalletService {
 		}
 	}
 
-	public async swapSell(args, selectedToken, tokenAmount, callbacks = undefined) {
+	public async swapSell(args, selectedToken, tokenAmount, rswp_fee_amount, callbacks = undefined) {
 		let txList = [{contract: connectionRequest.contractName, method: "sell"}]
+
+		const { token_fees } = args
+
+		if (token_fees){
+			if (await this.needsApproval(config.ammTokenContract, rswp_fee_amount, config.ammContractName)){
+				txList.push({contract: config.ammTokenContract, method: "approve"})
+			}
+		}
+
 		if (await this.needsApproval(args.contract, tokenAmount)){
 			txList.push({contract: args.contract, method: "approve"})
 		}
 		let totalStampsNeeded = selectedToken.contract_name === "con_reflecttau" || "con_reflecttau_v2" ? 350 : await this.estimateTxCosts(txList)
 		if (this.userHasSufficientStamps(totalStampsNeeded, callbacks)){
+			if (token_fees){
+				let rswp_approve_results = await this.callApprove(config.ammTokenContract, rswp_fee_amount, config.ammContractName)
+				if(!rswp_approve_results){
+					if (callbacks) callbacks.error();
+					return
+				}
+			}
 			let results = await this.callApprove(args.contract, tokenAmount)
 			if (results){
 				this.sendTransaction(
@@ -577,6 +608,7 @@ export class WalletService {
 	public async stakeTokens(stakingContractName, args, stakingToken, yieldToken, isLpToken, callbacks = undefined) {
 		let txList = [{contract: stakingContractName, method: "addStakingTokens"}]
 		if (isLpToken){
+			let needs_approval = await this.needsApproval_LP(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)
 			if (await this.needsApproval_LP(stakingToken.contract_name, args.amount.__fixed__, stakingContractName)){
 				txList.push({contract: config.ammContractName, method: "approve_liquidity"})
 			}
@@ -861,6 +893,7 @@ export class WalletService {
 
 	public needsApproval = async (contract, amount, approvalTo = undefined) => {
 		let approvedAmount = await this.getApprovedAmount(get(walletAddress), contract, approvalTo)
+
 		return approvedAmount.isLessThan(amount)
 	}
 
@@ -871,6 +904,7 @@ export class WalletService {
 
 	public needsApproval_LP = async (tokenContract, amount, approvalTo = undefined) => {
 		let approvedAmount = await this.getApprovedAmount_LP(get(walletAddress), tokenContract, approvalTo)
+
 		return approvedAmount.isLessThan(amount)
 	}
 

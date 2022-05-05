@@ -15,7 +15,7 @@
     const walletService = WalletService.getInstance()
 
     //Misc
-    import { rocketState, slippageTolerance } from '../../store'
+    import { rocketState, slippageTolerance, rswpBalance } from '../../store'
     import { stringToFixed, toBigNumber } from '../../utils'
     import { config } from '../../config'
 
@@ -23,6 +23,7 @@
     export let closeConfirm;
 
     const { pageStats, resetPage, pageStores } = getContext('pageContext')
+    const { quoteCalc  } = $pageStats
     const { selectedToken, currencyAmount, tokenAmount, buy, payInRswp  } = pageStores
 
     let logoSize = "30px"
@@ -33,6 +34,8 @@
     $: slippage = buy ? $pageStats.tokenSlippage : $pageStats.currencySlippage
     $: percentOfTolerance = slippage.dividedBy($slippageTolerance)
     $: slippageWarning = slippage.isGreaterThan(5)
+    $: canPayInRSWP = $rswpBalance.isGreaterThan(0) && $payInRswp
+    $: rswpFee = canPayInRSWP ? $pageStats.rswpFee : null
 
     onMount(() => {
         rocketState.set(1)
@@ -52,9 +55,9 @@
             },
         ]
         if ($buy) {
-            slotArray[1].amount = stringToFixed($payInRswp ? $pageStats.tokensPurchased : $pageStats.tokensPurchasedLessFee, 8)
+            slotArray[1].amount = stringToFixed(canPayInRSWP ? $pageStats.tokensPurchased : $pageStats.tokensPurchasedLessFee, 8)
         }else{
-            slotArray[0].amount = stringToFixed($payInRswp ? $pageStats.currencyPurchased : $pageStats.currencyPurchasedLessFee, 8)
+            slotArray[0].amount = stringToFixed(canPayInRSWP ? $pageStats.currencyPurchased : $pageStats.currencyPurchasedLessFee, 8)
             slotArray.reverse(); 
         }
         return slotArray;
@@ -80,18 +83,12 @@
     const swapBuy = () => {
         if (!$currencyAmount) return
         loading = true;
-        console.log({
-            'contract': $selectedToken.contract_name,
-            'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 8)},
-            'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
-            'token_fees': $payInRswp
-        })
         walletService.swapBuy({
             'contract': $selectedToken.contract_name,
             'currency_amount': {'__fixed__': stringToFixed($currencyAmount, 8)},
             'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
-            'token_fees': $payInRswp
-        }, $selectedToken, $currencyAmount, { success, error })
+            'token_fees': canPayInRSWP
+        }, $selectedToken, $currencyAmount, rswpFee, { success, error })
     }
 
     const swapSell = () => {
@@ -101,8 +98,8 @@
             'contract': $selectedToken.contract_name,
             'token_amount': {'__fixed__': stringToFixed($tokenAmount, 8)},
             'minimum_received': {'__fixed__': stringToFixed(minimumReceived, 8)},
-            'token_fees': $payInRswp
-        }, $selectedToken, $tokenAmount, { success, error })
+            'token_fees': canPayInRSWP
+        }, $selectedToken, $tokenAmount, rswpFee, { success, error })
     }
 </script>
 
@@ -185,7 +182,7 @@
         </div>
         <div class="flex-row flex-align-center modal-confirm-item">
             <p class="text-primary-dim">Fee</p>
-            {#if $payInRswp}
+            {#if canPayInRSWP}
                 <span>{`${stringToFixed($pageStats.rswpFee, 8)} ${config.ammTokenSymbol}`}</span>
             {:else}
                 <span>{`${stringToFixed($pageStats.fee, 8)} ${receivedSymbol}`}</span>

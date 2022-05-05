@@ -85,6 +85,7 @@ export const rswpBalance = derived(tokenBalances, ($tokenBalances) => {
 	return $tokenBalances?.con_rswp_lst001 ? $tokenBalances.con_rswp_lst001 : toBigNumber("0")
 })
 
+
 export const rswpStakingInfo = derived(stakingInfoProcessed, ($stakingInfoProcessed) => {
 	return $stakingInfoProcessed.find(info => info.contract_name === config.ammTokenStakingContract) || null
 })
