@@ -71,18 +71,25 @@ app.use(
 );
 
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(
-	{
-		key: fs.readFileSync("src/certs/key.pem"),
-		cert: fs.readFileSync("src/certs/pub.pem")
-	},
-	app
-);
+let httpsServer: https.Server
+
+const key = fs.readFileSync("src/certs/key.pem")
+const cert = fs.readFileSync("src/certs/pub.pem")
+
+if (key && cert) {
+	httpsServer = https.createServer(
+		{
+			key,
+			cert
+		},
+		app
+	);
+	httpsServer.listen(443, () => {
+		console.log(`Starting HTTPS Proxy on port : ${443}`);
+	});
+}
 
 httpServer.listen(80, () => {
 	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 
-httpsServer.listen(443, () => {
-	console.log(`Starting HTTPS Proxy on port : ${443}`);
-});
