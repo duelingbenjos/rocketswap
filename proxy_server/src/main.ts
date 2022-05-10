@@ -5,6 +5,9 @@ import cors from "cors";
 import https from "https";
 import http from "http";
 import fs from "fs";
+const promisify = require("util-promisify")
+
+const readFileAsync = promisify(fs.readFile)
 
 // Create Express Server
 const app = express();
@@ -73,8 +76,9 @@ app.use(
 const httpServer = http.createServer(app);
 let httpsServer: https.Server
 
-const key = fs.readFileSync("src/certs/key.pem")
-const cert = fs.readFileSync("src/certs/pub.pem")
+let key, cert
+
+loadKeys()
 
 if (key && cert) {
 	httpsServer = https.createServer(
@@ -89,7 +93,17 @@ if (key && cert) {
 	});
 }
 
+
 httpServer.listen(80, () => {
 	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 
+function loadKeys() {
+	try {
+		key = fs.readFileSync("src/certs/key.pem")
+		cert = fs.readFileSync("src/certs/pub.pem")
+
+	} catch (err) {
+		console.log(err)
+	}
+}

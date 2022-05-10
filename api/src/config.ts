@@ -21,7 +21,7 @@ export const config_prod: IApiConfig = {
 	masternode: process.env.MASTERNODE_URL || "https://masternode-01.lamden.io",
 	network_type: process.env.NETWORK_TYPE || "mainnet",
 	staking_contract_submittor: "7c296eb80e379171f694a3c5be7640d16f300f09d731c99ac0a92f49c9c0c151",
-	block_service_urls: process.env.block_service_urls?.split(",") || ["78.141.225.103:3535"]
+	block_service_urls: process.env.block_service_urls?.split(",") || ["<BLOCK_SERVICE_IP HERE>"]
 };
 
 export const getConfig = () => (process.env.NETWORK_TYPE === "testnet" ? config_testnet : config_prod);

@@ -7,12 +7,22 @@ const fs = require("fs");
 
 let options: NestApplicationOptions = {};
 
-if (process.env.CONTEXT === "remote") {
+let key, cert
+
+try {
+	key = fs.readFileSync("src/certs/key.pem")
+	cert = fs.readFileSync("src/certs/pub.pem")
+} catch (err) {
+	console.log(err)
+}
+
+if (key && cert) {
 	options.httpsOptions = {
-		key: fs.readFileSync("src/certs/key.pem"),
-		cert: fs.readFileSync("src/certs/pub.pem")
+		key,
+		cert
 	};
 }
+
 options.cors = true;
 
 async function bootstrap() {
