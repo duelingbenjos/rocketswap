@@ -5,9 +5,6 @@ import cors from "cors";
 import https from "https";
 import http from "http";
 import fs from "fs";
-const promisify = require("util-promisify")
-
-const readFileAsync = promisify(fs.readFile)
 
 // Create Express Server
 const app = express();
@@ -16,7 +13,6 @@ const app = express();
 const DOWN_URL = "http://0.0.0.0:82";
 const APP_URL = "http://0.0.0.0:5000";
 const DOCS_URL = "http://0.0.0.0:3000";
-const API_URL = "http://0.0.0.0:2053";
 
 app.use(morgan("dev"));
 app.use(cors({ origin: "*" }));
