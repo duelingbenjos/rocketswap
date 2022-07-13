@@ -1,19 +1,17 @@
-import { kStringMaxLength } from "buffer";
-import { Entity } from "typeorm";
 import { config } from "../config";
 import { saveBalances } from "../entities/balance.entity";
 import { NameEntity } from "../entities/name.entity";
 import { PairEntity } from "../entities/pair.entity";
 import { createNewEpoch } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
-import { AddTokenDto, getBaseSupply, getTokenData, saveToken } from "../entities/token.entity";
-import { ITrade, parseTrades, saveTradesToDb, TradeHistoryEntity } from "../entities/trade-history.entity";
+import { getTokenData, saveToken } from "../entities/token.entity";
+import { ITrade, parseTrades, saveTradesToDb } from "../entities/trade-history.entity";
 import { syncUserStakingData } from "../entities/user-staking.entity";
 import { BlockService } from "../services/block.service";
 import { handleNewBlock, T_ParseBlockFn } from "../socket-client.provider";
 import { IBlockServiceProxyReq } from "../types/dto";
 import { log } from "./logger";
-import { arrFromStr, getValue, isValidStakingContract, validateStakingContract, validateTokenContract, writeToFile } from "./utils";
+import { getValue, validateStakingContract, validateTokenContract } from "./utils";
 import { changeVisibility } from "./yield-utils";
 
 const axiosDefaultConfig = {
