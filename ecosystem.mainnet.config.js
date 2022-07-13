@@ -19,7 +19,7 @@ module.exports = {
 		},
 		{
 			name: "docs",
-			script: "cd ./docs && npm run serve"
+			script: "cd ./docs && npm run serve:ssr"
 		},
 		{
 			name: "proxy",
