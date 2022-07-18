@@ -386,8 +386,6 @@ const getProxyActionPath = (req_params: IBlockServiceProxyReq): string | false =
 export const proxyBlockserviceRequest = async (req_params: IBlockServiceProxyReq) => {
 	const request_path = getProxyActionPath(req_params);
 	const url = `http://${BlockService.get_block_service_url()}/${request_path}`
-	log.log(url)
 	const req = await axios.get(url);
-	log.log(req.data)
 	return req.data?.value;
 };
