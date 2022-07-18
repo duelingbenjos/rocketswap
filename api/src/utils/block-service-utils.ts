@@ -352,22 +352,6 @@ export const syncTokenTradeHistory = async (starting_tx_id = "0", batch_size = 1
 	}
 };
 
-// getApprovedAmount - The current approval given to a contract
-// getApprovedAmount_LP - The current LP approved to a contract
-// getAmmStakeDetails - Looks like some look up "staked_amount" and "discount" on the main rocketswap contract
-// getAccountName - Checks "key_to_name" variable in the namesContract to get their Trollbox name
-// nameIsTaken - checks the  "name_to_key" variable in the namesContract to see if a name is already taken.
-// {
-// 	"contractName": connectionRequest.contractName,
-// 	"variableName": "staked_amount",
-// 	"key": `${account}:${config.ammTokenContract}`
-// },
-// {
-// 	"contractName": connectionRequest.contractName,
-// 	"variableName": "discount",
-// 	"key": account
-// }
-
 const getProxyActionPath = (req_params: IBlockServiceProxyReq): string | false => {
 	let { action_name, args } = req_params;
 	if (typeof args === "string") args = [args]
