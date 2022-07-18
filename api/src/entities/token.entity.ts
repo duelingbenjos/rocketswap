@@ -191,8 +191,8 @@ export const getTokenData = (state, contract_name: string): { token: AddTokenDto
 	const token: AddTokenDto = {
 		developer,
 		operator,
-		token_base64_png: token_logo_base64_png,
-		token_base64_svg: token_logo_base64_svg,
+		token_base64_png: token_logo_base64_png.__hash_self__ ? token_logo_base64_png.__hash_self__ : token_logo_base64_png,
+		token_base64_svg: token_logo_base64_svg.__hash_self__ ? token_logo_base64_svg.__hash_self__ : token_logo_base64_svg,
 		token_logo_url,
 		base_supply: getBaseSupply(),
 		token_symbol: token_symbol || '',
