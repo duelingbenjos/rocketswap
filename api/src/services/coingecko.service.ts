@@ -4,21 +4,22 @@ import { SocketService } from "./socket.service";
 import { log } from "../utils/logger";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { PairEntity } from "../entities/pair.entity";
+import { async } from "rxjs";
 
 @Injectable()
 export class CoinGeckoAPIService implements OnModuleInit {
 	public static last_price: number = 0;
 	private baseUrl = "https://api.coingecko.com/api/v3";
-	private timeInterval = 30000; // 30 seconds
+	private timeInterval = 60000; // 30 seconds
 
-	constructor(private readonly socketService: SocketService) {}
+	constructor(private readonly socketService: SocketService) { }
 
 	async onModuleInit() {
 		// await this.getTauUSDPrice();
-		await this.getTauUSDGlobalPrice();
+		await this.syncTauUsdcPrice();
 		setInterval(async () => {
 			// await this.getTauUSDPrice();
-			await this.getTauUSDPrice_rocketswap();
+			await this.syncTauUsdcPrice();
 		}, this.timeInterval);
 	}
 
@@ -70,5 +71,29 @@ export class CoinGeckoAPIService implements OnModuleInit {
 			price: tau_price_usd,
 			handleClientUpdate: this.socketService.handleClientUpdate
 		});
+	};
+
+
+	private syncTauUsdcPrice = async () => {
+		try {
+			let tickerData: any = await axios.get(`https://api.coingecko.com/api/v3/exchanges/kraken/tickers?coin_id=usdc`);
+			const usdc_usd_ticker = tickerData.data?.tickers?.find((ticker) => ticker.target === "USD" && ticker.base === "USDC");
+			const last_price_usdc_usd = usdc_usd_ticker?.last;
+			const timestamp = usdc_usd_ticker?.timestamp
+			if (last_price_usdc_usd && timestamp) {
+				const tau_lusd_last = (await PairEntity.findOne("con_lusd_lst001")).price
+				const tau_usdc_price = (Number(tau_lusd_last) * last_price_usdc_usd).toString()
+				return await saveUSDPrice({
+					price: String(100 / Number(tau_usdc_price)),
+					handleClientUpdate: this.socketService.handleClientUpdate
+				});
+			} else {
+				throw ("could not retrieve last_price / timestamp")
+			}
+		} catch (err) {
+			const err_response = err.response ? err.response.statusText || err.response : err;
+			log.warn(`could not retrieve USDC price`);
+			log.warn(err_response)
+		}
 	};
 }
