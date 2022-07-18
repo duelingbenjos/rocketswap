@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "build": "rollup -c",
-    "dev": "mv -f ./src/config-testnet.ts ./src/config.ts && PORT=3003 npm run start:dev",
-    "prod": "mv -f ./src/config-prod.ts ./src/config.ts && npm start",
+    "dev": "cp -f ./src/config-testnet.ts ./src/config.ts && PORT=3003 npm run start:dev",
+    "prod": "cp -f ./src/config-prod.ts ./src/config.ts && npm start",
     "dev-on-prod": "cp ./src/config-prod.ts ./src/config.ts && PORT=3003 npm run start:dev",
     "start:dev": "rollup -c -w",
     "start": "sirv public --host -p 5000",
