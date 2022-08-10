@@ -9,3 +9,4 @@ ui/public/build
 database.sqlite
 database.testnet.sqlite
 dist
+.vscode
