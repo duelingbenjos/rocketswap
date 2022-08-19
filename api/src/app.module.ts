@@ -3,7 +3,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { AppGateway } from "./app.gateway";
 import { TokenEntity } from "./entities/token.entity";
 import { AppController } from "./app.controller";
-import { ParserProvider } from "./data-sync.provider";
+import { DataSyncProvider } from "./data-sync.provider";
 import { BalanceEntity } from "./entities/balance.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -75,10 +75,10 @@ const db_options: TypeOrmModuleOptions = {
 			}
 		})
 	],
-	exports: [ParserProvider],
+	exports: [DataSyncProvider],
 	controllers: [AppController, TrollboxController],
 	providers: [
-		ParserProvider,
+		DataSyncProvider,
 		AppGateway,
 		SocketService,
 		StakingService,
