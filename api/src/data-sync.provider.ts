@@ -19,7 +19,7 @@ import { BlockDTO, initSocket } from "./socket-client.provider";
 import { getLastProcessedBlock, startTrimLastBlocksTask } from "./entities/last-block.entity";
 
 @Injectable()
-export class ParserProvider {
+export class DataSyncProvider {
 	constructor(
 		private readonly authService: AuthService,
 		@Inject(forwardRef(() => StakingService))
@@ -167,7 +167,7 @@ export class ParserProvider {
 				this.socketService.handleClientUpdate,
 				timestamp,
 				hash,
-				ParserProvider.amm_meta_entity?.TOKEN_CONTRACT
+				DataSyncProvider.amm_meta_entity?.TOKEN_CONTRACT
 			);
 			await updateAmmMeta({
 				state,
@@ -194,7 +194,7 @@ export class ParserProvider {
 
 	private refreshAmmMeta = async () => {
 		const amm_meta_entity = await AmmMetaEntity.findOne();
-		ParserProvider.amm_meta_entity = amm_meta_entity;
+		DataSyncProvider.amm_meta_entity = amm_meta_entity;
 	};
 }
 
