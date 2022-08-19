@@ -1,7 +1,7 @@
 import { log } from "../utils/logger";
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
-import { ParserProvider } from "../data-sync.provider";
+import { DataSyncProvider } from "../data-sync.provider";
 import { PairEntity } from "../entities/pair.entity";
 import { updateEpoch } from "../entities/staking-epoch.entity";
 import { IKvp } from "../types/misc.types";
@@ -16,8 +16,8 @@ export class StakingService implements OnModuleInit {
 	constructor(
 		@Inject(forwardRef(() => SocketService))
 		private readonly socketService: SocketService,
-		@Inject(forwardRef(() => ParserProvider))
-		private readonly parserProvider: ParserProvider
+		@Inject(forwardRef(() => DataSyncProvider))
+		private readonly parserProvider: DataSyncProvider
 	) {}
 
 	async onModuleInit() {
@@ -57,15 +57,15 @@ export class StakingService implements OnModuleInit {
 			 * Smart Epoch Staking Contract, RSWP => RSWP
 			 */
 			meta.type === "staking_smart_epoch" &&
-			meta.STAKING_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT &&
-			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
+			meta.STAKING_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT &&
+			meta.YIELD_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			// log.log("staking_smart_epoch called");
 			return await this.getRSWPStakingROI(meta_entity);
 		} else if (
 			meta.type === "staking_smart_epoch_compounding_timeramp" &&
-			meta.STAKING_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT &&
-			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
+			meta.STAKING_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT &&
+			meta.YIELD_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			return await this.getRSWPStakingROI(meta_entity);
 		} else if (
@@ -124,7 +124,7 @@ export class StakingService implements OnModuleInit {
 		Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
 
 	getSimpleStakingROI = async (yearly_emission_rate: number) => {
-		const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity?.TOKEN_CONTRACT);
+		const rswp_entity = await PairEntity.findOne(DataSyncProvider.amm_meta_entity?.TOKEN_CONTRACT);
 		if (rswp_entity && rswp_entity.price) {
 			const apy = Math.round(parseFloat(rswp_entity.price) * yearly_emission_rate * 100);
 			return apy;

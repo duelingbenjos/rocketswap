@@ -11,10 +11,10 @@ import {
 	IUserYieldPayload
 } from "../types/websocket.types";
 import { log } from "../utils/logger";
-import { ParserProvider } from "../data-sync.provider";
+import { DataSyncProvider } from "../data-sync.provider";
 @Injectable()
 export class SocketService implements OnApplicationBootstrap {
-	constructor(private readonly parserProvider: ParserProvider) {}
+	constructor(private readonly parserProvider: DataSyncProvider) {}
 
 	public handleClientUpdate: handleClientUpdateType = null;
 	public handleAuthenticateResponse: handleAuthenticateResponseType = null;
