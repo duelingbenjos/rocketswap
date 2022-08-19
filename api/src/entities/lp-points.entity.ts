@@ -5,7 +5,6 @@ import {
 	Column,
 	PrimaryColumn,
 	BaseEntity,
-	PrimaryGeneratedColumn
 } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
 import { config } from "../config";
