@@ -154,9 +154,9 @@
 </style>
 
 <main>
-	<Header />
+	<!-- <Header /> -->
 	<Router />
-	<ToastsContainer />
+	<!-- <ToastsContainer /> -->
 </main>
 <Footer />
 <!--

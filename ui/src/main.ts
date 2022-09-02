@@ -10,11 +10,20 @@ import RemovePool from './pages/pool-remove.page.svelte'
 import App from './app.container.svelte'
 import { routes } from 'svelte-hash-router'
 import Home from './pages/home.page.svelte'
+import Chart from './pages/chart.page.svelte'
 
 routes.set({
   '/': {
-    $$component: Home,
-     $$name: 'Home'
+    $$component: Chart,
+     $$name: 'Chart'
+   },
+  // '/': {
+  //   $$component: Home,
+  //    $$name: 'Home'
+  //  },
+  '/chart': {
+    $$component: Chart,
+     $$name: 'Chart'
    },
   '/swap/': {
     $$component: Swap,
