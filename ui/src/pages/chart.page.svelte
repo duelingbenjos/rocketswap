@@ -12,17 +12,17 @@
     getData()
   })
 
-  const histogram_options = {
-    color: '#26a69a',
-    priceFormat: {
-      type: 'volume'
-    },
-    priceScaleId: '',
-    scaleMargins: {
-      top: 0.8,
-      bottom: 0
-    }
-  }
+  // const histogram_options = { 
+  //   color: '#26a69a',
+  //   priceFormat: {
+  //     type: 'volume'
+  //   },
+  //   priceScaleId: '',
+  //   scaleMargins: {
+  //     top: 0.8,
+  //     bottom: 0
+  //   }
+  // }
 
   async function getData() {
     const res = await axios.get('http://0.0.0.0:2001/get_chart_data?contract_name=con_lusd_lst001&resolution=1w')
