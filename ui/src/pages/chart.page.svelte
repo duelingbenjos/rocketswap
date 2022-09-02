@@ -11,7 +11,7 @@
   onMount(async () => {
     getData()
   })
-
+  //
   // const histogram_options = { 
   //   color: '#26a69a',
   //   priceFormat: {
