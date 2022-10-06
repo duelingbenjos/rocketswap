@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
 });
-
+˙
 app.use(
 	"/docs#",
 	createProxyMiddleware({
@@ -84,13 +84,13 @@ if (key && cert) {
 		},
 		app
 	);
-	httpsServer.listen(443, () => {
-		console.log(`Starting HTTPS Proxy on port : ${443}`);
-	});
+	// httpsServer.listen(443, () => {
+	// 	console.log(`Starting HTTPS Proxy on port : ${443}`);
+	// });
 }
 
 
-httpServer.listen(80, () => {
+httpServer.listen(81, () => {
 	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 
