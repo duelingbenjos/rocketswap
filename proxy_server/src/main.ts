@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
 });
-˙
+
 app.use(
 	"/docs#",
 	createProxyMiddleware({
@@ -70,36 +70,36 @@ app.use(
 );
 
 const httpServer = http.createServer(app);
-let httpsServer: https.Server
+// let httpsServer: https.Server
 
-let key, cert
+// let key, cert
 
-loadKeys()
+// loadKeys()
 
-if (key && cert) {
-	httpsServer = https.createServer(
-		{
-			key,
-			cert
-		},
-		app
-	);
+// if (key && cert) {
+// 	httpsServer = https.createServer(
+// 		{
+// 			key,
+// 			cert
+// 		},
+// 		app
+// 	);
 	// httpsServer.listen(443, () => {
 	// 	console.log(`Starting HTTPS Proxy on port : ${443}`);
 	// });
-}
+// }
 
 
 httpServer.listen(81, () => {
 	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 
-function loadKeys() {
-	try {
-		key = fs.readFileSync("src/certs/key.pem")
-		cert = fs.readFileSync("src/certs/pub.pem")
+// function loadKeys() {
+// 	try {
+// 		key = fs.readFileSync("src/certs/key.pem")
+// 		cert = fs.readFileSync("src/certs/pub.pem")
 
-	} catch (err) {
-		console.log(err)
-	}
-}
+// 	} catch (err) {
+// 		console.log(err)
+// 	}
+// }
