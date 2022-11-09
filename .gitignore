@@ -8,3 +8,4 @@ node_modules
 ui/public/build
 database.sqlite
 dist
+docs/node_modules
