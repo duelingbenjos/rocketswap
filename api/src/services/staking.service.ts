@@ -28,7 +28,6 @@ export class StakingService implements OnModuleInit {
 	}
 
 	updateROI = async () => {
-		if (!ParserProvider.amm_meta_entity) return
 		// log.debug("UPDATE ROI CALLED")
 		// log.log({staking_contracts: this.parserProvider.getAllStakingContracts()})
 		// log.log(this.parserProvider.getActiveStakingContracts().length)
