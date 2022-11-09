@@ -71,6 +71,7 @@ export async function saveTransfer(args: { state: IKvp[]; handleClientUpdate: ha
 
 export const saveBalances = async (contract_name: string, balances) => {
 	const balance_keys = Object.keys(balances);
+	const to_save = [];
 	for (let key of balance_keys) {
 		let entity = await BalanceEntity.findOne(key);
 		if (!entity) {
@@ -81,6 +82,7 @@ export const saveBalances = async (contract_name: string, balances) => {
 
 		const balance_entry = String(getValue(balances[key]));
 		entity.balances[contract_name] = balance_entry;
-		await entity.save();
+		to_save.push(entity);
 	}
+	await BalanceEntity.save(to_save, { chunk: 500 });
 };
