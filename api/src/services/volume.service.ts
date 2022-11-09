@@ -19,16 +19,17 @@ export class VolumeService implements OnModuleInit {
 
 	private async updateDailyVolumes() {
 		try {
-			const tokens = await TokenEntity.find({ where: { has_market: true } });
+			const tokens = (await TokenEntity.find({ where: { has_market: true } })).filter((t) => t.token_name && t.token_symbol);
 			const proms: Promise<any>[] = [];
 			for (let token of tokens) {
+				if (!token.token_symbol || !token.token_name) return;
 				const { contract_name } = token;
 
 				let volume_metrics_entity = await VolumeMetricsEntity.findOne(contract_name);
 				if (!volume_metrics_entity) {
 					volume_metrics_entity = new VolumeMetricsEntity();
 					volume_metrics_entity.contract_name = contract_name;
-					volume_metrics_entity.MarketName = `${config.currencySymbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
+					volume_metrics_entity.MarketName = `${config.currency_symbol.toUpperCase()}/${token.token_symbol.toUpperCase()}`;
 					volume_metrics_entity.token_symbol = token.token_symbol;
 				}
 				if (!volume_metrics_entity.token_attached) {

@@ -3,7 +3,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { AppGateway } from "./app.gateway";
 import { TokenEntity } from "./entities/token.entity";
 import { AppController } from "./app.controller";
-import { ParserProvider } from "./parser.provider";
+import { DataSyncProvider } from "./data-sync.provider";
 import { BalanceEntity } from "./entities/balance.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -34,11 +34,13 @@ import { MarketcapService } from "./services/marketcap.service";
 import { CoinGeckoAPIService } from "./services/coingecko.service";
 import { StakingService } from "./services/staking.service";
 import { LastBlockEntity } from "./entities/last-block.entity";
+import { log } from "./utils/logger";
+import { config, isTestnet } from "./config";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
 	type: "sqlite",
-	database: "database.sqlite",
+	database: isTestnet() ? "database.testnet.sqlite" : "database.sqlite",
 	entities: [
 		TokenEntity,
 		BalanceEntity,
@@ -73,12 +75,10 @@ const db_options: TypeOrmModuleOptions = {
 			}
 		})
 	],
-	exports: [
-		ParserProvider
-	],
+	exports: [DataSyncProvider],
 	controllers: [AppController, TrollboxController],
 	providers: [
-		ParserProvider,
+		DataSyncProvider,
 		AppGateway,
 		SocketService,
 		StakingService,
@@ -92,7 +92,11 @@ const db_options: TypeOrmModuleOptions = {
 		StakingEpochEntity,
 		VolumeService,
 		MarketcapService,
-		CoinGeckoAPIService,
+		CoinGeckoAPIService
 	]
 })
-export class AppModule {}
+export class AppModule {
+	constructor() {
+		log.log({ NETWORK_TYPE: process.env.NETWORK_TYPE });
+	}
+}

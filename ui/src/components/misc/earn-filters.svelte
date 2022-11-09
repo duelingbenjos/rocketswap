@@ -20,7 +20,7 @@
             value: "alpha_staking_token"
         },
         {
-            name: "APY %",
+            name: "APR %",
             value: "apy"
         },
         {
@@ -36,7 +36,6 @@
     const handleChangedSort = (e) => setFarmFilter(e.target.value)
 
     const handleSearch = (e) => {
-        console.log(e)
         if (e.target.value === "") setEarnFilters({...$earnFilters, search: null}) 
         else setEarnFilters({...$earnFilters, search: e.target.value.toLowerCase()})
     }
@@ -74,6 +73,9 @@
         height: 36px;
         border: 1px solid var(--text-color-highlight);
     }
+    select > option{
+        color: black;
+    }
     input{
         margin: 0;
     }
@@ -105,9 +107,6 @@
         color: var(--text-color-highlight);
         width: -webkit-fill-available;
         width: fit-content;
-    }
-    .chk-container > span{
-        margin-right: 10px;
     }
     .chk-checkmark{
         margin-left: 0;

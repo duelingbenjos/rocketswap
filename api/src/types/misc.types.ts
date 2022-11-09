@@ -1,11 +1,4 @@
-export class BlockDTO {
-	state: IKvp[];
-	fn: string;
-	contract: string;
-	timestamp: number;
-	hash: string;
-	block_num: number
-}
+import { BlockDTO } from "../socket-client.provider";
 
 export interface IKvp {
 	key: string;

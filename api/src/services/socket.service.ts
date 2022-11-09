@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, OnApplicationBootstrap } from "@nestjs/common";
 import { fillMissingEpochs, filterEpochs, getUserRewardRate, getUserYieldPerSecond } from "../utils/yield-utils";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
@@ -11,11 +11,10 @@ import {
 	IUserYieldPayload
 } from "../types/websocket.types";
 import { log } from "../utils/logger";
-import { ParserProvider } from "../parser.provider";
+import { DataSyncProvider } from "../data-sync.provider";
 @Injectable()
-export class SocketService {
-	constructor(private readonly parserProvider: ParserProvider) {}
-	private logger: Logger = new Logger("SocketService");
+export class SocketService implements OnApplicationBootstrap {
+	constructor(private readonly parserProvider: DataSyncProvider) {}
 
 	public handleClientUpdate: handleClientUpdateType = null;
 	public handleAuthenticateResponse: handleAuthenticateResponseType = null;
@@ -24,7 +23,7 @@ export class SocketService {
 	public staking_epochs: { [key: string]: number } = {};
 	public staking_panel_clients: string[] = [];
 
-	async afterInit() {
+	async onApplicationBootstrap() {
 		const staking_entities = await StakingMetaEntity.find({ where: { visible: true } });
 		this.staking_epochs = staking_entities.reduce((accum, entity) => {
 			accum[entity.contract_name] = entity.Epoch.index;
@@ -33,7 +32,6 @@ export class SocketService {
 	}
 
 	public addStakingPanelClient(vk: string) {
-		//console.log("addStakingPanelClient called");
 		const idx = this.staking_panel_clients.indexOf(vk);
 		if (idx < 0) {
 			this.staking_panel_clients.push(vk);
@@ -62,7 +60,7 @@ export class SocketService {
 					if (
 						(!user_staking_entity.yield_info ||
 							!Object.keys(user_staking_entity.yield_info).length ||
-							user_staking_entity.yield_info.epoch_updated !== this.staking_epochs[staking_contract]) &&
+							user_staking_entity.yield_info?.epoch_updated !== this.staking_epochs[staking_contract]) &&
 						user_staking_entity.deposits.length
 					) {
 						const epoch_entities = await StakingEpochEntity.find({
@@ -79,8 +77,14 @@ export class SocketService {
 							staking_meta_entity.Epoch.index
 						);
 						epoch_entities_complete.sort((a, b) => a.epoch_index - b.epoch_index);
-						// log.log(epoch_entities_complete.map((e) => e.epoch_index));
-						const metrics = await this.updateClientStakingMetrics(vk, staking_contract, user_staking_entity, epoch_entities_complete);
+
+						const metrics = await this.updateClientStakingMetrics(
+							vk,
+							staking_contract,
+							user_staking_entity,
+							epoch_entities_complete
+						);
+						log.log({ metrics });
 						if (metrics && metrics[staking_contract]) {
 							user_staking_entity.yield_info = metrics[staking_contract];
 							await user_staking_entity.save();
@@ -88,6 +92,8 @@ export class SocketService {
 						} else {
 							log.warn(`client staking metrics for staking contract : ${staking_contract}, vk : ${vk} is undefined.`);
 						}
+					} else {
+						accum[staking_contract] = user_staking_entity.yield_info;
 					}
 					return accum;
 				}, Promise.resolve({}));
@@ -98,7 +104,6 @@ export class SocketService {
 	}
 
 	public async sendClientStakingUpdates(staking_contract: string) {
-		log.log("sendClientStakingUpdats called")
 		try {
 			const epoch_entities = await StakingEpochEntity.find({ where: { staking_contract }, take: 10000 });
 			for (let vk of this.staking_panel_clients) {

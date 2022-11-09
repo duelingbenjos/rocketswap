@@ -5,11 +5,6 @@
 
     import FAQ from './faq-questions-list.json'
 
-    onMount(() => {
-        console.log(FAQ)
-    })
-    
-
 </script>
 
 <style>

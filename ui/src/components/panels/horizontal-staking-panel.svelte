@@ -135,6 +135,7 @@
         top: 10px;
         left: 30px; 
     }
+    
     @media screen and (min-width: 430px) {
         .panel-container{
             margin: 10px;
@@ -160,7 +161,7 @@
         </div>
         <div class="flex-row flex-grow flex-justify-spaceevenly">
             <div class="flex-col detail-col">
-                <span>APY:</span>
+                <span>APR:</span>
                 <div class="flex-col flex-align-end ">
                     <span class="weight-600">{stringToFixed(stakingCalcs.emissionRatePerYear, 8)}</span>
                     <span class="text-primary-dimmer">{stringToFixed(stakingInfo.EmissionRatePerHour, 8)}/hour</span>

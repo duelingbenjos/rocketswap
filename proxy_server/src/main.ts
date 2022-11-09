@@ -13,7 +13,6 @@ const app = express();
 const DOWN_URL = "http://0.0.0.0:82";
 const APP_URL = "http://0.0.0.0:5000";
 const DOCS_URL = "http://0.0.0.0:3000";
-const API_URL = "http://0.0.0.0:2053";
 
 app.use(morgan("dev"));
 app.use(cors({ origin: "*" }));
@@ -71,18 +70,36 @@ app.use(
 );
 
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(
-	{
-		key: fs.readFileSync("src/certs/key.pem"),
-		cert: fs.readFileSync("src/certs/pub.pem")
-	},
-	app
-);
+// let httpsServer: https.Server
 
-httpServer.listen(80, () => {
+// let key, cert
+
+// loadKeys()
+
+// if (key && cert) {
+// 	httpsServer = https.createServer(
+// 		{
+// 			key,
+// 			cert
+// 		},
+// 		app
+// 	);
+	// httpsServer.listen(443, () => {
+	// 	console.log(`Starting HTTPS Proxy on port : ${443}`);
+	// });
+// }
+
+
+httpServer.listen(81, () => {
 	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 
-httpsServer.listen(443, () => {
-	console.log(`Starting HTTPS Proxy on port : ${443}`);
-});
+// function loadKeys() {
+// 	try {
+// 		key = fs.readFileSync("src/certs/key.pem")
+// 		cert = fs.readFileSync("src/certs/pub.pem")
+
+// 	} catch (err) {
+// 		console.log(err)
+// 	}
+// }

@@ -16,7 +16,7 @@ import { StakingMetaEntity } from "./entities/staking-meta.entity";
 import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { TauMarketEntity } from "./entities/tau-market.entity";
-import { ParserProvider } from "./parser.provider";
+// import { ParserProvider } from "./parser.provider";
 import { SocketService } from "./services/socket.service";
 import { TransactionService } from "./services/transaction.service";
 import {
@@ -187,6 +187,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
+		// log.log(`${client.id} joined ${subject}`);
 		this.socketService.addStakingPanelClient(subject);
 		const yield_list = await this.socketService.getClientYieldList(subject);
 		client.emit("user_yield_list", yield_list);

@@ -67,9 +67,6 @@
 			if ($currencyAmount.isEqualTo(0) || $tokenAmount.isEqualTo(0)) return true
 			let tokenBalance = $tokenBalances[$selectedToken.contract_name] || toBigNumber(0)
 
-			console.log({currencyAmount: $currencyAmount, tokenAmount: $tokenAmount, tokenBalance})
-
-
 			if (typeof $buy === 'undefined'){
 				if ($currencyAmount.isGreaterThan($walletBalance)){
 					disabledText = `Insufficient ${config.currencySymbol}`

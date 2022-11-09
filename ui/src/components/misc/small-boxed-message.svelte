@@ -19,7 +19,6 @@
         width: fit-content;
 
         width: 100%;
-        max-width: 300px;
         margin: 10px 0;
 
         border-top: 2px solid var(--text-color-highlight);
@@ -35,12 +34,15 @@
     @media screen and (min-width: 430px) {
         div{
             border-radius: var(--border-radius);
+
+            min-width: 350px;
         }
     }
 
     @media screen and (min-width: 650px) {
         div{
             margin: 10px;
+            max-width: 45%;
         }
                 
 

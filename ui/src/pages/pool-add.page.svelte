@@ -1,6 +1,8 @@
 <script>
   	import { onMount, setContext } from 'svelte'
-  	import { writable } from 'svelte/store'
+	import { writable, derived } from 'svelte/store'
+	import { fade } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
 	//Router
 	import { params, active } from 'svelte-hash-router'
@@ -13,7 +15,7 @@
 	
 	//Misc
 	import { stringToFixed, quoteCalculator, toBigNumber, pageUtils } from '../utils'
-	import { walletIsReady, lwc_info, tokenBalances, lpBalances, saveStoreValue } from '../store'
+	import { walletIsReady, lwc_info, tokenBalances, lpBalances, saveStoreValue, verifiedTokens } from '../store'
 	import { connectionRequest, config } from '../config'
 
 	//Components
@@ -22,6 +24,7 @@
 	import PoolStats from '../components/pools/pool-stats.svelte'
 	import Buttons from '../components/buttons.svelte'
 	import IconBackArrow from '../icons/back-arrow.svelte'
+	import ConfirmUnverified from '../components/confirms/confirm-unverified.svelte'
 
 	let pageStats = writable()
 	let currencyAmount = writable(null)
@@ -31,13 +34,20 @@
 	let lpBalance = writable()
 	let txOkay = writable(true)
 
+	let isVerified = derived([verifiedTokens, selectedToken], ([$verifiedTokens, $selectedToken]) => {
+		if (!$selectedToken) return false
+		if (!$verifiedTokens) return false
+		return $verifiedTokens.includes($selectedToken.contract_name)
+	})
+
 	let pageStores = {
 		currencyAmount,
 		tokenAmount,
 		selectedToken,
 		tokenLP,
 		lpBalance,
-		txOkay
+		txOkay,
+		isVerified
 	}
 
   	let pageUtilites = pageUtils(pageStores)
@@ -47,6 +57,7 @@
 	$: pageDescription = $selectedToken ? `Add liquidity to the ${$selectedToken.token_symbol}/${config.currencySymbol} pool!` : 'Add Liquidity!';
 	$: removeHref = $selectedToken ? `/#/pool-remove/${$selectedToken.contract_name}` : false;
 	$: updateStats = updatePageStats($walletIsReady, $tokenLP, $lpBalances, $currencyAmount)
+	$: showUnverifiedMessage = true
 
 	selectedToken.subscribe(value => {
 		if (value) {
@@ -56,6 +67,7 @@
 			}else{
 				pageUtilites.refreshTokenInfo(value.contract_name)
 				pageUtilites.updateWindowHistory("pool-add/")
+				showUnverifiedMessage = true
 			}
 		}
 	})
@@ -115,6 +127,8 @@
 		}
 		return await walletService.estimateTxCosts(txList)
 	}
+
+	const closeConfirm = () => showUnverifiedMessage = false
 </script>
 
 <style>
@@ -157,5 +171,13 @@
 	</PoolSwapPanel>
 </div>
 
+{#if $selectedToken && !$isVerified && showUnverifiedMessage }
+	<div class="modal"
+		in:fade="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
+		out:fade="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.0, easing: quintOut}}"
+		>
+		<ConfirmUnverified {closeConfirm}/>
+	</div>
+{/if}
 
 

@@ -204,8 +204,8 @@
 			</div>
 		</div>
 		<span class="prices text-xsmall">
-			<strong class="text-color-highlight">{config.currencySymbol}</strong>{`: $${stringToFixed($tauUSDPrice, 3)} USD | `}
-			<strong class="text-color-highlight">{config.ammTokenSymbol}</strong>{`: $${stringToFixed($rswpPriceUSD, 3)} USD`}
+			<strong class="text-color-highlight">{config.currencySymbol}</strong>{`: $${stringToFixed($tauUSDPrice, 4)} USD | `}
+			<strong class="text-color-highlight">{config.ammTokenSymbol}</strong>{`: $${stringToFixed($rswpPriceUSD, 4)} USD`}
 		</span>
 	</div>
 
