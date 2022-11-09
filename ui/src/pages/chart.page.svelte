@@ -25,7 +25,7 @@
   // }
 
   async function getData() {
-    const res = await axios.get('http://0.0.0.0:2001/get_chart_data?contract_name=con_lusd_lst001&resolution=1w')
+    const res = await axios.get('http://0.0.0.0:2001/get_chart_data?contract_name=con_lambdoge&resolution=1w')
     const { candles, meta } = res.data
     data = candles
     priceFormat = {
