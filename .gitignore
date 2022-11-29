@@ -7,5 +7,5 @@ ui/public/build
 database.sqlite
 dist
 docs/node_modules
-database.testnet.sqlite
+*.sqlite
 .vscode

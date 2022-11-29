@@ -12,6 +12,7 @@
     "baseUrl": "./",
     "incremental": true,
     "noImplicitAny": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   }
 }
