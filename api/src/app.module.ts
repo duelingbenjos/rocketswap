@@ -40,7 +40,7 @@ import { config, isTestnet } from "./config";
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
 	type: "sqlite",
-	database: isTestnet() ? "database.testnet.sqlite" : "database.sqlite",
+	database: `db.${config.network_name}.${config.network_type}${config.lamden_version}.sqlite`,
 	entities: [
 		TokenEntity,
 		BalanceEntity,
@@ -97,6 +97,6 @@ const db_options: TypeOrmModuleOptions = {
 })
 export class AppModule {
 	constructor() {
-		log.log({ NETWORK_TYPE: process.env.NETWORK_TYPE });
+		log.log({ network_type: config.network_type });
 	}
 }

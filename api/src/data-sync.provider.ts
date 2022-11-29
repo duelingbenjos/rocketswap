@@ -16,7 +16,7 @@ import { StakingService } from "./services/staking.service";
 import { getStakingMetaList } from "./entities/staking-meta.entity";
 import { fillBlocksSinceSync, getLatestSyncedBlock, syncContracts, syncIdentityData, syncTradeHistory } from "./utils/block-service-utils";
 import { BlockDTO, initSocket } from "./socket-client.provider";
-import { getLastProcessedBlock, startTrimLastBlocksTask } from "./entities/last-block.entity";
+import { getLastProcessedBlock, setLatestBlock, startTrimLastBlocksTask } from "./entities/last-block.entity";
 
 @Injectable()
 export class DataSyncProvider {
@@ -35,30 +35,40 @@ export class DataSyncProvider {
 	token_contract_list: any[] = [];
 
 	async onModuleInit() {
-		const last_block_saved_db = await getLastProcessedBlock();
-		const latest_synced_block_bs = await getLatestSyncedBlock();
-		const start_sync_block = last_block_saved_db || latest_synced_block_bs;
+		try {
+			const last_block_saved_db = await getLastProcessedBlock();
+			const latest_synced_block_bs = await getLatestSyncedBlock();
+			const start_sync_block = last_block_saved_db || latest_synced_block_bs;
 
-		if (!last_block_saved_db) {
-			await syncAmmCurrentState();
+			if (!last_block_saved_db) {
+				await this.syncFromPristineState();
+				await setLatestBlock();
+			} else {
+				log.log(`last block detected in local db.`);
+				log.log(`starting block sync from block ${start_sync_block}`);
+				// await this.syncFromPristineState();
+			}
+
 			await this.refreshAmmMeta();
-			await syncContracts();
-			await updatePairs();
-			await syncIdentityData();
-			await syncTradeHistory();
-		} else {
-			log.log(`last block detected in local db.`);
-			log.log(`starting block sync from block ${start_sync_block}`);
+
+			await fillBlocksSinceSync(start_sync_block, this.parseBlock);
+
+			initSocket(this.parseBlock);
+
+			await this.updateStakingContractList();
+			startTrimLastBlocksTask();
+		} catch (err) {
+			log.log({ err });
 		}
+	}
 
+	private async syncFromPristineState() {
+		await syncAmmCurrentState();
 		await this.refreshAmmMeta();
-
-		await fillBlocksSinceSync(start_sync_block, this.parseBlock);
-
-		initSocket(this.parseBlock);
-
-		await this.updateStakingContractList();
-		startTrimLastBlocksTask();
+		await syncContracts();
+		await updatePairs();
+		await syncIdentityData();
+		await syncTradeHistory();
 	}
 
 	public updateStakingContractList = async (): Promise<void> => {
@@ -72,6 +82,8 @@ export class DataSyncProvider {
 		log.warn({ staking_contract_list_all: this.staking_contract_list_all });
 		this.staking_contract_list_all = this.staking_contract_list_all;
 	};
+
+	public async updateLatestBlock() {}
 
 	/**
 	 * ALL NEW BLOCKS ARE PASSED THROUGH THIS FUNCTION FOR PROCESSING

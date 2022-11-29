@@ -8,7 +8,6 @@ import {
 	ws_id, 
 	walletBalance, 
 	lamdenWalletAutoConnect, 
-	tokenBalances,
 	keystore,
 	walletAddress
 	 } from '../store'
@@ -67,6 +66,7 @@ export class WalletService {
 	}
 
 	private checkForIntstalledWallet = async () => {
+		console.log("checkForIntstalledWalled")
 		this.lwc.walletIsInstalled().then(res => {
 			clearInterval(this.installChecker)
 			this.handleWalletInstalled(res)

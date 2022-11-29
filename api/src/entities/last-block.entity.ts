@@ -1,4 +1,5 @@
 import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, PrimaryColumn, Unique } from "typeorm";
+import { getLatestSyncedBlock } from "../utils/block-service-utils";
 import { log } from "../utils/logger";
 
 @Entity()
@@ -43,4 +44,13 @@ export async function startTrimLastBlocksTask() {
 			}
 		}
 	}, 1000000);
+}
+
+export async function setLatestBlock() {
+	try {
+		const block_num = await getLatestSyncedBlock();
+		await updateLastBlock({block_num})
+	} catch (err) {
+		log.log({ err });
+	}
 }

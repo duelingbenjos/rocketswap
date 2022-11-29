@@ -77,11 +77,26 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 	}
 }
 
+/**
+ * value.<value>
+ * value.__fixed__
+ * value.__hash_self__.<value>
+ * value.__hash_self__.__fixed__.<value>
+ */
+
 export function getValue(value: any) {
+	if (!value) return 0;
+	if (value.__hash_self__) return getValue(value.__hash_self__);
+	if (value.__fixed__) return String(value.__fixed__);
+	if (Object.keys(value).length) return "0";
+	return String(value);
+}
+
+export function getValueOld(value: any) {
+	log.log({ value });
 	if (!value) {
 		return 0;
-	} else if (Number(value)! === NaN) {
-		// is
+	} else if (!Number.isNaN(value)) {
 		return value;
 	} else if (value.__fixed__) {
 		return value.__fixed__;
@@ -206,7 +221,7 @@ export async function calcRswpCirculating() {
 		}, 0);
 
 	const total = total_balance - custodians_balance - undistributed_from_rswp_rswp;
-	
+
 	log.log(total);
 }
 

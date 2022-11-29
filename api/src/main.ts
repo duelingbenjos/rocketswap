@@ -8,19 +8,19 @@ let options: NestApplicationOptions = {};
 
 let key, cert
 
-try {
-	key = fs.readFileSync("src/certs/key.pem")
-	cert = fs.readFileSync("src/certs/pub.pem")
-} catch (err) {
-	console.log(err)
-}
+// try {
+// 	key = fs.readFileSync("src/certs/key.pem")
+// 	cert = fs.readFileSync("src/certs/pub.pem")
+// } catch (err) {
+// 	console.log(err)
+// }
 
-if (key && cert) {
-	options.httpsOptions = {
-		key,
-		cert
-	};
-}
+// if (key && cert) {
+// 	options.httpsOptions = {
+// 		key,
+// 		cert
+// 	};
+// }
 
 options.cors = true;
 

@@ -1,4 +1,5 @@
 import * as io from "socket.io-client";
+import { config } from "./config";
 import { updateLastBlock } from "./entities/last-block.entity";
 import { BlockService } from "./services/block.service";
 import { IKvp } from "./types/misc.types";
@@ -7,7 +8,7 @@ import { log } from "./utils/logger";
 let init = false;
 
 export function initSocket(parseBlockFn: T_ParseBlockFn) {
-	const block_service_url = `http://${BlockService.get_block_service_url()}`;
+	const block_service_url = `https://${BlockService.get_block_service_url}`;
 	const socket = io(block_service_url, {
 		reconnectionDelayMax: 10000
 	});
@@ -18,7 +19,7 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 			socket.emit("join", "new-block");
 
 			socket.on("new-block", async (payload) => {
-				const parsed: IBsSocketBlockUpdate = JSON.parse(payload);
+				const parsed: I_v1_BsSocketBlockUpdate = JSON.parse(payload);
 				const bs_block = parsed.message;
 				await handleNewBlock(bs_block, parseBlockFn);
 			});
@@ -27,11 +28,11 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	});
 
 	socket.io.on("reconnect", (attempt) => {
-		log.log(attempt);
+		log.log(`reconnected !`);
 	});
 
 	socket.io.on("reconnect_attempt", (attempt) => {
-		log.log(attempt);
+		log.log(`reconnecting attempt : ${attempt}`);
 	});
 
 	socket.io.on("error", (error) => {
@@ -40,7 +41,28 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 	});
 }
 
-export async function handleNewBlock(block: IBsBlock, parseBlockFn: T_ParseBlockFn) {
+export let handleNewBlock = async (block: I_v1_BsBlock | I_v2_Block, parseBlockFn: T_ParseBlockFn) => {
+	log.log({ block });
+	log.log({});
+	config.lamden_version === "v2" ? handleV2Block(block as I_v2_Block, parseBlockFn) : handleV1Block(block as I_v1_BsBlock, parseBlockFn);
+};
+
+async function handleV2Block(block: I_v2_Block, parseBlockFn: T_ParseBlockFn) {
+	log.log({ block });
+	if ((block as any).error) return;
+	const timestamp = block.processed.transaction.metadata.timestamp;
+	const hash = block.hash;
+	const fn = block.processed.transaction.payload.function;
+	const contract = block.processed.transaction.payload.contract;
+	const state = block.processed.state;
+	const block_dto: BlockDTO = { timestamp, hash, fn, contract, state };
+	log.log({ block_dto });
+	log.log({ block });
+	await parseBlockFn(block_dto);
+	updateLastBlock({ block_num: Number(block.number) });
+}
+
+async function handleV1Block(block: I_v1_BsBlock, parseBlockFn: T_ParseBlockFn) {
 	const has_transaction = block.subblocks.length && block.subblocks[0].transactions.length;
 	if (!has_transaction) return;
 	const { subblocks, number: block_num } = block;
@@ -57,7 +79,7 @@ export async function handleNewBlock(block: IBsBlock, parseBlockFn: T_ParseBlock
 				await parseBlockFn(block_obj);
 			}
 		}
-		log.log(`processed ${transactions.length} transactions`)
+		log.log(`processed ${transactions.length} transactions`);
 	}
 	updateLastBlock({ block_num });
 }
@@ -71,40 +93,77 @@ export class BlockDTO {
 	block_num?: number;
 }
 
-export interface IBsSocketBlockUpdate {
-	message: IBsBlock;
+export interface I_v2_Block {
+	hash: string;
+	number: string;
+	hlc_timestamp: string; // '2022-11-18T09:29:22.544632576Z_0',
+	previous: string;
+	proofs: { signature: string; signer: string }[];
+	processed: I_v2_Processed;
+	rewards: { key: string; value: { __fixed__: number }; rewards: { __fixed__: number } }[];
+	origin: {
+		signature: string;
+		sender: string;
+	};
 }
 
-export interface IBsBlock {
+export interface I_v2_Processed {
+	hash: string;
+	result: string;
+	stamps_used: number;
+	state: IKvp[];
+	status: number;
+	transaction: {
+		metadata: {
+			signature: string;
+			timestamp: number;
+		};
+		payload: {
+			contract: string;
+			function: string;
+			kwards: any;
+			nonce: number;
+			processor: string;
+			sender: string;
+			stamps_supplied: number;
+		};
+	}; // [Object]
+}
+
+export interface I_v1_BsSocketBlockUpdate {
+	message: I_v1_BsBlock;
+}
+
+export interface I_v1_BsBlock {
 	hash: string;
 	number: number;
 	previous: string;
-	subblocks: IBsSubBlock[];
+	subblocks: I_v1_BsSubBlock[];
 }
 
-export interface IBsSubBlock {
+export interface I_v1_BsSubBlock {
 	input_hash: string;
 	merkle_leaves: string[];
-	signatures: ISignature[];
+	signatures: I_v1_Signature[];
 	subblock: number;
-	transactions: ITransaction[];
+	transactions: I_v1_Transaction[];
 }
 
-export interface ISignature {
+export interface I_v1_Signature {
 	signature: string;
 	signer: string;
 }
 
-export interface ITransaction {
+export interface I_v1_Transaction {
 	hash: string;
 	result: string;
 	stamps_user: number;
 	state: IKvp[];
 	status: number;
-	transaction: ITransactionInner;
+	transaction: I_v1_TransactionInner;
 }
 
-export interface ITransactionInner {
+export interface I_v1_TransactionInner {
 	metadata: any;
 	payload: any;
 }

@@ -23,14 +23,14 @@ const axios = require("axios").create(axiosDefaultConfig);
 export const getVariableChanges = async (contractName: string, variableName: string, last_tx_uid: string | number, limit: number = 10) => {
 	let endpoint = "variable_history";
 	let query = [`contract=${contractName}`, `variable=${variableName}`, `last_tx_uid=${last_tx_uid}`, `limit=${limit}`].join("&");
-	let res = await axios.get(`http://${BlockService.get_block_service_url()}/${endpoint}?${query}`);
+	let res = await axios.get(`http://${BlockService.get_block_service_url}/${endpoint}?${query}`);
 	return res.data;
 };
 
 export const getCurrentKeyValue = async (contractName: string, variableName: string, key: string) => {
 	try {
 		let endpoint = "current/one";
-		let res = await axios(`http://${BlockService.get_block_service_url()}/${endpoint}/${contractName}/${variableName}/${key}`);
+		let res = await axios(`http://${BlockService.get_block_service_url}/${endpoint}/${contractName}/${variableName}/${key}`);
 		return res.data;
 	} catch (e) {
 		return e;
@@ -40,7 +40,7 @@ export const getCurrentKeyValue = async (contractName: string, variableName: str
 export const getContractChanges = async (contractName: string, last_tx_uid: string, limit: number = 10) => {
 	let endpoint = "contract_history";
 	let query = [`contract=${contractName}`, `last_tx_uid=${last_tx_uid}`, `limit=${limit}`].join("&");
-	let res = await axios(`http://${BlockService.get_block_service_url()}/${endpoint}?${query}`);
+	let res = await axios(`http://${BlockService.get_block_service_url}/${endpoint}?${query}`);
 	return res.data;
 };
 
@@ -48,7 +48,7 @@ export const getContractState = async (contractName: string) => {
 	try {
 		let endpoint = "current/all";
 		// current/all/con_mint
-		const url = `http://${BlockService.get_block_service_url()}/${endpoint}/${contractName}`;
+		const url = `http://${BlockService.get_block_service_url}/${endpoint}/${contractName}`;
 		let res = await axios(url);
 		return res.data;
 	} catch (err) {
@@ -73,7 +73,7 @@ export const getRootKeyChanges = async (args: {
 			`last_tx_uid=${last_tx_uid}`,
 			`limit=${limit}`
 		].join("&");
-		let res = await axios.get(`http://${BlockService.get_block_service_url()}/${endpoint}?${query}`);
+		let res = await axios.get(`http://${BlockService.get_block_service_url}/${endpoint}?${query}`);
 		return res.data;
 	} catch (err) {
 		log.warn(err);
@@ -81,28 +81,28 @@ export const getRootKeyChanges = async (args: {
 };
 
 export async function getCurrentSyncedBlock() {
-	const res = await axios.get(`http://${BlockService.get_block_service_url()}/latest_synced_block`);
+	const res = await axios.get(`http://${BlockService.get_block_service_url}/latest_synced_block`);
 	return res.latest_synced_block;
 }
 
 export const getNumberFromFixed = (value: any) => (value.__fixed__ ? Number(value.__fixed__) : Number(value));
 
 export const getAllContracts = async () => {
-	const res = await axios.get(`http://${BlockService.get_block_service_url()}/contracts`);
+	const res = await axios.get(`http://${BlockService.get_block_service_url}/contracts`);
 	return res.data;
 };
 
 export const getContractSource = async (contract_name: string) => {
 	// http://165.227.181.34:3535/current/one/con_bdt_lst001/__code__
 	const endpoint = "current/one";
-	const res = await axios.get(`http://${BlockService.get_block_service_url()}/${endpoint}/${contract_name}/__code__`);
+	const res = await axios.get(`http://${BlockService.get_block_service_url}/${endpoint}/${contract_name}/__code__`);
 	return res.data;
 };
 
 export const getContractMeta = async (contract_name: string) => {
 	// http://165.227.181.34:3535/current/one/con_bdt_lst001/__code__
 	const endpoint = "current/all";
-	const res = await axios.get(`http://${BlockService.get_block_service_url()}/${endpoint}/${contract_name}`);
+	const res = await axios.get(`http://${BlockService.get_block_service_url}/${endpoint}/${contract_name}`);
 	return res.data;
 };
 
@@ -150,7 +150,7 @@ export const syncContracts = async (starting_tx_id = "0", batch_size = 1000, con
 		const contract_source = await getContractSource(contract_name);
 
 		if (contract_source.value) {
-			const is_valid_token = validateTokenContract(contract_source.value);
+			const is_valid_token = validateTokenContract(contract_source.value) && !isRbxTestContract(contract_name);
 
 			if (is_valid_token) {
 				valid_tokens.push(contract_name);
@@ -284,8 +284,8 @@ export const parseEpoch = (epoch, index) => {
 
 export async function syncIdentityData() {
 	const state = await getContractState(config.identity_contract);
-	const names_state = state[config.identity_contract].key_to_name;
-
+	const names_state = state[config.identity_contract]?.key_to_name;
+	if (!names_state) return;
 	const keys = Object.keys(names_state);
 
 	for (let vk of keys) {
@@ -294,16 +294,18 @@ export async function syncIdentityData() {
 		entity.name = names_state[vk];
 		await entity.save();
 	}
-	log.log(`${keys.length} identity contracts synced`);
+	log.log(`${keys.length} identity entries synced`);
 }
 
 export async function getLatestSyncedBlock(): Promise<number> {
-	const res = await axios(`http://${BlockService.get_block_service_url()}/latest_synced_block`);
+	const url = `https://${BlockService.get_block_service_url}/latest_synced_block`;
+	log.log({ url });
+	const res = await axios(url);
 	return res.data?.latest_synced_block;
 }
 
 export async function getBlock(num: number): Promise<any> {
-	const res = await axios(`http://${BlockService.get_block_service_url()}/blocks/${num}`);
+	const res = await axios(`http://${BlockService.get_block_service_url}/blocks/${num}`);
 	return res.data;
 }
 
@@ -354,12 +356,12 @@ export const syncTokenTradeHistory = async (starting_tx_id = "0", batch_size = 1
 
 const getProxyActionPath = (req_params: IBlockServiceProxyReq): string | false => {
 	let { action_name, args } = req_params;
-	if (typeof args === "string") args = [args]
+	if (typeof args === "string") args = [args];
 	const requests = {
 		get_balance_value: `current/one/${args[0]}/balances/${args[1]}`,
 		get_lp_approval_value: `current/one/${config.amm_contract}/lp_points/${args[0]}`,
 		get_discount: `current/one/${config.amm_contract}/discount/${args[0]}`,
-		get_staked_rocketfuel: `current/one/${config.amm_contract}/staked_amount/${args[0]}:con_rswp_lst001`
+		get_staked_rocketfuel: `current/one/${config.amm_contract}/staked_amount/${args[0]}:${config.dex_token}`
 	};
 
 	const request_path = requests[action_name];
@@ -369,7 +371,7 @@ const getProxyActionPath = (req_params: IBlockServiceProxyReq): string | false =
 
 export const proxyBlockserviceRequest = async (req_params: IBlockServiceProxyReq) => {
 	const request_path = getProxyActionPath(req_params);
-	const url = `http://${BlockService.get_block_service_url()}/${request_path}`
+	const url = `http://${BlockService.get_block_service_url}/${request_path}`;
 	const req = await axios.get(url);
 	return req.data?.value;
 };
