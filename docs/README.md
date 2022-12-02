@@ -47,7 +47,6 @@ RSWP is the governance token of the Rocketswap exchange. Paying fees with RSWP o
 
 ### I found a bug!
 
-
 Submit an [issue](https://github.com/cloakdkiller/rocketswap/issues) on Github - That way you can check to see if anyone else has reported it and this is also the best way to ensure one of the developers sees it.
 
 ### How can I get Mainnet TAU?
