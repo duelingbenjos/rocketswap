@@ -32,7 +32,7 @@ interface IApiConfig {
 
 export const config_testnet: IApiConfig = {
 	app_name: "Rocketswap",
-	amm_contract: process.env.CONTRACT_NAME || "con_rocketswap_v1",
+	amm_contract: process.env.CONTRACT_NAME || "con_rocketswap_v1_1",
 	identity_contract: process.env.IDENTITY_CONTRACT || "con_rocket_id",
 	dex_token: process.env.DEX_TOKEN || "con_rswp_lst001_1",
 	buy: 150,

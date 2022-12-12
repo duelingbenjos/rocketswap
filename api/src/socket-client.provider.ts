@@ -59,7 +59,7 @@ async function handleV2Block(block: I_v2_Block, parseBlockFn: T_ParseBlockFn) {
 	log.log({ block_dto });
 	log.log({ block });
 	await parseBlockFn(block_dto);
-	updateLastBlock({ block_num: Number(block.number) });
+	await updateLastBlock({ block_num: Number(block.number) });
 }
 
 async function handleV1Block(block: I_v1_BsBlock, parseBlockFn: T_ParseBlockFn) {

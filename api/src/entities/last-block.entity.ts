@@ -15,6 +15,7 @@ export async function updateLastBlock(args: { block_num: number }) {
 	try {
 		const { block_num } = args;
 		let entity = new LastBlockEntity();
+		entity.id = block_num;
 		entity.last_block = block_num;
 		await entity.save();
 		log.log(`saved block_num: ${block_num}`);
@@ -49,7 +50,7 @@ export async function startTrimLastBlocksTask() {
 export async function setLatestBlock() {
 	try {
 		const block_num = await getLatestSyncedBlock();
-		await updateLastBlock({block_num})
+		await updateLastBlock({ block_num });
 	} catch (err) {
 		log.log({ err });
 	}

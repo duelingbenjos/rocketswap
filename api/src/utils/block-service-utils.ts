@@ -122,7 +122,8 @@ export const prepareAndAddToken = async (contract_name: string) => {
 };
 
 const isRbxTestContract = (contract_name: string) =>
-	(contract_name.includes("_dai") || contract_name.includes("_stake")) && contract_name.includes("_demo");
+	((contract_name.includes("demo") && contract_name.includes("tad")) || contract_name.includes("_stake")) &&
+	contract_name.includes("_demo");
 
 /** This method syncs all Tokens and Staking data */
 
@@ -309,17 +310,31 @@ export async function getBlock(num: number): Promise<any> {
 	return res.data;
 }
 
-export async function fillBlocksSinceSync(block_to_sync_from: number, parseBlock: T_ParseBlockFn): Promise<void> {
+export async function getBlocks(limit: number, start_block: number): Promise<any> {
+	const res = await axios(`http://${BlockService.get_block_service_url}/blocks?limit=${limit}&start_block=${start_block}`);
+	// example url as written above: http://localhost:3000/blocks?limit=10&offset=0
+	return res.data;
+}
+
+export async function fillBlocksSinceSync(block_to_sync_from: number, parseBlock: T_ParseBlockFn, did_recurse = false): Promise<void> {
+	const batch_size = 100;
 	try {
 		let current_block = await getLatestSyncedBlock();
 		if (block_to_sync_from === current_block) {
 			log.log("Finished syncing historical blocks");
 			return;
 		}
+		// block to sync from
 		let next_block_to_sync = block_to_sync_from + 1;
-		const block = await getBlock(next_block_to_sync);
-		await handleNewBlock(block, parseBlock);
-		if (next_block_to_sync <= current_block) return await fillBlocksSinceSync(next_block_to_sync, parseBlock);
+		const blocks = await getBlocks(next_block_to_sync, batch_size);
+		for (let i = 0; i < blocks.length; i++) {
+			if (did_recurse && i === 0) continue; // skip first block if we are recursing (we already handled it
+			await handleNewBlock(blocks[i], parseBlock);
+		}
+		if (blocks.length === batch_size) {
+			next_block_to_sync = blocks[blocks.length - 1].block_num;
+			return await fillBlocksSinceSync(next_block_to_sync, parseBlock, did_recurse);
+		}
 	} catch (err) {
 		log.warn({ err });
 	}

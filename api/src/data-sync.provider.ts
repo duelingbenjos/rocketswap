@@ -46,7 +46,6 @@ export class DataSyncProvider {
 			} else {
 				log.log(`last block detected in local db.`);
 				log.log(`starting block sync from block ${start_sync_block}`);
-				// await this.syncFromPristineState();
 			}
 
 			await this.refreshAmmMeta();
@@ -140,10 +139,10 @@ export class DataSyncProvider {
 			} else if (contract_name === config.identity_contract) {
 				switch (fn) {
 					case "setName":
-						setName(state);
+						await setName(state);
 						break;
 					case "auth":
-						this.authService.authenticate(state);
+						await this.authService.authenticate(state);
 						break;
 				}
 			} else if (this.getAllStakingContracts().includes(contract_name)) {
