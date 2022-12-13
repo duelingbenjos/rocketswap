@@ -12,10 +12,10 @@ module.exports = {
 				CONTEXT: "remote"
 			}
 		},
-		{
-			name: "docs",
-			script: "cd ./docs && npm run serve"
-		},
+		// {
+		// 	name: "docs",
+		// 	script: "cd ./docs && npm run serve"
+		// },
 		{
 			name: "proxy",
 			script: "cd ./proxy_server && npm run start"
