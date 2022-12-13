@@ -32,9 +32,9 @@ interface IApiConfig {
 
 export const config_testnet: IApiConfig = {
 	app_name: "Rocketswap",
-	amm_contract: process.env.CONTRACT_NAME || "con_rocketswap_v1_1",
+	amm_contract: process.env.CONTRACT_NAME || "con_amm",
 	identity_contract: process.env.IDENTITY_CONTRACT || "con_rocket_id",
-	dex_token: process.env.DEX_TOKEN || "con_rswp_lst001_1",
+	dex_token: process.env.DEX_TOKEN || "con_rswp_lst001",
 	buy: 150,
 	currency_symbol: process.env.CURRENCY_SYMBOL || "dTAU",
 	masternode: process.env.MASTERNODE_URL || "https://testnet-v2-master-lon.lamden.io",

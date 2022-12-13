@@ -42,13 +42,11 @@ export function initSocket(parseBlockFn: T_ParseBlockFn) {
 }
 
 export let handleNewBlock = async (block: I_v1_BsBlock | I_v2_Block, parseBlockFn: T_ParseBlockFn) => {
-	log.log({ block });
-	log.log({});
 	config.lamden_version === "v2" ? handleV2Block(block as I_v2_Block, parseBlockFn) : handleV1Block(block as I_v1_BsBlock, parseBlockFn);
 };
 
 async function handleV2Block(block: I_v2_Block, parseBlockFn: T_ParseBlockFn) {
-	log.log({ block });
+	// log.log({ block });
 	if ((block as any).error) return;
 	const timestamp = block.processed.transaction.metadata.timestamp;
 	const hash = block.hash;
@@ -56,10 +54,10 @@ async function handleV2Block(block: I_v2_Block, parseBlockFn: T_ParseBlockFn) {
 	const contract = block.processed.transaction.payload.contract;
 	const state = block.processed.state;
 	const block_dto: BlockDTO = { timestamp, hash, fn, contract, state };
-	log.log({ block_dto });
-	log.log({ block });
-	await parseBlockFn(block_dto);
+	// log.log({ block_dto });
+	// log.log({ block });
 	await updateLastBlock({ block_num: Number(block.number) });
+	await parseBlockFn(block_dto);
 }
 
 async function handleV1Block(block: I_v1_BsBlock, parseBlockFn: T_ParseBlockFn) {

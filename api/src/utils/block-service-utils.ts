@@ -300,7 +300,6 @@ export async function syncIdentityData() {
 
 export async function getLatestSyncedBlock(): Promise<number> {
 	const url = `https://${BlockService.get_block_service_url}/latest_synced_block`;
-	log.log({ url });
 	const res = await axios(url);
 	return res.data?.latest_synced_block;
 }
@@ -312,9 +311,10 @@ export async function getBlock(num: number): Promise<any> {
 
 export async function getBlocks(limit: number, start_block: number): Promise<any> {
 	const res = await axios(`http://${BlockService.get_block_service_url}/blocks?limit=${limit}&start_block=${start_block}`);
-	// example url as written above: http://localhost:3000/blocks?limit=10&offset=0
 	return res.data;
 }
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function fillBlocksSinceSync(block_to_sync_from: number, parseBlock: T_ParseBlockFn, did_recurse = false): Promise<void> {
 	const batch_size = 100;
@@ -324,16 +324,16 @@ export async function fillBlocksSinceSync(block_to_sync_from: number, parseBlock
 			log.log("Finished syncing historical blocks");
 			return;
 		}
-		// block to sync from
-		let next_block_to_sync = block_to_sync_from + 1;
-		const blocks = await getBlocks(next_block_to_sync, batch_size);
+		const blocks = await getBlocks(batch_size, block_to_sync_from);
 		for (let i = 0; i < blocks.length; i++) {
+			// inline function which causes the loop to wait for 100ms
 			if (did_recurse && i === 0) continue; // skip first block if we are recursing (we already handled it
 			await handleNewBlock(blocks[i], parseBlock);
+			// await wait(100);
 		}
 		if (blocks.length === batch_size) {
-			next_block_to_sync = blocks[blocks.length - 1].block_num;
-			return await fillBlocksSinceSync(next_block_to_sync, parseBlock, did_recurse);
+			block_to_sync_from = blocks[blocks.length - 1].number;
+			return await fillBlocksSinceSync(block_to_sync_from, parseBlock, did_recurse);
 		}
 	} catch (err) {
 		log.warn({ err });

@@ -49,7 +49,6 @@ export class DataSyncProvider {
 			}
 
 			await this.refreshAmmMeta();
-
 			await fillBlocksSinceSync(start_sync_block, this.parseBlock);
 
 			initSocket(this.parseBlock);
