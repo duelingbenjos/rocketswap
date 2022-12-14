@@ -113,6 +113,7 @@ export class WalletService {
 	}
 
 	private handleWalletInfo = (e) => {
+    console.log({e})
 		//console.log(JSON.parse(JSON.stringify({e, lwc: this.lwc, lwc_store: get(lwc_info)})))
 		if (this.lwc.installed){
 			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0 && get(lamdenWalletAutoConnect)) this.connectToWallet();
