@@ -11,7 +11,7 @@ const app = express();
 
 // Configuration
 const DOWN_URL = "http://0.0.0.0:82";
-const APP_URL = "http://0.0.0.0:5000";
+const APP_URL = "http://0.0.0.0:5001";
 const DOCS_URL = "http://0.0.0.0:3000";
 
 app.use(morgan("dev"));
