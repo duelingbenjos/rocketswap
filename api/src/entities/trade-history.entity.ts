@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity, PrimaryGeneratedColumn, PrimaryColumnCannotBeNullableError } from "typeorm";
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from "typeorm";
 import { config } from "../config";
 import { getNumberFromFixed } from "../utils/block-service-utils";
 import { log } from "../utils/logger";
