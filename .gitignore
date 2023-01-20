@@ -2,11 +2,8 @@
 
 .DS_Store
 node_modules
-# /node_modules
-# node_modules/
 */node_modules
 ui/public/build
-database.sqlite
-database.testnet.sqlite
+*.sqlite
 dist
 .vscode
