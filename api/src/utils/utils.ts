@@ -80,9 +80,9 @@ export function getVal(state: IKvp[] | IKvp, idx?: number) {
 export function getValue(value: any) {
 	if (!value) {
 		return 0;
-	} else if (Number(value)! === NaN) {
-		// is
-		return value;
+	// } else if (isNaN(value)) {
+	// 	// is
+	// 	return value;
 	} else if (value.__fixed__) {
 		return value.__fixed__;
 	} else if (value.__hash_self__ || String(value.__hash_self__) === "0") {
