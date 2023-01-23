@@ -2,6 +2,7 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { NestApplicationOptions } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+const cors = require("cors");
 const fs = require("fs");
 
 let options: NestApplicationOptions = {};
@@ -20,17 +21,21 @@ async function bootstrap() {
 
 	SwaggerModule.setup("api_docs", app, document);
 
-	app.use((req, res, next) => {
-		res.header("Access-Control-Allow-Origin", "rocketswap.exchange");
-		res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange");
-		res.header("Access-Control-Allow-Origin", "*.rocketswap.exchange:2053");
-		res.header("Access-Control-Allow-Origin", "rswp.io");
-		res.header("Access-Control-Allow-Origin", "lamden.io");
-		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-		next();
-	});
+	// app.use((req, res, next) => {
+	// 	res.header("Access-Control-Allow-Origin", "rocketswap.exchange");
+	// 	res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange");
+	// 	res.header("Access-Control-Allow-Origin", "*.rocketswap.exchange:2053");
+	// 	res.header("Access-Control-Allow-Origin", "rswp.io");
+	// 	res.header("Access-Control-Allow-Origin", "lamden.io");
+	// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	// 	next();
+	// });
+
+	app.use(cors())
 
 	app.enableCors({ origin: "*" });
 	await app.listen(2053);
 }
 bootstrap();
+
+
