@@ -33,7 +33,7 @@ async function bootstrap() {
 
 	app.use(cors())
 
-	// app.enableCors({ origin: "*" });
+	app.enableCors({ origin: "https://stagingv2.rocketswap.exchange" });
 	await app.listen(2053);
 }
 bootstrap();
