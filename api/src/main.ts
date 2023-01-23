@@ -21,10 +21,11 @@ async function bootstrap() {
 	SwaggerModule.setup("api_docs", app, document);
 
 	app.use((req, res, next) => {
-		res.header("Access-Control-Allow-Origin", "rocketswap.exchange"); // update to match the domain you will make the request from
-		res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange"); // update to match the domain you will make the request from
-		res.header("Access-Control-Allow-Origin", "rswp.io"); // update to match the domain you will make the request from
-		res.header("Access-Control-Allow-Origin", "lamden.io"); // update to match the domain you will make the request from
+		res.header("Access-Control-Allow-Origin", "rocketswap.exchange");
+		res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange");
+		res.header("Access-Control-Allow-Origin", "*.rocketswap.exchange:2053");
+		res.header("Access-Control-Allow-Origin", "rswp.io");
+		res.header("Access-Control-Allow-Origin", "lamden.io");
 		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 		next();
 	});
