@@ -40,6 +40,11 @@ export class GetBalancesDTO {
 	vk: string;
 }
 
+export class GetUserYieldDTO {
+	@ApiProperty()
+	vk: string;
+}
+
 export class GetUserStakingInfoDTO {
 	@ApiProperty()
 	vk: string;

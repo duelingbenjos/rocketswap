@@ -12,6 +12,7 @@ import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { UserStakingEntity } from "./entities/user-staking.entity";
 import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
+import { SocketService } from "./services/socket.service";
 import {
 	GetBalancesDTO,
 	GetMarketSummaryDTO,
@@ -20,6 +21,7 @@ import {
 	GetTradeHistoryDTO,
 	GetUserLpBalanceDTO,
 	GetUserStakingInfoDTO,
+	GetUserYieldDTO,
 	IBlockServiceProxyReq
 } from "./types/dto";
 import { proxyBlockserviceRequest } from "./utils/block-service-utils";
@@ -31,7 +33,7 @@ const fs = require("fs");
 @Controller("api")
 @ApiTags("Main API")
 export class AppController {
-	constructor() {}
+	constructor(private readonly socketService: SocketService) {}
 
 	@Get("verified_tokens")
 	public async getVerifiedTokens() {
@@ -284,6 +286,15 @@ export class AppController {
 		}
 	}
 
+	@Get("user_yield_list/:vk")
+	async getUserYieldList(@Param() params: GetUserYieldDTO): Promise<any> {
+		try {
+			return await this.socketService.getClientYieldList(params.vk);
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
 	@Get("marketcaps")
 	async getMarketcaps() {
 		try {
@@ -295,7 +306,7 @@ export class AppController {
 
 	@Get("proxy_req")
 	async proxyRequest(@Query() params: IBlockServiceProxyReq) {
-		log.log({params})
+		log.log({ params });
 		try {
 			return await proxyBlockserviceRequest(params);
 		} catch (err) {
