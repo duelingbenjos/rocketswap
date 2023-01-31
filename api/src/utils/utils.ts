@@ -189,7 +189,7 @@ export const getVkFromKeys = (keys: string[]): string => {
 	const k = keys.find((k) => {
 		let vk = k.split(":")[1];
 		return vk.length === 64;
-	});
+	}) || '';
 	return k.split(":")[1];
 };
 
@@ -228,9 +228,9 @@ export async function calcRswpCirculating() {
 async function getUndistributed(contract_names: string[], rswp_balances: IRswpBalances[]) {
 	let undistributed = 0;
 	for (let c of contract_names) {
-		const this_balance = rswp_balances.find((b) => b.vk === c)?.rswp_balance;
+		const this_balance = rswp_balances.find((b) => b.vk === c)?.rswp_balance || 0;
 		const ent = await StakingMetaEntity.findOne({ where: { contract_name: c } });
-		const { StakedBalance } = ent;
+		const { StakedBalance } = ent as StakingMetaEntity;
 		const excess = this_balance - StakedBalance;
 		undistributed += excess > 0 ? excess : 0;
 	}
