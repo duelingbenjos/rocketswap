@@ -11,7 +11,7 @@ const app = express();
 
 // Configuration
 const DOWN_URL = "http://0.0.0.0:82";
-const APP_URL = "http://0.0.0.0:5001";
+const APP_URL = "http://0.0.0.0:3007";
 const DOCS_URL = "http://0.0.0.0:3000";
 
 app.use(morgan("dev"));
@@ -20,7 +20,8 @@ app.use(cors({ origin: "*" }));
 app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Origin", "rocketswap.exchange"); // update to match the domain you will make the request from
 	res.header("Access-Control-Allow-Origin", "staging.rocketswap.exchange"); // update to match the domain you will make the request from
-	res.header("Access-Control-Allow-Origin", "https://stagingv2.rocketswap.exchange"); // update to match the domain you will make the request from
+	res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange"); // update to match the domain you will make the request from
+	res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange"); // update to match the domain you will make the request from
 	res.header("Access-Control-Allow-Origin", "rswp.io"); // update to match the domain you will make the request from
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
@@ -91,7 +92,7 @@ const httpServer = http.createServer(app);
 // }
 
 
-httpServer.listen(81, () => {
+httpServer.listen(80, () => {
 	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 

@@ -1,8 +1,8 @@
-const DOMAIN_NAME = 'http://0.0.0.0:3007'
+const DOMAIN_NAME = 'https://stagingv2.rocketswap.exchange'
 const CURRENCY_SYMBOL = 'DTAU'
 const CURRENCY_NAME = 'Lamden Testnet Token'
-const AMM_CONTRACT_NAME = 'con_rocketswap_v1_1'
-const AMM_TOKEN_CONTRACT = 'con_rswp_lst001_1'
+const AMM_CONTRACT_NAME = 'con_rocketswap_official_v1_1'
+const AMM_TOKEN_CONTRACT = 'con_rswp_lst001'
 const AMM_TOKEN_SYMBOL = 'RSWP'
 const AMM_TOKEN_YIELD_CONTRACT = 'con_staking_rswp_rswp_interop_v2'
 const AMM_TOKEN_STAKING_CONTRACT = 'con_rswp_lp_mining_02'
@@ -18,14 +18,12 @@ const GENERIC_ICON =
 export const contract_blacklist = []
 
 export const connectionRequest = {
-  appName: 'Rocketswap @ Lamden v2 Testnet',
-  contractName: 'con_rocketswap_v1_1',
-  hosts: ['testnet-v2-master-lon.lamden.io', 'testnet-v2-master-sf.lamden.io', 'testnet-v2-master-bang.lamden.io'],
-  version: '2',
-  type: 'testnet',
-  networkVersion: 2,
-  logo: 'asd',
-  networkType: 'testnet'
+  appName: 'Rocketswap v1 - ARKO Testnet',
+  version: '1.0.0',
+  logo: 'images/logo.png', 
+  contractName: 'con_rocketswap_official_v1_1', 
+  networkType: 'testnet', 
+  networkName: 'arko' // ADD THIS HERE
 }
 
 export const stamps = {
@@ -86,5 +84,5 @@ export const ammStakingValues = {
 }
 
 export const getBaseUrl = (): string => {
-  return `${window.location.protocol}//${window.location.hostname}:2053`
+  return ``
 }

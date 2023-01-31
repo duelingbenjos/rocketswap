@@ -2,36 +2,36 @@ import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
 import { NestApplicationOptions } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { log } from "./utils/logger";
 const cors = require("cors");
 const fs = require("fs");
 
 let options: NestApplicationOptions = {};
 
-// options.cors = true;
+const cors_whitelist = ['https://lamden.io', 'https://www.onlyluck.net', 'https://rocketswap.exchange']
+
+var cors_options = {
+	origin: function (origin, callback) {
+	  if (cors_whitelist.indexOf(origin) !== -1 || !origin) {
+		callback(null, true)
+	  } else {
+		callback(log.log(`CORS Request blocked from origin : ${origin}`))
+	  }
+	}
+  }
+
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, options);
-
 	const config = new DocumentBuilder()
-		.setTitle("Rocketswap API Documentation")
-		.setDescription("Details of the Rocketswap REST API. Further documentation can be found @ https://rocketswap.exchange/docs/")
-		.setVersion("1.0")
-		.build();
+	.setTitle("Rocketswap API Documentation")
+	.setDescription("Details of the Rocketswap REST API. Further documentation can be found @ https://rocketswap.exchange/docs/")
+	.setVersion("1.0")
+	.build();
 	const document = SwaggerModule.createDocument(app, config);
-
 	SwaggerModule.setup("api_docs", app, document);
 
-	// app.use((req, res, next) => {
-	// 	res.header("Access-Control-Allow-Origin", "rocketswap.exchange");
-	// 	res.header("Access-Control-Allow-Origin", "https://stagingv2.rocketswap.exchange");
-	// 	res.header("Access-Control-Allow-Origin", "lamden.io");
-	// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	// 	next();
-	// });
-
-	app.use(cors({origin: "https://stagingv2.rocketswap.exchange"}));
-
-	// app.enableCors({ origin: "https://stagingv2.rocketswap.exchange" });
+	app.use(cors(cors_options))
 	await app.listen(2053);
 }
 bootstrap();

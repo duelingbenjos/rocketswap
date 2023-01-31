@@ -46,9 +46,8 @@ export let handleNewBlock = async (block: I_v1_BsBlock | I_v2_Block, parseBlockF
 };
 
 async function handleV2Block(block: I_v2_Block, parseBlockFn: T_ParseBlockFn) {
-	// log.log({ block });
 	if ((block as any).error) return;
-	const timestamp = block.processed.transaction.metadata.timestamp;
+	const timestamp = Math.round(Number(block.number) / 1000000000); // HLC BLocknum is timestamp
 	const hash = block.hash;
 	const fn = block.processed.transaction.payload.function;
 	const contract = block.processed.transaction.payload.contract;

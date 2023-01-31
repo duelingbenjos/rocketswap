@@ -4,6 +4,7 @@ import { SocketService } from "./socket.service";
 import { log } from "../utils/logger";
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { PairEntity } from "../entities/pair.entity";
+import { config } from "../config";
 
 @Injectable()
 export class CoinGeckoAPIService implements OnModuleInit {
@@ -27,7 +28,7 @@ export class CoinGeckoAPIService implements OnModuleInit {
 			const last_price_usdc_usd = usdc_usd_ticker?.last;
 			const timestamp = usdc_usd_ticker?.timestamp
 			if (last_price_usdc_usd && timestamp) {
-				const tau_lusd_last = (await PairEntity.findOne("con_lusd_lst001")).price
+				const tau_lusd_last = (await PairEntity.findOne(config.lusd_token)).price
 				const tau_usdc_price = (Number(tau_lusd_last) * last_price_usdc_usd).toString()
 				log.log(`latest TAU/LUSD price is : $ ${1 / Number(tau_usdc_price)}`)
 				return await saveUSDPrice({
