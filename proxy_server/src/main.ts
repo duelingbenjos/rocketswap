@@ -62,7 +62,7 @@ app.use(
 app.use(
 	"/",
 	createProxyMiddleware({
-		target: APP_URL,
+		target: DOWN_URL,
 		changeOrigin: true,
 		pathRewrite: {
 			[`^/`]: ""
