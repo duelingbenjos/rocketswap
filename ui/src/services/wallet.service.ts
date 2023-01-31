@@ -43,6 +43,7 @@ export class WalletService {
 	private Lamden = LamdenJS;
 	private keystore = null;
 	private maxApprovalAmount = "99999999999999999999999999999"
+	private tried_to_connect = 0
 
 	public static getInstance() {
 		if (!WalletService._instance) {
@@ -72,7 +73,17 @@ export class WalletService {
 			this.handleWalletInstalled(res)
 		})
 	}
-	public connectToWallet = async () => this.lwc.sendConnection(this.connectionRequest)
+	public connectToWallet = async () =>{ 
+		console.log({connected: this.tried_to_connect})
+		console.log(this.lwc)
+		if (this.tried_to_connect < 5) {
+			console.log("connect to wallet clicked")
+			this.lwc.sendConnection(this.connectionRequest)
+			this.tried_to_connect ++
+		} else {
+			console.error("tried to connect to wallet too many times !!")
+		}
+	}
 
 	public addKeystoreEncrypted = (encryptedKeystore) => {
 		this.keystore = encryptedKeystore
@@ -116,7 +127,9 @@ export class WalletService {
     console.log({e})
 		//console.log(JSON.parse(JSON.stringify({e, lwc: this.lwc, lwc_store: get(lwc_info)})))
 		if (this.lwc.installed){
-			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0 && get(lamdenWalletAutoConnect)) this.connectToWallet();
+			if (this.lwc.approved === false && this.lwc.walletAddress.length > 0 && get(lamdenWalletAutoConnect)) {
+				this.connectToWallet();
+			}
 
 			//If the wallet is installed then update the store if new information is passed
 			let lwc_info_store = get(lwc_info)
@@ -131,6 +144,7 @@ export class WalletService {
 		if (!this.lwc.installed) return
 		lwc_info.update(current => {
 			const { approved, installed, locked } = this.lwc;
+			console.log({ approved, installed, locked })
 			let vk = this.lwc.walletAddress
 			if (vk.length > 0 && approved){
 				//Get the inital balance 
@@ -209,6 +223,7 @@ export class WalletService {
 			contractName,
 			methodName: method,
 			networkType: connectionRequest.networkType,
+			networkName: 'arko',
 			stampLimit: stamps,
 			kwargs: args
 		}

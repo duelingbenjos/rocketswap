@@ -65,6 +65,7 @@ export async function saveTradeUpdate(args: {
 	time: number;
 	hash;
 }) {
+	console.log("save trade update")
 	const entity = new TradeHistoryEntity();
 	for (let arg in args) {
 		entity[arg] = args[arg];
