@@ -39,7 +39,7 @@
 
 	constructor() {
 		this.base_url = getBaseUrl()
-		this.connection = socket.connect(this.base_url)
+		this.connection = socket.connect('')
 		this.setupEvents()
 		this.setupSubs()
 		this.txCallbacks = {}

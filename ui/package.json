@@ -33,8 +33,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
+    "lamden_wallet_controller": "^0.7.2",
     "lamden-js": "^1.4.9",
-    "lamden_wallet_controller": "^0.6.3",
     "lightweight-charts": "^3.8.0",
     "sirv-cli": "^1.0.0",
     "socket.io-client": "^2.3",
