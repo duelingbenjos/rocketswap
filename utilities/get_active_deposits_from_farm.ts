@@ -2,169 +2,146 @@ import fs from "fs";
 import axios from "axios";
 
 const deposits: any = {
-	"00b82d83ac279bbd42b538afec4bc662d8b99f799474b6359888c6476752fd2a": false,
-	"012a723734fe5c5d410a63306516a216518b7313aee64e14f415061cd813f6d3": false,
-	"0164fdd6095debbb62b828df7f3c556f5fc3cf8eeece5772041f8cfe106817c3": false,
-	"04555e6a3eeec9c43d9026565b8e52c00baf410a916a4b5d61ced2d9c0f0899a": false,
-	"048161ae4c1a66a5e51a6f9017b0dc644c11fbb74d7712636bf102caeffb01cc": false,
-	"0736e364c7f55af4aa316b4ea40a1a3764a177f7ce4e5e048a9802ca049a41a2": false,
-	"08e23d7b472ca7e4543bfacfe2e98441d46bdb52000bb2fbb7c0b071024a6ea8": false,
-	"0bbb00502e214be42a0a04fa4f328583582480dbc588a8328da71b8516f18bbe": false,
-	"0cbe1128cef87101733b00a2dc6bdfe978a219a1eeaa6740cb479f99e1392789": false,
-	"0e265d958966f0aea59b3bf2d310670d3afdc4ad04ee7cb40ba96ae6666aaf4b": false,
-	"0ec6f11a178c2c8d491eddbb869e5192a5be8c00909b2d94b65ce8cb22f6199e": false,
-	"12110815a41d49f5b4624ccf9167c3c36581f1e2fe0dbf6fa5763ba9762660f3": {
-		amount: {
-			__fixed__: "405.33844292"
-		},
-		starting_epoch: 3,
-		time: {
-			__time__: [2021, 6, 12, 13, 21, 35, 0]
-		},
-		user_yield: 0
-	},
-	"130ae2259475d66186af9dae0171743563690e9c53d2cd26c12925ff7c142a96": false,
-	"15f96e4d0f0d33f8fbbbd6f001641208141120868ae5dce58c5d9afa8e8199c5": false,
-	"164976e07309fb45b0ca3e159ee022b2ebc7e4c6defd9b5a517db1bbc452ea4e": false,
-	"194f28792a4c41d50fe466a4472738c75784b5db18fb5e33d4561f79ab395fd2": false,
-	"2074de0121239f52f53bd4b4b23365262348c20b30f6bbfc2808baf8a5088bd2": false,
-	"240b6b57e679113ad9b433c925698e0111debfacce0949919056e6a90790f98d": false,
-	"2a3808b6e21a668e58e3c0180e2a6330298c6333469668199d9460b0fd68d113": false,
-	"2abe216964762e74b96fd73f55462c9440aefff409f29110d995422ca5b635ee": false,
-	"2b33bce98b188d5f9296271af0bcd65f1685e349e1fb4feb37fc8193a81a5ea7": false,
-	"2c1f56bed673eee36986389b33ba80df85e845b5e6ac030feeda021297293528": false,
-	"3168d0fe541bbd5ea80523e6deb44989980142a86574dc3c40380d7eb4ff159c": false,
-	"350d2d3aac618995a265152a7779e649078ce6ee6921bf01d5679a8a11ee5d20": false,
-	"355eb15617108c53bb0e1797be89f3d1a343754a76f3f21b8c55cc22a7895a91": {
-		amount: {
-			__fixed__: "79.85231343"
-		},
-		starting_epoch: 52,
-		time: {
-			__time__: [2021, 8, 10, 2, 17, 25, 0]
-		},
-		user_yield: 0
-	},
-	"3574bcb5c8b12b335189e801e84c5805aa5077668e69651217ede48fdd71086f": false,
-	"3730ca41222fd5d8e6c5f79bd9d3b1a3132a7832e10e06d0e693978f480f80d5": false,
-	"3a796e9366b829cdb848281a8592d324b0f0d13288b0a2012673e845ddc11645": false,
-	"3b81f7290ec43c716175519e58a313b2afe27449608a37281ccc05cfac41d66f": false,
-	"3bf49aba752a5d82b5ccbb3475a47d7eab25e39c07ee80f81a5189bae811f743": false,
-	"3d1e1970d1075f9c2f65ba62831239b07ffd107a9d560467df4dc4d7bb79672f": false,
-	"3e12734f2d93dc3d1c2343361170697afe285b553fce85146e6fef6f2c51e0a5": false,
-	"3e9ca396167b385491bf12b19dad9fec865afa0c300f6eea2cf29760e8d78323": false,
-	"3f88b33239789e00bb69f977d5ec0cf75eab7ed96479d2224df12ddd208c85e2": false,
-	"4229bcd57299dc89e8c4b1893d7fe5caa58a2fa5c65aa0c4d1177c356cdc1fc9": false,
-	"42cee17da8dc813c61c2cbd3b8803752ca4a83f7848695abc992e12a7cac3fe6": false,
-	"4489524c8d7a36a488d1be063af1d89ccc57d6aabb58e75badf0f020621dd0cc": false,
-	"4868a66e9fe479da6e992b85158ed70a40779be239aa057f010abbdfe33fd9ac": false,
-	"4d0ff3a9681bcf0f6e8f2715afb605a31aa3fff8b2a6793410fff627e40a5f46": false,
-	"4e32d1c0b967d298cf304bb20ed642b0b0eab9f7197b0e0f3a534f91d031ecff": false,
-	"50ea6fcf10c40a6a539a4ec07c6441bc5bd71f48c41380f24ee8d03076ae8ee6": false,
-	"585e49eec5beecb8baafde9c61de629da3373152a151a53fa50919df36cf5853": false,
-	"615ee8b79f76b018aa98956a482d0e7cabd2c766bebcfb896e78fb05b9c532e3": false,
-	"61ec99a4b72e5308a033a854ebbb8829e04ad014041bc32e094c832c84a9dd15": false,
-	"63cb6389a6103cf05236916d9692b456c63ee291f98fbc486b36f4bcaf28210e": false,
-	"6433ff4f7cb39efd798bff4cf488bd889740d8df08aeaa37a3d86f740db30cda": false,
-	"647e05c869ccaf95d2070e64066474ec980aa9f7d9c87a73f0d670a4111bfff5": false,
-	"6656a5c9dcf37f7eadc2b7d8de1998bb5bc4d69244ce75642dd57274feae93db": false,
-	"66bc5dfdc4e9a4d8532e1007dc26bc07ba8065c7823663bec071e74aa2231431": false,
-	"6e3d6554c0f015efddbc1902d512884e52c23c16c94e3bc35382a7eb342c70d5": false,
-	"6f2cfdbbca59acf34bf86ec3e4144accb9ed53c4328887ece5a846252ee2f684": false,
-	"7057e3c4ac151168dddfc5e290e9f59e7b0be75e73538498b67e025d8925c962": false,
-	"706eb73151b47b88bf863af73edc503b7f745534c8ecd6285dfcaaf268cdb7fc": false,
-	"7477439428278898099f1131960cc9f77cfd1f9b2d4de546b8c4884657b85c8e": false,
-	"74bc82a342c38b1e2dea699bd62c847df2c2acad9a78386e213b3e034628d776": false,
-	"76d9aa0faee1224facaf06b2ae3ee0cbff4e65a8f031ca575ac794ceac5dc275": false,
-	"7c88da2557f43cbf1fbfa67ffdf7bb7d777c37af29a7bbf74c8fa5342955ba7e": false,
-	"7cc994343843d5d00f7cf7e26420744ef50e60cd732d24bd0c6f5aa9cf438c13": false,
-	"7d5518ea41b5b3103f2f2219dfd2380ec09a51482ba5157cfaa1c83c09094df8": false,
-	"8047f342b1327ee41de8592a6f28006b7edf9428488245736c9a37f7feb142cc": false,
-	"847b63623747b538bae3d1bbc17e8ea01a8d4da6bb21bdc4ede8d14bc225b6fa": false,
-	"84f201e881cf0b2e8165ba432264d0732ecf4226df4a79d8e42f1a0b94d88d04": false,
-	"866d2627ea986c40f4dd9969b00f36f7870a8018c62e9975ad6f458a58f826fe": false,
-	"889f923fb54a79deb11ee2850010488992222c92351d3024ea3a737b78fab0eb": false,
-	"8aa3efea0cd819c2fe898fc77df6b44237294a9fb02950c760a86d0e7563d2de": false,
-	"8da77ecffe0564781e21ecc07b91c1e28893e7d656a04c5621234e0367889989": false,
-	"8ec687f8f6f0b70b51bfbfab144cde0d4ac57715b32a0cc609d4c75c99acf8cf": false,
-	"95b97a7be7b2b9502b86db932ae5b0cdf2c971ac51150fb1f319094eac221f98": false,
-	"96c36b7466a21c9a9f4e7ad2265e7a9c452e562a999ddaf5a4000ced3b07bb62": false,
-	"9984186b51ebbb096784a7dcc134882dcda55eb30fbf13a651034df619ceb678": false,
-	"9b5f7b7a0d7c808204c0e92ff7666e38df3f818fcf9a0abeaab835050126d317": false,
-	"9bd90812d2179ce0afbd1d4a2d7cecc05a94726c292b4c95d41e055f2233d7e3": false,
-	a326abeb476997e5254945035e6878faf86882360e7ad4d44dbaa89e95af86c9: false,
-	a54426a8f93e01e3ba90b87e74345b725874e6a345f8feaf6b9dffffb4f333f7: false,
-	a607c12daf717b9e75d9c7f167d4bd4250bd08449ac5342f48b82bf3943ddf25: false,
-	a85b07902b938a37b0501ddd29d1725f99c8daeec6f5f4b4b45b3d801ede599f: false,
-	a8cd9f5fec7ef2a384f37b3fd1c3b30f4ddf9a850b9fc518a260d7bf06b627a7: false,
-	af2641245b15a1b70625a3d8613c24a423065ca810b3228d299e34622a0615a5: false,
-	af4cef007ee92772ac092ff2f9ceadb440922378655a7fd66347a518ef88bd3a: false,
-	afc14f98073901a78b0f073957768086f6a8c0582a6a74c77439fdf6fe8dbe64: false,
-	b03a169646cd89546f5b7a4c0efc5cfed76898bc573a267d5b4669e4ef5ef419: false,
-	b086161bc65197f033fc75f6f244bcbac012634565a2c02d2b9f4fcd2a3f7cba: false,
-	b2d81d5844e20c316b941aaa0d2e9ee47d7b69d682ca78a2191254282c04e4fb: false,
-	b945f761871125743c993d410948fe92a3cae3176aa8158e7982a4945fcf40e6: false,
-	bd3688016a9b33bffcf127050d38a86f4469e8de5a393ae2909007ece4ac7e43: {
-		amount: {
-			__fixed__: "433.53145933"
-		},
-		starting_epoch: 122,
-		time: {
-			__time__: [2021, 11, 9, 2, 38, 10, 0]
-		},
-		user_yield: 0
-	},
-	be16cc0d444f203ae90d52afd94ef296cc8dd94786b6974550d54773f6570ad8: false,
-	bee7c87fdd9997bc2b35663a6d932efd03a98685d1f944386f5d16d055982a76: false,
-	c3d95f37e50518543797da2ad121fa4f08a4590e7e805e0336f6cd99cb20a883: false,
-	c428d11b1a0712bd649095db003b9ec498c28a689409c36b81db44c70e4888a6: false,
-	c73cb3a8c6489122a594ecc1725404f81b558ac9a8c7320da228e1f8426e332c: {
-		amount: {
-			__fixed__: "2155453.94508844"
-		},
-		starting_epoch: 1,
-		time: {
-			__time__: [2021, 6, 10, 22, 26, 47, 0]
-		},
-		user_yield: 0
-	},
-	c8c65e34504c41fcefe47ae417d3ade5fcc0008d3df68622b03d093964e40247: false,
-	c8ca6ac7285bf12865038c3078d11804a193da773e252af6692f7fc4804a0f5c: false,
-	c9799dd73bf480bbd0bdde169affe3dce76bc1da4f7d14221c87f3b6b34808ac: false,
-	d57eab87785afc29705072d3615698bfc089d433aaf34e034c309d227958a40a: false,
-	d734220e1962ac68013849f12bdef9935be11f14c67b8105970b041fa3c0d045: false,
-	db4e0532cdca1895bed55c91914ff4dd42ea75b37698c3acee6ca84cc764e391: false,
-	dc47eac2fd2121a9b4a1f5f67c5b399def6370114e7cf048148385af6a451c07: false,
-	dcb6bf9abca7fa4176cc490a8daf7ff2a7897b7e2445ad4444e6b041b9ef232a: false,
-	dee03a2863be66e3afddbb02d13f85013c499fca9c4b2a8ef6e0efb34d13153b: false,
-	df043ffd8ee0d9937cded0e96e35f0ba8fb0ed1f8867b5aac3dc7b51fe431f91: false,
-	e04f90729084c2597af61a9a6c6897318b921c49b0560403e8d93d5ae3351123: false,
-	e1e8b78368b4b90ee17312b7f7e9aff73f542ce742a19c4512f085137b86bc2e: false,
-	e42f935f5f247a55b2c676c60e76bcc19ab5fff527fef08ae9f747d1ed60c6ed: false,
-	e6b7a76e7b1a8ad22b16444c3b0205bde8fc83dd62683eea8dea29603c80dd75: false,
-	e7879070d0fd0476ec4a378f852d59d362ae26033b948136371608c12bffd03b: false,
-	e7937ec2971e369641c4777c74a37a248b8b947c081f0cef164de2146d3f3118: false,
-	f39af09c436f60d1d77dd0305c942072a926446c4914fb2f89db6442db088502: false,
-	f66786094017ca25e9ef2475f6f0eb9b590211d4d3377f473fce4d133ccbac28: false,
-	f699dc56bcf2562df955aee946e11b0858c4e58a04cfd742719eb1aff921b5fc: false,
-	f8e5dc0a645b4771291790d4e46719d345c7dd8b21241c80508fbbbeb8790dda: false,
-	f92d5f5bf073c688e281d63f2fdde03e0d4466e685866b4ff2854dcd1ce09595: false,
-	faff209b3b97e41862dce6a530a02d9bb38836595778cfe78a3796d78410444f: false,
-	fb42db1f142a3f85cfddd6e082464706b130fd6337410a0a3ba9c02faecc2c70: false,
-	fb9217abf0536880ccb8fd263330130f99619392cd68dca62dda7a3e395b6397: {
-		amount: {
-			__fixed__: "20039.84229445"
-		},
-		starting_epoch: 2,
-		time: {
-			__time__: [2021, 6, 10, 23, 41, 18, 0]
-		},
-		user_yield: 0
-	},
-	fb9dfda07670a86d6c4826f31561c7036cacc16f71e3ae5fe03d6f03803f3037: false,
-	fbe6a144f905c30e4c6ec3f4b181dfeb3a5cef3be5ca251898dc45dc2325b857: false,
-	fc6da03f2a6051d09bad993db6b0b78c339e3d336514cf2a38fe611d88f2ba01: false,
-	ffd3a5fc0a5f9da5db60c42fc242038ed19f577c247c35c15ad0945c5da9ca0c: false
+    "00b82d83ac279bbd42b538afec4bc662d8b99f799474b6359888c6476752fd2a": false,
+    "016db974119fa09466db4d02162fecd7b4d3e182a0538a8decdc720e8a0294d4": false,
+    "048161ae4c1a66a5e51a6f9017b0dc644c11fbb74d7712636bf102caeffb01cc": false,
+    "08e23d7b472ca7e4543bfacfe2e98441d46bdb52000bb2fbb7c0b071024a6ea8": false,
+    "0cbe1128cef87101733b00a2dc6bdfe978a219a1eeaa6740cb479f99e1392789": false,
+    "0cd3f6b6bf1b8cc6d630cd9bd5f36605945906dd033f4d663faea45c53a2aeb8": false,
+    "0e265d958966f0aea59b3bf2d310670d3afdc4ad04ee7cb40ba96ae6666aaf4b": false,
+    "130ae2259475d66186af9dae0171743563690e9c53d2cd26c12925ff7c142a96": false,
+    "15ff54d0e09610b748416cb7fc09ae4020a218b0dbcad00988d06dbda3444075": false,
+    "17aaf6f3292be287d04c68a7d62eaaf32632448b126cd73e47ad00f463984ba2": false,
+    "18cc8a112763c37ebf41174b31f74ae5189ff28210474fba43e890724c8579ef": false,
+    "194f28792a4c41d50fe466a4472738c75784b5db18fb5e33d4561f79ab395fd2": false,
+    "234b0e9ee76f5032dbfe75efc653fc28d7e7fc23ca5972a9d310236de313a650": false,
+    "2abe216964762e74b96fd73f55462c9440aefff409f29110d995422ca5b635ee": false,
+    "342b932bf80639a940d3ccb9ee2f1394a3f49fe9dbf4aabca4162a13b43b36c3": false,
+    "350d2d3aac618995a265152a7779e649078ce6ee6921bf01d5679a8a11ee5d20": false,
+    "35595cdf921a7622d70fbf50c0cd2dfcceafd675eec8b0433c35944dbd7562a0": false,
+    "3574bcb5c8b12b335189e801e84c5805aa5077668e69651217ede48fdd71086f": false,
+    "3a796e9366b829cdb848281a8592d324b0f0d13288b0a2012673e845ddc11645": false,
+    "3b50e35cd7eff9ff0c03358cc4894a2a74bb9e8d3f5bb43fd5728a7f3aece25f": false,
+    "3b81f7290ec43c716175519e58a313b2afe27449608a37281ccc05cfac41d66f": false,
+    "3e12734f2d93dc3d1c2343361170697afe285b553fce85146e6fef6f2c51e0a5": false,
+    "3fac30ec8b9401e20c7f8a5845fa2d8a7d5b72e0155945245d5f8b85269c1e2d": false,
+    "4229bcd57299dc89e8c4b1893d7fe5caa58a2fa5c65aa0c4d1177c356cdc1fc9": false,
+    "4489524c8d7a36a488d1be063af1d89ccc57d6aabb58e75badf0f020621dd0cc": false,
+    "4868a66e9fe479da6e992b85158ed70a40779be239aa057f010abbdfe33fd9ac": false,
+    "4b05a3ee6fa1601e6f6b9180afbf23d2def2aa57d5d8b8cb845850887eaedb1c": false,
+    "4d0ff3a9681bcf0f6e8f2715afb605a31aa3fff8b2a6793410fff627e40a5f46": false,
+    "50ea6fcf10c40a6a539a4ec07c6441bc5bd71f48c41380f24ee8d03076ae8ee6": false,
+    "519a4433ebca91e77a30d10ba3f54803dbe2a0856d31ab2b5ee1680a6efcfbc3": false,
+    "53c0d9594dd0f5f4a78ad21e68477aaed97c315abd74e615e89f8f2327fbc5c9": false,
+    "5d6344afd1db39da3e1107e59193d9d66c1a26c39d1c0deb64390eca0a53ecd7": false,
+    "647e05c869ccaf95d2070e64066474ec980aa9f7d9c87a73f0d670a4111bfff5": false,
+    "6656a5c9dcf37f7eadc2b7d8de1998bb5bc4d69244ce75642dd57274feae93db": false,
+    "6b2776749f64ace2fabdb7af26fd3500716502ed6402cbd304375ed3c78580db": false,
+    "6c13b564b0cc3cfbb8ad797c14fd263f0a09c3d227afacce60d1d50c95f9dbe9": {
+        "amount": {
+            "__fixed__": "16.59"
+        },
+        "starting_epoch": 105,
+        "time": {
+            "__time__": [
+                2021,
+                12,
+                12,
+                14,
+                51,
+                36,
+                0
+            ]
+        },
+        "user_yield": 0
+    },
+    "6df81460beefadf830d804872de3c941a0a093c785872193e1e141992fe7e1da": false,
+    "6e3d6554c0f015efddbc1902d512884e52c23c16c94e3bc35382a7eb342c70d5": false,
+    "7057e3c4ac151168dddfc5e290e9f59e7b0be75e73538498b67e025d8925c962": false,
+    "7cc994343843d5d00f7cf7e26420744ef50e60cd732d24bd0c6f5aa9cf438c13": false,
+    "818265dea1c3a8a5cf72b22f3454d23a62f1f90d29b8f463410678ac33300d83": false,
+    "83f161db5ca59b820a1c27654b7780cf36554156c97df7eedc0e330d2d9b3094": false,
+    "866d2627ea986c40f4dd9969b00f36f7870a8018c62e9975ad6f458a58f826fe": false,
+    "86ef2511949397f8ff1072ebd74698a6903e67d17fabf4a42ebe99ee5b13decd": false,
+    "889f923fb54a79deb11ee2850010488992222c92351d3024ea3a737b78fab0eb": false,
+    "8aa3efea0cd819c2fe898fc77df6b44237294a9fb02950c760a86d0e7563d2de": false,
+    "8bd83b16328cdbd557f32bf4107b3a2a62afac0818b94dd079caa1a6f7dddfd8": {
+        "amount": {
+            "__fixed__": "0.24733859"
+        },
+        "starting_epoch": 94,
+        "time": {
+            "__time__": [
+                2021,
+                11,
+                21,
+                17,
+                16,
+                40,
+                0
+            ]
+        },
+        "user_yield": 0
+    },
+    "8da77ecffe0564781e21ecc07b91c1e28893e7d656a04c5621234e0367889989": false,
+    "933a0a747b7aa99bdc42eb53cb3dae001ebb035124c81988e649004a0266d1e2": false,
+    "941e3fa48f248a2ebfd7c904504149bcb8cc110a6ff30c724e1745aa9fbf248d": false,
+    "95b97a7be7b2b9502b86db932ae5b0cdf2c971ac51150fb1f319094eac221f98": false,
+    "96c36b7466a21c9a9f4e7ad2265e7a9c452e562a999ddaf5a4000ced3b07bb62": false,
+    "9984186b51ebbb096784a7dcc134882dcda55eb30fbf13a651034df619ceb678": false,
+    "9efd0891225cbc0044645009524bb0320ca606068651619541a6c5d8d0dd8171": false,
+    "9ff2513c1d535f24c1d513dd9144cb7ba0e6e77076738b81a11b8130170aa7b4": false,
+    "a326abeb476997e5254945035e6878faf86882360e7ad4d44dbaa89e95af86c9": false,
+    "a6acd55ed1ce13f6704fd1d98ad5c3df4671ac0e5066d7ec9c0680fc87067a98": false,
+    "a85b07902b938a37b0501ddd29d1725f99c8daeec6f5f4b4b45b3d801ede599f": false,
+    "a8cd9f5fec7ef2a384f37b3fd1c3b30f4ddf9a850b9fc518a260d7bf06b627a7": false,
+    "a9de1753b0be6559d45932b2fbff9d9e4c6e3387f4a139a844492a06c57301b4": false,
+    "b945f761871125743c993d410948fe92a3cae3176aa8158e7982a4945fcf40e6": false,
+    "bae2ac10e1a75c603ffb440ba95da955098a8af4db7a75f03a63f00c97fe6667": false,
+    "bc9de245ce318814e1b430ea5dbc4aa803d5734929d5c817853ffabf0a87340c": false,
+    "bcf638443491499ebc2b23b2d6b872fe89cc7db81bac0e4f1f330196834120a5": false,
+    "bec17d74064eddb7eeeeee81d8354cb637984f3bf0fee59632d2a34dd0202696": false,
+    "c1bdeb09e03e58621e4408ee0a71636a81b64e4afa4c76c795ba8d3583e1ccde": false,
+    "c3d95f37e50518543797da2ad121fa4f08a4590e7e805e0336f6cd99cb20a883": false,
+    "c4cb7bb144a7db9f470c06c1e915b975eb746e3ea8919d4b43f689ebb30fb8d1": false,
+    "cbdc5c611e997936b293c4a03e7e28492db188a10d8a6f28ada97f8c4a74f600": false,
+    "ccd71ac1abbdeaa8c16207ed5e39747cec1dd37b82288ba10bd7017a73d09f6a": false,
+    "ccfef6807ec8d4d7a890b08eaa3b8aeef4722191c2b489501623fa2741cc0f47": false,
+    "ce20e58137b6dfeb1c25c690961fef9f33d32fda34b2f23f869f7db23a86a680": false,
+    "cfca90d18a25efcbb97f50fa24e9ca1bdfc79c359717b63bbea0ebe72e4287ee": false,
+    "dc47eac2fd2121a9b4a1f5f67c5b399def6370114e7cf048148385af6a451c07": false,
+    "dcb6bf9abca7fa4176cc490a8daf7ff2a7897b7e2445ad4444e6b041b9ef232a": false,
+    "df043ffd8ee0d9937cded0e96e35f0ba8fb0ed1f8867b5aac3dc7b51fe431f91": false,
+    "e04f90729084c2597af61a9a6c6897318b921c49b0560403e8d93d5ae3351123": false,
+    "e1e8b78368b4b90ee17312b7f7e9aff73f542ce742a19c4512f085137b86bc2e": false,
+    "e42f935f5f247a55b2c676c60e76bcc19ab5fff527fef08ae9f747d1ed60c6ed": false,
+    "e7937ec2971e369641c4777c74a37a248b8b947c081f0cef164de2146d3f3118": false,
+    "eaee58e60ed417c78d4085107893d85aa4b1adef1fe462b034d44dc5a02ac35e": false,
+    "ec3634c3e2b9dadaa58568cfbbadcfab84d5b75192cfa06a85f40b41a9b19f1d": false,
+    "ee014a09b14f1fd0ff55d341814ad73ee00d594d33879810f4c23c582b7b6950": false,
+    "ef59aedb2335e2636deef241c0e7e92ff6f9a7cf5bc8ff0ef9ce17247203374b": {
+        "amount": {
+            "__fixed__": "5.12518293"
+        },
+        "starting_epoch": 15,
+        "time": {
+            "__time__": [
+                2021,
+                9,
+                1,
+                9,
+                10,
+                25,
+                0
+            ]
+        },
+        "user_yield": 0
+    },
+    "f66786094017ca25e9ef2475f6f0eb9b590211d4d3377f473fce4d133ccbac28": false,
+    "f699dc56bcf2562df955aee946e11b0858c4e58a04cfd742719eb1aff921b5fc": false,
+    "f8adfa4b66a8ed22d43e7da93f25903d960b7a04fa67b8f5da3be00eba454d98": false,
+    "f92d5f5bf073c688e281d63f2fdde03e0d4466e685866b4ff2854dcd1ce09595": false,
+    "feaecce9a1f05b182c4ab7f7a80f0e98fe4ea25ff85235d076fe9a63faab056e": false
 };
 
 const active_deposits: any[] = [];
@@ -183,17 +160,17 @@ for (let i = 0; i < dep_keys.length; i++) {
 	}
 }
 
-async function getWethYield(address: string) {
+async function getTokenYield(address: string) {
 	console.log("called get weth yield");
 	const user_yield_list = (await axios.get("https://rocketswap.exchange:2053/api/user_yield_list/" + address)).data;
-	const weth_yield = user_yield_list["con_liq_mining_weth_tau"];
-	return weth_yield?.current_yield || 0;
+	const neb_yield = user_yield_list["con_liq_mining_neb"];
+	return neb_yield?.current_yield || 0;
 }
 
 const getYield = async () => {
 	let total_yield = 0;
 	for (let d of active_deposits) {
-		total_yield += await getWethYield(d.address);
+		total_yield += await getTokenYield(d.address);
 	}
 	console.log({ total_yield });
 };
@@ -202,9 +179,9 @@ async function main() {
 	await getYield();
 }
 
-// main();
+main();
 
-const sanity_checks = [148353.27331796353, 23.413328349006107, 11.824335662676836, 20.228032968878203, 2356.937462718106];
+// const sanity_checks = [148353.27331796353, 23.413328349006107, 11.824335662676836, 20.228032968878203, 2356.937462718106];
 
 const addTogetherArray = (arr: number[]) => {
 	let total = 0;
@@ -214,10 +191,10 @@ const addTogetherArray = (arr: number[]) => {
 	return total;
 };
 
-const sanity_check = addTogetherArray(sanity_checks);
-console.log(sanity_check);
-console.log(sanity_check === 150765.6764776622);
+// const sanity_check = addTogetherArray(sanity_checks);
+// console.log(sanity_check);
+// console.log(sanity_check === 150765.6764776622);
 
-const remainder = 505442.841006374322926570441345854303 - 150765.6764776622;
+// const remainder = 505442.841006374322926570441345854303 - 150765.6764776622;
 
-console.log(remainder); // 354677.16452871216
+// console.log(remainder); // 354677.16452871216
