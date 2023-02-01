@@ -187,9 +187,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	private async handleJoinUserYieldFeed(subject: string, client: Socket) {
+		// log.log(`${client.id} joined ${subject}`);
 		this.socketService.addStakingPanelClient(subject);
-		// const yield_list = await this.socketService.getClientYieldList(subject);
-		// client.emit("user_yield_list", yield_list);
+		const yield_list = await this.socketService.getClientYieldList(subject);
+		client.emit("user_yield_list", yield_list);
 	}
 
 	private async handleJoinTauUsdPrice(client: Socket) {

@@ -1,7 +1,7 @@
 import { log } from "../utils/logger";
 import { forwardRef, Inject, Injectable, OnModuleInit } from "@nestjs/common";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
-import { ParserProvider } from "../parser.provider";
+import { DataSyncProvider } from "../data-sync.provider";
 import { PairEntity } from "../entities/pair.entity";
 import { updateEpoch } from "../entities/staking-epoch.entity";
 import { IKvp } from "../types/misc.types";
@@ -16,8 +16,8 @@ export class StakingService implements OnModuleInit {
 	constructor(
 		@Inject(forwardRef(() => SocketService))
 		private readonly socketService: SocketService,
-		@Inject(forwardRef(() => ParserProvider))
-		private readonly parserProvider: ParserProvider
+		@Inject(forwardRef(() => DataSyncProvider))
+		private readonly parserProvider: DataSyncProvider
 	) {}
 
 	async onModuleInit() {
@@ -30,6 +30,7 @@ export class StakingService implements OnModuleInit {
 	updateROI = async () => {
 		// log.debug("UPDATE ROI CALLED")
 		// log.log({staking_contracts: this.parserProvider.getAllStakingContracts()})
+		// log.log(this.parserProvider.getActiveStakingContracts().length)
 		for (let contract_name of this.parserProvider.getActiveStakingContracts()) {
 			const meta_entity = await StakingMetaEntity.findOne({ where: { contract_name, visible: true } });
 			// log.debug({meta_entity})
@@ -56,15 +57,15 @@ export class StakingService implements OnModuleInit {
 			 * Smart Epoch Staking Contract, RSWP => RSWP
 			 */
 			meta.type === "staking_smart_epoch" &&
-			meta.STAKING_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT &&
-			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
+			meta.STAKING_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT &&
+			meta.YIELD_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			// log.log("staking_smart_epoch called");
 			return await this.getRSWPStakingROI(meta_entity);
 		} else if (
 			meta.type === "staking_smart_epoch_compounding_timeramp" &&
-			meta.STAKING_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT &&
-			meta.YIELD_TOKEN === ParserProvider.amm_meta_entity.TOKEN_CONTRACT
+			meta.STAKING_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT &&
+			meta.YIELD_TOKEN === DataSyncProvider.amm_meta_entity.TOKEN_CONTRACT
 		) {
 			return await this.getRSWPStakingROI(meta_entity);
 		} else if (
@@ -109,11 +110,11 @@ export class StakingService implements OnModuleInit {
 				PairEntity.findOne(staking_token),
 				PairEntity.findOne(reward_token)
 			]);
-			if (!staking_token_pair_entity || !reward_token_pair_entity) return 0
-			const staking_p = Number(staking_token_pair_entity.price)
-			const reward_p = Number(reward_token_pair_entity.price)
+			if (!staking_token_pair_entity || !reward_token_pair_entity) return 0;
+			const staking_p = Number(staking_token_pair_entity.price);
+			const reward_p = Number(reward_token_pair_entity.price);
 
-			const total_staked_value = staking_p * meta_entity.StakedBalance
+			const total_staked_value = staking_p * meta_entity.StakedBalance;
 			const reward_value_per_year = reward_p * this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour);
 			return Math.round((reward_value_per_year / total_staked_value) * 100);
 		}
@@ -123,7 +124,7 @@ export class StakingService implements OnModuleInit {
 		Math.round((this.getYearlyOutputFromHourly(meta_entity.EmissionRatePerHour) / meta_entity.StakedBalance) * 100);
 
 	getSimpleStakingROI = async (yearly_emission_rate: number) => {
-		const rswp_entity = await PairEntity.findOne(ParserProvider.amm_meta_entity?.TOKEN_CONTRACT);
+		const rswp_entity = await PairEntity.findOne(DataSyncProvider.amm_meta_entity?.TOKEN_CONTRACT);
 		if (rswp_entity && rswp_entity.price) {
 			const apy = Math.round(parseFloat(rswp_entity.price) * yearly_emission_rate * 100);
 			return apy;
@@ -225,6 +226,7 @@ export class StakingService implements OnModuleInit {
 				case `${staking_contract}.TimeRampValues`:
 					entity["TimeRampValues"] = getVal(kvp);
 					break;
+				default:
 			}
 			if (kvp.key.includes("Epochs")) {
 				const index = parseInt(kvp.key.split(":")[1]);
@@ -275,24 +277,20 @@ export class StakingService implements OnModuleInit {
 				const exporter_deposit = deposits_arr.find((kvp) => kvp.key.includes(exporter_contract));
 				const exporter_withdrawal = withdrawals_arr.find((kvp) => kvp.key.includes(exporter_contract));
 
-				const proms = [
-					updateUserStakingInfo({
-						deposits: importer_deposit,
-						withdrawals: importer_withdrawal,
-						staking_contract,
-						fn,
-						handleClientUpdate
-					}),
-					updateUserStakingInfo({
-						deposits: exporter_deposit,
-						withdrawals: exporter_withdrawal,
-						staking_contract: exporter_contract,
-						fn,
-						handleClientUpdate
-					})
-				];
-
-				await Promise.all(proms);
+				await updateUserStakingInfo({
+					deposits: importer_deposit,
+					withdrawals: importer_withdrawal,
+					staking_contract,
+					fn,
+					handleClientUpdate
+				});
+				await updateUserStakingInfo({
+					deposits: exporter_deposit,
+					withdrawals: exporter_withdrawal,
+					staking_contract: exporter_contract,
+					fn,
+					handleClientUpdate
+				});
 			}
 		}
 		handleClientUpdate({ action: "staking_panel_update", data: entity });

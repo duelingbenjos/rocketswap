@@ -41,7 +41,6 @@ export class AmmMetaEntity extends BaseEntity {
 	__developer__: string;
 }
 
-
 export const updateAmmMeta = async (args: { state: IKvp[]; handleClientUpdate: handleClientUpdateType }) => {
 	const { state, handleClientUpdate } = args;
 
@@ -83,18 +82,22 @@ export const updateAmmMeta = async (args: { state: IKvp[]; handleClientUpdate: h
 
 export const syncAmmCurrentState = async () => {
 	const current_state = await getContractState(config.amm_contract);
+	// log.log(current_state);
 	const amm_state = current_state[config.amm_contract];
 
 	if (amm_state) {
+		log.log({ amm_state });
+		// log.log({ amm_state });
 		const { discount, lp_points, reserves, staked_amount, state: amm_meta } = amm_state;
+		console.log({ discount, lp_points, reserves, staked_amount, state: amm_meta });
 		await syncLpPointsEntities(lp_points);
 		await syncPairEntities(reserves);
 		await syncAmmMeta(amm_meta);
 	}
+	log.log("AMM_META state synced");
 };
 
 export const syncAmmMeta = async (amm_meta: IAmmMetaState) => {
-	log.log(amm_meta);
 	const ent = new AmmMetaEntity();
 	ent.TOKEN_DISCOUNT = getValue(amm_meta.TOKEN_DISCOUNT);
 	ent.MULTIPLIER = getValue(amm_meta.MULTIPLIER);
@@ -109,7 +112,9 @@ export const syncAmmMeta = async (amm_meta: IAmmMetaState) => {
 };
 
 export const syncLpPointsEntities = async (lp_points_state: ILpPointsState) => {
+	if (!lp_points_state) return
 	const contract_keys = Object.keys(lp_points_state);
+	log.log(contract_keys);
 	for (let contract of contract_keys) {
 		const contract_obj = lp_points_state[contract];
 		const address_keys = Object.keys(contract_obj);
@@ -128,6 +133,7 @@ export const syncLpPointsEntities = async (lp_points_state: ILpPointsState) => {
 };
 
 export const syncPairEntities = async (reserves_state: IReservesState) => {
+	if (!reserves_state) return
 	const lp_totals = await LpPointsEntity.findOne("__hash_self__");
 	for (let contract of Object.keys(reserves_state)) {
 		const reserves = reserves_state[contract];

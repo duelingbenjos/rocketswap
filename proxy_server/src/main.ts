@@ -11,9 +11,8 @@ const app = express();
 
 // Configuration
 const DOWN_URL = "http://0.0.0.0:82";
-const APP_URL = "http://0.0.0.0:5000";
+const APP_URL = "http://0.0.0.0:3007";
 const DOCS_URL = "http://0.0.0.0:3000";
-const API_URL = "http://0.0.0.0:2053";
 
 app.use(morgan("dev"));
 app.use(cors({ origin: "*" }));
@@ -21,6 +20,8 @@ app.use(cors({ origin: "*" }));
 app.use((req, res, next) => {
 	res.header("Access-Control-Allow-Origin", "rocketswap.exchange"); // update to match the domain you will make the request from
 	res.header("Access-Control-Allow-Origin", "staging.rocketswap.exchange"); // update to match the domain you will make the request from
+	res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange"); // update to match the domain you will make the request from
+	res.header("Access-Control-Allow-Origin", "stagingv2.rocketswap.exchange"); // update to match the domain you will make the request from
 	res.header("Access-Control-Allow-Origin", "rswp.io"); // update to match the domain you will make the request from
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 	next();
@@ -62,7 +63,7 @@ app.use(
 app.use(
 	"/",
 	createProxyMiddleware({
-		target: APP_URL,
+		target: DOWN_URL,
 		changeOrigin: true,
 		pathRewrite: {
 			[`^/`]: ""
@@ -71,18 +72,36 @@ app.use(
 );
 
 const httpServer = http.createServer(app);
-const httpsServer = https.createServer(
-	{
-		key: fs.readFileSync("src/certs/key.pem"),
-		cert: fs.readFileSync("src/certs/pub.pem")
-	},
-	app
-);
+// let httpsServer: https.Server
+
+// let key, cert
+
+// loadKeys()
+
+// if (key && cert) {
+// 	httpsServer = https.createServer(
+// 		{
+// 			key,
+// 			cert
+// 		},
+// 		app
+// 	);
+	// httpsServer.listen(443, () => {
+	// 	console.log(`Starting HTTPS Proxy on port : ${443}`);
+	// });
+// }
+
 
 httpServer.listen(80, () => {
 	console.log(`Starting HTTP Proxy on port : ${80}`);
 });
 
-httpsServer.listen(443, () => {
-	console.log(`Starting HTTPS Proxy on port : ${443}`);
-});
+// function loadKeys() {
+// 	try {
+// 		key = fs.readFileSync("src/certs/key.pem")
+// 		cert = fs.readFileSync("src/certs/pub.pem")
+
+// 	} catch (err) {
+// 		console.log(err)
+// 	}
+// }

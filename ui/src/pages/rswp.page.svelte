@@ -3,6 +3,7 @@
     import { writable } from 'svelte/store'
 
     // Components
+    import PageHeader from '../components/misc/page-header.svelte'
     import HeadMeta from '../components/head-meta.svelte'
     import RSWPBalance from '../components/rswp/rswp-balance.svelte'
     import StakingPanel from '../components/panels/staking-panel.svelte'
@@ -25,7 +26,7 @@
 
     let rswpToken = writable()
 
-    $: pageTitle = `Get RocketSwap Token (${config.ammTokenSymbol})!`
+    $: pageTitle = `Rocketswap Token`
     $: pageDescription = `The only place to farm the official (${config.ammTokenSymbol}) token!`
 
     setContext("rswpContext", {
@@ -50,6 +51,7 @@
         width: 100%;
         max-width: 1020px;
         margin: 0 auto;
+        padding-top: 2rem;
         padding-bottom: 10rem;
         box-sizing: border-box;
     }
@@ -58,10 +60,17 @@
         flex-direction: column;
         box-sizing: border-box;
         align-items: center;
+        margin-top: 2rem;
+    }
+    .info-boxes{
+        margin-top: 2rem;
     }
 
     .li{
         margin: 0.25rem 0;
+    }
+    .li > span {
+        font-size: 1.1em;
     }
     .buy-button{
         margin: 1rem auto 0;
@@ -85,8 +94,9 @@
 <HeadMeta {pageTitle} {pageDescription} />
 
 <div class="page">
+<PageHeader title={pageTitle}/>
     <RSWPBalance />
-    <div class="flex-row flex-justify-spacearound">
+    <div class="info-boxes flex-row flex-wrap flex-justify-spacearound">
         <SmallBoxedMessage title="How do I get RSWP?"  >
             <div slot="message" class="flex-col text-xsmall">
                 <div class="li flex-row">
@@ -97,7 +107,7 @@
                         styles="min-width: 20px;"
                     /> 
                     <span>
-                        Stake {config.currencySymbol} below to earn RSWP over time.
+                        Stake below to earn RSWP over time
                     </span>
                 </div>
 
@@ -109,7 +119,7 @@
                         styles="min-width: 20px;"  
                     /> 
                     <span>
-                        Buy RSWP from the RSWP/{config.currencySymbol} pairing.
+                        Buy RSWP with {config.currencySymbol}
                     </span>
                 </div>
                 <button class="primary buy-button" on:click={gotoBuyRSWP}>Buy {config.ammTokenSymbol}!</button>
@@ -126,7 +136,7 @@
                         styles="min-width: 20px;" 
                     /> 
                     <span>
-                        Instant 25% discount on fees when paying in RSWP.
+                        Instant 25% discount on fees when paying in RSWP
                     </span>
                 </div>
 
@@ -138,14 +148,14 @@
                         styles="min-width: 20px;" 
                     /> 
                     <span>
-                        Additional discount on fees depending on how much RSWP is in your Fuel Tank.
+                        Additional discount on fees depending on how much RSWP is in your Fuel Tank
                     </span>
                 </div>
             </div>
         </SmallBoxedMessage>
     </div>
 
-    <div class="flex panels">
+    <div class="flex panels flex-wrap">
         <StakingPanel stakingInfo={$rswpStakingInfo} />
         <StakingPanel stakingInfo={$rswpYieldInfo} />
         <RSWPDiscountPanel />

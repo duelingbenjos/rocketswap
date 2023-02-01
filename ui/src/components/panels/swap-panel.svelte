@@ -1,17 +1,21 @@
 <script lang="ts">
 	import { getContext } from 'svelte'
 
-	//Components
+	// Components
 	import InputCurrency from '../inputs/input-currency.svelte'
 	import InputToken from '../inputs/input-token.svelte'
-	import Buttons from '../buttons.svelte'
+	import Tooltip from '../misc/tooltip.svelte'
 	import DirectionalArrow from '../../icons/directional-arrow.svelte'
 
-	//Misc
+	// Icons
+	import VerifiedToken from '../../icons/verified_token.svelte'
+
+	// Misc
 	import { quoteCalculator, toBigNumber, stringToFixed } from '../../utils'
 
+
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
-	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP, payInRswp, currentPrice, lastTradeType } = pageStores
+	const { currencyAmount, tokenAmount, buy, selectedToken, tokenLP, payInRswp, currentPrice, lastTradeType, isVerified } = pageStores
 
 	let slots = [
 		{
@@ -23,6 +27,8 @@
 			handler: handleTokenChange
 		}
 	]
+
+	let tooltip = ["Rocketswap Verified Token Contract"]
 
 	const swapSlots = () => {
 		slots = [...slots.reverse()]
@@ -104,6 +110,15 @@
 		color: var(--error-color);
 	}
 
+	.verified-token-legend{
+		position: absolute;
+		top: 20px;
+		left: -5px;
+		width: 50px;
+		transform: translateY(-50%);
+		z-index: 2;
+    }
+
 	@media screen and (min-width: 430px) {
 		.price{
 			position: absolute;
@@ -115,11 +130,20 @@
 			text-align: center;
 			justify-content: center;
 		}
+		.verified-token-legend{
+			transform: translate(-40%, -50%);
+			width: 75px;
+		}
 	}
 
 </style>
 
 <div class="panel-container">
+	{#if $isVerified}
+		<div class="verified-token-legend flex row">
+			<Tooltip icon={VerifiedToken} width="100%" {tooltip}/>
+		</div>
+	{/if}
 	{#if $selectedToken && !$currentPrice.isNaN()}
 		<div 
 			class="flex-row flex-center-center price weight-600"

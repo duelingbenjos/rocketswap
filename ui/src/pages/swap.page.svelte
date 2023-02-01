@@ -1,6 +1,8 @@
-<script lang="ts">
+<script>
 	import { onMount, setContext } from 'svelte'
-	import { writable } from 'svelte/store'
+	import { writable, derived } from 'svelte/store'
+	import { fade } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 
 	//Router
 	import { params } from 'svelte-hash-router'
@@ -18,7 +20,7 @@
 		tokenBalances, 
 		walletIsReady, 
 		saveStoreValue, 
-		walletAddress, 
+		verifiedTokens, 
 		slippageTolerance, 
 		rswpPrice, 
 		payInRswp, 
@@ -35,9 +37,8 @@
 	import SwapPanel from '../components/panels/swap-panel.svelte'
 	import TradeTable from '../components/misc/trade-table.svelte'
 	import SwapInfoBox from '../components/misc/swap-info-box.svelte'
-	import PoolStats from '../components/pools/pool-stats.svelte'
+	import ConfirmUnverified from '../components/confirms/confirm-unverified.svelte'
 	import Buttons from '../components/buttons.svelte'
-	import IconBackArrow from '../icons/back-arrow.svelte'
 
 	let pageStats = writable()
 	let currencyAmount = writable(null)
@@ -50,6 +51,14 @@
 	let currentPrice = writable(toBigNumber(0))
 	let lastTradeType = writable("buy")
 
+	let isVerified = derived([verifiedTokens, selectedToken], ([$verifiedTokens, $selectedToken]) => {
+		if (!$selectedToken) return false
+		if (!$verifiedTokens) return false
+		return $verifiedTokens.includes($selectedToken.contract_name)
+	})
+
+	$: showUnverifiedMessage = true
+
 	let pageStores = {
 		currencyAmount,
 		tokenAmount,
@@ -60,7 +69,8 @@
 		txOkay,
 		priceImpactTooHigh,
 		currentPrice,
-		lastTradeType
+		lastTradeType,
+		isVerified
 	}
 
 	let pageUtilites = pageUtils(pageStores)
@@ -73,6 +83,7 @@
 	selectedToken.subscribe(value => {
 		if (value) {
 			joinTradeFeed_UpdateWindow(value.contract_name)
+			showUnverifiedMessage = true
 		}
 	})
 
@@ -154,6 +165,8 @@
 		}
 		return await walletService.estimateTxCosts(txList)
 	}
+
+	const closeConfirm = () => showUnverifiedMessage = false
 </script>
 
 <style>
@@ -176,3 +189,12 @@
 		<TradeTable />
 	{/if}
 </div>
+
+{#if $selectedToken && !$isVerified && showUnverifiedMessage }
+	<div class="modal"
+		in:fade="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.5, easing: quintOut}}"
+		out:fade="{{delay: 0, duration: 500, x: 0, y: 20, opacity: 0.0, easing: quintOut}}"
+		>
+		<ConfirmUnverified {closeConfirm}/>
+	</div>
+{/if}

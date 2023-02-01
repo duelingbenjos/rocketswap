@@ -5,11 +5,11 @@ import {
 	Column,
 	PrimaryColumn,
 	BaseEntity,
-	PrimaryGeneratedColumn
 } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
+import { config } from "../config";
 
-/** This entity is created / updated when the LP points balance of an address changes. */
+/** This entity is created / updated when the LP points balance of an address changes or an LP pair is created. */
 
 @Entity()
 export class LpPointsEntity extends BaseEntity {
@@ -24,18 +24,23 @@ export class LpPointsEntity extends BaseEntity {
 }
 
 export async function saveUserLp(args: {
-		state: IKvp[];
-		handleClientUpdate: handleClientUpdateType;
-	}) {
+	state: IKvp[];
+	handleClientUpdate: handleClientUpdateType;
+}) {
 	const { state, handleClientUpdate } = args;
-	// [{key:"con_amm2.lp_points:con_token_test7:f8a429afc20727902fa9503f5ecccc9b40cfcef5bcba05204c19e44423e65def",value: 100}]
-	// { key: "con_amm2.lp_points:con_token_test7", value: 100 }
 	const lp_kvp = state.filter(
-		(kvp) => kvp.key.split(".")[1].split(":")[0] === "lp_points"
+		(kvp) => {
+			const parts = kvp.key.split(":")
+			return parts[0] === `${config.amm_contract}.lp_points`
+		}
 	);
+
+	if (!lp_kvp.length) return
+
 	for (let kvp of lp_kvp) {
 		const parts = kvp.key.split(":");
 		const contract_name = parts[1];
+		/** Change in user LP points amount */
 		if (parts.length === 3) {
 			let entity = await LpPointsEntity.findOne(parts[2]);
 			if (!entity) {
@@ -51,7 +56,9 @@ export async function saveUserLp(args: {
 				points: entity.points,
 				vk: entity.vk
 			});
-		} else if (parts.length === 2) {
+		}
+		/** Pair is created */
+		else if (parts.length === 2) {
 			let entity = await LpPointsEntity.findOne(parts[0].split(".")[0]);
 			if (!entity) {
 				entity = new LpPointsEntity();

@@ -7,10 +7,11 @@
 
     // Icons
     import DirectionalChevron from '../../icons/directional-chevron.svelte'
+    import VerifiedToken from '../../icons/verified_token.svelte'
     
 	//Misc
     import { stringToFixed, numberWithCommas, setCurrencyType, setHomePageTableFilter, toBigNumber } from '../../utils'
-    import { tauUSDPrice, currencyType, homePageTableFilter } from '../../store'
+    import { tauUSDPrice, currencyType, homePageTableFilter, verifiedTokens } from '../../store'
 
     let selectElm
     let type = $currencyType
@@ -23,7 +24,7 @@
     $: priceChangeFilter = $homePageTableFilter ? $homePageTableFilter.price_change : null;
     $: currentFilter = $homePageTableFilter ? $homePageTableFilter.current : null;
 
-    $: results = [...sortMarketData(marketData, $homePageTableFilter)]
+    $: results = !marketData ? null : [...sortMarketData(marketData, $homePageTableFilter)]
 
     const handleCurrencyTypeChange = () => setCurrencyType(type)
 
@@ -39,7 +40,7 @@
     }
 
     const sortMarketData = () => {
-        if (!marketData) return []
+        if (!marketData) return null
         if (!$homePageTableFilter) return marketData
 
         let r =  marketData.sort((a, b) => {
@@ -73,11 +74,15 @@
     .panel-container{
         max-width: 850px;
         padding: 18px 20px;
+        font-size: 0.8em;
     }
     table {
         width: 100%;
         border-collapse: collapse;
         font-size: var(--text-size-small);
+    }
+    tr:nth-child(2) > td{
+        padding-top: 2rem;
     }
     .headings{
         border-bottom: 1px solid var(--text-primary-color-dimmer);
@@ -85,28 +90,26 @@
     .mobile-hide{
         display: none;
     }
-    .symbol-text{
-        margin-left: 34px;
-        margin-top: -6px;
+    tr{
+        font-weight: 100;
     }
     th{
         text-align: left;
         padding: 0;
-        font-weight: 100;
+    }
+    tr.headings > th{
+        font-weight: 400;
     }
     td{
-        max-width: 100px;
-        padding: 8px 0px;
+        max-width: 150px;
+        padding: 1.5em 0px;
         vertical-align: top;
+        line-height: 1.4;
     }
     div.ellipsis{
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-    }
-
-    a{
-        text-decoration: underline;
     }
 
     select{
@@ -126,12 +129,28 @@
         align-self: flex-start;
         margin-top: -5px;
     }
+    .verified-token-legend{
+        margin-bottom: 1rem;
+        
+    }
+    .verified-token-legend > span{
+        margin-left: 0.5em;
+    }
+    .no-results{
+        width: max-content;
+    }
+    @media screen and (min-width: 400px) {
+        .panel-container{
+            font-size: 0.9em;
+        }
+    }
     @media screen and (min-width: 430px) {
         .panel-container{
             background: var(--home-panel-background-gradient);
+            font-size: 1em;
         }
         td{
-            padding: 12px 8px 0;
+            padding: 1.5em 8px 0;
         }
 
         th{
@@ -158,14 +177,14 @@
 	@media screen and (min-width: 680px) {
         td{
             max-width: 175px;
-            padding: 12px 8px 0;
+            padding: 1.5em 8px 0;
         }
 	}
 
     @media screen and (min-width: 850px) {
         td{
             max-width: 250px;
-            padding: 12px 8px 0;
+            padding: 1.5em 0.5em 0;
         }
         table{
             font-size: var(--text-size-large);
@@ -178,7 +197,7 @@
     @media screen and (min-width: 2560px) {
         td{
             max-width: 300px;
-            padding: 12px 8px 0;
+            padding: 1.5em 8px 0;
         }
         table{
             font-size: var(--text-size-xlarge);
@@ -190,14 +209,21 @@
 	}
 
 </style>
+
 <div class="panel-container">
-    {#if results.length > 0}
+    <div class="verified-token-legend flex row">
+        <VerifiedToken />
+        <span class="text-primary-dim">Rocketswap Verified Token</span>
+    </div>
+    {#if results === null}
+        <PulseSpinner margin="0 auto" color="var(--color-primary)" />
+    {:else}
         <table>
             <tr class="headings">
                 <th class="mobile-hide">#</th>
                 <th>                    
                     <button class="flex-row" on:click={() => handleFilterClick('name')}>
-                        Name
+                        Token Name
                         <DirectionalChevron 
                             width="10px"
                             styles={`position: relative; ${nameFilter === "asc" ? "top: 4px;" : "top: -6px;"}`}
@@ -283,52 +309,70 @@
                     </button>
                 </th>
             </tr>
+            {#if results.length === 0}
 
-            {#each results as tokenInfo, index}
-                <tr>
-                    <td class="mobile-hide">{index + 1}</td>
-                    <td class="flex-col">
-                        <div class="flex-row" >
-                            <TokenLogo tokenMeta={tokenInfo.token} margin={"0 10px 0 0"}/>
-                            <div class="ellipsis">
-                                <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
+                <p class="text-primary-dim no-results">
+                    0 results (check filters) 
+                </p>
+            {:else}
+                {#each results as tokenInfo, index}
+                    <tr>
+                        <td class="mobile-hide">
+                            <div class="flex flex-align-center">
+                                {index + 1}
                             </div>
-                        </div>
-                        <div class="text-primary-dimmer symbol-text">{tokenInfo.token.token_symbol}</div>
-                    </td>
-                    
-                    <td >
-                        {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(9).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 9)}
-                        <div
+                        </td>
+                        <td class="flex-col">
+                            <div class="flex-row flex-align-center" >
+                                <TokenLogo tokenMeta={tokenInfo.token} margin={"0 10px 0 0"} width="45px"/>
+                                <div class="flex-col overflow hidden">
+                                    <div class="ellipsis">
+                                        <a href="{`/#/swap/${tokenInfo.contract_name}`}">{tokenInfo.token.token_name || "Unnamed Token"}</a>
+                                    </div>
+        
+                                    <div class="flex-row flex-align-center">
+                                        <div class="text-primary-dimmer symbol-text">{tokenInfo.token.token_symbol}</div>
+                                        {#if $verifiedTokens.includes(tokenInfo.contract_name)}
+                                            <VerifiedToken margin="0 0 0 0.5em"/>
+                                        {/if}
+                                    </div>
+                                </div>
+                            </div>
+
+                            
+                        </td>
+                        
+                        <td >
+                            {currencyToDisplay === "usd" ? `$${tokenInfo.usdPrice.toFixed(9).match(/^-?\d*\.?0*\d{0,2}/)[0]}` : stringToFixed(tokenInfo.Last, 9)}
+                            <div
+                                class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
+                                class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
+                                class="mobile-show">
+                                {stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%
+                            </div>
+                        </td>
+                        <td
                             class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
                             class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
-                            class="mobile-show">
-                            {stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%
-                        </div>
-                    </td>
-                    <td
-                        class:text-error={tokenInfo.PercentPriceIncrease_24h.isLessThan(0)}
-                        class:text-success={tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0)}
-                        class="mobile-hide">
-                        {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
-                    </td>
-                    <td class="mobile-hide">
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
-                    </td>
-                    <td class="mobile-show">
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
-                        <div class="text-primary-dim">
+                            class="mobile-hide">
+                            {`${tokenInfo.PercentPriceIncrease_24h.isGreaterThan(0) ? "+" : ""}${stringToFixed(tokenInfo.PercentPriceIncrease_24h, 2)}%`}
+                        </td>
+                        <td class="mobile-hide">
+                            {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
+                        </td>
+                        <td class="mobile-show">
+                            {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdVolume.toFixed(2).toString()}` : stringToFixed(tokenInfo.BaseVolume, 5))}
+                            <div class="text-primary-dim">
+                                {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
+                            </div>
+                            
+                        </td>
+                        <td class="mobile-hide">
                             {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
-                        </div>
-                        
-                    </td>
-                    <td class="mobile-hide">
-                        {numberWithCommas(currencyToDisplay === "usd" ? `$${tokenInfo.usdLiquidity.toFixed(2).toString()}` : stringToFixed(tokenInfo.tauLiquidity, 5))}
-                    </td>
-                </tr>
-            {/each}
+                        </td>
+                    </tr>
+                {/each}
+            {/if}
         </table>
-    {:else}
-        <PulseSpinner margin="0 auto" color="var(--color-primary)" />
     {/if}
 </div>

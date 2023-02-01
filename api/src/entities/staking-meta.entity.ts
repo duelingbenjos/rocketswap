@@ -1,6 +1,8 @@
 import { IContractingTime, ITimeRampValue, StakingType } from "../types/misc.types";
 import { Entity, Column, BaseEntity, PrimaryColumn } from "typeorm";
 import { log } from "../utils/logger";
+import { StakingEpochEntity } from "./staking-epoch.entity";
+import { UserStakingEntity } from "./user-staking.entity";
 
 @Entity()
 export class StakingMetaEntity extends BaseEntity {
@@ -53,6 +55,9 @@ export class StakingMetaEntity extends BaseEntity {
 	EpochMaxRatioIncrease: string;
 
 	@Column({ nullable: true })
+	EpochMinTime: string;
+
+	@Column({ nullable: true })
 	WithdrawnBalance: string;
 
 	@Column({ nullable: true })
@@ -83,4 +88,19 @@ export const getStakingMetaList = async () => {
 		}, [])
 	};
 	return return_obj;
+};
+
+export const removeAllStakingMeta = async () => {
+	const meta_ents = await StakingMetaEntity.find();
+	for (let e of meta_ents) {
+		await e.remove();
+	}
+	const epoch_ents = await StakingEpochEntity.find();
+	for (let e of epoch_ents) {
+		await e.remove();
+	}
+	const user_staking_ents = await UserStakingEntity.find();
+	for (let e of user_staking_ents) {
+		await e.remove();
+	}
 };

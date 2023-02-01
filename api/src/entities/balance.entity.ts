@@ -1,5 +1,5 @@
 import { IKvp } from "../types/misc.types";
-import { getVal } from "../utils/utils";
+import { getVal, getValue } from "../utils/utils";
 import { Entity, Column, PrimaryColumn, BaseEntity } from "typeorm";
 import { handleClientUpdateType } from "../types/websocket.types";
 import { log } from "../utils/logger";
@@ -52,7 +52,6 @@ export async function saveTransfer(args: { state: IKvp[]; handleClientUpdate: ha
 		const { key, value } = kvp;
 		const parts = key.split(".");
 		const is_balance = parts[1].split(":")[0] === "balances" ? true : false;
-		
 		const vk = key.split(":")[1];
 		const contract_name = parts[0];
 		const amount = getVal(kvp);
@@ -69,3 +68,21 @@ export async function saveTransfer(args: { state: IKvp[]; handleClientUpdate: ha
 		}
 	}
 }
+
+export const saveBalances = async (contract_name: string, balances) => {
+	const balance_keys = Object.keys(balances);
+	const to_save = [];
+	for (let key of balance_keys) {
+		let entity = await BalanceEntity.findOne(key);
+		if (!entity) {
+			entity = new BalanceEntity();
+			entity.balances = {};
+			entity.vk = key;
+		}
+
+		const balance_entry = String(getValue(balances[key]));
+		entity.balances[contract_name] = balance_entry;
+		to_save.push(entity);
+	}
+	await BalanceEntity.save(to_save, { chunk: 500 });
+};

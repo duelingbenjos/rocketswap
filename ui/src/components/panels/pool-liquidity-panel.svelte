@@ -4,14 +4,19 @@
 	//Components
 	import InputCurrency from '../inputs/input-currency.svelte'
 	import InputToken from '../inputs/input-token.svelte'
-	import Buttons from '../buttons.svelte'
+	import Tooltip from '../misc/tooltip.svelte'
 	import IconPlusSign from '../../icons/plus-sign.svelte'
+
+	// Icons
+	import VerifiedToken from '../../icons/verified_token.svelte'
 
 	//Misc
 	import { quoteCalculator, toBigNumber, stringToFixed } from '../../utils'
 
 	const { determineValues, pageStores, saveStoreValue } = getContext('pageContext')
-	const { selectedToken, tokenAmount, currencyAmount, tokenLP } = pageStores
+	const { selectedToken, tokenAmount, currencyAmount, tokenLP, isVerified } = pageStores
+
+	let tooltip = ["Rocketswap Verified Token Contract"]
 
 	$: quoteCalc = quoteCalculator($tokenLP);
 
@@ -41,11 +46,30 @@
     text-align: center;
     margin: 0.5rem 0;
   }
+  .verified-token-legend{
+		position: absolute;
+		top: 20px;
+		left: -5px;
+		width: 50px;
+		transform: translateY(-50%);
+		z-index: 2;
+    }
 
+	@media screen and (min-width: 430px) {
+		.verified-token-legend{
+			transform: translate(-42%, -67%);
+			width: 75px;
+		}
+	}
 
 </style>
 
 <div class="panel-container">
+	{#if $isVerified}
+		<div class="verified-token-legend flex row">
+			<Tooltip icon={VerifiedToken} width="100%" {tooltip}/>
+		</div>
+	{/if}
 	<slot name="header"></slot>
 	<InputCurrency 
 		label={'Base'}

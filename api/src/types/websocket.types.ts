@@ -2,7 +2,6 @@ import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { AuthenticationPayload } from "../authentication/trollbox.controller";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { UserStakingEntity } from "../entities/user-staking.entity";
-import { BlockDTO } from "./misc.types";
 import { PairEntity } from "../entities/pair.entity";
 
 export type handleClientUpdateType = (update: ClientUpdateType) => Promise<void>;

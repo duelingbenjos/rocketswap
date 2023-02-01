@@ -36,13 +36,25 @@ export class GetPairsInfoDTO {
 }
 
 export class GetBalancesDTO {
-    @ApiProperty()
+	@ApiProperty()
+	vk: string;
+}
+
+export class GetUserYieldDTO {
+	@ApiProperty()
 	vk: string;
 }
 
 export class GetUserStakingInfoDTO {
-    @ApiProperty()
+	@ApiProperty()
 	vk: string;
+}
+
+export class IBlockServiceProxyReq {
+	@ApiProperty()
+	action_name: string; // the name of your action
+	@ApiProperty()
+	args: (string | number)[];
 }
 
 // export class GetMarketcapsDTO {

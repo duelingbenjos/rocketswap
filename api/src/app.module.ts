@@ -3,7 +3,7 @@ import { TypeOrmModule, TypeOrmModuleOptions } from "@nestjs/typeorm";
 import { AppGateway } from "./app.gateway";
 import { TokenEntity } from "./entities/token.entity";
 import { AppController } from "./app.controller";
-import { ParserProvider } from "./parser.provider";
+import { DataSyncProvider } from "./data-sync.provider";
 import { BalanceEntity } from "./entities/balance.entity";
 import { PairEntity } from "./entities/pair.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -32,12 +32,15 @@ import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
 import { MarketcapEntity } from "./entities/marketcap.entity";
 import { MarketcapService } from "./services/marketcap.service";
 import { CoinGeckoAPIService } from "./services/coingecko.service";
-
+import { StakingService } from "./services/staking.service";
+import { LastBlockEntity } from "./entities/last-block.entity";
+import { log } from "./utils/logger";
+import { config, isTestnet } from "./config";
 
 const db_options: TypeOrmModuleOptions = {
 	name: "default",
 	type: "sqlite",
-	database: "database.sqlite",
+	database: `db.${config.network_name}.${config.network_type}${config.lamden_version}.sqlite`,
 	entities: [
 		TokenEntity,
 		BalanceEntity,
@@ -54,7 +57,8 @@ const db_options: TypeOrmModuleOptions = {
 		StakingEpochEntity,
 		TauMarketEntity,
 		VolumeMetricsEntity,
-		MarketcapEntity
+		MarketcapEntity,
+		LastBlockEntity
 	],
 	subscribers: [TradeSubscriber],
 	synchronize: true,
@@ -71,14 +75,13 @@ const db_options: TypeOrmModuleOptions = {
 			}
 		})
 	],
-	exports: [ParserProvider],
+	exports: [DataSyncProvider],
 	controllers: [AppController, TrollboxController],
 	providers: [
-		ParserProvider,
+		DataSyncProvider,
 		AppGateway,
 		SocketService,
-		// BsSyncService,
-		// StakingService,
+		StakingService,
 		TokensService,
 		RefreshTokensRepository,
 		JWTGuard,
@@ -92,4 +95,8 @@ const db_options: TypeOrmModuleOptions = {
 		CoinGeckoAPIService
 	]
 })
-export class AppModule {}
+export class AppModule {
+	constructor() {
+		log.log({ network_type: config.network_type });
+	}
+}

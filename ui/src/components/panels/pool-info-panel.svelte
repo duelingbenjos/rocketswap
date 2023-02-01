@@ -6,10 +6,11 @@
 
     // Icons
     import PieIcon from '../../icons/pie.svelte'
+    import IconVerifiedToken from '../../icons/verified_token.svelte'
 
     // Misc
     import { toBigNumber, quoteCalculator, stringToFixed } from '../../utils'
-    import { lpBalances } from '../../store'
+    import { lpBalances, verifiedTokens } from '../../store'
     import { config } from '../../config'
 
     const {  adjustLiquidityRedirect, removeLiquidityRedirect } = getContext("pageContext")
@@ -20,6 +21,7 @@
     $: lpTokens = $lpBalances[pairInfo.contract_name] || toBigNumber("0")
     $: lpTokenValue = quoteCalc.calcTokenValueInCurrency(lpTokens)
     $: poolPercent = quoteCalc.calcLpPercent(lpTokens)
+    $: isVerified = $verifiedTokens.includes(pairInfo.contract_name)
 
 
     const lp_percent = (contract_name, lp_total) => (balances[contract_name] / lp_total)
@@ -94,10 +96,16 @@
             <a href="{`/#/swap/${pairInfo.contract_name}`}">{pairInfo.token_symbol || "none"}</a>
             <span class="text-primary-dimmer">{pairInfo.token_name || "none"}</span>
         </div> 
-        <div class="flex-row flex-start-end flex-grow">
-            <PieIcon width="20px"/>
-            <span class="percent text-color-primary">{stringToFixed(poolPercent.multipliedBy(100), 2)}%</span>
+        <div class="flex-col flex-grow">
+            <div class="flex-row flex-start-end">
+                <PieIcon width="20px"/>
+                <span class="percent text-color-primary">{stringToFixed(poolPercent.multipliedBy(100), 2)}%</span>
+            </div>
+            {#if isVerified}
+                <IconVerifiedToken width="26px" margin="-5px 0 0 auto"/>
+            {/if}
         </div>
+
     </div>
     
     <div class="info">

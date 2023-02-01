@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, OnApplicationBootstrap } from "@nestjs/common";
 import { fillMissingEpochs, filterEpochs, getUserRewardRate, getUserYieldPerSecond } from "../utils/yield-utils";
 import { StakingEpochEntity } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
@@ -11,11 +11,10 @@ import {
 	IUserYieldPayload
 } from "../types/websocket.types";
 import { log } from "../utils/logger";
-import { ParserProvider } from "../parser.provider";
+import { DataSyncProvider } from "../data-sync.provider";
 @Injectable()
-export class SocketService {
-	constructor(private readonly parserProvider: ParserProvider) {}
-	private logger: Logger = new Logger("SocketService");
+export class SocketService implements OnApplicationBootstrap {
+	constructor(private readonly parserProvider: DataSyncProvider) {}
 
 	public handleClientUpdate: handleClientUpdateType = null;
 	public handleAuthenticateResponse: handleAuthenticateResponseType = null;
@@ -24,7 +23,7 @@ export class SocketService {
 	public staking_epochs: { [key: string]: number } = {};
 	public staking_panel_clients: string[] = [];
 
-	async afterInit() {
+	async onApplicationBootstrap() {
 		const staking_entities = await StakingMetaEntity.find({ where: { visible: true } });
 		this.staking_epochs = staking_entities.reduce((accum, entity) => {
 			accum[entity.contract_name] = entity.Epoch.index;
@@ -50,51 +49,59 @@ export class SocketService {
 		this.staking_epochs[contract_name] = index;
 	}
 
-	// public async getClientYieldList(vk: string) {
-	// 	try {
-	// 		const staking_entities = await UserStakingEntity.find({ where: { vk } });
-	// 		const payload = await staking_entities
-	// 			.filter((ent) => this.parserProvider.getActiveStakingContracts().includes(ent.staking_contract))
-	// 			.reduce(async (accumP, user_staking_entity) => {
-	// 				const accum = await accumP;
-	// 				const { staking_contract } = user_staking_entity;
-	// 				if (
-	// 					(!user_staking_entity.yield_info ||
-	// 						!Object.keys(user_staking_entity.yield_info).length ||
-	// 						user_staking_entity.yield_info.epoch_updated !== this.staking_epochs[staking_contract]) &&
-	// 					user_staking_entity.deposits.length
-	// 				) {
-	// 					const epoch_entities = await StakingEpochEntity.find({
-	// 						where: { staking_contract: staking_contract },
-	// 						take: 10000
-	// 					});
-	// 					const staking_meta_entity = await StakingMetaEntity.findOneOrFail(staking_contract);
-	// 					/** Hack here to make this work, on testnet, after multiple resyncs. */
-	// 					const epoch_entities_filtered = filterEpochs(epoch_entities);
-	// 					/** Quick fix here, since API is missing some epochs on resync */
-	// 					const epoch_entities_complete = await fillMissingEpochs(
-	// 						staking_contract,
-	// 						epoch_entities_filtered,
-	// 						staking_meta_entity.Epoch.index
-	// 					);
-	// 					epoch_entities_complete.sort((a, b) => a.epoch_index - b.epoch_index);
-	// 					// log.log(epoch_entities_complete.map((e) => e.epoch_index));
-	// 					const metrics = await this.updateClientStakingMetrics(vk, staking_contract, user_staking_entity, epoch_entities_complete);
-	// 					if (metrics && metrics[staking_contract]) {
-	// 						user_staking_entity.yield_info = metrics[staking_contract];
-	// 						await user_staking_entity.save();
-	// 						accum[staking_contract] = user_staking_entity.yield_info;
-	// 					} else {
-	// 						log.warn(`client staking metrics for staking contract : ${staking_contract}, vk : ${vk} is undefined.`);
-	// 					}
-	// 				}
-	// 				return accum;
-	// 			}, Promise.resolve({}));
-	// 		return payload;
-	// 	} catch (err) {
-	// 		log.error(err);
-	// 	}
-	// }
+	public async getClientYieldList(vk: string) {
+		try {
+			const staking_entities = await UserStakingEntity.find({ where: { vk } });
+			const payload = await staking_entities
+				.filter((ent) => this.parserProvider.getActiveStakingContracts().includes(ent.staking_contract))
+				.reduce(async (accumP, user_staking_entity) => {
+					const accum = await accumP;
+					const { staking_contract } = user_staking_entity;
+					if (
+						(!user_staking_entity.yield_info ||
+							!Object.keys(user_staking_entity.yield_info).length ||
+							user_staking_entity.yield_info?.epoch_updated !== this.staking_epochs[staking_contract]) &&
+						user_staking_entity.deposits.length
+					) {
+						const epoch_entities = await StakingEpochEntity.find({
+							where: { staking_contract: staking_contract },
+							take: 10000
+						});
+						const staking_meta_entity = await StakingMetaEntity.findOneOrFail(staking_contract);
+						/** Hack here to make this work, on testnet, after multiple resyncs. */
+						const epoch_entities_filtered = filterEpochs(epoch_entities);
+						/** Quick fix here, since API is missing some epochs on resync */
+						const epoch_entities_complete = await fillMissingEpochs(
+							staking_contract,
+							epoch_entities_filtered,
+							staking_meta_entity.Epoch.index
+						);
+						epoch_entities_complete.sort((a, b) => a.epoch_index - b.epoch_index);
+
+						const metrics = await this.updateClientStakingMetrics(
+							vk,
+							staking_contract,
+							user_staking_entity,
+							epoch_entities_complete
+						);
+						log.log({ metrics });
+						if (metrics && metrics[staking_contract]) {
+							user_staking_entity.yield_info = metrics[staking_contract];
+							await user_staking_entity.save();
+							accum[staking_contract] = user_staking_entity.yield_info;
+						} else {
+							log.warn(`client staking metrics for staking contract : ${staking_contract}, vk : ${vk} is undefined.`);
+						}
+					} else {
+						accum[staking_contract] = user_staking_entity.yield_info;
+					}
+					return accum;
+				}, Promise.resolve({}));
+			return payload;
+		} catch (err) {
+			log.error(err);
+		}
+	}
 
 	public async sendClientStakingUpdates(staking_contract: string) {
 		try {

@@ -1,5 +1,6 @@
 import { Controller, Get, HttpException, Param, Post, Query } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
+import { isTestnet } from "./config";
 import { AmmMetaEntity } from "./entities/amm-meta.entity";
 import { BalanceEntity } from "./entities/balance.entity";
 import { LpPointsEntity } from "./entities/lp-points.entity";
@@ -11,6 +12,7 @@ import { TokenEntity } from "./entities/token.entity";
 import { TradeHistoryEntity } from "./entities/trade-history.entity";
 import { UserStakingEntity } from "./entities/user-staking.entity";
 import { VolumeMetricsEntity } from "./entities/volume-metrics.entity";
+import { SocketService } from "./services/socket.service";
 import {
 	GetBalancesDTO,
 	GetMarketSummaryDTO,
@@ -18,15 +20,33 @@ import {
 	GetTokenDTO,
 	GetTradeHistoryDTO,
 	GetUserLpBalanceDTO,
-	GetUserStakingInfoDTO
+	GetUserStakingInfoDTO,
+	GetUserYieldDTO,
+	IBlockServiceProxyReq
 } from "./types/dto";
+import { proxyBlockserviceRequest } from "./utils/block-service-utils";
 import { log } from "./utils/logger";
 import { decideLogo } from "./utils/utils";
+
+const fs = require("fs");
 
 @Controller("api")
 @ApiTags("Main API")
 export class AppController {
-	constructor() {}
+	constructor(private readonly socketService: SocketService) {}
+
+	@Get("verified_tokens")
+	public async getVerifiedTokens() {
+		const path = isTestnet() ? `./src/verified_tokens_testnet.json` : `./src/verified_tokens.json`;
+		return await new Promise((resolve, reject) => {
+			fs.readFile(path, (err, data: any) => {
+				if (err) reject(err);
+				else resolve(JSON.parse(data));
+			});
+		}).catch((err) => {
+			throw new HttpException(err, 500);
+		});
+	}
 
 	@Get("amm_meta")
 	public async getAmmMeta() {
@@ -69,10 +89,10 @@ export class AppController {
 	}
 
 	@Get("get_market_summary/:contract_name")
-	public async getMarketSummary(@Query() params: GetMarketSummaryDTO) {
+	public async getMarketSummary(@Param() params: GetMarketSummaryDTO) {
 		const { contract_name } = params;
 		try {
-			return await VolumeMetricsEntity.findOne(contract_name);
+			return await VolumeMetricsEntity.findOne({ where: { contract_name } });
 		} catch (err) {
 			log.error(err);
 		}
@@ -100,7 +120,6 @@ export class AppController {
 	public async getMarketSummariesWToken() {
 		try {
 			let res = await VolumeMetricsEntity.find({ relations: ["token", "pair"] });
-
 			const fields = ["contract_name", "token_symbol", "Volume", "PrevDay", "BaseVolume", "PercentPriceIncrease_24h", "Last"];
 			const token_fields = ["token_symbol", "token_name", "token_base64_svg", "token_base64_png", "token_logo_url"];
 
@@ -203,7 +222,8 @@ export class AppController {
 	@Get("market_list")
 	public async getMarketList() {
 		try {
-			return await TokenEntity.find({ where: { has_market: true } });
+			const res = (await TokenEntity.find({ where: { has_market: true } })).filter((t) => t.token_name && t.token_symbol);
+			return res;
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}
@@ -266,10 +286,29 @@ export class AppController {
 		}
 	}
 
+	@Get("user_yield_list/:vk")
+	async getUserYieldList(@Param() params: GetUserYieldDTO): Promise<any> {
+		try {
+			return await this.socketService.getClientYieldList(params.vk);
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
 	@Get("marketcaps")
 	async getMarketcaps() {
 		try {
 			return await MarketcapEntity.find();
+		} catch (err) {
+			throw new HttpException(err, 500);
+		}
+	}
+
+	@Get("proxy_req")
+	async proxyRequest(@Query() params: IBlockServiceProxyReq) {
+		log.log({ params });
+		try {
+			return await proxyBlockserviceRequest(params);
 		} catch (err) {
 			throw new HttpException(err, 500);
 		}

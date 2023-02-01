@@ -126,12 +126,12 @@
 			/>
 		</svg>
 		<br>
-		<b>... BRB ...</b> 
-		<!-- <a
-			style="padding-top: 20px;"
+		<b>We will be back this evening after the </b> 
+		<a
+			style="padding-top: 20px; color: #fff; text-decoration: underline;"
 			target="_blank"
-			href="http://45.63.40.194:5000/">testnet</a
-		> -->
+			href="https://blog.lamden.io/arko-faq-54dc0634de62">Lamden ARKO Update</a
+		>
 	</div>
 	<canvas
 		id="canvas"
@@ -148,12 +148,6 @@
 		width: 100%;
 	}
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
 	#powered {
 		position: absolute;
 		bottom: 40px;

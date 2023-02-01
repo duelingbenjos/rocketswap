@@ -1,0 +1,37 @@
+[
+	{
+		"amount": { "__fixed__": "405.33844292" },
+		"starting_epoch": 3,
+		"time": { "__time__": [2021, 6, 12, 13, 21, 35, 0] },
+		"user_yield": 0,
+		"address": "12110815a41d49f5b4624ccf9167c3c36581f1e2fe0dbf6fa5763ba9762660f3"
+	},
+	{
+		"amount": { "__fixed__": "79.85231343" },
+		"starting_epoch": 52,
+		"time": { "__time__": [2021, 8, 10, 2, 17, 25, 0] },
+		"user_yield": 0,
+		"address": "355eb15617108c53bb0e1797be89f3d1a343754a76f3f21b8c55cc22a7895a91"
+	},
+	{
+		"amount": { "__fixed__": "433.53145933" },
+		"starting_epoch": 122,
+		"time": { "__time__": [2021, 11, 9, 2, 38, 10, 0] },
+		"user_yield": 0,
+		"address": "bd3688016a9b33bffcf127050d38a86f4469e8de5a393ae2909007ece4ac7e43"
+	},
+	{
+		"amount": { "__fixed__": "2155453.94508844" },
+		"starting_epoch": 1,
+		"time": { "__time__": [2021, 6, 10, 22, 26, 47, 0] },
+		"user_yield": 0,
+		"address": "c73cb3a8c6489122a594ecc1725404f81b558ac9a8c7320da228e1f8426e332c"
+	},
+	{
+		"amount": { "__fixed__": "20039.84229445" },
+		"starting_epoch": 2,
+		"time": { "__time__": [2021, 6, 10, 23, 41, 18, 0] },
+		"user_yield": 0,
+		"address": "fb9217abf0536880ccb8fd263330130f99619392cd68dca62dda7a3e395b6397"
+	}
+]

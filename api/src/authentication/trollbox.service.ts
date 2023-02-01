@@ -18,7 +18,7 @@ export class AuthService {
 		const auth_state = state.find(
 			(kvp) =>
 				kvp.key.split(":")[0] ===
-				`${config.identityContract}.auth_codes`
+				`${config.identity_contract}.auth_codes`
 		);
 		const auth_code = auth_state.key.split(":")[1];
 		const vk = auth_state.value;
