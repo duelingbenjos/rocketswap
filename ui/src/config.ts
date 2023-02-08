@@ -35,14 +35,14 @@ export const stamps = {
   approve_liquidity: 80,
   addStakingTokens: 120,
   stakeFromContractProfits: 1000,
-  withdrawTokensAndYield: 150,
-  withdrawYield: 150,
+  withdrawTokensAndYield: 350,
+  withdrawYield: 350,
   stake: 200,
   buy: 105,
   auth: 35,
   approve: 30,
   buffer: 40,
-  currentRatio: 13 //Change for PROD
+  currentRatio: 62 //Change for PROD
 }
 
 export const config = {
