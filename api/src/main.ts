@@ -8,7 +8,7 @@ const fs = require("fs");
 
 let options: NestApplicationOptions = {};
 
-const cors_whitelist = ['https://lamden.io', 'https://www.onlyluck.net', 'https://rocketswap.exchange', 'https://taurusnft.art', 'http://localhost', 'localhost', 'http//localhost:5002', '0.0.0.0']
+const cors_whitelist = ['https://lamden.io', 'https://www.onlyluck.net', 'https://rocketswap.exchange', 'https://taurusnft.art', 'http://localhost', 'localhost', 'http://localhost:5002', '0.0.0.0']
 
 var cors_options = {
 	origin: function (origin, callback) {
