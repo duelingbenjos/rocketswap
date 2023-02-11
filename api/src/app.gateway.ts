@@ -43,7 +43,7 @@ import { datetimeToUnix } from "./utils/yield-utils";
  * Gateway uses socket.io v2^
  * https://socket.io/docs/v2/server-api/
  */
-@WebSocketGateway({ origin: "*", cors: { origins: ["*", "staging.rocketswap.exchange"] } })
+@WebSocketGateway({ origin: "*", cors: { origins: ["*", "staging.rocketswap.exchange", "localhost", "portal.rocketswap.exchange"] } })
 export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger = new Logger("AppGateway");
 
