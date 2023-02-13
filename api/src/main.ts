@@ -8,30 +8,39 @@ const fs = require("fs");
 
 let options: NestApplicationOptions = {};
 
-const cors_whitelist = ['https://lamden.io', 'https://www.onlyluck.net', 'https://rocketswap.exchange', 'https://taurusnft.art', 'http://localhost', 'localhost', 'http://localhost:5002', '0.0.0.0']
+const cors_whitelist = [
+	"https://lamden.io",
+	"https://www.onlyluck.net",
+	"https://rocketswap.exchange",
+	"https://taurusnft.art",
+	"http://localhost",
+	"localhost",
+	"http://localhost:5002",
+	"0.0.0.0",
+	"https://portal.rocketswap.exchange"
+];
 
 var cors_options = {
-	origin: function (origin, callback) {
-	  if (cors_whitelist.indexOf(origin) !== -1 || !origin) {
-		callback(null, true)
-	  } else {
-		callback(log.log(`CORS Request blocked from origin : ${origin}`))
-	  }
+	origin: function(origin, callback) {
+		if (cors_whitelist.indexOf(origin) !== -1 || !origin) {
+			callback(null, true);
+		} else {
+			callback(log.log(`CORS Request blocked from origin : ${origin}`));
+		}
 	}
-  }
-
+};
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, options);
 	const config = new DocumentBuilder()
-	.setTitle("Rocketswap API Documentation")
-	.setDescription("Details of the Rocketswap REST API. Further documentation can be found @ https://rocketswap.exchange/docs/")
-	.setVersion("1.0")
-	.build();
+		.setTitle("Rocketswap API Documentation")
+		.setDescription("Details of the Rocketswap REST API. Further documentation can be found @ https://rocketswap.exchange/docs/")
+		.setVersion("1.0")
+		.build();
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup("api_docs", app, document);
 
-	app.use(cors(cors_options))
+	app.use(cors(cors_options));
 	await app.listen(2053);
 }
 bootstrap();
