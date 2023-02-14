@@ -248,8 +248,8 @@ export class AppController {
 		const contract_names_arr = contract_names.split(",");
 		if (!contract_names_arr.length) throw "Invalid contract_names provided.";
 		try {
-			if (contract_names_arr.length > 20) {
-				throw "You may only request a maximum of 20 pairs at a time.";
+			if (contract_names_arr.length > 40) {
+				throw "You may only request a maximum of 40 pairs at a time.";
 			}
 			const pair_proms: Promise<PairEntity>[] = contract_names_arr.map((contract_name) => {
 				return new Promise(async (resolve) => {
