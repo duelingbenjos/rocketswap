@@ -32,6 +32,9 @@ routes.set({
     $$component: Farm,
     $$name: 'Farm'
   },
+  '/leaderboard': {
+    $$name: 'Leaderboard',
+  },
   '/help/': {
     $$component: Help,
     $$name: 'Help'

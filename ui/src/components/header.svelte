@@ -21,11 +21,12 @@
 	import { mainMenuOpen, rswpPriceUSD, walletAddress, tauUSDPrice } from '../store'
 	import { config } from '../config'
 	import { stringToFixed } from '../utils'
+  import { prevent_default } from 'svelte/internal'
 
 	const { themeToggle, currentThemeName } = getContext('app')
 
 	let links
-	let menuItems = ["Home", "Swap", "Pools", "$RSWP", "Farm", "Help"]
+	let menuItems = ["Home", "Swap", "Pools", "$RSWP", "Farm", "Leaderboard", "Help"]
 	$: links = Object.values($routes)
 
 	const handleLinkClick = () => mainMenuOpen.set(false)
@@ -213,12 +214,20 @@
 	<div class="right-content flex-row flex-align-center flex-grow">
 		<div class="links flex-row">
 			{#each links as e}
-				{#if menuItems.includes(e.$$name)}
+				{#if e.$$name === "Leaderboard"}
+					<a href={"https://leaderboard.rocketswap.exchange"}
+					target="_blank"
+					rel="noopener noreferrer"
+					> 
+					Leaderboard
+					</a> 
+				{:else if menuItems.includes(e.$$name)}
 					<a class:active={e === $active} href={e.$$href}> 
 						{e.$$name} 
 					</a> 
 				{/if}
 			{/each}
+			
 		</div>
 		<LightDark />
 	</div>
@@ -234,7 +243,17 @@
 				/>
 			</div>
 			{#each links as e}
-				{#if menuItems.includes(e.$$name)}
+				{#if e.$$name === "Leaderboard"}
+					<div class="mobile-link flex-row flex-center-center">
+						<a  class=" text-large weight-400"
+						href={"https://leaderboard.rocketswap.exchange"}
+						target="_blank"
+						rel="noopener noreferrer"
+						> 
+						Leaderboard
+						</a> 
+					</div>
+				{:else if menuItems.includes(e.$$name)}
 					<div class="mobile-link flex-row flex-center-center">
 						<a  class=" text-large weight-400"
 							class:active={e === $active} 
