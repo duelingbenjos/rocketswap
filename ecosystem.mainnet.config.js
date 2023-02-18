@@ -1,11 +1,11 @@
 module.exports = {
 	apps: [
 		{
-			name: "ui",
+			name: "rs-ui",
 			script: "cd ./ui && npm run prod",
 		},
 		{
-			name: "api",
+			name: "rs-api",
 			script: "cd ./api && npm run start",
 			env: {
 				MASTERNODE_URL: "https://arko-mn-3.lamden.io",
@@ -18,7 +18,7 @@ module.exports = {
 			}
 		},
 		{
-			name: "docs",
+			name: "rs-docs",
 			script: "cd ./docs && npm run serve"
 		},
 	]
