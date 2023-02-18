@@ -224,7 +224,7 @@ export class WalletService {
 			methodName: method,
 			networkType: connectionRequest.networkType,
 			networkName: 'arko',
-			stampLimit: stamps,
+			// stampLimit: stamps,
 			kwargs: args
 		}
 	}
