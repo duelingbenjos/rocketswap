@@ -13,7 +13,7 @@ interface IApiConfig {
 	block_service_urls: string[];
 	lamden_version: "v1" | "v2";
 	network_name: string;
-	lusd_token: string
+	lusd_token: string;
 }
 
 /**
@@ -63,7 +63,7 @@ export const config_prod: IApiConfig = {
 	network_type: process.env.NETWORK_TYPE || "mainnet",
 	network_name: process.env.NETWORK_NAME || "lamden",
 	staking_contract_submittor: "7c296eb80e379171f694a3c5be7640d16f300f09d731c99ac0a92f49c9c0c151",
-	block_service_urls: process.env.block_service_urls?.split(",") || ["arko-bs-2.lamden.io","arko-bs-3.lamden.io","arko-bs-1.lamden.io"],
+	block_service_urls: process.env.block_service_urls?.split(",") || ["arko-bs-1.lamden.io","arko-bs-2.lamden.io", "arko-bs-3.lamden.io"],
 	lamden_version: "v2"
 };
 
