@@ -5,7 +5,7 @@ import { PairEntity } from "../entities/pair.entity";
 import { createNewEpoch } from "../entities/staking-epoch.entity";
 import { StakingMetaEntity } from "../entities/staking-meta.entity";
 import { getTokenData, saveToken } from "../entities/token.entity";
-import { ITrade, parseTrades, saveTradesToDb } from "../entities/trade-history.entity";
+import { parseTrades, saveTradesToDb } from "../entities/trade-history.entity";
 import { syncUserStakingData } from "../entities/user-staking.entity";
 import { BlockService } from "../services/block.service";
 import { handleNewBlock, T_ParseBlockFn } from "../socket-client.provider";
